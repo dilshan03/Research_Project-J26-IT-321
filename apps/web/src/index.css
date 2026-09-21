@@ -1,0 +1,205 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Tailwind Integration for the Custom Theme */
+  --color-mq-bg: #F4F8FB;
+  --color-mq-surface: #FFFFFF;
+  --color-mq-surface-soft: #EEF6FB;
+  
+  /* Surfaces */
+  --color-mq-surface-blue: #E9F3FF;
+  --color-mq-surface-green: #EAF8F2;
+  --color-mq-surface-yellow: #FFF7E3;
+  --color-mq-surface-purple: #F3EEFF;
+  --color-mq-surface-pink: #FFF0F4;
+  
+  /* Primary & Secondary */
+  --color-mq-primary: #3C82B4;
+  --color-mq-primary-hover: #2E6F9D;
+  --color-mq-primary-dark: #275F88;
+  --color-mq-secondary: #63B7AF;
+  
+  /* Text */
+  --color-mq-text: #16324A;
+  --color-mq-text-strong: #0D2340;
+  --color-mq-text-muted: #5F7488;
+  
+  /* Borders */
+  --color-mq-border: #D6E4ED;
+  --color-mq-border-strong: #BFD2DF;
+  
+  /* Accents */
+  --color-mq-accent-yellow: #F3B944;
+  --color-mq-accent-green: #4FBF8F;
+  --color-mq-accent-purple: #8D6CE7;
+  --color-mq-accent-pink: #EB7E9E;
+  
+  /* Feedback */
+  --color-mq-success: #4E9B78;
+  --color-mq-warning: #D9A441;
+  --color-mq-danger: #C96868;
+  --color-mq-info: #4D8EF7;
+  
+  /* Fonts */
+  --font-lexend: 'Lexend', 'Segoe UI', sans-serif;
+  --font-sinhala: 'Noto Sans Sinhala', 'Segoe UI', sans-serif;
+}
+
+:root {
+  /* Keep raw CSS variables for custom components */
+  --mq-bg: #F4F8FB;
+  --mq-surface: #FFFFFF;
+  --mq-surface-soft: #EEF6FB;
+  --mq-surface-blue: #E9F3FF;
+  --mq-primary: #3C82B4;
+  --mq-primary-hover: #2E6F9D;
+  --mq-primary-dark: #275F88;
+  --mq-secondary: #63B7AF;
+  --mq-text: #16324A;
+  --mq-text-strong: #0D2340;
+  --mq-text-muted: #5F7488;
+  --mq-border: #D6E4ED;
+  --mq-border-strong: #BFD2DF;
+  
+  --mq-success: #4E9B78;
+  --mq-success-bg: #EAF7F0;
+  --mq-warning: #D9A441;
+  --mq-warning-bg: #FFF7E3;
+  --mq-danger: #C96868;
+  --mq-danger-bg: #FDEEEE;
+  --mq-info: #4D8EF7;
+  --mq-info-bg: #EAF2FF;
+  
+  --mq-radius-md: 14px;
+  --mq-radius-lg: 18px;
+  --mq-radius-xl: 24px;
+  --mq-radius-full: 999px;
+  
+  --mq-shadow-sm: 0 4px 14px rgba(39, 95, 136, 0.08);
+  --mq-shadow-md: 0 10px 28px rgba(39, 95, 136, 0.10);
+  
+  --mq-transition: 180ms ease;
+}
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--mq-bg);
+    color: var(--mq-text);
+    font-family: var(--font-lexend);
+    font-size: 16px;
+    line-height: 1.65;
+    letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  [lang='si'], .si, .sinhala {
+    font-family: var(--font-sinhala);
+    line-height: 1.8;
+  }
+  h1,h2,h3,h4,h5,h6 {
+    color: var(--mq-text-strong);
+    font-weight: 700;
+  }
+}
+
+/* ---------- Custom Components (from your CSS) ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  min-height: 40px;
+  padding: .5rem 1.25rem;
+  border: 1px solid transparent;
+  border-radius: var(--mq-radius-full);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--mq-transition);
+}
+.btn-primary { 
+  background: var(--mq-primary); 
+  color: #fff; 
+  box-shadow: var(--mq-shadow-sm); 
+}
+.btn-primary:hover { 
+  background: var(--mq-primary-hover); 
+  transform: translateY(-2px); 
+}
+.btn-secondary { 
+  background: var(--mq-surface); 
+  color: var(--mq-primary-dark); 
+  border-color: var(--mq-border-strong); 
+}
+.btn-secondary:hover { 
+  background: var(--mq-surface-soft); 
+  border-color: var(--mq-primary); 
+}
+
+/* Custom pills & alerts from your CSS */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .45rem .75rem;
+  border-radius: var(--mq-radius-full);
+  font-size: .75rem;
+  font-weight: 700;
+  background: var(--mq-surface-soft);
+  color: var(--mq-primary-dark);
+  border: 1px solid var(--mq-border);
+}
+
+/* ---------- Custom Animations ---------- */
+@keyframes morph {
+  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50% { border-radius: 30% 70% 70% 30% / 30% 60% 40% 70%; }
+  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+}
+
+@keyframes morph-square {
+  0% { border-radius: 20% 50% 30% 40% / 30% 40% 20% 50%; }
+  50% { border-radius: 30% 40% 40% 30% / 40% 30% 30% 40%; }
+  100% { border-radius: 20% 50% 30% 40% / 30% 40% 20% 50%; }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-morph { animation: morph 8s ease-in-out infinite; }
+.animate-morph-square { animation: morph-square 9s ease-in-out infinite; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-float-delayed { animation: float 6s ease-in-out 3s infinite; }
+.animate-fade-in { 
+  animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+  opacity: 0; 
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

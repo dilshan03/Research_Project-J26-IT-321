@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const Navbar = () => {
   return (
@@ -25,9 +26,9 @@ export const Navbar = () => {
       </div>
 
       <div className="flex space-x-4">
-        <button className="btn btn-secondary">
+        <Link to="/sign-in" className="btn btn-secondary">
           Sign In
-        </button>
+        </Link>
         <button className="btn btn-primary">
           Start Learning <ArrowRight size={18} strokeWidth={3} />
         </button>

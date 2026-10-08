@@ -5,9 +5,11 @@ import { AuthLayout } from '../components/AuthLayout';
 import { AuthInput } from '../components/AuthInput';
 import { PasswordInput } from '../components/PasswordInput';
 import { authService } from '../services/authService';
+import { useAuth } from '../hooks/useAuth';
 
 export const SignInPage: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -52,10 +54,19 @@ export const SignInPage: React.FC = () => {
     setIsLoading(false);
 
     if (response.success) {
+      const userEmail = email.trim();
+      const userName = userEmail.split('@')[0];
+      login({
+        id: 'user-id-1',
+        fullName: userName.charAt(0).toUpperCase() + userName.slice(1),
+        email: userEmail,
+        role: 'parent',
+      });
+
       setSuccessMessage(response.message || 'Sign in successful! Redirecting...');
       setTimeout(() => {
         navigate('/');
-      }, 1200);
+      }, 1000);
     } else {
       setGlobalError(
         response.error?.message || response.message || 'Sign in failed. Please try again.'

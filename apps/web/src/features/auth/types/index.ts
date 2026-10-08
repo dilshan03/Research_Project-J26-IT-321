@@ -1,5 +1,12 @@
 export type UserRole = 'parent' | 'teacher';
 
+export interface User {
+  id: string;
+  fullName: string;
+  email: string;
+  role: UserRole;
+}
+
 export interface SignInCredentials {
   email: string;
   password: string;

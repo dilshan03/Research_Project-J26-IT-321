@@ -4,8 +4,8 @@ import heroImage from '../../../assets/images/public-pages/home/section-1-hero/h
 
 export const HeroSection = () => {
   return (
-    <section className="relative pt-6 pb-0 overflow-hidden bg-gradient-to-b from-mq-surface-soft to-mq-surface">
-      <div className="max-w-[1400px] mx-auto px-8 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+    <section className="relative pt-6 pb-0 overflow-hidden bg-gradient-to-b from-mq-surface-soft to-mq-surface w-full max-w-full">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
         {/* Left Column */}
         <div className="space-y-5 max-w-2xl">
           {/* Badge */}
@@ -74,11 +74,11 @@ export const HeroSection = () => {
         </div>
 
         {/* Right Column (Hero Graphic with Distinct Liquid Blobs) */}
-        <div className="relative w-full max-w-[450px] lg:max-w-[500px] aspect-square mx-auto flex items-center justify-center animate-fade-in delay-300 mt-8 lg:-mt-12 p-2">
+        <div className="relative w-full max-w-[380px] sm:max-w-[450px] lg:max-w-[480px] aspect-square mx-auto flex items-center justify-center animate-fade-in delay-300 mt-8 lg:-mt-12 p-2 overflow-hidden">
           
-          {/* Transparent Liquid Blob 1 (Yatin dapu transparent layer eka) */}
+          {/* Transparent Liquid Blob 1 */}
           <div 
-            className="absolute inset-[-4%] bg-mq-primary/20 animate-morph-square -z-20" 
+            className="absolute inset-0 scale-105 bg-mq-primary/20 animate-morph-square -z-20" 
             style={{ animationDuration: '12s' }}
           ></div>
           

@@ -1,0 +1,12 @@
+export { idle } from './idle';
+export { wave } from './wave';
+export { smallHint } from './smallHint';
+export { guidedHint } from './guidedHint';
+export { explain } from './explain';
+export { pointLeft } from './pointLeft';
+export { pointRight } from './pointRight';
+export { thinking } from './thinking';
+export { correctCelebrate } from './correctCelebrate';
+export { tryAgain } from './tryAgain';
+export { encourage } from './encourage';
+export { clap } from './clap';

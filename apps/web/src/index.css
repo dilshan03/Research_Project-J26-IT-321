@@ -108,52 +108,54 @@
 }
 
 /* ---------- Custom Components (from your CSS) ---------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: .5rem;
-  min-height: 40px;
-  padding: .5rem 1.25rem;
-  border: 1px solid transparent;
-  border-radius: var(--mq-radius-full);
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all var(--mq-transition);
-}
-.btn-primary { 
-  background: var(--mq-primary); 
-  color: #fff; 
-  box-shadow: var(--mq-shadow-sm); 
-}
-.btn-primary:hover { 
-  background: var(--mq-primary-hover); 
-  transform: translateY(-2px); 
-}
-.btn-secondary { 
-  background: var(--mq-surface); 
-  color: var(--mq-primary-dark); 
-  border-color: var(--mq-border-strong); 
-}
-.btn-secondary:hover { 
-  background: var(--mq-surface-soft); 
-  border-color: var(--mq-primary); 
-}
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    min-height: 36px;
+    padding: .5rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--mq-radius-full);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--mq-transition);
+  }
+  .btn-primary { 
+    background: var(--mq-primary); 
+    color: #fff; 
+    box-shadow: var(--mq-shadow-sm); 
+  }
+  .btn-primary:hover { 
+    background: var(--mq-primary-hover); 
+    transform: translateY(-2px); 
+  }
+  .btn-secondary { 
+    background: var(--mq-surface); 
+    color: var(--mq-primary-dark); 
+    border-color: var(--mq-border-strong); 
+  }
+  .btn-secondary:hover { 
+    background: var(--mq-surface-soft); 
+    border-color: var(--mq-primary); 
+  }
 
-/* Custom pills & alerts from your CSS */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: .4rem;
-  padding: .45rem .75rem;
-  border-radius: var(--mq-radius-full);
-  font-size: .75rem;
-  font-weight: 700;
-  background: var(--mq-surface-soft);
-  color: var(--mq-primary-dark);
-  border: 1px solid var(--mq-border);
+  /* Custom pills & alerts from your CSS */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .45rem .75rem;
+    border-radius: var(--mq-radius-full);
+    font-size: .75rem;
+    font-weight: 700;
+    background: var(--mq-surface-soft);
+    color: var(--mq-primary-dark);
+    border: 1px solid var(--mq-border);
+  }
 }
 
 /* ---------- Custom Animations ---------- */

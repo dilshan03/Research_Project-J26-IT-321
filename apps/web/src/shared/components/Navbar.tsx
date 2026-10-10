@@ -9,48 +9,45 @@ export const Navbar = () => {
 
   return (
     <nav className="w-full bg-mq-surface/95 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-mq-border">
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-3 sm:gap-4 min-w-0">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 lg:px-6 xl:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-2 lg:gap-3 xl:gap-6 min-w-0">
         {/* Left: Branding */}
-        <Link to="/" className="flex flex-col shrink-0 text-left group">
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center">
+        <Link to="/" className="flex flex-col shrink-0 min-w-0 text-left group">
+          <h1 className="text-xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight flex items-center">
             <span className="text-mq-primary-dark">Math</span>
             <span className="text-mq-secondary">Quest</span>
-            <span className="text-mq-accent-yellow ml-1 text-3xl sm:text-4xl leading-none -mt-3">*</span>
+            <span className="text-mq-accent-yellow ml-0.5 sm:ml-1 text-2xl sm:text-3xl xl:text-4xl leading-none -mt-2 sm:-mt-2.5 xl:-mt-3">*</span>
           </h1>
-          <span className="text-mq-text-muted text-[10px] sm:text-xs font-semibold tracking-widest uppercase mt-0.5 whitespace-nowrap">
+          <span className="text-mq-text-muted text-[9px] sm:text-[10px] xl:text-xs font-semibold tracking-wider xl:tracking-widest uppercase mt-0.5 whitespace-nowrap">
             Small Steps Big Progress
           </span>
         </Link>
 
         {/* Center: Desktop Navigation Links (Visible on lg screens 1024px+) */}
-        <div className="hidden lg:flex items-center space-x-3 xl:space-x-6 font-semibold text-mq-text text-xs xl:text-[15px] shrink-0">
-          <a href="#" className="text-mq-primary relative font-bold whitespace-nowrap">
+        <div className="hidden lg:flex items-center gap-1.5 xl:gap-3 2xl:gap-5 font-semibold text-mq-text text-xs xl:text-[14px] 2xl:text-[15px] min-w-0">
+          <a href="#" className="text-mq-primary relative font-bold whitespace-nowrap px-1.5 py-1 xl:px-2.5">
             Home
-            <span className="absolute -bottom-1.5 left-0 w-full h-[3px] bg-mq-primary rounded-full"></span>
+            <span className="absolute bottom-0 left-1.5 right-1.5 xl:left-2.5 xl:right-2.5 h-[2.5px] bg-mq-primary rounded-full"></span>
           </a>
-          <a href="#" className="hover:text-mq-primary transition whitespace-nowrap">
-            How It Works
-          </a>
-          <a href="#" className="hover:text-mq-primary transition whitespace-nowrap">
+          <a href="#" className="hover:text-mq-primary transition-colors whitespace-nowrap px-1.5 py-1 xl:px-2.5">
             Features
           </a>
-          <a href="#" className="hover:text-mq-primary transition whitespace-nowrap">
+          <a href="#" className="hover:text-mq-primary transition-colors whitespace-nowrap px-1.5 py-1 xl:px-2.5">
             For Parents & Teachers
           </a>
-          <a href="#" className="hover:text-mq-primary transition whitespace-nowrap">
+          <a href="#" className="hover:text-mq-primary transition-colors whitespace-nowrap px-1.5 py-1 xl:px-2.5">
             About
           </a>
-          <a href="#" className="hover:text-mq-primary transition whitespace-nowrap">
+          <a href="#" className="hover:text-mq-primary transition-colors whitespace-nowrap px-1.5 py-1 xl:px-2.5">
             Contact
           </a>
         </div>
 
         {/* Right: Authentication & Action Buttons (Visible on lg screens 1024px+) */}
-        <div className="hidden lg:flex items-center space-x-2.5 shrink-0">
+        <div className="hidden lg:flex items-center gap-1.5 xl:gap-2.5 shrink-0">
           {isAuthenticated && user ? (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-1.5 xl:gap-2">
               {/* Compact User Profile Badge */}
-              <div className="flex items-center gap-1.5 px-2 py-1 bg-mq-surface-blue border border-mq-border rounded-full shadow-sm max-w-[130px] xl:max-w-[160px] shrink-0">
+              <div className="flex items-center gap-1.5 px-2 py-1 bg-mq-surface-blue border border-mq-border rounded-full shadow-sm max-w-[115px] xl:max-w-[155px] shrink-0">
                 <div className="w-5 h-5 xl:w-6 xl:h-6 bg-mq-primary text-white rounded-full flex items-center justify-center font-bold text-[10px] xl:text-xs shrink-0">
                   {user.fullName ? user.fullName.charAt(0).toUpperCase() : <UserIcon size={12} />}
                 </div>
@@ -58,7 +55,7 @@ export const Navbar = () => {
                   <span className="text-[11px] xl:text-xs font-bold text-mq-text-strong leading-tight truncate">
                     {user.fullName || user.email.split('@')[0]}
                   </span>
-                  <span className="text-[9px] xl:text-[10px] font-semibold text-mq-primary capitalize leading-none">
+                  <span className="text-[8px] xl:text-[9px] font-semibold text-mq-primary capitalize leading-none">
                     {user.role}
                   </span>
                 </div>
@@ -67,7 +64,7 @@ export const Navbar = () => {
               {/* Sign Out Button */}
               <button
                 onClick={logout}
-                className="btn btn-secondary text-xs py-1.5 px-2.5 xl:px-3 rounded-full flex items-center gap-1 text-mq-text-muted hover:text-mq-danger hover:border-mq-danger/40 transition-colors whitespace-nowrap shrink-0"
+                className="btn btn-secondary text-xs py-1.5 px-2 xl:px-3 rounded-full flex items-center gap-1 text-mq-text-muted hover:text-mq-danger hover:border-mq-danger/40 transition-colors whitespace-nowrap shrink-0"
                 title="Sign Out"
               >
                 <LogOut size={13} />
@@ -75,21 +72,21 @@ export const Navbar = () => {
               </button>
             </div>
           ) : (
-            <Link to="/sign-in" className="btn btn-secondary text-xs xl:text-sm py-1.5 px-3 whitespace-nowrap shrink-0">
+            <Link to="/sign-in" className="btn btn-secondary text-xs xl:text-sm py-1.5 px-2.5 xl:px-3.5 whitespace-nowrap shrink-0">
               Sign In
             </Link>
           )}
 
-          <button className="btn btn-primary text-xs xl:text-sm py-1.5 px-3.5 whitespace-nowrap shrink-0">
-            Start Learning <ArrowRight size={15} strokeWidth={3} />
+          <button className="btn btn-primary text-xs xl:text-sm py-1.5 px-2.5 xl:px-3.5 whitespace-nowrap shrink-0">
+            Start Learning <ArrowRight size={14} className="xl:w-[15px] xl:h-[15px]" strokeWidth={3} />
           </button>
         </div>
 
         {/* Hamburger Menu Button & Mobile/Tablet Action (Visible below lg screens < 1024px) */}
-        <div className="flex items-center space-x-2 lg:hidden shrink-0">
+        <div className="flex items-center gap-2 lg:hidden shrink-0">
           {/* Quick Action Button on Tablet */}
           <button className="hidden sm:inline-flex btn btn-primary text-xs py-1.5 px-3 whitespace-nowrap">
-            Start Learning <ArrowRight size={14} />
+            Start Learning <ArrowRight size={14} strokeWidth={3} />
           </button>
 
           <button
@@ -108,9 +105,6 @@ export const Navbar = () => {
           <div className="flex flex-col space-y-2.5 font-semibold text-mq-text text-sm">
             <a href="#" className="text-mq-primary font-bold py-1" onClick={() => setIsMobileMenuOpen(false)}>
               Home
-            </a>
-            <a href="#" className="hover:text-mq-primary py-1" onClick={() => setIsMobileMenuOpen(false)}>
-              How It Works
             </a>
             <a href="#" className="hover:text-mq-primary py-1" onClick={() => setIsMobileMenuOpen(false)}>
               Features

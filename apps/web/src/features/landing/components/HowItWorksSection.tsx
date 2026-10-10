@@ -27,10 +27,10 @@ export const HowItWorksSection = () => {
         </svg>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-8 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-6 mb-10 animate-fade-in">
+        <div className="text-center max-w-3xl mx-auto space-y-4 sm:space-y-6 mb-8 sm:mb-10 animate-fade-in">
           <div className="flex items-center justify-center gap-4">
             <span className="w-8 h-[2px] bg-mq-border-strong"></span>
             <span className="px-5 py-2 bg-mq-surface-blue text-mq-primary font-bold rounded-full text-sm tracking-wide">
@@ -39,11 +39,11 @@ export const HowItWorksSection = () => {
             <span className="w-8 h-[2px] bg-mq-border-strong"></span>
           </div>
           
-          <h2 className="text-[2.5rem] md:text-[3.2rem] font-extrabold text-mq-text-strong leading-[1.2] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl md:text-[3.2rem] font-extrabold text-mq-text-strong leading-[1.2] tracking-tight">
             A Smarter Learning Journey <br className="hidden md:block"/> Designed <span className="text-mq-primary">Around the Learner</span>
           </h2>
           
-          <p className="text-lg text-mq-text-muted font-medium">
+          <p className="text-base sm:text-lg text-mq-text-muted font-medium">
             MathQuest combines learner data, adaptive content, behavioural insights and intelligent support to create a personalized mathematics learning experience.
           </p>
         </div>
@@ -143,7 +143,7 @@ export const HowItWorksSection = () => {
       </div>
 
       {/* Bottom Text with Wave Background */}
-      <div className="relative w-full mt-4 py-24 px-8">
+      <div className="relative w-full mt-4 py-16 sm:py-24 px-4 sm:px-8">
         {/* SVG Wave Background */}
         <div className="absolute inset-0 w-full h-full pointer-events-none">
           <svg viewBox="0 0 1440 320" preserveAspectRatio="none" className="w-full h-full">
@@ -151,19 +151,19 @@ export const HowItWorksSection = () => {
           </svg>
         </div>
         
-        <div className="max-w-[1400px] mx-auto text-center relative z-10">
+        <div className="max-w-[1400px] mx-auto text-center relative z-10 px-4">
           <div className="animate-fade-in delay-500">
-            <p className="text-mq-text-soft uppercase tracking-widest text-sm font-bold mb-3 flex items-center justify-center gap-4">
-              <span className="w-12 h-[2px] bg-mq-border-strong"></span>
+            <p className="text-mq-text-soft uppercase tracking-widest text-xs sm:text-sm font-bold mb-3 flex items-center justify-center gap-3 sm:gap-4">
+              <span className="w-8 sm:w-12 h-[2px] bg-mq-border-strong"></span>
               Same Goal
-              <span className="w-12 h-[2px] bg-mq-border-strong"></span>
+              <span className="w-8 sm:w-12 h-[2px] bg-mq-border-strong"></span>
             </p>
-            <h2 className="text-3xl font-extrabold text-mq-text-strong flex items-center justify-center gap-3 flex-wrap">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--mq-accent-yellow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-              More Confident Learners, Brighter Futures
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--mq-accent-yellow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-mq-text-strong flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--mq-accent-yellow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+              <span>More Confident Learners, Brighter Futures</span>
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--mq-accent-yellow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
             </h2>
-            <p className="text-mq-text-muted font-medium text-lg mt-6">
+            <p className="text-mq-text-muted font-medium text-base sm:text-lg mt-4 sm:mt-6">
               Step by step, MathQuest helps every learner reach their full potential.
             </p>
           </div>

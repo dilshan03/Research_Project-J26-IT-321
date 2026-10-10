@@ -26,10 +26,10 @@ export const WhyMathQuestSection = () => {
       </div>
 
 
-      <div className="max-w-[1400px] mx-auto px-8 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-6 mb-16 animate-fade-in">
+        <div className="text-center max-w-3xl mx-auto space-y-4 sm:space-y-6 mb-12 sm:mb-16 animate-fade-in">
           <div className="flex items-center justify-center gap-4">
             <span className="w-8 h-[2px] bg-mq-border-strong"></span>
             <span className="px-5 py-2 bg-mq-surface-blue text-mq-primary font-bold rounded-full text-sm tracking-wide">
@@ -38,11 +38,11 @@ export const WhyMathQuestSection = () => {
             <span className="w-8 h-[2px] bg-mq-border-strong"></span>
           </div>
           
-          <h2 className="text-[2.5rem] md:text-[3.2rem] font-extrabold text-mq-text-strong leading-[1.2] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl md:text-[3.2rem] font-extrabold text-mq-text-strong leading-[1.2] tracking-tight">
             Learning Mathematics <br className="hidden md:block" /> <span className="text-mq-primary">Shouldn't</span> Feel Overwhelming
           </h2>
           
-          <p className="text-lg text-mq-text-muted font-medium">
+          <p className="text-base sm:text-lg text-mq-text-muted font-medium">
             Many children, especially those who need ADHD-related learning support, face unique challenges when learning mathematics. MathQuest is designed to address these real-world difficulties.
           </p>
         </div>
@@ -51,7 +51,7 @@ export const WhyMathQuestSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
           {/* Card 1: Pink */}
-          <div className="bg-mq-surface-pink rounded-[2rem] p-8 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm animate-fade-in delay-100">
+          <div className="bg-mq-surface-pink rounded-[2rem] p-6 sm:p-8 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm animate-fade-in delay-100">
             <div className="w-full aspect-[4/3] rounded-2xl mb-6 overflow-hidden">
               <img src={imgLongInstructions} alt="Long Instructions" className="w-full h-full object-contain hover:scale-105 transition-transform duration-500" />
             </div>
@@ -62,7 +62,7 @@ export const WhyMathQuestSection = () => {
           </div>
 
           {/* Card 2: Blue */}
-          <div className="bg-mq-surface-blue rounded-[2rem] p-8 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm animate-fade-in delay-200">
+          <div className="bg-mq-surface-blue rounded-[2rem] p-6 sm:p-8 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm animate-fade-in delay-200">
             <div className="w-full aspect-[4/3] rounded-2xl mb-6 overflow-hidden">
               <img src={imgDifficultyStaying} alt="Difficulty Staying Focused" className="w-full h-full object-contain hover:scale-105 transition-transform duration-500" />
             </div>
@@ -73,7 +73,7 @@ export const WhyMathQuestSection = () => {
           </div>
 
           {/* Card 3: Green */}
-          <div className="bg-mq-surface-green rounded-[2rem] p-8 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm animate-fade-in delay-300">
+          <div className="bg-mq-surface-green rounded-[2rem] p-6 sm:p-8 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm animate-fade-in delay-300">
             <div className="w-full aspect-[4/3] rounded-2xl mb-6 overflow-hidden">
               <img src={imgSameSupport} alt="Same Support for Everyone" className="w-full h-full object-contain hover:scale-105 transition-transform duration-500" />
             </div>
@@ -84,7 +84,7 @@ export const WhyMathQuestSection = () => {
           </div>
 
           {/* Card 4: Yellow */}
-          <div className="bg-mq-surface-yellow rounded-[2rem] p-8 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm animate-fade-in delay-400">
+          <div className="bg-mq-surface-yellow rounded-[2rem] p-6 sm:p-8 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm animate-fade-in delay-400">
             <div className="w-full aspect-[4/3] rounded-2xl mb-6 overflow-hidden">
               <img src={imgCorrectIncorrect} alt="Correct / Incorrect Is Not Enough" className="w-full h-full object-contain hover:scale-105 transition-transform duration-500" />
             </div>
@@ -97,15 +97,15 @@ export const WhyMathQuestSection = () => {
         </div>
 
         {/* Bottom Banner */}
-        <div className="mt-16 text-center space-y-6 animate-fade-in delay-500">
-          <div className="inline-flex items-center gap-4 px-8 py-4 bg-mq-surface-blue rounded-full border border-mq-border shadow-sm">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--mq-accent-yellow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-            <span className="text-mq-primary-dark font-extrabold text-lg md:text-xl">
+        <div className="mt-12 sm:mt-16 text-center space-y-4 sm:space-y-6 animate-fade-in delay-500">
+          <div className="inline-flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 sm:gap-4 px-4 sm:px-8 py-3 sm:py-4 bg-mq-surface-blue rounded-2xl sm:rounded-full border border-mq-border shadow-sm max-w-full">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--mq-accent-yellow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            <span className="text-mq-primary-dark font-extrabold text-base sm:text-lg md:text-xl text-center">
               Different learners need different levels of presentation, support and revision.
             </span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--mq-accent-yellow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--mq-accent-yellow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
           </div>
-          <p className="text-mq-text-muted font-bold">
+          <p className="text-mq-text-muted font-bold text-sm sm:text-base">
             MathQuest adapts to each learner, helping them build confidence and make steady progress — one step at a time.
           </p>
         </div>

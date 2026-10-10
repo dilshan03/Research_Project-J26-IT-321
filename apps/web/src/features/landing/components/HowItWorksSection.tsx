@@ -1,4 +1,3 @@
-import React from 'react';
 import { User, BookOpen, BarChart2, Lightbulb } from 'lucide-react';
 
 import imgProfile from '../../../assets/images/public-pages/home/section-3-how-it-works/profile.png';

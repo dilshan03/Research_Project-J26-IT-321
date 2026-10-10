@@ -1,4 +1,3 @@
-import React from 'react';
 import imgLongInstructions from '../../../assets/images/public-pages/home/section-2-why/long-instructions.png';
 import imgDifficultyStaying from '../../../assets/images/public-pages/home/section-2-why/difficulty-staying.png';
 import imgSameSupport from '../../../assets/images/public-pages/home/section-2-why/same-support.png';

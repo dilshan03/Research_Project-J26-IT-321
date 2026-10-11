@@ -44,8 +44,39 @@ export type PedagogicalIntent =
   | 'PROCESSING'
   | 'IDLE';
 
+export type AgentActionName =
+  | 'idle'
+  | 'wave'
+  | 'smallHint'
+  | 'guidedHint'
+  | 'stepByStep'
+  | 'explain'
+  | 'pointLeft'
+  | 'pointRight'
+  | 'thinking'
+  | 'correctCelebrate'
+  | 'tryAgain'
+  | 'encourage'
+  | 'clap';
+
+export type GameEvent =
+  | 'GAME_START'
+  | 'QUESTION_SHOW'
+  | 'THINKING'
+  | 'CORRECT_ANSWER'
+  | 'WRONG_ANSWER'
+  | 'HINT_LEVEL_1'
+  | 'HINT_LEVEL_2'
+  | 'HINT_LEVEL_3'
+  | 'HINT_LEVEL_4'
+  | 'ENCOURAGE'
+  | 'CELEBRATE';
+
 export interface AgentActionOptions {
   duration?: number;
   loop?: boolean;
   intensity?: number;
+  playSound?: boolean;
+  message?: string;
+  secondaryMessage?: string;
 }

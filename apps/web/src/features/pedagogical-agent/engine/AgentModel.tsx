@@ -20,6 +20,7 @@ export function AgentModel({ agentId }: AgentModelProps) {
   // Use Zustand store for action state
   const currentAction = useAgentStore((state) => state.currentAction);
   const actionOptions = useAgentStore((state) => state.actionOptions);
+  const actionInstanceId = useAgentStore((state) => state.actionInstanceId);
   const stopAction = useAgentStore((state) => state.stopAction);
   
   // Load model (suspends until loaded)
@@ -56,10 +57,10 @@ export function AgentModel({ agentId }: AgentModelProps) {
     });
   }, [mappedBones]);
   
-  // Reset start time when action changes
+  // Reset start time when action or actionInstanceId changes
   useEffect(() => {
-    actionStartTime.current = 0; // Will be set in useFrame
-  }, [currentAction]);
+    actionStartTime.current = 0; // Will be re-anchored on first frame
+  }, [currentAction, actionInstanceId]);
 
   useFrame((state, delta) => {
     if (!clonedScene || Object.keys(mappedBones).length === 0) return;

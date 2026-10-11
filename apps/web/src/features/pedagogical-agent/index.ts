@@ -1,5 +1,8 @@
 export { AgentAvatar } from './components/AgentAvatar';
+export { AgentSpeechBubble } from './components/AgentSpeechBubble';
 export { AgentDevPanel } from './components/dev/AgentDevPanel';
 export { usePedagogicalAgent } from './hooks/usePedagogicalAgent';
 export { useAgentStore } from './store/useAgentStore';
+export { GAME_EVENT_MAP, mapGameEvent } from './mapping/gameEventMapping';
+export { ACTION_SPEECH_MAP } from './dialogue/actionSpeechMap';
 export type * from './types/agent.types';

@@ -2,18 +2,23 @@ import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stage, PerspectiveCamera } from '@react-three/drei';
 import { AgentModel } from '../engine/AgentModel';
+import { AgentSpeechBubble } from './AgentSpeechBubble';
 import { getAgentConfig } from '../agents/registry';
 import type { AgentId } from '../types/agent.types';
 
 interface AgentAvatarProps {
   agentId?: AgentId;
+  showSpeechBubble?: boolean;
 }
 
-export function AgentAvatar({ agentId = 'greenbot' }: AgentAvatarProps) {
+export function AgentAvatar({ agentId = 'greenbot', showSpeechBubble = true }: AgentAvatarProps) {
   const config = getAgentConfig(agentId);
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
+      {/* 2D Speech Bubble Cloud Overlay */}
+      {showSpeechBubble && <AgentSpeechBubble />}
+
       <Canvas shadows>
         <PerspectiveCamera makeDefault position={[0, 1.5, 4]} fov={50} />
         <ambientLight intensity={0.5} />

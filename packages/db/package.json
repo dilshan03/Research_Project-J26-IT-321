@@ -1,0 +1,13 @@
+{
+    "name": "@mathquest/db",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "main": "./mongodb.js",
+    "exports": {
+        ".": "./mongodb.js"
+    },
+    "dependencies": {
+        "mongodb": "^7.0.0"
+    }
+}

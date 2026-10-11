@@ -53,16 +53,21 @@ export const SignInPage: React.FC = () => {
 
     setIsLoading(false);
 
-    if (response.success) {
+    if (response.success && response.data?.user) {
+      login(response.data.user);
+      setSuccessMessage(response.message || 'Sign in successful! Redirecting...');
+      setTimeout(() => {
+        navigate('/');
+      }, 1000);
+    } else if (response.success) {
       const userEmail = email.trim();
       const userName = userEmail.split('@')[0];
       login({
-        id: 'user-id-1',
+        id: '',
         fullName: userName.charAt(0).toUpperCase() + userName.slice(1),
         email: userEmail,
         role: 'parent',
       });
-
       setSuccessMessage(response.message || 'Sign in successful! Redirecting...');
       setTimeout(() => {
         navigate('/');

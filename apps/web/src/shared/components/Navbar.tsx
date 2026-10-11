@@ -47,19 +47,24 @@ export const Navbar = () => {
           {isAuthenticated && user ? (
             <div className="flex items-center gap-1.5 xl:gap-2">
               {/* Compact User Profile Badge */}
-              <div className="flex items-center gap-1.5 px-2 py-1 bg-mq-surface-blue border border-mq-border rounded-full shadow-sm max-w-[115px] xl:max-w-[155px] shrink-0">
-                <div className="w-5 h-5 xl:w-6 xl:h-6 bg-mq-primary text-white rounded-full flex items-center justify-center font-bold text-[10px] xl:text-xs shrink-0">
+              <Link
+                to="/profile"
+                className="flex items-center gap-1.5 px-2 py-1 bg-mq-surface-blue border border-mq-border hover:border-mq-primary/60 hover:bg-mq-surface-soft active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-mq-primary/40 rounded-full shadow-sm max-w-[115px] xl:max-w-[155px] shrink-0 transition-all cursor-pointer group"
+                title="View Profile"
+                aria-label="View user profile"
+              >
+                <div className="w-5 h-5 xl:w-6 xl:h-6 bg-mq-primary group-hover:bg-mq-primary-hover text-white rounded-full flex items-center justify-center font-bold text-[10px] xl:text-xs shrink-0 transition-colors">
                   {user.fullName ? user.fullName.charAt(0).toUpperCase() : <UserIcon size={12} />}
                 </div>
                 <div className="flex flex-col text-left overflow-hidden min-w-0">
-                  <span className="text-[11px] xl:text-xs font-bold text-mq-text-strong leading-tight truncate">
+                  <span className="text-[11px] xl:text-xs font-bold text-mq-text-strong group-hover:text-mq-primary leading-tight truncate transition-colors">
                     {user.fullName || user.email.split('@')[0]}
                   </span>
                   <span className="text-[8px] xl:text-[9px] font-semibold text-mq-primary capitalize leading-none">
                     {user.role}
                   </span>
                 </div>
-              </div>
+              </Link>
 
               {/* Sign Out Button */}
               <button
@@ -123,19 +128,25 @@ export const Navbar = () => {
           <div className="pt-3 border-t border-mq-border flex flex-col gap-2.5">
             {isAuthenticated && user ? (
               <>
-                <div className="flex items-center gap-2.5 px-3 py-2 bg-mq-surface-blue border border-mq-border rounded-2xl">
-                  <div className="w-8 h-8 bg-mq-primary text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0">
+                <Link
+                  to="/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 bg-mq-surface-blue border border-mq-border hover:border-mq-primary/60 hover:bg-mq-surface-soft active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-mq-primary/40 rounded-2xl transition-all cursor-pointer group"
+                  title="View Profile"
+                  aria-label="View user profile"
+                >
+                  <div className="w-8 h-8 bg-mq-primary group-hover:bg-mq-primary-hover text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0 transition-colors">
                     {user.fullName ? user.fullName.charAt(0).toUpperCase() : <UserIcon size={16} />}
                   </div>
                   <div className="flex flex-col text-left overflow-hidden">
-                    <span className="text-sm font-bold text-mq-text-strong truncate">
+                    <span className="text-sm font-bold text-mq-text-strong group-hover:text-mq-primary truncate transition-colors">
                       {user.fullName || user.email.split('@')[0]}
                     </span>
                     <span className="text-xs font-semibold text-mq-primary capitalize">
                       {user.role}
                     </span>
                   </div>
-                </div>
+                </Link>
                 <button
                   onClick={() => {
                     logout();

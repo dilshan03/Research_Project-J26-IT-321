@@ -1,4 +1,4 @@
-import type { SignInCredentials, SignUpData, ForgotPasswordRequest, AuthResponse } from '../types';
+import type { SignInCredentials, SignUpData, ForgotPasswordRequest, AuthResponse, User, UpdateProfileData } from '../types';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL as string) || '';
 
@@ -6,6 +6,7 @@ export const AUTH_API_ENDPOINTS = {
   SIGN_IN: `${API_BASE_URL}/api/auth/sign-in`,
   SIGN_UP: `${API_BASE_URL}/api/auth/sign-up`,
   FORGOT_PASSWORD: `${API_BASE_URL}/api/auth/forgot-password`,
+  UPDATE_PROFILE: `${API_BASE_URL}/api/auth/profile`,
 };
 
 /**
@@ -117,6 +118,46 @@ export const authService = {
     return {
       success: true,
       message: 'Password reset instructions sent to your email. (Development Mode)',
+    };
+  },
+
+  async updateProfile(userId: string, data: UpdateProfileData): Promise<AuthResponse<User>> {
+    await new Promise((resolve) => setTimeout(resolve, 600));
+
+    try {
+      const response = await fetch(AUTH_API_ENDPOINTS.UPDATE_PROFILE, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, ...data }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        return {
+          success: true,
+          message: 'Profile updated successfully.',
+          data: result.user || result.data || result,
+        };
+      }
+
+      if (response.status !== 404) {
+        const errorData = await response.json().catch(() => ({
+          message: `Profile update failed (HTTP ${response.status}).`,
+        }));
+        return {
+          success: false,
+          message: errorData.message || 'Profile update failed.',
+        };
+      }
+    } catch {
+      // Backend microservice offline or network unreachable
+    }
+
+    // Backend endpoint is not yet implemented or offline.
+    // Important requirement: Do not simulate successful persistence.
+    return {
+      success: false,
+      message: 'Backend profile update endpoint (/api/auth/profile) is not currently available or offline. Profile changes could not be persisted to the server.',
     };
   },
 };

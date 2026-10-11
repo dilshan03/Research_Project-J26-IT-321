@@ -6,6 +6,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (userData: User) => void;
   logout: () => void;
+  updateUser: (updatedData: Partial<User>) => void;
 }
 
 const AUTH_STORAGE_KEY = 'mathquest_auth_user';
@@ -41,6 +42,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUser = (updatedData: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return null;
+      const updated: User = { ...prev, ...updatedData };
+      try {
+        if (sessionStorage.getItem(AUTH_STORAGE_KEY)) {
+          sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
+        }
+        if (localStorage.getItem(AUTH_STORAGE_KEY)) {
+          localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
+        }
+        if (!sessionStorage.getItem(AUTH_STORAGE_KEY) && !localStorage.getItem(AUTH_STORAGE_KEY)) {
+          sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updated));
+        }
+      } catch {
+        // ignore storage errors
+      }
+      return updated;
+    });
+  };
+
   useEffect(() => {
     const handleStorage = () => {
       try {
@@ -62,6 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: !!user,
         login,
         logout,
+        updateUser,
       }}
     >
       {children}

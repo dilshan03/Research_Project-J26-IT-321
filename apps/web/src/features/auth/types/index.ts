@@ -5,6 +5,14 @@ export interface User {
   fullName: string;
   email: string;
   role: UserRole;
+  username?: string;
+}
+
+export interface UpdateProfileData {
+  fullName: string;
+  email: string;
+  role?: UserRole;
+  username?: string;
 }
 
 export interface SignInCredentials {

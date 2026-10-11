@@ -99,6 +99,7 @@ export const playAgentSound = (actionName: string, config: AgentConfig) => {
     case 'explain':
     case 'smallHint':
     case 'guidedHint':
+    case 'stepByStep':
       playTone(600, waveType, t, 0.15);
       playTone(750, waveType, t+0.2, 0.2);
       playNoise(t, 0.3, 800, 0.05);

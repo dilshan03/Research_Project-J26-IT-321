@@ -15,6 +15,7 @@ export function AgentDevPanel() {
     { id: 'wave', label: 'Wave' },
     { id: 'smallHint', label: 'Small Hint' },
     { id: 'guidedHint', label: 'Guided Hint' },
+    { id: 'stepByStep', label: 'Step-by-Step' },
     { id: 'explain', label: 'Explain' },
     { id: 'pointLeft', label: 'Point Left' },
     { id: 'pointRight', label: 'Point Right' },

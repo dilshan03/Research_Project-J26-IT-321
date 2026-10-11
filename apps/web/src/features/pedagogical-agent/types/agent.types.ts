@@ -38,6 +38,7 @@ export type PedagogicalIntent =
   | 'RETRY_PROMPT'
   | 'SMALL_HINT'
   | 'GUIDED_HINT'
+  | 'STEP_BY_STEP'
   | 'EXPLAIN'
   | 'REENGAGE'
   | 'PROCESSING'

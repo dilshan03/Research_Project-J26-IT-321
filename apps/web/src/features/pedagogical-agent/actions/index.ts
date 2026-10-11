@@ -2,6 +2,7 @@ export { idle } from './idle';
 export { wave } from './wave';
 export { smallHint } from './smallHint';
 export { guidedHint } from './guidedHint';
+export { stepByStep } from './stepByStep';
 export { explain } from './explain';
 export { pointLeft } from './pointLeft';
 export { pointRight } from './pointRight';

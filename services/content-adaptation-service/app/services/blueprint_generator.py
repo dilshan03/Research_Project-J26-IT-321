@@ -119,10 +119,12 @@ def _identify_step(parsed: ParsedProblem, order: int, settings: ADHDGameSettings
         target_visual_asset=_quantity_asset(parsed),
         correct_target_value=correct,
         game_options=_shuffle(opts, seed=a + b),
+        operands=[a, b],
     )
 
 
-def _operator_step(parsed: ParsedProblem, op: str, order: int, settings: ADHDGameSettings) -> GameMicroStep:
+def _operator_step(parsed: ParsedProblem, op: str, order: int, settings: ADHDGameSettings,
+                   operands: List[int]) -> GameMicroStep:
     return GameMicroStep(
         step_order=order, action_type="SELECT_OPERATOR",
         instruction_si="නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
@@ -130,11 +132,13 @@ def _operator_step(parsed: ParsedProblem, op: str, order: int, settings: ADHDGam
         target_visual_asset=VisualAssetTag.OPERATOR_CHEST,
         correct_target_value=OPERATION_SYMBOLS[op],
         game_options=_operator_options(op, min(settings.distractor_count, 3)),
+        operands=operands,
+        operation=op,
     )
 
 
 def _calc_step(order: int, correct: int, impulsive: List[int], memory: List[int],
-               settings: ADHDGameSettings, final: bool) -> GameMicroStep:
+               settings: ADHDGameSettings, final: bool, operands: List[int], op: str) -> GameMicroStep:
     return GameMicroStep(
         step_order=order, action_type="CALCULATE_MICROSTEP",
         instruction_si="දැන් පිළිතුර සොයන්න" if final else "පළමුව මෙය ගණනය කරන්න",
@@ -142,6 +146,8 @@ def _calc_step(order: int, correct: int, impulsive: List[int], memory: List[int]
         target_visual_asset=VisualAssetTag.NUMBER_BLOCK,
         correct_target_value=str(correct),
         game_options=_numeric_options(correct, settings.distractor_count, impulsive, memory),
+        operands=operands,
+        operation=op,
     )
 
 
@@ -156,11 +162,13 @@ def build_micro_steps(parsed: ParsedProblem, settings: ADHDGameSettings) -> List
     if len(ops) >= 2:
         subtotal = parsed.partial_results[0]
         paid = parsed.numbers[-1]
+        items = parsed.numbers[:-1]
         return [
-            _operator_step(parsed, ops[0], 1, settings),
-            _calc_step(2, subtotal, impulsive=parsed.numbers[:2], memory=[paid], settings=settings, final=False),
+            _operator_step(parsed, ops[0], 1, settings, operands=items),
+            _calc_step(2, subtotal, impulsive=parsed.numbers[:2], memory=[paid], settings=settings, final=False,
+                       operands=items, op=ops[0]),
             _calc_step(3, answer, impulsive=[subtotal, paid + subtotal], memory=[paid - parsed.numbers[0]],
-                       settings=settings, final=True),
+                       settings=settings, final=True, operands=[paid, subtotal], op=ops[-1]),
         ]
 
     op = ops[0]
@@ -171,8 +179,9 @@ def build_micro_steps(parsed: ParsedProblem, settings: ADHDGameSettings) -> List
     steps: List[GameMicroStep] = []
     if settings.step_granularity == "MAXIMAL_THREE_TIER":
         steps.append(_identify_step(parsed, 1, settings))
-    steps.append(_operator_step(parsed, op, len(steps) + 1, settings))
-    steps.append(_calc_step(len(steps) + 1, answer, impulsive, memory=[], settings=settings, final=True))
+    steps.append(_operator_step(parsed, op, len(steps) + 1, settings, operands=[a, b]))
+    steps.append(_calc_step(len(steps) + 1, answer, impulsive, memory=[], settings=settings, final=True,
+                            operands=[a, b], op=op))
     return steps
 
 

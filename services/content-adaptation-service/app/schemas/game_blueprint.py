@@ -41,6 +41,12 @@ class GameMicroStep(BaseModel):
     target_visual_asset: VisualAssetTag = Field(..., description="The main visual asset type used in this step")
     correct_target_value: str = Field(..., description="The expected string representation of the correct answer")
     game_options: List[GameChoiceOption] = Field(..., description="List of options presented to the learner")
+    operands: Optional[List[int]] = Field(
+        None, description="Quantities this step works on (used by the game layer for manipulatives)"
+    )
+    operation: Optional[Literal['ADD', 'SUB', 'MUL', 'DIV']] = Field(
+        None, description="Arithmetic operation this step applies to the operands"
+    )
 
 
 class ADHDGameSettings(BaseModel):

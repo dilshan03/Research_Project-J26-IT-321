@@ -23,6 +23,8 @@ export interface GameMicroStep {
   target_visual_asset: VisualAssetTag;
   correct_target_value: string;
   game_options: GameChoiceOption[];
+  operands?: number[] | null;
+  operation?: 'ADD' | 'SUB' | 'MUL' | 'DIV' | null;
 }
 
 export interface ADHDGameSettings {

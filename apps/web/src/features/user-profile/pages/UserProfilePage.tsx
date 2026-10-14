@@ -11,11 +11,13 @@ import {
   CheckCircle2,
   AlertCircle,
   ArrowLeft,
+  ArrowRight,
   LogOut,
   Loader2,
   KeyRound,
   IdCard,
   Check,
+  Users,
 } from 'lucide-react';
 import { Navbar } from '../../../shared/components/Navbar';
 import { useAuth } from '../../auth/hooks/useAuth';
@@ -561,6 +563,37 @@ export const UserProfilePage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Section: Child Profiles for Parents */}
+        {user.role === 'parent' && (
+          <div className="bg-mq-surface rounded-3xl border border-mq-border p-6 sm:p-8 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-mq-border/70 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-mq-surface-blue text-mq-primary flex items-center justify-center font-bold">
+                  <Users size={18} />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-bold text-mq-text-strong font-sinhala">
+                    මගේ දරුවන් (Child Learner Profiles)
+                  </h2>
+                  <p className="text-xs text-mq-text-muted">
+                    Manage enrolled children's adaptive profiles, learning preferences, and assessments
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/learners"
+                className="btn btn-primary text-xs sm:text-sm py-2 px-4 rounded-full flex items-center gap-2 self-start sm:self-auto font-sinhala shadow-sm"
+              >
+                <span>දරුවන් කළමනාකරණය (Manage Children)</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+            <p className="text-xs text-mq-text-muted font-sinhala leading-relaxed">
+              ඔබගේ දරුවන් වෙනුවෙන් MathQuest ADHD ඉගෙනුම් පැතිකඩ නිර්මාණය කිරීමට, ඉගෙනුම් මනාප සටහන් කිරීමට හා ආරම්භක ගණිත ඇගයීම් සිදු කිරීමට දරුවන් කළමනාකරණය පිටුවට පිවිසෙන්න.
+            </p>
+          </div>
+        )}
 
         {/* Section E: Account Security */}
         <div className="bg-mq-surface rounded-3xl border border-mq-border p-6 sm:p-8 shadow-sm space-y-4">

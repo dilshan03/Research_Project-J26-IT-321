@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, User as UserIcon, LogOut, Menu, X } from 'lucide-react';
+import { ArrowRight, User as UserIcon, LogOut, Menu, X, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 
@@ -24,10 +24,16 @@ export const Navbar = () => {
 
         {/* Center: Desktop Navigation Links (Visible on lg screens 1024px+) */}
         <div className="hidden lg:flex items-center gap-1.5 xl:gap-3 2xl:gap-5 font-semibold text-mq-text text-xs xl:text-[14px] 2xl:text-[15px] min-w-0">
-          <a href="#" className="text-mq-primary relative font-bold whitespace-nowrap px-1.5 py-1 xl:px-2.5">
+          <Link to="/" className="text-mq-primary relative font-bold whitespace-nowrap px-1.5 py-1 xl:px-2.5">
             Home
             <span className="absolute bottom-0 left-1.5 right-1.5 xl:left-2.5 xl:right-2.5 h-[2.5px] bg-mq-primary rounded-full"></span>
-          </a>
+          </Link>
+          {isAuthenticated && user?.role === 'parent' && (
+            <Link to="/learners" className="text-mq-text hover:text-mq-primary transition-colors whitespace-nowrap px-1.5 py-1 xl:px-2.5 font-bold flex items-center gap-1.5">
+              <Users size={14} className="text-mq-primary" />
+              <span>My Children</span>
+            </Link>
+          )}
           <a href="#" className="hover:text-mq-primary transition-colors whitespace-nowrap px-1.5 py-1 xl:px-2.5">
             Features
           </a>
@@ -46,6 +52,17 @@ export const Navbar = () => {
         <div className="hidden lg:flex items-center gap-1.5 xl:gap-2.5 shrink-0">
           {isAuthenticated && user ? (
             <div className="flex items-center gap-1.5 xl:gap-2">
+              {/* My Children Quick Button for Parent */}
+              {user.role === 'parent' && (
+                <Link
+                  to="/learners"
+                  className="btn btn-secondary text-xs py-1.5 px-3 rounded-full flex items-center gap-1.5 text-mq-primary font-bold hover:bg-mq-surface-soft border-mq-primary/40 whitespace-nowrap shrink-0"
+                  title="මගේ දරුවන් (My Children)"
+                >
+                  <Users size={14} />
+                  <span>My Children</span>
+                </Link>
+              )}
               {/* Compact User Profile Badge */}
               <Link
                 to="/profile"
@@ -147,6 +164,15 @@ export const Navbar = () => {
                     </span>
                   </div>
                 </Link>
+                {user.role === 'parent' && (
+                  <Link
+                    to="/learners"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="btn btn-secondary w-full justify-center gap-2 text-xs py-2 text-mq-primary font-bold border-mq-primary/30"
+                  >
+                    <Users size={16} /> My Children (මගේ දරුවන්)
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     logout();

@@ -8,6 +8,7 @@ import { ForgotPasswordPage } from './features/auth/pages/ForgotPasswordPage';
 import { AuthProvider } from './features/auth/context/AuthContext';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
 import { ProfilePage } from './pages/profile/ProfilePage';
+import { LearnersPage, OnboardingPlaceholderPage } from './features/learner-profile';
 
 function useHashRoute() {
   const [hash, setHash] = useState(window.location.hash);
@@ -38,6 +39,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/learners"
+            element={
+              <ProtectedRoute>
+                <LearnersPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/learners/:learnerId/onboarding"
+            element={
+              <ProtectedRoute>
+                <OnboardingPlaceholderPage />
               </ProtectedRoute>
             }
           />

@@ -36,16 +36,27 @@ async def connect_to_database() -> AsyncDatabase:
 
 
 async def init_indexes() -> None:
-    """Initializes indexes on learners collection, reusing existing collection schema."""
+    """Initializes indexes on learners, onboarding, questionnaires, and assessments collections."""
     if _database is None:
         return
     try:
         learners_col = _database["learners"]
-        # Ensure learnerId unique index
         await learners_col.create_index([("learnerId", ASCENDING)], unique=True)
-        # Ensure parentId lookup index
         await learners_col.create_index([("parentId", ASCENDING)])
-        logger.info("Learners collection indexes verified successfully.")
+
+        onboarding_col = _database["learner_onboarding"]
+        await onboarding_col.create_index([("learnerId", ASCENDING)], unique=True)
+        await onboarding_col.create_index([("parentId", ASCENDING)])
+
+        questionnaires_col = _database["learner_questionnaires"]
+        await questionnaires_col.create_index([("learnerId", ASCENDING)], unique=True)
+        await questionnaires_col.create_index([("parentId", ASCENDING)])
+
+        assessments_col = _database["learner_assessments"]
+        await assessments_col.create_index([("learnerId", ASCENDING)])
+        await assessments_col.create_index([("parentId", ASCENDING)])
+
+        logger.info("MongoDB collections and indexes initialized successfully.")
     except Exception as exc:
         logger.warning("Index initialization notice: %s", exc)
 
@@ -77,3 +88,16 @@ def get_sessions_collection() -> AsyncCollection:
 
 def get_users_collection() -> AsyncCollection:
     return get_database()["users"]
+
+
+def get_onboarding_collection() -> AsyncCollection:
+    return get_database()["learner_onboarding"]
+
+
+def get_questionnaires_collection() -> AsyncCollection:
+    return get_database()["learner_questionnaires"]
+
+
+def get_assessments_collection() -> AsyncCollection:
+    return get_database()["learner_assessments"]
+

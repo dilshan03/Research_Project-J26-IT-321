@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import CORS_ORIGINS
 from app.db.mongodb import connect_to_database, close_database_connection, get_database
 from app.api.v1.learners import router as learners_router
+from app.api.v1.onboarding import router as onboarding_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,6 +47,7 @@ app.add_middleware(
 
 # Include API v1 routes
 app.include_router(learners_router, prefix="/api/v1")
+app.include_router(onboarding_router, prefix="/api/v1")
 
 
 @app.get("/health", tags=["Health"])

@@ -1,38 +1,73 @@
-import { useState } from 'react'
-import HomePage from './pages/public/HomePage'
-import AgentTestPage from './pages/test/AgentTestPage'
+import { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/public/HomePage';
+import ContentAdaptationPage from './features/content-adaptation/ContentAdaptationPage';
+import { SignInPage } from './features/auth/pages/SignInPage';
+import { SignUpPage } from './features/auth/pages/SignUpPage';
+import { ForgotPasswordPage } from './features/auth/pages/ForgotPasswordPage';
+import { AuthProvider } from './features/auth/context/AuthContext';
+import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
+import { ProfilePage } from './pages/profile/ProfilePage';
 
-function App() {
-  // සරලව pages අතර මාරු වෙන්න state එකක් හදාගමු
-  const [currentRoute, setCurrentRoute] = useState('home')
+// -------------------------------------------------------------
+// [DEV TEMP] Pedagogical Agent Test Page Import (Remove later)
+// -------------------------------------------------------------
+import AgentTestPage from './pages/test/AgentTestPage';
+// -------------------------------------------------------------
 
-  // Agent Test Page එක පෙන්වීම
-  if (currentRoute === 'agent-test') {
-    return (
-      <div className="relative w-screen h-screen">
-        <button 
-          onClick={() => setCurrentRoute('home')}
-          className="absolute top-4 left-4 z-50 px-4 py-2 bg-gray-800 text-white rounded shadow hover:bg-gray-700 transition cursor-pointer"
-        >
-          ← Back to Home
-        </button>
-        <AgentTestPage />
-      </div>
-    )
-  }
-
-  // සාමාන්‍ය Home Page එක පෙන්වීම (Button එකත් එක්ක)
-  return (
-    <div className="relative">
-      <button 
-        onClick={() => setCurrentRoute('agent-test')}
-        className="fixed top-24 right-8 z-50 px-4 py-2 bg-green-500 text-white font-bold rounded-lg shadow-lg hover:bg-green-600 transition cursor-pointer"
-      >
-        Test 3D Agent →
-      </button>
-      <HomePage />
-    </div>
-  )
+function useHashRoute() {
+  const [hash, setHash] = useState(window.location.hash);
+  useEffect(() => {
+    const onChange = () => setHash(window.location.hash);
+    window.addEventListener('hashchange', onChange);
+    return () => window.removeEventListener('hashchange', onChange);
+  }, []);
+  return hash;
 }
 
-export default App
+function App() {
+  const hash = useHashRoute();
+  
+  if (hash.startsWith('#/adapt')) return <ContentAdaptationPage mode="studio" />;
+  if (hash.startsWith('#/play')) return <ContentAdaptationPage mode="play" />;
+  
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        {/* ------------------------------------------------------------- */}
+        {/* [DEV TEMP] Quick Floating Button to Test 3D Agent (Remove later) */}
+        {/* ------------------------------------------------------------- */}
+        <a
+          href="/agent-test"
+          className="fixed bottom-6 right-6 z-50 px-4 py-2 bg-emerald-600 text-white font-bold rounded-full shadow-2xl hover:bg-emerald-700 transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40"
+        >
+          <span>🤖</span>
+          <span>Test 3D Agent</span>
+        </a>
+        {/* ------------------------------------------------------------- */}
+
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route path="/sign-up" element={<SignUpPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          {/* ------------------------------------------------------------- */}
+          {/* [DEV TEMP] Pedagogical Agent Test Route (Remove later) */}
+          {/* ------------------------------------------------------------- */}
+          <Route path="/agent-test" element={<AgentTestPage />} />
+          {/* ------------------------------------------------------------- */}
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
+
+export default App;

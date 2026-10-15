@@ -53,15 +53,15 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
         <div className="flex flex-col sm:flex-row gap-2.5 shrink-0">
           <Link
             to="/learners"
-            className="btn btn-secondary text-xs py-2 px-4 rounded-full font-bold font-sinhala text-center"
+            className="btn btn-secondary text-xs py-2.5 px-4 rounded-full font-bold font-sinhala text-center inline-flex items-center justify-center gap-1.5 shadow-xs"
           >
-            මගේ දරුවන් වෙත
+            <span>මගේ දරුවන්ගේ ලැයිස්තුව (Learners Overview)</span>
           </Link>
           <a
             href="#/play"
-            className="btn btn-primary text-xs py-2 px-5 rounded-full font-bold font-sinhala inline-flex items-center justify-center gap-1.5 shadow-sm"
+            className="btn btn-primary text-xs py-2.5 px-5 rounded-full font-bold font-sinhala inline-flex items-center justify-center gap-1.5 shadow-sm"
           >
-            <span>ක්‍රීඩා අරඹමු</span>
+            <span>අනුවර්තී ක්‍රීඩා අරඹමු (Start Adaptive Play)</span>
             <ArrowRight size={14} strokeWidth={2.5} />
           </a>
         </div>
@@ -194,6 +194,9 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                   සාක්ෂි මට්ටම: {math.evidenceLevel}
                 </span>
               </div>
+              <p className="text-[10px] text-mq-text-muted text-left leading-relaxed">
+                <strong>ප්‍රමිති දැන්වීම:</strong> Provisional demonstration thresholds (Emerging: 0-49%, Developing: 50-79%, Proficient: 80-100%). Not validated mathematics mastery standards.
+              </p>
             </div>
           ) : (
             <p className="text-xs text-mq-text-muted font-sinhala">තොරතුරු ලබාගෙන නොමැත.</p>
@@ -211,7 +214,7 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
               <span>කුසලතා අනුව විශ්ලේෂණය (Skill Competency Breakdown)</span>
             </h3>
             <p className="text-xs text-mq-text-muted mt-0.5">
-              Grade {learner.grade} foundational mathematics competency areas.
+              Grade {learner.grade} foundational mathematics competency areas. Requires ≥3 items per skill for mastery classification.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 mt-4">
@@ -228,7 +231,7 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                       {s.skillName}
                     </span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between">
+                  <div className="mt-3 flex items-center justify-between gap-1 flex-wrap">
                     <span className="text-xs font-mono font-bold text-mq-primary">
                       {s.accuracyPercentage}% ({s.correctQuestions}/{s.totalQuestions})
                     </span>
@@ -238,10 +241,14 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                           ? 'bg-mq-success-bg text-mq-success'
                           : s.proficiencyCategory === 'Developing'
                           ? 'bg-mq-warning-bg text-mq-warning'
-                          : 'bg-mq-danger-bg text-mq-danger'
+                          : s.proficiencyCategory === 'Emerging'
+                          ? 'bg-mq-danger-bg text-mq-danger'
+                          : 'bg-mq-surface-soft text-mq-text-muted border border-mq-border'
                       }`}
                     >
-                      {s.proficiencyCategory}
+                      {s.proficiencyCategory === 'INSUFFICIENT_EVIDENCE'
+                        ? 'සාක්ෂි ප්‍රමාණවත් නැත (Insufficient Evidence)'
+                        : s.proficiencyCategory}
                     </span>
                   </div>
                 </div>

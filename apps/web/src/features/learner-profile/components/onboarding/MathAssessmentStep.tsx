@@ -136,6 +136,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
   };
 
   const handleNext = () => {
+    if (isSubmitting) return;
     recordTimeForCurrent();
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
@@ -145,6 +146,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
   };
 
   const handlePrev = () => {
+    if (isSubmitting) return;
     recordTimeForCurrent();
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
@@ -444,8 +446,9 @@ export const MathAssessmentStep: React.FC<Props> = ({
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <button
             type="button"
+            disabled={isSubmitting}
             onClick={handlePrev}
-            className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
+            className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5 disabled:opacity-50"
           >
             <ArrowLeft size={15} />
             <span>{currentIndex === 0 ? 'ආපසු' : 'පෙර ප්‍රශ්නය'}</span>

@@ -85,7 +85,7 @@ export interface SkillScore {
   totalQuestions: number;
   correctQuestions: number;
   accuracyPercentage: number;
-  proficiencyCategory: 'Emerging' | 'Developing' | 'Proficient';
+  proficiencyCategory: 'Emerging' | 'Developing' | 'Proficient' | 'INSUFFICIENT_EVIDENCE';
 }
 
 export interface MathAssessmentSummary {
@@ -98,6 +98,8 @@ export interface MathAssessmentSummary {
   strengths: string[];
   areasForGrowth: string[];
   recommendations: string[];
+  thresholdVersion?: string;
+  disclaimer?: string;
   mlPredictionNotice: string;
 }
 
@@ -111,6 +113,9 @@ export interface OnboardingProgress {
   snapIvCompleted: boolean;
   socialContextCompleted: boolean;
   mathAssessmentCompleted: boolean;
+  learningPreferences?: LearningPreferencesData;
+  snapIvResponses?: SnapIvItemAnswer[];
+  socialContext?: SocialContextData;
   snapIvSummary?: SnapIvScoreSummary;
   mathSummary?: MathAssessmentSummary;
   updatedAt: string;

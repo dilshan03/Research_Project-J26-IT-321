@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AgentActionName, AgentActionOptions, AgentId, GameEvent } from '../types/agent.types';
+import type { AgentActionName, AgentActionOptions, AgentId, GameEvent, HintLevel } from '../types/agent.types';
 import { getAgentConfig } from '../agents/registry';
 import { playAgentSound } from '../engine/soundEngine';
 import { mapGameEvent } from '../mapping/gameEventMapping';
@@ -24,8 +24,11 @@ interface AgentState {
   actionOptions: AgentActionOptions;
   activeAgentId: AgentId;
   actionInstanceId: number; // Incremented on every playAction to reset timers & prevent race conditions
+  currentHintLevel: HintLevel;
   playAction: (actionName: AgentActionName, options?: AgentActionOptions) => void;
   triggerGameEvent: (event: GameEvent, customDuration?: number) => void;
+  requestNextHint: () => HintLevel;
+  resetHints: () => void;
   stopAction: () => void;
   setAgent: (agentId: AgentId) => void;
 }
@@ -35,6 +38,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   actionOptions: {},
   activeAgentId: 'greenbot',
   actionInstanceId: 0,
+  currentHintLevel: 0,
 
   playAction: (actionName: AgentActionName, options: AgentActionOptions = {}) => {
     const nextInstanceId = get().actionInstanceId + 1;
@@ -61,6 +65,20 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     const config = mapGameEvent(event);
     const duration = customDuration ?? config.duration;
     get().playAction(config.action, { duration });
+  },
+
+  requestNextHint: () => {
+    const current = get().currentHintLevel;
+    const nextLevel = (Math.min(current + 1, 4)) as HintLevel;
+    set({ currentHintLevel: nextLevel });
+
+    const hintEvent: GameEvent = `HINT_LEVEL_${nextLevel}` as GameEvent;
+    get().triggerGameEvent(hintEvent);
+    return nextLevel;
+  },
+
+  resetHints: () => {
+    set({ currentHintLevel: 0 });
   },
 
   stopAction: () => {

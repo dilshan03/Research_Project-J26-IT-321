@@ -72,6 +72,8 @@ export type GameEvent =
   | 'ENCOURAGE'
   | 'CELEBRATE';
 
+export type HintLevel = 0 | 1 | 2 | 3 | 4;
+
 export interface AgentActionOptions {
   duration?: number;
   loop?: boolean;

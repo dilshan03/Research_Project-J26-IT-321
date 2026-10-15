@@ -37,13 +37,15 @@ function App() {
         {/* ------------------------------------------------------------- */}
         {/* [DEV TEMP] Quick Floating Button to Test 3D Agent (Remove later) */}
         {/* ------------------------------------------------------------- */}
-        <a
-          href="/agent-test"
-          className="fixed bottom-6 right-6 z-50 px-4 py-2 bg-emerald-600 text-white font-bold rounded-full shadow-2xl hover:bg-emerald-700 transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40"
-        >
-          <span>🤖</span>
-          <span>Test 3D Agent</span>
-        </a>
+        {window.location.pathname !== '/agent-test' && (
+          <a
+            href="/agent-test"
+            className="fixed bottom-6 right-6 z-50 px-4 py-2 bg-emerald-600 text-white font-bold rounded-full shadow-2xl hover:bg-emerald-700 transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40"
+          >
+            <span>🤖</span>
+            <span>Test 3D Agent</span>
+          </a>
+        )}
         {/* ------------------------------------------------------------- */}
 
         <Routes>

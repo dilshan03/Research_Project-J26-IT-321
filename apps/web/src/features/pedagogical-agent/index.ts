@@ -1,5 +1,7 @@
 export { AgentAvatar } from './components/AgentAvatar';
 export { AgentSpeechBubble } from './components/AgentSpeechBubble';
+export { HintBoard } from './components/HintBoard';
+export { PedagogicalCompanion } from './components/PedagogicalCompanion';
 export { AgentDevPanel } from './components/dev/AgentDevPanel';
 export { usePedagogicalAgent } from './hooks/usePedagogicalAgent';
 export { useAgentStore } from './store/useAgentStore';

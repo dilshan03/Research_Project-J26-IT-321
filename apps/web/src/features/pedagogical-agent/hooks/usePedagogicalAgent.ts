@@ -10,20 +10,26 @@ import type { AgentActionName, AgentActionOptions, GameEvent } from '../types/ag
 export function usePedagogicalAgent() {
   const currentAction = useAgentStore((state) => state.currentAction);
   const activeAgentId = useAgentStore((state) => state.activeAgentId);
+  const currentHintLevel = useAgentStore((state) => state.currentHintLevel);
   const playAction = useAgentStore((state) => state.playAction);
   const triggerGameEvent = useAgentStore((state) => state.triggerGameEvent);
+  const requestNextHint = useAgentStore((state) => state.requestNextHint);
+  const resetHints = useAgentStore((state) => state.resetHints);
   const stopAction = useAgentStore((state) => state.stopAction);
   const setAgent = useAgentStore((state) => state.setAgent);
 
   return {
     currentAction,
     activeAgentId,
+    currentHintLevel,
     playAction: (actionName: AgentActionName, options?: AgentActionOptions) => {
       playAction(actionName, options);
     },
     onGameEvent: (event: GameEvent, customDuration?: number) => {
       triggerGameEvent(event, customDuration);
     },
+    requestNextHint,
+    resetHints,
     stopAction,
     setAgent
   };

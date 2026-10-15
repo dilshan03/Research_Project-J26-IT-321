@@ -23,7 +23,7 @@ export function AgentSpeechBubble() {
     <div 
       style={{
         position: 'absolute',
-        top: '15%',
+        top: '6px',
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 40,
@@ -38,7 +38,7 @@ export function AgentSpeechBubble() {
         @keyframes popIn {
           0% {
             opacity: 0;
-            transform: translateX(-50%) translateY(14px) scale(0.9);
+            transform: translateX(-50%) translateY(8px) scale(0.9);
           }
           100% {
             opacity: 1;
@@ -50,35 +50,35 @@ export function AgentSpeechBubble() {
             transform: translateY(0px);
           }
           50% {
-            transform: translateY(-4px);
+            transform: translateY(-3px);
           }
         }
       `}</style>
 
-      {/* Clean & Cute Cloud Bubble */}
+      {/* Clean, Compact, Child-friendly Cloud Bubble */}
       <div
         style={{
           position: 'relative',
-          background: 'rgba(255, 255, 255, 0.97)',
+          background: 'rgba(255, 255, 255, 0.98)',
           backdropFilter: 'blur(10px)',
           borderRadius: '999px',
-          padding: '12px 24px',
-          boxShadow: '0 14px 30px -8px rgba(0, 0, 0, 0.25), 0 0 0 3px ' + accentColor + '33',
-          border: '2px solid ' + accentColor,
+          padding: '6px 16px',
+          boxShadow: '0 8px 20px -4px rgba(0, 0, 0, 0.3), 0 0 0 2px ' + accentColor + '33',
+          border: '1.5px solid ' + accentColor,
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
+          gap: '8px',
           whiteSpace: 'nowrap',
           animation: 'floatCloud 3s ease-in-out infinite'
         }}
       >
-        <span style={{ fontSize: '1.4rem', lineHeight: 1 }}>{emoji}</span>
+        <span style={{ fontSize: '1.15rem', lineHeight: 1 }}>{emoji}</span>
 
         {/* Clean Sinhala Text Only */}
         <span 
           style={{
             fontFamily: "'Noto Sans Sinhala', 'Lexend', sans-serif",
-            fontSize: '1.15rem',
+            fontSize: '0.92rem',
             fontWeight: 800,
             color: '#0D2340',
             letterSpacing: '0.2px'
@@ -87,20 +87,7 @@ export function AgentSpeechBubble() {
           {sinhalaText}
         </span>
 
-        {/* Cloud Bubble Tail */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '-10px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 0,
-            height: 0,
-            borderLeft: '10px solid transparent',
-            borderRight: '10px solid transparent',
-            borderTop: '10px solid ' + accentColor
-          }}
-        />
+        {/* Compact Cloud Bubble Tail */}
         <div
           style={{
             position: 'absolute',
@@ -109,35 +96,25 @@ export function AgentSpeechBubble() {
             transform: 'translateX(-50%)',
             width: 0,
             height: 0,
-            borderLeft: '8px solid transparent',
-            borderRight: '8px solid transparent',
-            borderTop: '8px solid #FFFFFF'
+            borderLeft: '7px solid transparent',
+            borderRight: '7px solid transparent',
+            borderTop: '7px solid ' + accentColor
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '-5px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 0,
+            height: 0,
+            borderLeft: '5px solid transparent',
+            borderRight: '5px solid transparent',
+            borderTop: '5px solid #FFFFFF'
           }}
         />
       </div>
-
-      {/* Little cloud thought puffs towards the robot */}
-      <div 
-        style={{
-          width: '8px',
-          height: '8px',
-          borderRadius: '50%',
-          background: accentColor,
-          opacity: 0.7,
-          marginTop: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}
-      />
-      <div 
-        style={{
-          width: '5px',
-          height: '5px',
-          borderRadius: '50%',
-          background: accentColor,
-          opacity: 0.5,
-          marginTop: '4px'
-        }}
-      />
     </div>
   );
 }

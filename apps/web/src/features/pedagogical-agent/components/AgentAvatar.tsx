@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stage, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei';
 import { AgentModel } from '../engine/AgentModel';
 import { AgentSpeechBubble } from './AgentSpeechBubble';
 import { getAgentConfig } from '../agents/registry';
@@ -9,9 +9,14 @@ import type { AgentId } from '../types/agent.types';
 interface AgentAvatarProps {
   agentId?: AgentId;
   showSpeechBubble?: boolean;
+  interactive?: boolean; // When false, camera is locked (no rotate, zoom in/out, pan)
 }
 
-export function AgentAvatar({ agentId = 'greenbot', showSpeechBubble = true }: AgentAvatarProps) {
+export function AgentAvatar({ 
+  agentId = 'greenbot', 
+  showSpeechBubble = true,
+  interactive = false 
+}: AgentAvatarProps) {
   const config = getAgentConfig(agentId);
 
   return (
@@ -20,15 +25,18 @@ export function AgentAvatar({ agentId = 'greenbot', showSpeechBubble = true }: A
       {showSpeechBubble && <AgentSpeechBubble />}
 
       <Canvas shadows>
-        <PerspectiveCamera makeDefault position={[0, 1.5, 4]} fov={50} />
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 5, 5]} intensity={1} castShadow />
+        <PerspectiveCamera makeDefault position={[0, 0.1, 3.2]} fov={45} />
+        <ambientLight intensity={0.7} />
+        <directionalLight position={[5, 8, 5]} intensity={1.2} castShadow />
+        <directionalLight position={[-5, 4, -4]} intensity={0.4} />
         <Suspense fallback={null}>
-          <Stage environment="city" intensity={0.6}>
+          <Environment preset="city" />
+          {/* Scaled down (0.72) and shifted down nicely to give ample headroom for bubble */}
+          <group position={[0, -0.28, 0]} scale={0.72}>
             <AgentModel agentId={agentId} />
-          </Stage>
+          </group>
         </Suspense>
-        <OrbitControls target={[0, 1, 0]} />
+        {interactive && <OrbitControls target={[0, -0.25, 0]} />}
       </Canvas>
     </div>
   );

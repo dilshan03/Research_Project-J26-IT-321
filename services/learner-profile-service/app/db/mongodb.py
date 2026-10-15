@@ -15,23 +15,8 @@ async def connect_to_database() -> AsyncDatabase:
     """Connects to MongoDB Atlas using PyMongo's official Async API and returns the database."""
     global _client, _database
 
-    import asyncio
-    current_loop = None
-    try:
-        current_loop = asyncio.get_running_loop()
-    except RuntimeError:
-        pass
-
-    if _database is not None and _client is not None:
-        client_loop = getattr(_client, "_loop", None)
-        if client_loop is None or client_loop is current_loop:
-            return _database
-        try:
-            _client.close()
-        except Exception:
-            pass
-        _client = None
-        _database = None
+    if _database is not None:
+        return _database
 
     if not MONGODB_URI:
         raise ValueError("MONGODB_URI environment variable is not configured.")
@@ -48,7 +33,6 @@ async def connect_to_database() -> AsyncDatabase:
     await init_indexes()
 
     return _database
-
 
 
 async def init_indexes() -> None:

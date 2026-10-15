@@ -88,6 +88,67 @@ export interface SkillScore {
   proficiencyCategory: 'Emerging' | 'Developing' | 'Proficient' | 'INSUFFICIENT_EVIDENCE';
 }
 
+export interface ElpxCredibleInterval {
+  lower: number;
+  upper: number;
+  confidenceLevel: number;
+}
+
+export interface ElpxSkillEstimate {
+  skillId: string;
+  skillName: string;
+  skillNameSi: string;
+  distinctQuestionsAssessed: number;
+  correctFirstResponses: number;
+  rawAccuracy: number;
+  rawAccuracyPercentage: number;
+  posteriorAlpha: number;
+  posteriorBeta: number;
+  estimatedProficiency: number;
+  estimatedProficiencyPercentage: number;
+  credibleInterval: ElpxCredibleInterval;
+  credibleIntervalWidth: number;
+  posteriorVariance: number;
+  evidenceSufficiency: 'SUFFICIENT' | 'INSUFFICIENT';
+  isEvidenceSufficient: boolean;
+  provisionalSkillLevel: 'INSUFFICIENT_EVIDENCE' | 'EMERGING' | 'DEVELOPING' | 'PROFICIENT';
+  isProvisional: boolean;
+}
+
+export interface ElpxStructuredRecommendation {
+  recommendationId: string;
+  skillId?: string | null;
+  strategyCode: string;
+  reasonCodes: string[];
+  inputEvidenceSummary: Record<string, any>;
+  recommendationRulesetVersion: string;
+  titleEn: string;
+  titleSi: string;
+  descriptionEn: string;
+  descriptionSi: string;
+}
+
+export interface ElpxProfile {
+  learnerId: string;
+  grade: number;
+  profileVersion: string;
+  algorithmVersion: string;
+  recommendationRulesetVersion: string;
+  evidenceStatus: 'SUFFICIENT' | 'INSUFFICIENT';
+  isOverallEvidenceSufficient: boolean;
+  totalDistinctQuestionsEvaluated: number;
+  totalCorrectFirstResponses: number;
+  rawOverallAccuracy: number;
+  skillEstimates: ElpxSkillEstimate[];
+  structuredRecommendations: ElpxStructuredRecommendation[];
+  explanationReasonCodes: string[];
+  learningPreferences?: Record<string, any>;
+  disclaimer: string;
+  lastUpdated: string;
+  mlPrediction?: any;
+  shapValues?: any;
+}
+
 export interface MathAssessmentSummary {
   grade: number;
   totalQuestions: number;
@@ -101,7 +162,9 @@ export interface MathAssessmentSummary {
   thresholdVersion?: string;
   disclaimer?: string;
   mlPredictionNotice: string;
+  elpxProfile?: ElpxProfile;
 }
+
 
 export interface OnboardingProgress {
   learnerId: string;

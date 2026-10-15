@@ -198,6 +198,10 @@ class MathAssessmentSummary(BaseModel):
     mlPredictionNotice: str = Field(
         default="Baseline derived via transparent pedagogical rules. Machine Learning / SHAP predictions will integrate when model service is attached."
     )
+    elpxProfile: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Versioned ELP-X evidence-aware proficiency estimates and explainable recommendations"
+    )
 
 
 # --- Onboarding State & Aggregated Summary ---

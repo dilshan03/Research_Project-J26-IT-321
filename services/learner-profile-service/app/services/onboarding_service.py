@@ -39,6 +39,7 @@ from app.schemas.onboarding import (
     SkillScore,
     OnboardingProgressResponse,
 )
+from app.core.elpx_engine import compute_elpx_profile_from_evaluated_items
 
 logger = logging.getLogger("learner_profile.onboarding_service")
 
@@ -107,6 +108,16 @@ async def get_or_create_onboarding_progress(
 
     math_summary = None
     if math_completed and assessment_doc:
+        elpx_prof = assessment_doc.get("elpxProfile")
+        if not elpx_prof and assessment_doc.get("evaluatedItems"):
+            elpx_prof = compute_elpx_profile_from_evaluated_items(
+                evaluated_items=assessment_doc.get("evaluatedItems", []),
+                grade=assessment_doc.get("grade", learner["grade"]),
+                learner_id=learner_id,
+                learning_preferences=quest_doc.get("learningPreferences") if quest_doc else None,
+                social_context=quest_doc.get("socialContext") if quest_doc else None,
+            )
+
         math_summary = {
             "grade": assessment_doc.get("grade", learner["grade"]),
             "totalQuestions": assessment_doc.get("totalQuestions", 0),
@@ -123,6 +134,7 @@ async def get_or_create_onboarding_progress(
                 "mlPredictionNotice",
                 "Baseline derived via transparent pedagogical rules."
             ),
+            "elpxProfile": elpx_prof,
         }
 
     # Determine overall status
@@ -461,6 +473,7 @@ async def submit_math_assessment(
                         "mlPredictionNotice",
                         "Baseline derived via transparent pedagogical rules."
                     ),
+                    "elpxProfile": existing_assessment.get("elpxProfile"),
                 },
             }
         else:
@@ -558,6 +571,15 @@ async def submit_math_assessment(
 
     evidence_level = "INSUFFICIENT" if total_questions < MINIMUM_EVIDENCE_QUESTIONS_OVERALL else "SUFFICIENT"
 
+    # Generate ELP-X v1.0 versioned profile for this assessment
+    elpx_profile = compute_elpx_profile_from_evaluated_items(
+        evaluated_items=evaluated_items,
+        grade=grade,
+        learner_id=learner_id,
+        learning_preferences=quest_doc.get("learningPreferences"),
+        social_context=quest_doc.get("socialContext"),
+    )
+
     assessment_doc = {
         "learnerId": learner_id,
         "parentId": parent_id,
@@ -575,6 +597,7 @@ async def submit_math_assessment(
         "areasForGrowth": areas_for_growth,
         "recommendations": recommendations,
         "evaluatedItems": evaluated_items,
+        "elpxProfile": elpx_profile,
         "mlPredictionNotice": (
             "Baseline derived via transparent pedagogical rules. "
             "Machine Learning / SHAP predictions will integrate when model service is attached."
@@ -623,6 +646,7 @@ async def submit_math_assessment(
         "thresholdVersion": assessment_doc["thresholdVersion"],
         "disclaimer": assessment_doc["disclaimer"],
         "mlPredictionNotice": assessment_doc["mlPredictionNotice"],
+        "elpxProfile": elpx_profile,
     }
 
     return {

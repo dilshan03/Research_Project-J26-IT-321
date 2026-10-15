@@ -208,6 +208,16 @@ def safe_recalculate_skill_scores(
 
     evidence_level = "INSUFFICIENT" if total_items < MINIMUM_EVIDENCE_QUESTIONS_OVERALL else "SUFFICIENT"
 
+    try:
+        from app.core.elpx_engine import compute_elpx_profile_from_evaluated_items
+        elpx_prof = compute_elpx_profile_from_evaluated_items(
+            evaluated_items=evaluated_items,
+            grade=1,
+            learner_id="historical_recalc",
+        )
+    except Exception:
+        elpx_prof = None
+
     return {
         "thresholdVersion": threshold_version,
         "disclaimer": PROVISIONAL_THRESHOLDS_METADATA["disclaimer"],
@@ -219,4 +229,6 @@ def safe_recalculate_skill_scores(
         "strengths": strengths,
         "areasForGrowth": areas_for_growth,
         "recommendations": recommendations,
+        "elpxProfile": elpx_prof,
     }
+

@@ -15,8 +15,23 @@ async def connect_to_database() -> AsyncDatabase:
     """Connects to MongoDB Atlas using PyMongo's official Async API and returns the database."""
     global _client, _database
 
-    if _database is not None:
-        return _database
+    import asyncio
+    current_loop = None
+    try:
+        current_loop = asyncio.get_running_loop()
+    except RuntimeError:
+        pass
+
+    if _database is not None and _client is not None:
+        client_loop = getattr(_client, "_loop", None)
+        if client_loop is None or client_loop is current_loop:
+            return _database
+        try:
+            _client.close()
+        except Exception:
+            pass
+        _client = None
+        _database = None
 
     if not MONGODB_URI:
         raise ValueError("MONGODB_URI environment variable is not configured.")
@@ -33,6 +48,7 @@ async def connect_to_database() -> AsyncDatabase:
     await init_indexes()
 
     return _database
+
 
 
 async def init_indexes() -> None:
@@ -55,6 +71,12 @@ async def init_indexes() -> None:
         assessments_col = _database["learner_assessments"]
         await assessments_col.create_index([("learnerId", ASCENDING)])
         await assessments_col.create_index([("parentId", ASCENDING)])
+
+        events_col = _database["learner_gameplay_events"]
+        await events_col.create_index([("eventId", ASCENDING)], unique=True)
+        await events_col.create_index([("learnerId", ASCENDING)])
+        await events_col.create_index([("skillId", ASCENDING)])
+        await events_col.create_index([("activityTimestamp", ASCENDING)])
 
         logger.info("MongoDB collections and indexes initialized successfully.")
     except Exception as exc:
@@ -100,4 +122,9 @@ def get_questionnaires_collection() -> AsyncCollection:
 
 def get_assessments_collection() -> AsyncCollection:
     return get_database()["learner_assessments"]
+
+
+def get_gameplay_events_collection() -> AsyncCollection:
+    return get_database()["learner_gameplay_events"]
+
 

@@ -206,6 +206,9 @@ async def adapt_problem_to_game(problem_id: str, req: AdaptProblemRequest):
         upsert=True,
     )
 
+    from app.services.repository import repository
+    repository.save(envelope)
+
     return envelope
 
 

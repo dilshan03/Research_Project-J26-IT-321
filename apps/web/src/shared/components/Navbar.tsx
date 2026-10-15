@@ -8,6 +8,7 @@ import {
   Users,
   ChevronDown,
   BookOpen,
+  LayoutDashboard,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks/useAuth';
@@ -24,6 +25,8 @@ export const Navbar: React.FC = () => {
   const isHome = location.pathname === '/';
   const isLearners = location.pathname.startsWith('/learners');
   const isProfile = location.pathname.startsWith('/profile');
+  const isParentDashboard = location.pathname.startsWith('/parent/dashboard');
+  const isTeacherDashboard = location.pathname.startsWith('/teacher/dashboard');
   const isTeacherStudio = window.location.hash.startsWith('#/adapt');
 
   // Close menus on route changes
@@ -115,40 +118,72 @@ export const Navbar: React.FC = () => {
             )}
           </Link>
 
-          {/* Role-Specific Navigation: Parent -> My Children */}
+          {/* Role-Specific Navigation: Parent -> Dashboard & My Children */}
           {isAuthenticated && user?.role === 'parent' && (
-            <Link
-              to="/learners"
-              className={`relative py-1.5 px-2.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                isLearners
-                  ? 'text-mq-primary font-bold'
-                  : 'text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft/60'
-              }`}
-            >
-              <Users size={15} className={isLearners ? 'text-mq-primary' : 'text-mq-primary-dark'} />
-              <span>My Children</span>
-              {isLearners && (
-                <span className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-mq-primary rounded-full" />
-              )}
-            </Link>
+            <>
+              <Link
+                to="/parent/dashboard"
+                className={`relative py-1.5 px-2.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+                  isParentDashboard
+                    ? 'text-mq-primary font-bold'
+                    : 'text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft/60'
+                }`}
+              >
+                <LayoutDashboard size={15} className={isParentDashboard ? 'text-mq-primary' : 'text-mq-primary-dark'} />
+                <span>Dashboard</span>
+                {isParentDashboard && (
+                  <span className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-mq-primary rounded-full" />
+                )}
+              </Link>
+              <Link
+                to="/learners"
+                className={`relative py-1.5 px-2.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+                  isLearners
+                    ? 'text-mq-primary font-bold'
+                    : 'text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft/60'
+                }`}
+              >
+                <Users size={15} className={isLearners ? 'text-mq-primary' : 'text-mq-primary-dark'} />
+                <span>My Children</span>
+                {isLearners && (
+                  <span className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-mq-primary rounded-full" />
+                )}
+              </Link>
+            </>
           )}
 
-          {/* Role-Specific Navigation: Teacher -> Studio */}
+          {/* Role-Specific Navigation: Teacher -> Dashboard & Studio */}
           {isAuthenticated && user?.role === 'teacher' && (
-            <a
-              href="#/adapt"
-              className={`relative py-1.5 px-2.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
-                isTeacherStudio
-                  ? 'text-mq-primary font-bold'
-                  : 'text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft/60'
-              }`}
-            >
-              <BookOpen size={15} className="text-mq-primary" />
-              <span>Teacher Studio</span>
-              {isTeacherStudio && (
-                <span className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-mq-primary rounded-full" />
-              )}
-            </a>
+            <>
+              <Link
+                to="/teacher/dashboard"
+                className={`relative py-1.5 px-2.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+                  isTeacherDashboard
+                    ? 'text-mq-primary font-bold'
+                    : 'text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft/60'
+                }`}
+              >
+                <LayoutDashboard size={15} className="text-mq-primary" />
+                <span>Dashboard</span>
+                {isTeacherDashboard && (
+                  <span className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-mq-primary rounded-full" />
+                )}
+              </Link>
+              <a
+                href="#/adapt"
+                className={`relative py-1.5 px-2.5 rounded-lg transition-colors whitespace-nowrap flex items-center gap-1.5 ${
+                  isTeacherStudio
+                    ? 'text-mq-primary font-bold'
+                    : 'text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft/60'
+                }`}
+              >
+                <BookOpen size={15} className="text-mq-primary" />
+                <span>Teacher Studio</span>
+                {isTeacherStudio && (
+                  <span className="absolute bottom-0 left-2.5 right-2.5 h-[2.5px] bg-mq-primary rounded-full" />
+                )}
+              </a>
+            </>
           )}
 
           {/* Informational Public Links */}
@@ -187,10 +222,10 @@ export const Navbar: React.FC = () => {
               {/* Contextual CTA when on Home page */}
               {isHome && (
                 <Link
-                  to={user.role === 'parent' ? '/learners' : '#/adapt'}
+                  to={user.role === 'parent' ? '/parent/dashboard' : '/teacher/dashboard'}
                   className="btn btn-primary text-xs xl:text-sm py-1.5 px-3.5 rounded-full whitespace-nowrap inline-flex items-center gap-1.5 shadow-sm hover:shadow transition-all"
                 >
-                  <span>{user.role === 'parent' ? 'Open Dashboard' : 'Open Studio'}</span>
+                  <span>{user.role === 'parent' ? 'Open Dashboard' : 'Open Teacher Dashboard'}</span>
                   <ArrowRight size={14} strokeWidth={2.5} />
                 </Link>
               )}
@@ -270,31 +305,61 @@ export const Navbar: React.FC = () => {
                       </Link>
 
                       {user.role === 'parent' && (
-                        <Link
-                          to="/learners"
-                          role="menuitem"
-                          onClick={() => setIsProfileMenuOpen(false)}
-                          className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
-                            isLearners
-                              ? 'bg-mq-surface-blue text-mq-primary font-bold'
-                              : 'text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary'
-                          }`}
-                        >
-                          <Users size={15} className="text-mq-primary shrink-0" />
-                          <span>My Children (මගේ දරුවන්)</span>
-                        </Link>
+                        <>
+                          <Link
+                            to="/parent/dashboard"
+                            role="menuitem"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                              isParentDashboard
+                                ? 'bg-mq-surface-blue text-mq-primary font-bold'
+                                : 'text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary'
+                            }`}
+                          >
+                            <LayoutDashboard size={15} className="text-mq-primary shrink-0" />
+                            <span>Parent Dashboard</span>
+                          </Link>
+                          <Link
+                            to="/learners"
+                            role="menuitem"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                              isLearners
+                                ? 'bg-mq-surface-blue text-mq-primary font-bold'
+                                : 'text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary'
+                            }`}
+                          >
+                            <Users size={15} className="text-mq-primary shrink-0" />
+                            <span>My Children (මගේ දරුවන්)</span>
+                          </Link>
+                        </>
                       )}
 
                       {user.role === 'teacher' && (
-                        <a
-                          href="#/adapt"
-                          role="menuitem"
-                          onClick={() => setIsProfileMenuOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
-                        >
-                          <BookOpen size={15} className="text-mq-primary shrink-0" />
-                          <span>Teacher Adaptation Studio</span>
-                        </a>
+                        <>
+                          <Link
+                            to="/teacher/dashboard"
+                            role="menuitem"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                              isTeacherDashboard
+                                ? 'bg-mq-surface-blue text-mq-primary font-bold'
+                                : 'text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary'
+                            }`}
+                          >
+                            <LayoutDashboard size={15} className="text-mq-primary shrink-0" />
+                            <span>Teacher Dashboard</span>
+                          </Link>
+                          <a
+                            href="#/adapt"
+                            role="menuitem"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                            className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
+                          >
+                            <BookOpen size={15} className="text-mq-primary shrink-0" />
+                            <span>Teacher Adaptation Studio</span>
+                          </a>
+                        </>
                       )}
                     </div>
 
@@ -396,33 +461,61 @@ export const Navbar: React.FC = () => {
             </Link>
 
             {isAuthenticated && user?.role === 'parent' && (
-              <Link
-                to="/learners"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center gap-2 py-2 px-3 rounded-xl transition-colors ${
-                  isLearners
-                    ? 'bg-mq-surface-blue text-mq-primary font-bold'
-                    : 'hover:bg-mq-surface-soft hover:text-mq-primary'
-                }`}
-              >
-                <Users size={16} className="text-mq-primary" />
-                <span>My Children (මගේ දරුවන්)</span>
-              </Link>
+              <>
+                <Link
+                  to="/parent/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center gap-2 py-2 px-3 rounded-xl transition-colors ${
+                    isParentDashboard
+                      ? 'bg-mq-surface-blue text-mq-primary font-bold'
+                      : 'hover:bg-mq-surface-soft hover:text-mq-primary'
+                  }`}
+                >
+                  <LayoutDashboard size={16} className="text-mq-primary" />
+                  <span>Parent Dashboard</span>
+                </Link>
+                <Link
+                  to="/learners"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center gap-2 py-2 px-3 rounded-xl transition-colors ${
+                    isLearners
+                      ? 'bg-mq-surface-blue text-mq-primary font-bold'
+                      : 'hover:bg-mq-surface-soft hover:text-mq-primary'
+                  }`}
+                >
+                  <Users size={16} className="text-mq-primary" />
+                  <span>My Children (මගේ දරුවන්)</span>
+                </Link>
+              </>
             )}
 
             {isAuthenticated && user?.role === 'teacher' && (
-              <a
-                href="#/adapt"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center gap-2 py-2 px-3 rounded-xl transition-colors ${
-                  isTeacherStudio
-                    ? 'bg-mq-surface-blue text-mq-primary font-bold'
-                    : 'hover:bg-mq-surface-soft hover:text-mq-primary'
-                }`}
-              >
-                <BookOpen size={16} className="text-mq-primary" />
-                <span>Teacher Studio</span>
-              </a>
+              <>
+                <Link
+                  to="/teacher/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center gap-2 py-2 px-3 rounded-xl transition-colors ${
+                    isTeacherDashboard
+                      ? 'bg-mq-surface-blue text-mq-primary font-bold'
+                      : 'hover:bg-mq-surface-soft hover:text-mq-primary'
+                  }`}
+                >
+                  <LayoutDashboard size={16} className="text-mq-primary" />
+                  <span>Teacher Dashboard</span>
+                </Link>
+                <a
+                  href="#/adapt"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center gap-2 py-2 px-3 rounded-xl transition-colors ${
+                    isTeacherStudio
+                      ? 'bg-mq-surface-blue text-mq-primary font-bold'
+                      : 'hover:bg-mq-surface-soft hover:text-mq-primary'
+                  }`}
+                >
+                  <BookOpen size={16} className="text-mq-primary" />
+                  <span>Teacher Studio</span>
+                </a>
+              </>
             )}
 
             <a

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   CheckCircle2,
@@ -9,7 +9,10 @@ import {
   ArrowRight,
   TrendingUp,
   Brain,
+  Info,
+  ShieldCheck,
 } from 'lucide-react';
+
 import type { OnboardingFullSummary } from '../../types/onboarding';
 import { AVATAR_OPTIONS } from '../../types';
 
@@ -18,6 +21,7 @@ interface Props {
 }
 
 export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
+  const [showFormulaExplanation, setShowFormulaExplanation] = useState<boolean>(false);
   const learner = summary.learner;
   const avatar =
     AVATAR_OPTIONS.find((a) => a.id === learner?.avatarId) || AVATAR_OPTIONS[0];
@@ -25,6 +29,7 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
   const math = summary.mathSummary;
   const snap = summary.snapIvSummary;
   const pref = summary.learningPreferences;
+  const elpx = math?.elpxProfile;
 
   return (
     <div className="space-y-6">
@@ -53,15 +58,15 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
         <div className="flex flex-col sm:flex-row gap-2.5 shrink-0">
           <Link
             to="/learners"
-            className="btn btn-secondary text-xs py-2 px-4 rounded-full font-bold font-sinhala text-center"
+            className="btn btn-secondary text-xs py-2.5 px-4 rounded-full font-bold font-sinhala text-center inline-flex items-center justify-center gap-1.5 shadow-xs"
           >
-            මගේ දරුවන් වෙත
+            <span>මගේ දරුවන්ගේ ලැයිස්තුව (Learners Overview)</span>
           </Link>
           <a
             href="#/play"
-            className="btn btn-primary text-xs py-2 px-5 rounded-full font-bold font-sinhala inline-flex items-center justify-center gap-1.5 shadow-sm"
+            className="btn btn-primary text-xs py-2.5 px-5 rounded-full font-bold font-sinhala inline-flex items-center justify-center gap-1.5 shadow-sm"
           >
-            <span>ක්‍රීඩා අරඹමු</span>
+            <span>අනුවර්තී ක්‍රීඩා අරඹමු (Start Adaptive Play)</span>
             <ArrowRight size={14} strokeWidth={2.5} />
           </a>
         </div>
@@ -167,7 +172,7 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
           )}
         </div>
 
-        {/* Card 3: Math Baseline Accuracy */}
+        {/* Card 3: Math Baseline Accuracy & ELP-X Overview */}
         <div className="bg-white rounded-3xl border border-mq-border p-6 shadow-xs space-y-4">
           <div className="flex items-center gap-2.5 border-b border-mq-border/70 pb-3">
             <div className="w-8 h-8 rounded-xl bg-mq-surface-yellow text-mq-warning flex items-center justify-center shrink-0">
@@ -175,9 +180,9 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
             </div>
             <div>
               <h3 className="text-sm font-bold text-mq-text-strong font-sinhala">
-                මූලික ගණිත නිපුණතාව
+                මූලික ගණිත තක්සේරුව
               </h3>
-              <span className="text-[10px] text-mq-text-muted">Math Baseline Score</span>
+              <span className="text-[10px] text-mq-text-muted">Math Assessment & ELP-X v1.0</span>
             </div>
           </div>
 
@@ -188,12 +193,28 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                   {math.accuracyPercentage}%
                 </span>
                 <span className="text-xs font-bold text-mq-text-strong mt-1 block">
-                  නිවැරදි පිළිතුරු {math.correctAnswers} / {math.totalQuestions}
+                  නිරීක්ෂිත නිවැරදි: {math.correctAnswers} / {math.totalQuestions}
                 </span>
-                <span className="inline-block mt-2 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary border border-mq-primary/20">
-                  සාක්ෂි මට්ටම: {math.evidenceLevel}
-                </span>
+                <div className="mt-2 flex items-center justify-center gap-2 flex-wrap">
+                  <span
+                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+                      math.evidenceLevel === 'SUFFICIENT'
+                        ? 'bg-mq-surface-green text-mq-success border-mq-success/20'
+                        : 'bg-mq-surface-yellow text-mq-warning border-mq-warning/20'
+                    }`}
+                  >
+                    සාක්ෂි තත්ත්වය: {math.evidenceLevel === 'SUFFICIENT' ? 'ප්‍රමාණවත් (Sufficient)' : 'අප්‍රමාණවත් (Insufficient)'}
+                  </span>
+                  {elpx && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary border border-mq-primary/20">
+                      {elpx.algorithmVersion}
+                    </span>
+                  )}
+                </div>
               </div>
+              <p className="text-[10px] text-mq-text-muted text-left leading-relaxed">
+                <strong>ප්‍රමිති දැන්වීම:</strong> පර්යේෂණාත්මක ආදර්ශන මිනුම් (Provisional Estimates). මෙම අගයන් සායනික හෝ රෝග විනිශ්චය සහතික නොවේ.
+              </p>
             </div>
           ) : (
             <p className="text-xs text-mq-text-muted font-sinhala">තොරතුරු ලබාගෙන නොමැත.</p>
@@ -201,21 +222,128 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
         </div>
       </div>
 
-      {/* Skills Breakdown & Recommendations Card */}
+      {/* Skills Breakdown & ELP-X Estimates Card */}
       {math && (
         <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-sm space-y-6 animate-fade-in font-sinhala">
-          {/* Skill Breakdown */}
-          <div>
-            <h3 className="text-base sm:text-lg font-extrabold text-mq-text-strong flex items-center gap-2">
-              <TrendingUp size={20} className="text-mq-primary" />
-              <span>කුසලතා අනුව විශ්ලේෂණය (Skill Competency Breakdown)</span>
-            </h3>
-            <p className="text-xs text-mq-text-muted mt-0.5">
-              Grade {learner.grade} foundational mathematics competency areas.
-            </p>
+          {/* Header & Distinction Note */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-mq-border/70 pb-4">
+            <div>
+              <h3 className="text-base sm:text-lg font-extrabold text-mq-text-strong flex items-center gap-2">
+                <TrendingUp size={20} className="text-mq-primary" />
+                <span>කුසලතා අනුව විශ්ලේෂණය (ELP-X Skill Estimates)</span>
+              </h3>
+              <p className="text-xs text-mq-text-muted mt-0.5">
+                නිරීක්ෂිත ප්‍රතිඵල (Observed Accuracy) සහ Bayesian Beta-Binomial ඇස්තමේන්තු සංසන්දනය:
+              </p>
+            </div>
+            <button
+              onClick={() => setShowFormulaExplanation(!showFormulaExplanation)}
+              className="text-xs font-bold text-mq-primary hover:text-mq-primary-hover inline-flex items-center gap-1.5 self-start sm:self-auto px-3 py-1.5 rounded-xl bg-mq-surface-blue/50 border border-mq-primary/20 transition-all cursor-pointer"
+            >
+              <Info size={14} />
+              <span>{showFormulaExplanation ? 'සූත්‍ර විස්තර සඟවන්න' : 'ELP-X ක්‍රමවේදය කුමක්ද?'}</span>
+            </button>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5 mt-4">
-              {math.skills.map((s) => (
+          {/* Collapsible Explainer Box */}
+          {showFormulaExplanation && (
+            <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-primary/30 text-xs text-mq-text space-y-2 animate-fade-in">
+              <div className="flex items-center gap-2 text-mq-primary font-bold">
+                <ShieldCheck size={16} />
+                <span>ELP-X v1.0 ක්‍රමවේද විස්තරය (Methodology & Safeguards):</span>
+              </div>
+              <p className="text-[11px] text-mq-text-muted leading-relaxed">
+                1. <strong>සාක්ෂි ආරක්ෂණය (Evidence Safeguard):</strong> යම් කුසලතාවක් සඳහා ඇගයූ ප්‍රශ්න ගණන 3ට අඩු නම් (<span className="font-mono">n &lt; 3</span>), එකම හරි උත්තරයකින් දරුවා 'ප්‍රවීණ' යැයි වැරදි ලෙස වර්ගීකරණය නොකරයි (<span className="font-bold text-mq-warning">INSUFFICIENT_EVIDENCE</span>).
+              </p>
+              <p className="text-[11px] text-mq-text-muted leading-relaxed">
+                2. <strong>Beta-Binomial ඇස්තමේන්තුව:</strong> කුඩා සාම්පල වලදී අහඹු උච්චාවචනයන් පාලනය කිරීමට Bayesian Laplace prior (<span className="font-mono">α₀=1, β₀=1</span>) යොදාගනී. ඇස්තමේන්තුගත නිපුණතාව <span className="font-mono">p = (1 + c) / (2 + n)</span> ලෙස ගණනය කෙරේ.
+              </p>
+              <p className="text-[11px] text-mq-text-muted leading-relaxed">
+                3. <strong>95% Credible Interval:</strong> දත්ත ප්‍රමාණය මත පදනම් වූ සංඛ්‍යානමය අවිනිශ්චිතතාව (Uncertainty) පරාසයක් ලෙස නිරූපණය කරයි.
+              </p>
+            </div>
+          )}
+
+          {/* Skill Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {elpx?.skillEstimates ? (
+              elpx.skillEstimates.map((s) => (
+                <div
+                  key={s.skillId}
+                  className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/80 flex flex-col justify-between space-y-3.5 hover:border-mq-primary/40 transition-colors"
+                >
+                  {/* Skill Title & Provisional Badge */}
+                  <div>
+                    <div className="flex items-start justify-between gap-1">
+                      <span className="text-sm font-bold text-mq-text-strong block">
+                        {s.skillNameSi}
+                      </span>
+                      <span
+                        className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+                          s.provisionalSkillLevel === 'PROFICIENT'
+                            ? 'bg-mq-success-bg text-mq-success border border-mq-success/30'
+                            : s.provisionalSkillLevel === 'DEVELOPING'
+                            ? 'bg-mq-warning-bg text-mq-warning border border-mq-warning/30'
+                            : s.provisionalSkillLevel === 'EMERGING'
+                            ? 'bg-mq-danger-bg text-mq-danger border border-mq-danger/30'
+                            : 'bg-mq-surface-yellow text-mq-warning border border-mq-warning/40'
+                        }`}
+                      >
+                        {s.provisionalSkillLevel === 'INSUFFICIENT_EVIDENCE'
+                          ? 'සාක්ෂි මදි (Insufficient)'
+                          : `${s.provisionalSkillLevel} (තාවකාලික)`}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-mq-text-muted block mt-0.5">
+                      {s.skillName}
+                    </span>
+                  </div>
+
+                  {/* Quantitative Metrics (Observed vs Estimated) */}
+                  <div className="space-y-2 pt-1 border-t border-mq-border/60 text-xs">
+                    {/* Observed Row */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-mq-text-muted">නිරීක්ෂිත ලකුණු:</span>
+                      <span className="font-mono font-bold text-mq-text-strong">
+                        {s.rawAccuracyPercentage}% ({s.correctFirstResponses}/{s.distinctQuestionsAssessed} ප්‍රශ්න)
+                      </span>
+                    </div>
+
+                    {/* Bayesian Estimated Proficiency */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-mq-text-muted">ELP-X ඇස්තමේන්තුව:</span>
+                      <span className="font-mono font-extrabold text-mq-primary">
+                        {s.estimatedProficiencyPercentage}%
+                      </span>
+                    </div>
+
+                    {/* 95% Bayesian Credible Interval */}
+                    <div className="flex items-center justify-between text-[10px] text-mq-text-muted">
+                      <span>95% විශ්වාස පරාසය:</span>
+                      <span className="font-mono font-semibold text-mq-text">
+                        [{(s.credibleInterval.lower * 100).toFixed(1)}% - {(s.credibleInterval.upper * 100).toFixed(1)}%]
+                      </span>
+                    </div>
+
+                    {/* Uncertainty Progress Bar */}
+                    <div className="space-y-1 pt-0.5">
+                      <div className="flex items-center justify-between text-[9px] text-mq-text-muted">
+                        <span>අවිනිශ්චිතතා පළල: {(s.credibleIntervalWidth * 100).toFixed(1)}%</span>
+                        <span>α={s.posteriorAlpha}, β={s.posteriorBeta}</span>
+                      </div>
+                      <div className="w-full bg-mq-border/40 h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-mq-primary h-full rounded-full transition-all duration-500"
+                          style={{ width: `${Math.min(100, s.estimatedProficiencyPercentage)}%` }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              /* Fallback to basic skills list if elpxProfile is pending */
+              math.skills.map((s) => (
                 <div
                   key={s.skillId}
                   className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/70 flex flex-col justify-between"
@@ -228,43 +356,80 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                       {s.skillName}
                     </span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between">
+                  <div className="mt-3 flex items-center justify-between gap-1 flex-wrap">
                     <span className="text-xs font-mono font-bold text-mq-primary">
                       {s.accuracyPercentage}% ({s.correctQuestions}/{s.totalQuestions})
                     </span>
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        s.proficiencyCategory === 'Proficient'
-                          ? 'bg-mq-success-bg text-mq-success'
-                          : s.proficiencyCategory === 'Developing'
-                          ? 'bg-mq-warning-bg text-mq-warning'
-                          : 'bg-mq-danger-bg text-mq-danger'
-                      }`}
-                    >
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-mq-surface-soft text-mq-text-muted border border-mq-border">
                       {s.proficiencyCategory}
                     </span>
                   </div>
                 </div>
-              ))}
-            </div>
+              ))
+            )}
           </div>
 
-          {/* Rule-Based Recommendations */}
+          {/* Structured Pedagogical Recommendations */}
           <div className="border-t border-mq-border/70 pt-5 space-y-3">
-            <h4 className="text-sm font-bold text-mq-text-strong flex items-center gap-2">
-              <Sparkles size={16} className="text-mq-primary" />
-              <span>අනුවර්තී ඉගෙනුම් නිර්දේශ (Pedagogical Recommendations):</span>
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {math.recommendations.map((rec, idx) => (
-                <div
-                  key={idx}
-                  className="p-3.5 rounded-2xl bg-mq-surface-blue/50 border border-mq-primary/20 text-xs text-mq-text leading-relaxed flex items-start gap-2"
-                >
-                  <span className="text-mq-primary font-bold mt-0.5">•</span>
-                  <span>{rec}</span>
-                </div>
-              ))}
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-bold text-mq-text-strong flex items-center gap-2">
+                <Sparkles size={16} className="text-mq-primary" />
+                <span>පුද්ගලීකරණය කළ පැහැදිලි නිර්දේශ (Explainable Recommendations):</span>
+              </h4>
+              {elpx && (
+                <span className="text-[10px] font-mono text-mq-text-muted">
+                  Ruleset: {elpx.recommendationRulesetVersion}
+                </span>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              {elpx?.structuredRecommendations ? (
+                elpx.structuredRecommendations.map((rec) => (
+                  <div
+                    key={rec.recommendationId}
+                    className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/80 flex flex-col justify-between space-y-2.5 hover:border-mq-primary/40 transition-colors"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-bold text-mq-text-strong">
+                          {rec.titleSi || rec.titleEn}
+                        </span>
+                        <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary border border-mq-primary/20 shrink-0">
+                          {rec.strategyCode}
+                        </span>
+                      </div>
+                      <p className="text-xs text-mq-text mt-1 leading-relaxed">
+                        {rec.descriptionSi || rec.descriptionEn}
+                      </p>
+                    </div>
+
+                    {/* Transparent Decision Reason Codes */}
+                    <div className="flex items-center gap-1.5 flex-wrap pt-1 border-t border-mq-border/50">
+                      <span className="text-[9px] text-mq-text-muted font-bold">හේතු කේත:</span>
+                      {rec.reasonCodes.map((rc, idx) => (
+                        <span
+                          key={idx}
+                          className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white text-mq-text-muted border border-mq-border/60"
+                        >
+                          {rc}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                /* Fallback to simple recommendations if structured not present */
+                math.recommendations.map((rec, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3.5 rounded-2xl bg-mq-surface-blue/50 border border-mq-primary/20 text-xs text-mq-text leading-relaxed flex items-start gap-2"
+                  >
+                    <span className="text-mq-primary font-bold mt-0.5">•</span>
+                    <span>{rec}</span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 

@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GameplayActivityEvidence",
+  "description": "Standard schema for continuous mathematics activity evidence ingested from gameplay and pedagogical engines into the Learner Profile Service.",
+  "type": "object",
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "description": "Unique idempotent gameplay event identifier"
+    },
+    "learnerId": {
+      "type": "string",
+      "description": "Unique learner profile identifier"
+    },
+    "questionId": {
+      "type": "string",
+      "description": "Curriculum or bank question identifier"
+    },
+    "activityId": {
+      "type": "string",
+      "description": "Adaptive activity identifier (alternative or alias to questionId)"
+    },
+    "skillId": {
+      "type": "string",
+      "description": "Curriculum competency area (e.g., 'addition', 'number_sense')"
+    },
+    "correctFirstResponse": {
+      "type": "boolean",
+      "description": "Whether the learner answered correctly on their first attempt"
+    },
+    "attempts": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Total attempts made during the activity session"
+    },
+    "hintsUsed": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0,
+      "description": "Number of pedagogical hints accessed"
+    },
+    "responseTime": {
+      "type": "number",
+      "minimum": 0.0,
+      "description": "Response time in seconds (recorded for engagement analysis, never used as score penalty)"
+    },
+    "activityTimestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the event occurred"
+    },
+    "sourceComponent": {
+      "type": "string",
+      "enum": [
+        "gameplay-engine",
+        "content-adaptation",
+        "pedagogical-engine",
+        "learner-onboarding",
+        "mathquest-client"
+      ],
+      "default": "gameplay-engine"
+    }
+  },
+  "required": [
+    "eventId",
+    "learnerId",
+    "skillId",
+    "correctFirstResponse"
+  ]
+}

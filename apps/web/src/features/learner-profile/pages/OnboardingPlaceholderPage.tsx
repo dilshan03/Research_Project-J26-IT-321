@@ -41,6 +41,11 @@ export const OnboardingPlaceholderPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<OnboardingStepKey>('preferences');
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
 
+  // Saved responses for resuming
+  const [savedPreferences, setSavedPreferences] = useState<Partial<LearningPreferencesData> | undefined>(undefined);
+  const [savedSnapIv, setSavedSnapIv] = useState<SnapIvItemAnswer[] | undefined>(undefined);
+  const [savedSocialContext, setSavedSocialContext] = useState<Partial<SocialContextData> | undefined>(undefined);
+
   // Math questions bank items
   const [mathQuestions, setMathQuestions] = useState<MathQuestion[]>([]);
   // Full summary for final step
@@ -79,6 +84,16 @@ export const OnboardingPlaceholderPage: React.FC = () => {
         setProgress(p);
         setCompletedSteps(p.completedSteps || []);
 
+        if (p.learningPreferences) {
+          setSavedPreferences(p.learningPreferences);
+        }
+        if (p.snapIvResponses) {
+          setSavedSnapIv(p.snapIvResponses);
+        }
+        if (p.socialContext) {
+          setSavedSocialContext(p.socialContext);
+        }
+
         if (p.status === 'COMPLETED') {
           setCurrentStep('summary');
           const sumRes = await onboardingApi.getSummary(learnerId);
@@ -108,28 +123,39 @@ export const OnboardingPlaceholderPage: React.FC = () => {
 
   // Handle Step 1: Learning Preferences
   const handleSavePreferences = async (data: LearningPreferencesData) => {
-    if (!learnerId) return;
+    if (!learnerId || isActionLoading) return;
     setIsActionLoading(true);
     try {
       const res = await onboardingApi.savePreferences(learnerId, data);
       if (res.success) {
+        setSavedPreferences(data);
         setCompletedSteps((prev) => Array.from(new Set([...prev, 'preferences'])));
         setCurrentStep('snap_iv');
         showToast('ඉගෙනුම් මනාපයන් සාර්ථකව සුරකින ලදී.');
       } else {
         showToast(res.message || 'සුරැකීමට නොහැකි විය.');
       }
+    } catch {
+      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
     } finally {
       setIsActionLoading(false);
     }
   };
 
   const handlePreferencesSaveAndExit = async (data: LearningPreferencesData) => {
-    if (!learnerId) return;
+    if (!learnerId || isActionLoading) return;
     setIsActionLoading(true);
     try {
-      await onboardingApi.savePreferences(learnerId, data);
-      navigate('/learners');
+      const res = await onboardingApi.savePreferences(learnerId, data);
+      if (res.success) {
+        setSavedPreferences(data);
+        showToast('ඉගෙනුම් මනාපයන් සුරකින ලදී.');
+        navigate('/learners');
+      } else {
+        showToast(res.message || 'සුරැකීමට නොහැකි විය.');
+      }
+    } catch {
+      showToast('ජාල දෝෂයක් හටගැනිණි. සුරැකීමට නොහැකි විය.');
     } finally {
       setIsActionLoading(false);
     }
@@ -137,28 +163,39 @@ export const OnboardingPlaceholderPage: React.FC = () => {
 
   // Handle Step 2: SNAP-IV Questionnaire
   const handleSaveSnapIv = async (responses: SnapIvItemAnswer[]) => {
-    if (!learnerId) return;
+    if (!learnerId || isActionLoading) return;
     setIsActionLoading(true);
     try {
       const res = await onboardingApi.submitSnapIv(learnerId, responses);
       if (res.success) {
+        setSavedSnapIv(responses);
         setCompletedSteps((prev) => Array.from(new Set([...prev, 'snap_iv'])));
         setCurrentStep('social_context');
         showToast('SNAP-IV ලකුණු සාර්ථකව සටහන් කරගන්නා ලදී.');
       } else {
         showToast(res.message || 'SNAP-IV සුරැකීමට නොහැකි විය.');
       }
+    } catch {
+      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
     } finally {
       setIsActionLoading(false);
     }
   };
 
   const handleSnapIvSaveAndExit = async (responses: SnapIvItemAnswer[]) => {
-    if (!learnerId) return;
+    if (!learnerId || isActionLoading) return;
     setIsActionLoading(true);
     try {
-      await onboardingApi.submitSnapIv(learnerId, responses);
-      navigate('/learners');
+      const res = await onboardingApi.submitSnapIv(learnerId, responses);
+      if (res.success) {
+        setSavedSnapIv(responses);
+        showToast('SNAP-IV ලකුණු සුරකින ලදී.');
+        navigate('/learners');
+      } else {
+        showToast(res.message || 'SNAP-IV සුරැකීමට නොහැකි විය.');
+      }
+    } catch {
+      showToast('ජාල දෝෂයක් හටගැනිණි. සුරැකීමට නොහැකි විය.');
     } finally {
       setIsActionLoading(false);
     }
@@ -166,28 +203,39 @@ export const OnboardingPlaceholderPage: React.FC = () => {
 
   // Handle Step 3: Social Context
   const handleSaveSocialContext = async (data: SocialContextData) => {
-    if (!learnerId) return;
+    if (!learnerId || isActionLoading) return;
     setIsActionLoading(true);
     try {
       const res = await onboardingApi.saveSocialContext(learnerId, data);
       if (res.success) {
+        setSavedSocialContext(data);
         setCompletedSteps((prev) => Array.from(new Set([...prev, 'social_context'])));
         setCurrentStep('handover');
         showToast('සමාජීය ඉගෙනුම් පසුබිම සටහන් කරගන්නා ලදී.');
       } else {
         showToast(res.message || 'සුරැකීමට නොහැකි විය.');
       }
+    } catch {
+      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
     } finally {
       setIsActionLoading(false);
     }
   };
 
   const handleSocialContextSaveAndExit = async (data: SocialContextData) => {
-    if (!learnerId) return;
+    if (!learnerId || isActionLoading) return;
     setIsActionLoading(true);
     try {
-      await onboardingApi.saveSocialContext(learnerId, data);
-      navigate('/learners');
+      const res = await onboardingApi.saveSocialContext(learnerId, data);
+      if (res.success) {
+        setSavedSocialContext(data);
+        showToast('සමාජීය පසුබිම සුරකින ලදී.');
+        navigate('/learners');
+      } else {
+        showToast(res.message || 'සුරැකීමට නොහැකි විය.');
+      }
+    } catch {
+      showToast('ජාල දෝෂයක් හටගැනිණි. සුරැකීමට නොහැකි විය.');
     } finally {
       setIsActionLoading(false);
     }
@@ -200,7 +248,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
 
   // Handle Step 5: Math Assessment Submit
   const handleMathSubmit = async (answers: MathItemAnswer[]) => {
-    if (!learnerId || !learner) return;
+    if (!learnerId || !learner || isActionLoading) return;
     setIsActionLoading(true);
     try {
       const res = await onboardingApi.submitMathAssessment(
@@ -222,13 +270,14 @@ export const OnboardingPlaceholderPage: React.FC = () => {
       } else {
         showToast(res.message || 'ඇගයීම සුරැකීමට නොහැකි විය.');
       }
+    } catch {
+      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
     } finally {
       setIsActionLoading(false);
     }
   };
 
   const handleMathSaveAndExit = async (_answers: MathItemAnswer[]) => {
-    showToast('ප්‍රගතිය සුරකින ලදී.');
     navigate('/learners');
   };
 
@@ -353,6 +402,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
             {/* Step 1: Learning Preferences */}
             {currentStep === 'preferences' && (
               <LearningPreferencesStep
+                initialData={savedPreferences}
                 onSave={handleSavePreferences}
                 onSaveAndExit={handlePreferencesSaveAndExit}
                 isSaving={isActionLoading}
@@ -362,6 +412,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
             {/* Step 2: SNAP-IV Questionnaire */}
             {currentStep === 'snap_iv' && (
               <SnapIvStep
+                initialResponses={savedSnapIv}
                 onSave={handleSaveSnapIv}
                 onSaveAndExit={handleSnapIvSaveAndExit}
                 onBack={() => setCurrentStep('preferences')}
@@ -372,6 +423,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
             {/* Step 3: Social Learning Context */}
             {currentStep === 'social_context' && (
               <SocialContextStep
+                initialData={savedSocialContext}
                 onSave={handleSaveSocialContext}
                 onSaveAndExit={handleSocialContextSaveAndExit}
                 onBack={() => setCurrentStep('snap_iv')}

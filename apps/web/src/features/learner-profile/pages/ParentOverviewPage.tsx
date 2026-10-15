@@ -8,7 +8,6 @@ import {
   Plus,
   ArrowRight,
   Brain,
-  AlertCircle,
   Loader2,
   GraduationCap,
   ChevronRight,
@@ -21,6 +20,9 @@ import type { Learner, CreateLearnerData, UpdateLearnerData } from '../types';
 import { AVATAR_OPTIONS } from '../types';
 import type { ElpxProfile, ElpxSkillEstimate } from '../types/onboarding';
 import { LearnerModal } from '../components/LearnerModal';
+import { OnboardingStatusBadge } from '../components/OnboardingStatusBadge';
+import { PageHeader } from '../../../shared/components/PageHeader';
+import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
 
 export const ParentOverviewPage: React.FC = () => {
   const { user } = useAuth();
@@ -123,6 +125,25 @@ export const ParentOverviewPage: React.FC = () => {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
+      {/* Standardized Page Header */}
+      <PageHeader
+        role="parent"
+        title="Dashboard Overview"
+        titleSi="දළ විශ්ලේෂණය"
+        description="Monitor your children’s math progress, assessment baselines, and personalized support."
+        descriptionSi="දරුවන්ගේ ගණිත ප්‍රගතිය, මූලික ඇගයීම් සහ පුද්ගලාරෝපිත අධ්‍යාපනික නිර්දේශ මෙතැනින් බලන්න."
+        actions={
+          <button
+            type="button"
+            onClick={() => setIsAddModalOpen(true)}
+            className="btn btn-primary inline-flex items-center gap-2 py-2 px-4 rounded-full text-xs sm:text-sm font-bold shadow-xs cursor-pointer"
+          >
+            <Plus size={16} />
+            <span>Add Child Profile</span>
+          </button>
+        }
+      />
+
       {/* ========================================================= */}
       {/* 1. Personalized Parent Welcome & Quick Stat Highlights    */}
       {/* ========================================================= */}
@@ -140,18 +161,6 @@ export const ParentOverviewPage: React.FC = () => {
               Track your child’s ADHD-tailored math journey, review evidence-aware skill levels,
               and explore explainable learning recommendations.
             </p>
-          </div>
-
-          {/* Quick Action Button */}
-          <div className="flex items-center gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={() => setIsAddModalOpen(true)}
-              className="btn btn-primary inline-flex items-center gap-2 py-2.5 px-5 rounded-full text-xs sm:text-sm font-bold shadow-sm hover:shadow"
-            >
-              <Plus size={16} />
-              <span>Add Child Profile</span>
-            </button>
           </div>
         </div>
 
@@ -193,45 +202,41 @@ export const ParentOverviewPage: React.FC = () => {
       {/* 2. Loading & Error States                                 */}
       {/* ========================================================= */}
       {isLoadingLearners && (
-        <div className="flex items-center justify-center p-12 bg-white rounded-3xl border border-mq-border text-mq-primary gap-3 font-semibold text-sm">
-          <Loader2 size={24} className="animate-spin" />
-          <span>Loading children profiles...</span>
-        </div>
+        <LoadingState
+          message="Loading children profiles..."
+          messageSi="දරුවන්ගේ පැතිකඩ පූරණය වෙමින් පවතී..."
+        />
       )}
 
       {errorMessage && (
-        <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-mq-danger text-sm flex items-center gap-3">
-          <AlertCircle size={18} className="shrink-0" />
-          <span>{errorMessage}</span>
-        </div>
+        <ErrorAlert
+          message={errorMessage}
+          messageSi="දරුවන්ගේ තොරතුරු ලබාගැනීමට නොහැකි විය."
+          onRetry={loadLearners}
+        />
       )}
 
       {/* ========================================================= */}
       {/* 3. Empty State: No Registered Children                    */}
       {/* ========================================================= */}
       {!isLoadingLearners && totalChildren === 0 && (
-        <div className="bg-white rounded-3xl border border-dashed border-mq-border-strong p-8 sm:p-14 text-center max-w-xl mx-auto space-y-4">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-mq-surface-blue text-mq-primary rounded-3xl flex items-center justify-center mx-auto text-3xl">
-            👶
-          </div>
-          <h3 className="text-xl sm:text-2xl font-extrabold text-mq-text-strong">
-            No Children Registered Yet
-          </h3>
-          <p className="text-sm text-mq-text-muted max-w-md mx-auto">
-            Get started by registering your child’s profile. Once added, you will complete the 5-step
-            Sinhala onboarding assessment to discover their tailored mathematics level.
-          </p>
-          <div className="pt-2">
+        <EmptyState
+          icon={<Users size={36} />}
+          title="No Children Registered Yet"
+          titleSi="තවමත් දරුවෙකු ලියාපදිංචි කර නැත"
+          description="Get started by registering your child’s profile. Once added, you will complete the 5-step Sinhala onboarding assessment to discover their tailored mathematics level."
+          descriptionSi="ඔබේ දරුවාගේ අවධානය සහ ගණිත කුසලතා මට්ටමට ගැළපෙන අනුවර්තී අධ්‍යාපනික අත්දැකීම ලබා දීමට පළමුව දරුවාගේ තොරතුරු ඇතුළත් කරන්න."
+          action={
             <button
               type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className="btn btn-primary inline-flex items-center gap-2 py-2.5 px-6 rounded-full text-sm font-bold shadow-sm"
+              className="btn btn-primary inline-flex items-center gap-2 py-2.5 px-6 rounded-full text-sm font-bold shadow-xs cursor-pointer"
             >
               <Plus size={16} />
               <span>Register Your First Child</span>
             </button>
-          </div>
-        </div>
+          }
+        />
       )}
 
       {/* ========================================================= */}
@@ -246,7 +251,7 @@ export const ParentOverviewPage: React.FC = () => {
                 Select Child (දරුවා තෝරන්න)
               </h3>
               <Link
-                to="/parent/dashboard/children"
+                to="/learners"
                 className="text-xs font-bold text-mq-primary hover:underline inline-flex items-center gap-1"
               >
                 <span>Manage all ({totalChildren})</span>
@@ -305,22 +310,7 @@ export const ParentOverviewPage: React.FC = () => {
                       {selectedChild.firstName}{' '}
                       {selectedChild.preferredName && `(${selectedChild.preferredName})`}
                     </h3>
-                    {selectedChild.onboardingStatus === 'COMPLETED' ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-mq-success-bg text-mq-success border border-mq-success/30">
-                        <CheckCircle2 size={13} />
-                        <span>Ready (සම්පූර්ණයි)</span>
-                      </span>
-                    ) : selectedChild.onboardingStatus === 'IN_PROGRESS' ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-mq-surface-blue text-mq-primary border border-mq-primary/30">
-                        <Clock size={13} />
-                        <span>In Progress (ක්‍රියාත්මකයි)</span>
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-mq-warning-bg text-mq-warning border border-mq-warning/30">
-                        <Sparkles size={13} />
-                        <span>Needs Profiling (ආරම්භ කිරීමට ඇත)</span>
-                      </span>
-                    )}
+                    <OnboardingStatusBadge status={selectedChild.onboardingStatus} />
                   </div>
                   <p className="text-xs sm:text-sm text-mq-text-muted mt-0.5">
                     Grade {selectedChild.grade} · Age {selectedChild.age} · Preferred Language:{' '}

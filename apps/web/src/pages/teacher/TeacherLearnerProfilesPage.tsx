@@ -1,9 +1,16 @@
-import React from 'react';
-import { GraduationCap, ShieldCheck, Lock, ExternalLink, BookOpen } from 'lucide-react';
+import { ShieldCheck, ExternalLink, BookOpen } from 'lucide-react';
+import { PageHeader } from '../../shared/components/PageHeader';
 
 export const TeacherLearnerProfilesPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
+      <PageHeader
+        role="teacher"
+        title="Learner Profiles"
+        titleSi="අධ්‍යාපනික ඉගෙනුම් පැතිකඩ"
+        description="Review sanitized pedagogical skill levels, Bayesian credible intervals, and support requirements."
+      />
+
       <div className="bg-white rounded-3xl border border-mq-border p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-5">
         <div className="w-16 h-16 bg-mq-surface-green text-mq-success rounded-3xl flex items-center justify-center mx-auto">
           <ShieldCheck size={32} />

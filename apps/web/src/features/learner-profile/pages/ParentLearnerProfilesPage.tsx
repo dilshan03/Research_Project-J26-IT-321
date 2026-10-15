@@ -15,6 +15,9 @@ import { onboardingApi } from '../services/onboardingApi';
 import type { Learner } from '../types';
 import { AVATAR_OPTIONS } from '../types';
 import type { ElpxProfile, ElpxSkillEstimate, OnboardingFullSummary } from '../types/onboarding';
+import { PageHeader } from '../../../shared/components/PageHeader';
+import { OnboardingStatusBadge } from '../components/OnboardingStatusBadge';
+import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
 
 export const ParentLearnerProfilesPage: React.FC = () => {
   const [learners, setLearners] = useState<Learner[]>([]);
@@ -111,35 +114,54 @@ export const ParentLearnerProfilesPage: React.FC = () => {
 
   if (isLoadingLearners) {
     return (
-      <div className="flex items-center justify-center p-16 text-mq-primary gap-3">
-        <Loader2 size={32} className="animate-spin" />
-        <span className="font-semibold text-sm">Loading learner profiles...</span>
-      </div>
+      <LoadingState
+        message="Loading learner profiles..."
+        messageSi="ඉගෙනුම් පැතිකඩ පූරණය වෙමින් පවතී..."
+      />
     );
   }
 
   if (learners.length === 0) {
     return (
-      <div className="bg-white rounded-3xl border border-dashed border-mq-border p-8 sm:p-12 text-center max-w-lg mx-auto my-6 space-y-4">
-        <div className="text-4xl">👶</div>
-        <h3 className="text-xl font-extrabold text-mq-text-strong">No Child Profiles Found</h3>
-        <p className="text-sm text-mq-text-muted">
-          Add a child profile first to generate evidence-aware mathematics learner profiles.
-        </p>
-        <Link to="/parent/dashboard/children" className="btn btn-primary text-xs py-2 px-5 rounded-full inline-block">
-          Go to My Children
-        </Link>
-      </div>
+      <EmptyState
+        title="No Child Profiles Found"
+        titleSi="තවමත් දරුවන් ලියාපදිංචි කර නැත"
+        description="Add a child profile first to generate evidence-aware mathematics learner profiles."
+        descriptionSi="ඉගෙනුම් පැතිකඩ නිර්මාණය කිරීමට පෙර කරුණාකර පළමුව දරුවාගේ තොරතුරු ඇතුළත් කරන්න."
+        action={
+          <Link to="/learners" className="btn btn-primary text-xs py-2 px-5 rounded-full inline-block font-bold">
+            Go to My Children (දරුවන් කළමනාකරණය)
+          </Link>
+        }
+      />
     );
   }
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
+      {/* Standardized Page Header */}
+      <PageHeader
+        role="parent"
+        title="Learner Profiles & Evidence Levels"
+        titleSi="ඉගෙනුම් පැතිකඩ"
+        description="Evidence-aware mathematics proficiencies, Bayesian credible intervals, and skill levels."
+        descriptionSi="බේසියානු ඇස්තමේන්තු, 95% විශ්වාස්‍යතා පරාසයන් සහ ස්ථිර සාක්ෂි මත පදනම් වූ ගණිත නිපුණතා පැතිකඩ."
+        actions={
+          <Link
+            to="/learners"
+            className="btn btn-secondary py-2 px-4 rounded-full text-xs sm:text-sm font-bold shadow-xs inline-flex items-center gap-1.5"
+          >
+            <span>Manage Children (මගේ දරුවන්)</span>
+          </Link>
+        }
+      />
+
       {errorMessage && (
-        <div className="p-4 rounded-2xl bg-red-50 text-mq-danger text-sm flex items-center gap-2 border border-red-200">
-          <Info size={16} />
-          <span>{errorMessage}</span>
-        </div>
+        <ErrorAlert
+          message={errorMessage}
+          messageSi="පැතිකඩ තොරතුරු ලබාගැනීමේදී දෝෂයක් හටගැනිණි."
+          onRetry={loadLearners}
+        />
       )}
 
       {/* Child Switcher Tabs */}
@@ -173,9 +195,11 @@ export const ParentLearnerProfilesPage: React.FC = () => {
                   <p className="text-xs font-bold text-mq-text-strong truncate">
                     {child.preferredName || child.firstName}
                   </p>
-                  <p className="text-[11px] text-mq-text-muted">
-                    Grade {child.grade} · {child.onboardingStatus}
-                  </p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-[11px] text-mq-text-muted">Grade {child.grade}</span>
+                    <span className="text-mq-border">•</span>
+                    <OnboardingStatusBadge status={child.onboardingStatus} size="sm" />
+                  </div>
                 </div>
               </button>
             );

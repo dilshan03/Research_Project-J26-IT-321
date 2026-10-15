@@ -20,6 +20,7 @@ import {
   Users,
 } from 'lucide-react';
 import { Navbar } from '../../../shared/components/Navbar';
+import { PageHeader } from '../../../shared/components/PageHeader';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { authService } from '../../auth/services/authService';
 import type { UserRole } from '../../auth/types';
@@ -166,12 +167,23 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
   const displayUsername = user.username || (user.email ? user.email.split('@')[0] : 'User');
 
   return (
-    <div className={hideNavbar ? "w-full font-sans text-mq-text flex flex-col" : "min-h-screen bg-mq-bg font-sans text-mq-text flex flex-col selection:bg-mq-surface-blue"}>
+    <div className={hideNavbar ? "w-full text-mq-text flex flex-col" : "min-h-screen bg-mq-bg text-mq-text flex flex-col selection:bg-mq-surface-blue"}>
       {/* Existing Navbar */}
       {!hideNavbar && <Navbar />}
 
       {/* Main Content Area */}
       <main className={hideNavbar ? "w-full py-2 space-y-6" : "flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6"}>
+        {/* Page Header when embedded in Dashboard shell */}
+        {hideNavbar && (
+          <PageHeader
+            role={user.role}
+            title="Account Settings"
+            titleSi="ගිණුම් සැකසුම්"
+            description="Manage your verified account profile, identity credentials, security settings, and notifications."
+            descriptionSi="ඔබගේ පරිශීලක පැතිකඩ, මුරපදය සහ ගිණුම් තොරතුරු මෙතැනින් කළමනාකරණය කරන්න."
+          />
+        )}
+
         {/* Navigation Breadcrumb / Back Link */}
         {!hideNavbar && (
           <div className="flex items-center justify-between">

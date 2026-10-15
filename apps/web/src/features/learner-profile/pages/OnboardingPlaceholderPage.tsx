@@ -2,13 +2,13 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
-  Loader2,
-  AlertCircle,
   CheckCircle2,
   Clock,
 } from 'lucide-react';
 
-import { Navbar } from '../../../shared/components/Navbar';
+import { PortalHeader } from '../../../shared/components/portal/PortalHeader';
+import { OnboardingStatusBadge } from '../components/OnboardingStatusBadge';
+import { LoadingState, ErrorAlert } from '../../../shared/components/ui/StateViews';
 import { learnerApi } from '../services/learnerApi';
 import { onboardingApi } from '../services/onboardingApi';
 import type { Learner } from '../types';
@@ -284,50 +284,69 @@ export const OnboardingPlaceholderPage: React.FC = () => {
   const avatar =
     AVATAR_OPTIONS.find((a) => a.id === learner?.avatarId) || AVATAR_OPTIONS[0];
 
+  const isMathAssessment = currentStep === 'math_assessment';
+
   return (
-    <div className="min-h-screen bg-mq-bg font-sans text-mq-text selection:bg-mq-surface-blue pb-16">
-      <Navbar />
+    <div className="min-h-screen bg-mq-bg text-mq-text selection:bg-mq-surface-blue pb-16">
+      {/* Step Header: Distraction-free for Child Assessment, Portal Header for Parent Steps */}
+      {isMathAssessment ? (
+        <header className="bg-white border-b border-mq-border/70 sticky top-0 z-30 shadow-xs">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-mq-surface-blue text-mq-primary font-bold flex items-center justify-center text-lg">
+                🎯
+              </div>
+              <div>
+                <span className="text-xs font-bold text-mq-text-strong block font-sinhala">
+                  {learner?.firstName} ගේ ගණිත ඇගයීම (Math Assessment)
+                </span>
+                <span className="text-[10px] text-mq-text-muted">
+                  Focus Mode • Minimal Distraction-Free Interface
+                </span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => navigate('/learners')}
+              className="text-xs font-bold text-mq-text-muted hover:text-mq-primary px-3 py-1.5 rounded-xl border border-mq-border hover:bg-mq-surface-soft transition-colors cursor-pointer"
+            >
+              Pause & Exit (පසුවට සුරකින්න)
+            </button>
+          </div>
+        </header>
+      ) : (
+        <PortalHeader role="parent" />
+      )}
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between">
-          <Link
-            to="/learners"
-            className="inline-flex items-center gap-2 text-xs font-bold text-mq-text-muted hover:text-mq-primary transition-colors font-sinhala"
-          >
-            <ArrowLeft size={16} />
-            <span>මගේ දරුවන් වෙත ආපසු යන්න (Back to My Children)</span>
-          </Link>
+        {/* Navigation Breadcrumb / Context Bar (Parent steps only) */}
+        {!isMathAssessment && (
+          <div className="flex items-center justify-between">
+            <Link
+              to="/learners"
+              className="inline-flex items-center gap-2 text-xs font-bold text-mq-primary hover:text-mq-primary-hover transition-colors font-sinhala"
+            >
+              <ArrowLeft size={16} />
+              <span>මගේ දරුවන් වෙත ආපසු යන්න (Back to My Children)</span>
+            </Link>
 
-          {progress && progress.status === 'IN_PROGRESS' && (
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-mq-surface-yellow text-mq-warning border border-mq-warning/30 font-sinhala">
-              <Clock size={13} />
-              <span>ප්‍රගතිය සුරැකිව පවතී (Resumable)</span>
-            </span>
-          )}
-        </div>
+            {progress && progress.status === 'IN_PROGRESS' && (
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-mq-surface-yellow text-mq-warning border border-mq-warning/30 font-sinhala">
+                <Clock size={13} />
+                <span>ප්‍රගතිය සුරැකිව පවතී (Resumable)</span>
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Global Loading State */}
         {isLoading ? (
-          <div className="bg-white rounded-3xl border border-mq-border p-12 text-center flex flex-col items-center justify-center space-y-3">
-            <Loader2 size={32} className="animate-spin text-mq-primary" />
-            <p className="text-sm font-bold text-mq-text-strong font-sinhala">
-              ආරම්භක ඇගයීම් පද්ධතිය පූරණය වෙමින් පවතී...
-            </p>
-          </div>
+          <LoadingState message="ආරම්භක ඇගයීම් පද්ධතිය පූරණය වෙමින් පවතී..." />
         ) : errorMessage || !learner ? (
-          <div className="bg-white rounded-3xl border border-mq-border p-8 text-center space-y-4">
-            <AlertCircle size={32} className="text-mq-danger mx-auto" />
-            <h2 className="text-lg font-bold text-mq-text-strong font-sinhala">
-              {errorMessage || 'දරුවාගේ තොරතුරු සොයාගත නොහැකි විය.'}
-            </h2>
-            <Link
-              to="/learners"
-              className="btn btn-secondary text-xs py-2 px-4 rounded-full inline-block font-sinhala"
-            >
-              දරුවන්ගේ ලැයිස්තුවට ආපසු යන්න
-            </Link>
-          </div>
+          <ErrorAlert
+            message={errorMessage || 'දරුවාගේ තොරතුරු සොයාගත නොහැකි විය.'}
+            onRetry={loadData}
+          />
         ) : (
           <div className="space-y-6">
             {/* Child Profile Banner */}
@@ -343,17 +362,9 @@ export const OnboardingPlaceholderPage: React.FC = () => {
                     <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary">
                       {learner.preferredLanguage} මාධ්‍යය
                     </span>
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        progress?.status === 'COMPLETED'
-                          ? 'bg-mq-success-bg text-mq-success'
-                          : 'bg-mq-warning-bg text-mq-warning'
-                      }`}
-                    >
-                      {progress?.status === 'COMPLETED'
-                        ? 'සම්පූර්ණයි (Completed)'
-                        : 'ක්‍රියාත්මක වෙමින් පවතී (In Progress)'}
-                    </span>
+                    <OnboardingStatusBadge
+                      status={progress?.status === 'COMPLETED' ? 'COMPLETED' : 'IN_PROGRESS'}
+                    />
                   </div>
                   <h1 className="text-xl sm:text-2xl font-extrabold text-mq-text-strong mt-0.5">
                     {learner.firstName}

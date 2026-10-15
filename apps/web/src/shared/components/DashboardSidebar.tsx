@@ -1,10 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import {
-  ChevronDown,
-  X,
-  ShieldCheck,
-} from 'lucide-react';
+import { ChevronDown, X, ShieldCheck } from 'lucide-react';
 import {
   PARENT_NAV_GROUPS,
   TEACHER_NAV_GROUPS,
@@ -29,23 +25,40 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const groups: NavGroupConfig[] =
     role === 'parent' ? PARENT_NAV_GROUPS : TEACHER_NAV_GROUPS;
 
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+
   // Track collapsed groups
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
-  // Close mobile drawer on route change
+  // Close mobile drawer strictly when pathname changes
   useEffect(() => {
     onCloseMobile();
-  }, [location.pathname, onCloseMobile]);
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handle escape key on mobile
+  // Handle escape key & focus management when mobile drawer opens
   useEffect(() => {
+    if (!isOpenMobile) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpenMobile) {
+      if (e.key === 'Escape') {
         onCloseMobile();
       }
     };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    // Prevent background scrolling while drawer is active
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    // Focus close button for accessibility
+    setTimeout(() => {
+      closeBtnRef.current?.focus();
+    }, 50);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
   }, [isOpenMobile, onCloseMobile]);
 
   const toggleGroup = (groupId: string) => {
@@ -55,11 +68,23 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     }));
   };
 
-  const isItemActive = (item: NavItemConfig) => {
-    if (item.path === `/${role}/dashboard`) {
-      return location.pathname === item.path;
+  const isItemActive = (item: NavItemConfig): boolean => {
+    const current = location.pathname;
+
+    // Check specific matchPaths if defined
+    if (item.matchPaths && item.matchPaths.length > 0) {
+      return item.matchPaths.some((p) => {
+        if (p === `/${role}/dashboard`) {
+          return current === p;
+        }
+        return current === p || current.startsWith(`${p}/`);
+      });
     }
-    return location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+
+    if (item.path === `/${role}/dashboard`) {
+      return current === item.path;
+    }
+    return current === item.path || current.startsWith(`${item.path}/`);
   };
 
   const renderNavContent = () => (
@@ -75,9 +100,9 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
               {user?.fullName || (role === 'parent' ? 'Parent Account' : 'Teacher Account')}
             </p>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="inline-block w-2 h-2 rounded-full bg-mq-success"></span>
+              <span className="inline-block w-2 h-2 rounded-full bg-mq-success" />
               <span className="text-[11px] font-semibold text-mq-primary capitalize">
-                {role} Portal
+                {role} Portal Active
               </span>
             </div>
           </div>
@@ -174,7 +199,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       {/* 1. Desktop Persistent Sidebar                             */}
       {/* ========================================================= */}
       <aside
-        className="hidden lg:flex flex-col w-64 xl:w-72 bg-white border-r border-mq-border shrink-0 sticky top-[61px] h-[calc(100vh-61px)] z-30"
+        className="hidden lg:flex flex-col w-64 xl:w-72 bg-white border-r border-mq-border shrink-0 sticky top-16 h-[calc(100vh-4rem)] z-30"
         aria-label={`${role === 'parent' ? 'Parent' : 'Teacher'} Dashboard Navigation`}
       >
         {renderNavContent()}
@@ -210,13 +235,14 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
               <span className="text-mq-secondary">Quest</span>
             </span>
             <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary">
-              {role}
+              {role === 'parent' ? 'Parent Portal' : 'Teacher Portal'}
             </span>
           </div>
           <button
+            ref={closeBtnRef}
             type="button"
             onClick={onCloseMobile}
-            className="p-1.5 rounded-xl text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface transition-colors"
+            className="p-1.5 rounded-xl text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface transition-colors cursor-pointer"
             aria-label="Close navigation sidebar"
           >
             <X size={18} />

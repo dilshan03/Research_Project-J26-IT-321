@@ -13,7 +13,6 @@ import {
   LearnersPage,
   OnboardingPlaceholderPage,
   ParentOverviewPage,
-  ParentChildrenPage,
   ParentLearnerProfilesPage,
   ParentAssessmentsPage,
   ParentRecommendationsPage,
@@ -65,14 +64,18 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Canonical My Children Route (Unified in Parent Portal Layout) */}
           <Route
             path="/learners"
             element={
               <ProtectedRoute allowedRoles={['parent']}>
-                <LearnersPage />
+                <DashboardLayout role="parent" />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<LearnersPage />} />
+          </Route>
+
           <Route
             path="/learners/:learnerId/onboarding"
             element={
@@ -100,8 +103,8 @@ function App() {
             {/* 1. Overview */}
             <Route index element={<ParentOverviewPage />} />
 
-            {/* 2. My Children (Reuses child management) */}
-            <Route path="children" element={<ParentChildrenPage />} />
+            {/* 2. My Children (Canonical redirect to /learners) */}
+            <Route path="children" element={<Navigate to="/learners" replace />} />
 
             {/* 3. Learner Profiles */}
             <Route path="learner-profiles" element={<ParentLearnerProfilesPage />} />

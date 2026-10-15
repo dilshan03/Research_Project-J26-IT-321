@@ -175,7 +175,7 @@ class SkillScore(BaseModel):
     correctQuestions: int
     accuracyPercentage: float
     proficiencyCategory: str = Field(
-        description="Provisional descriptive category: 'Emerging' (<50%), 'Developing' (50-79%), 'Proficient' (>=80%)"
+        description="Provisional descriptive category: 'Emerging' (0-49%), 'Developing' (50-79%), 'Proficient' (80-100%), or 'INSUFFICIENT_EVIDENCE' (<3 questions)"
     )
 
 
@@ -191,6 +191,10 @@ class MathAssessmentSummary(BaseModel):
     strengths: List[str]
     areasForGrowth: List[str]
     recommendations: List[str]
+    thresholdVersion: Optional[str] = Field(default="PROV-THRESH-v1.0")
+    disclaimer: Optional[str] = Field(
+        default="Provisional demonstration thresholds for prototype formative feedback only. Not validated mathematics mastery standards."
+    )
     mlPredictionNotice: str = Field(
         default="Baseline derived via transparent pedagogical rules. Machine Learning / SHAP predictions will integrate when model service is attached."
     )
@@ -208,6 +212,9 @@ class OnboardingProgressResponse(BaseModel):
     snapIvCompleted: bool
     socialContextCompleted: bool
     mathAssessmentCompleted: bool
+    learningPreferences: Optional[Dict[str, Any]] = None
+    snapIvResponses: Optional[List[Dict[str, Any]]] = None
+    socialContext: Optional[Dict[str, Any]] = None
     snapIvSummary: Optional[SnapIvScoreSummary] = None
     mathSummary: Optional[MathAssessmentSummary] = None
     updatedAt: str

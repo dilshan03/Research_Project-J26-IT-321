@@ -16,6 +16,19 @@ from app.db.question_bank import (
     QUESTION_BANK_VERSION,
 )
 from app.services.learner_service import get_learner_by_id
+from app.core.thresholds import (
+    determine_proficiency_category,
+    generate_pedagogical_recommendations,
+    safe_recalculate_skill_scores,
+    MINIMUM_EVIDENCE_QUESTIONS_PER_SKILL,
+    MINIMUM_EVIDENCE_QUESTIONS_OVERALL,
+    THRESHOLD_CONFIG_VERSION,
+    PROVISIONAL_THRESHOLDS_METADATA,
+    PROFICIENCY_LEVEL_PROFICIENT,
+    PROFICIENCY_LEVEL_DEVELOPING,
+    PROFICIENCY_LEVEL_EMERGING,
+    PROFICIENCY_LEVEL_INSUFFICIENT,
+)
 from app.schemas.onboarding import (
     LearningPreferencesRequest,
     SnapIvSubmissionRequest,
@@ -104,6 +117,8 @@ async def get_or_create_onboarding_progress(
             "strengths": assessment_doc.get("strengths", []),
             "areasForGrowth": assessment_doc.get("areasForGrowth", []),
             "recommendations": assessment_doc.get("recommendations", []),
+            "thresholdVersion": assessment_doc.get("thresholdVersion", THRESHOLD_CONFIG_VERSION),
+            "disclaimer": assessment_doc.get("disclaimer", PROVISIONAL_THRESHOLDS_METADATA["disclaimer"]),
             "mlPredictionNotice": assessment_doc.get(
                 "mlPredictionNotice",
                 "Baseline derived via transparent pedagogical rules."
@@ -130,6 +145,9 @@ async def get_or_create_onboarding_progress(
         "snapIvCompleted": snap_iv_completed,
         "socialContextCompleted": social_context_completed,
         "mathAssessmentCompleted": math_completed,
+        "learningPreferences": quest_doc.get("learningPreferences") if quest_doc else None,
+        "snapIvResponses": quest_doc.get("snapIv", {}).get("responses") if quest_doc and quest_doc.get("snapIv") else None,
+        "socialContext": quest_doc.get("socialContext") if quest_doc else None,
         "snapIvSummary": snap_iv_summary,
         "mathSummary": math_summary,
         "updatedAt": updated_at.isoformat() if isinstance(updated_at, datetime) else str(updated_at),
@@ -203,6 +221,14 @@ async def save_snap_iv_questionnaire(
     now = datetime.now(timezone.utc)
     questionnaires_col = get_questionnaires_collection()
     onboarding_col = get_onboarding_collection()
+
+    # Validate that mandatory preceding stage (Learning Preferences) is completed
+    quest_doc = await questionnaires_col.find_one({"learnerId": learner_id})
+    if not (quest_doc and quest_doc.get("learningPreferences")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot submit SNAP-IV questionnaire: Mandatory stage 'Learning Preferences' must be completed first.",
+        )
 
     # Calculate subscale scores
     # Items 1-9: Inattention subscale
@@ -289,6 +315,19 @@ async def save_social_context(
     questionnaires_col = get_questionnaires_collection()
     onboarding_col = get_onboarding_collection()
 
+    # Validate that mandatory preceding stages are completed
+    quest_doc = await questionnaires_col.find_one({"learnerId": learner_id})
+    if not (quest_doc and quest_doc.get("learningPreferences")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot save social context: Mandatory stage 'Learning Preferences' must be completed first.",
+        )
+    if not (quest_doc and quest_doc.get("snapIv")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot save social context: Mandatory stage 'SNAP-IV Questionnaire' must be completed first.",
+        )
+
     payload = {
         **data.model_dump(),
         "disclaimer": "Optional parent observation of learning environment and collaboration preference. Not a psychometric assessment.",
@@ -365,6 +404,74 @@ async def submit_math_assessment(
     assessments_col = get_assessments_collection()
     onboarding_col = get_onboarding_collection()
     learners_col = get_learners_collection()
+    questionnaires_col = get_questionnaires_collection()
+
+    # 1. Enforce mandatory sequential stages: Learning Preferences & SNAP-IV must be stored
+    quest_doc = await questionnaires_col.find_one({"learnerId": learner_id})
+    if not (quest_doc and quest_doc.get("learningPreferences")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot submit mathematics assessment: Mandatory stage 'Learning Preferences' must be completed first.",
+        )
+    if not (quest_doc and quest_doc.get("snapIv")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot submit mathematics assessment: Mandatory stage 'SNAP-IV Questionnaire' must be completed first.",
+        )
+
+    # 2. Check for duplicate or conflicting assessment submissions
+    existing_assessment = await assessments_col.find_one(
+        {"learnerId": learner_id},
+        sort=[("completedAt", -1)]
+    )
+    if existing_assessment:
+        existing_items = existing_assessment.get("evaluatedItems", [])
+        existing_map = {item["questionId"]: item.get("userAnswer") for item in existing_items}
+        incoming_map = {ans.questionId: ans.userAnswer for ans in data.answers}
+
+        is_identical = (
+            len(existing_map) == len(incoming_map) and
+            all(
+                qid in existing_map and normalize_answer(existing_map[qid]) == normalize_answer(ans_val)
+                for qid, ans_val in incoming_map.items()
+            )
+        )
+
+        if is_identical:
+            logger.info(
+                "Duplicate identical math assessment submission detected for learner %s. Returning existing assessment result.",
+                learner_id
+            )
+            return {
+                "success": True,
+                "message": "Mathematics assessment was already submitted. Returning existing baseline result.",
+                "summary": {
+                    "grade": existing_assessment.get("grade", grade),
+                    "totalQuestions": existing_assessment.get("totalQuestions", 0),
+                    "correctAnswers": existing_assessment.get("correctAnswers", 0),
+                    "accuracyPercentage": existing_assessment.get("accuracyPercentage", 0.0),
+                    "evidenceLevel": existing_assessment.get("evidenceLevel", "SUFFICIENT"),
+                    "skills": existing_assessment.get("skills", []),
+                    "strengths": existing_assessment.get("strengths", []),
+                    "areasForGrowth": existing_assessment.get("areasForGrowth", []),
+                    "recommendations": existing_assessment.get("recommendations", []),
+                    "thresholdVersion": existing_assessment.get("thresholdVersion", THRESHOLD_CONFIG_VERSION),
+                    "disclaimer": existing_assessment.get("disclaimer", PROVISIONAL_THRESHOLDS_METADATA["disclaimer"]),
+                    "mlPredictionNotice": existing_assessment.get(
+                        "mlPredictionNotice",
+                        "Baseline derived via transparent pedagogical rules."
+                    ),
+                },
+            }
+        else:
+            logger.warning(
+                "Conflicting math assessment submission rejected for learner %s.",
+                learner_id
+            )
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="A mathematics baseline assessment has already been completed for this learner. Conflicting submissions cannot overwrite historical baseline results.",
+            )
 
     evaluated_items = []
     skill_stats: Dict[str, Dict[str, Any]] = {}
@@ -400,6 +507,8 @@ async def submit_math_assessment(
         evaluated_items.append({
             "questionId": ans.questionId,
             "skillId": skill_id,
+            "skillName": skill_name,
+            "skillNameSi": skill_name_si,
             "isCorrect": is_correct,
             "userAnswer": ans.userAnswer,
             "correctAnswer": expected,
@@ -411,27 +520,24 @@ async def submit_math_assessment(
     total_questions = len(evaluated_items)
     accuracy_pct = round((correct_count / total_questions * 100.0), 1) if total_questions > 0 else 0.0
 
-    # Skill breakdown
+    # Skill breakdown using centralized thresholds & minimum evidence requirement
     skills_list: List[Dict[str, Any]] = []
     strengths: List[str] = []
     areas_for_growth: List[str] = []
-    recommendations: List[str] = []
 
     for sid, st in skill_stats.items():
         s_total = st["total"]
         s_correct = st["correct"]
         s_pct = round((s_correct / s_total * 100.0), 1) if s_total > 0 else 0.0
 
-        # Descriptive proficiency categories (configurable thresholds)
-        if s_pct >= 80.0:
-            category = "Proficient"
+        # Centralized classification: requires >= 3 items to assign proficiency, otherwise INSUFFICIENT_EVIDENCE
+        category = determine_proficiency_category(s_pct, s_total)
+
+        if category == PROFICIENCY_LEVEL_PROFICIENT:
             strengths.append(f"{st['skillName']} ({st['skillNameSi']})")
-        elif s_pct >= 50.0:
-            category = "Developing"
+        elif category in (PROFICIENCY_LEVEL_DEVELOPING, PROFICIENCY_LEVEL_EMERGING):
             areas_for_growth.append(f"{st['skillName']} ({st['skillNameSi']})")
-        else:
-            category = "Emerging"
-            areas_for_growth.append(f"{st['skillName']} ({st['skillNameSi']})")
+        # INSUFFICIENT_EVIDENCE skills are NOT claimed as mastered or deficient
 
         skills_list.append({
             "skillId": sid,
@@ -443,32 +549,14 @@ async def submit_math_assessment(
             "proficiencyCategory": category,
         })
 
-    # Transparent rule-based recommendations
-    if accuracy_pct >= 80.0:
-        recommendations.append(
-            "High foundation mastery observed. Recommend introducing step-by-step challenges and multi-step math quests."
-        )
-        recommendations.append(
-            "Keep rewards and interactive celebration active to maintain high intrinsic engagement."
-        )
-    elif accuracy_pct >= 50.0:
-        recommendations.append(
-            "Solid core comprehension with developing fluency. Provide visual hints and structured step breakdown for new topics."
-        )
-        recommendations.append(
-            "Encourage 10-15 minute focused gameplay intervals with short breaks."
-        )
-    else:
-        recommendations.append(
-            "Foundational skills are emerging. Recommend highly visual, concrete item representations with spoken audio guidance."
-        )
-        recommendations.append(
-            "Prioritize number sense and basic grouping with unlimited attempts and zero time pressure."
-        )
+    # Transparent rule-based recommendations adhering to evidence validity
+    recommendations = generate_pedagogical_recommendations(
+        overall_accuracy=accuracy_pct,
+        overall_total_questions=total_questions,
+        skills=skills_list,
+    )
 
-    evidence_level = "INSUFFICIENT" if total_questions < 3 else "SUFFICIENT"
-    if evidence_level == "INSUFFICIENT":
-        recommendations.insert(0, "Notice: Assessment completed with fewer than 3 questions. Provisional baseline only.")
+    evidence_level = "INSUFFICIENT" if total_questions < MINIMUM_EVIDENCE_QUESTIONS_OVERALL else "SUFFICIENT"
 
     assessment_doc = {
         "learnerId": learner_id,
@@ -476,6 +564,8 @@ async def submit_math_assessment(
         "assessmentType": "BASELINE_MATH",
         "grade": grade,
         "questionBankVersion": QUESTION_BANK_VERSION,
+        "thresholdVersion": THRESHOLD_CONFIG_VERSION,
+        "disclaimer": PROVISIONAL_THRESHOLDS_METADATA["disclaimer"],
         "totalQuestions": total_questions,
         "correctAnswers": correct_count,
         "accuracyPercentage": accuracy_pct,
@@ -530,6 +620,8 @@ async def submit_math_assessment(
         "strengths": strengths,
         "areasForGrowth": areas_for_growth,
         "recommendations": recommendations,
+        "thresholdVersion": assessment_doc["thresholdVersion"],
+        "disclaimer": assessment_doc["disclaimer"],
         "mlPredictionNotice": assessment_doc["mlPredictionNotice"],
     }
 
@@ -546,6 +638,14 @@ async def get_onboarding_summary(
 ) -> Dict[str, Any]:
     """Consolidates complete onboarding summary including preferences, SNAP-IV, and Math baseline."""
     progress = await get_or_create_onboarding_progress(learner_id=learner_id, parent_id=parent_id)
+
+    # Validate that mandatory onboarding stages have completed records before returning final summary
+    if not (progress.get("preferencesCompleted") and progress.get("snapIvCompleted") and progress.get("mathAssessmentCompleted")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Consolidated onboarding summary cannot be generated: Required assessment stages have not been completed.",
+        )
+
     learner = await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent")
 
     questionnaires_col = get_questionnaires_collection()

@@ -1,7 +1,7 @@
 import { connectToDatabase, closeDatabaseConnection } from './packages/db/mongodb.js';
 
-const AUTH_BASE = 'http://localhost:5000/api/auth';
-const LEARNER_BASE = 'http://localhost:5001/api/v1/learners';
+const AUTH_BASE = 'http://127.0.0.1:5000/api/auth';
+const LEARNER_BASE = 'http://127.0.0.1:5001/api/v1/learners';
 
 async function runOnboardingE2ETests() {
   console.log('--- STARTING LEARNER ONBOARDING E2E INTEGRATION TEST SUITE ---');

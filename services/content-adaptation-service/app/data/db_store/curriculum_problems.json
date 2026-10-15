@@ -1,0 +1,275 @@
+[
+  {
+    "problem_id": "G1-NUM-001",
+    "doc_id": "doc_g1_grade_01",
+    "grade": 1,
+    "topic": "Addition",
+    "competency_code": "1.1",
+    "competency_desc": "එකතු කිරීම - 1 සිට 10 දක්වා සංඛ්‍යා එකතු කිරීම (Adds quantities up to 10)",
+    "raw_problem_text": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "english_translation": "Mala has 5 apples. Nimal gave her 3 more apples. How many apples does Mala have now?",
+    "operands": [
+      5,
+      3
+    ],
+    "operation": "ADD",
+    "expected_answer": 8,
+    "difficulty": "EASY",
+    "page_number": 1,
+    "is_money": false,
+    "created_at": "2026-10-15T05:20:49.149524+00:00",
+    "_id": "a6f72a3350c744dbbad41b108aab29e5"
+  },
+  {
+    "problem_id": "G1-SUB-002",
+    "doc_id": "doc_g1_grade_01",
+    "grade": 1,
+    "topic": "Subtraction",
+    "competency_code": "1.2",
+    "competency_desc": "අඩු කිරීම - 10 ට අඩු සංඛ්‍යා අඩු කිරීම (Subtracts single-digit numbers)",
+    "raw_problem_text": "ගසේ කුරුල්ලන් 7 ක් සිටියා. උන්ගෙන් 3 ක් පියාඹා ගියා. දැන් ගසේ ඉතිරි කුරුල්ලන් ගණන කීයද?",
+    "english_translation": "There were 7 birds on a tree. 3 flew away. How many birds are left on the tree?",
+    "operands": [
+      7,
+      3
+    ],
+    "operation": "SUB",
+    "expected_answer": 4,
+    "difficulty": "EASY",
+    "page_number": 2,
+    "is_money": false,
+    "created_at": "2026-10-15T05:20:49.149524+00:00",
+    "_id": "7c67bd0f10134ff6bf0771d76fccbd6f"
+  },
+  {
+    "problem_id": "G1-CNT-003",
+    "doc_id": "doc_g1_grade_01",
+    "grade": 1,
+    "topic": "Counting",
+    "competency_code": "1.3",
+    "competency_desc": "ද්‍රව්‍ය ගණන් කිරීම හා එකතු කිරීම (Counting objects and adding within 15)",
+    "raw_problem_text": "කූඩයේ අඹ 6 ක් ඇත. අම්මා තවත් අඹ 4 ක් දැමුවාය. දැන් කූඩයේ ඇති මුළු අඹ ගණන කීයද?",
+    "english_translation": "There are 6 mangoes in the basket. Mother added 4 more mangoes. What is the total number of mangoes in the basket now?",
+    "operands": [
+      6,
+      4
+    ],
+    "operation": "ADD",
+    "expected_answer": 10,
+    "difficulty": "EASY",
+    "page_number": 3,
+    "is_money": false,
+    "created_at": "2026-10-15T05:20:49.149524+00:00",
+    "_id": "dad4c358db364e48803371182d6592bf"
+  },
+  {
+    "problem_id": "G2-ADD-001",
+    "doc_id": "doc_g2_grade_02",
+    "grade": 2,
+    "topic": "Addition",
+    "competency_code": "2.1",
+    "competency_desc": "ද්විත්ව සංඛ්‍යා එකතු කිරීම (Adds two-digit quantities up to 50)",
+    "raw_problem_text": "පන්තියේ පිරිමි ළමුන් 14 ක් සහ ගැහැනු ළමුන් 15 ක් සිටිති. පන්තියේ සිටින මුළු ළමුන් ගණන කීයද?",
+    "english_translation": "There are 14 boys and 15 girls in the class. What is the total number of children in the class?",
+    "operands": [
+      14,
+      15
+    ],
+    "operation": "ADD",
+    "expected_answer": 29,
+    "difficulty": "MEDIUM",
+    "page_number": 1,
+    "is_money": false,
+    "created_at": "2026-10-15T05:20:49.158704+00:00",
+    "_id": "f42be7c627264fc391d4bb0e32f07a39"
+  },
+  {
+    "problem_id": "G2-SUB-002",
+    "doc_id": "doc_g2_grade_02",
+    "grade": 2,
+    "topic": "Subtraction",
+    "competency_code": "2.2",
+    "competency_desc": "අඩු කිරීම - ඉතිරිය සෙවීම (Subtraction up to 50)",
+    "raw_problem_text": "කසුන් ළඟ පැන්සල් 25 ක් තිබුණි. ඔහු මල්ලිට පැන්සල් 12 ක් දුන්නේය. දැන් කසුන් ළඟ ඉතිරි පැන්සල් කීයද?",
+    "english_translation": "Kasun had 25 pencils. He gave 12 pencils to his younger brother. How many pencils are left with Kasun now?",
+    "operands": [
+      25,
+      12
+    ],
+    "operation": "SUB",
+    "expected_answer": 13,
+    "difficulty": "MEDIUM",
+    "page_number": 2,
+    "is_money": false,
+    "created_at": "2026-10-15T05:20:49.158704+00:00",
+    "_id": "4f57a91622b944a4aefcb92162561765"
+  },
+  {
+    "problem_id": "G2-MON-003",
+    "doc_id": "doc_g2_grade_02",
+    "grade": 2,
+    "topic": "Money",
+    "competency_code": "2.4",
+    "competency_desc": "මුදල් ගනුදෙනු හා ශේෂය (Sri Lankan Rupee transactions up to Rs. 50)",
+    "raw_problem_text": "රුපියල් 20 ක ටොෆි පැකට්ටුවක් සහ රුපියල් 15 ක බිස්කට් පැකට්ටුවක් ගැනීමට අවශ්‍ය මුළු මුදල කීයද?",
+    "english_translation": "What is the total amount needed to buy a toffee packet for Rs. 20 and a biscuit packet for Rs. 15?",
+    "operands": [
+      20,
+      15
+    ],
+    "operation": "ADD",
+    "expected_answer": 35,
+    "difficulty": "MEDIUM",
+    "page_number": 3,
+    "is_money": true,
+    "created_at": "2026-10-15T05:20:49.158704+00:00",
+    "_id": "b129e37ffda44485a57a9dba5b081fa1"
+  },
+  {
+    "problem_id": "G3-MON-001",
+    "doc_id": "doc_g3_grade_03",
+    "grade": 3,
+    "topic": "Money",
+    "competency_code": "3.3",
+    "competency_desc": "මුදල් හා ශේෂය ගණනය කිරීම (Multi-stage currency computation)",
+    "raw_problem_text": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
+    "english_translation": "Kamal bought a book for Rs. 50 and a pen for Rs. 20. He gave Rs. 100 to the shopkeeper. How much is the balance?",
+    "operands": [
+      50,
+      20
+    ],
+    "operation": "ADD",
+    "expected_answer": 30,
+    "difficulty": "HARD",
+    "page_number": 2,
+    "is_money": true,
+    "created_at": "2026-10-15T05:20:49.167312+00:00",
+    "_id": "0068a2d6d8554909a0e0f4f3a47b26fa"
+  },
+  {
+    "problem_id": "G3-MUL-002",
+    "doc_id": "doc_g3_grade_03",
+    "grade": 3,
+    "topic": "Multiplication",
+    "competency_code": "3.1",
+    "competency_desc": "ගුණ කිරීමේ වගු හා මූලික ගුණ කිරීම (Multiplication up to 5 times table)",
+    "raw_problem_text": "එක් පෙට්ටියක පැන්සල් 6 බැගින් ඇති පෙට්ටි 4 ක ඇති මුළු පැන්සල් ගණන කීයද?",
+    "english_translation": "If each box has 6 pencils, how many pencils are there altogether in 4 such boxes?",
+    "operands": [
+      6,
+      4
+    ],
+    "operation": "MUL",
+    "expected_answer": 24,
+    "difficulty": "MEDIUM",
+    "page_number": 3,
+    "is_money": false,
+    "created_at": "2026-10-15T05:20:49.167312+00:00",
+    "_id": "7a9dc833606946fc8cb326f9232d343a"
+  },
+  {
+    "problem_id": "G3-DIV-003",
+    "doc_id": "doc_g3_grade_03",
+    "grade": 3,
+    "topic": "Division",
+    "competency_code": "3.2",
+    "competency_desc": "සමානව බෙදාදීම (Simple division without remainder)",
+    "raw_problem_text": "ළමුන් 4 දෙනෙකු අතර අඹ 20 ක් සමානව බෙදා දුන් විට එක් අයෙකුට ලැබෙන අඹ ගණන කීයද?",
+    "english_translation": "When 20 mangoes are distributed equally among 4 children, how many mangoes does each child get?",
+    "operands": [
+      20,
+      4
+    ],
+    "operation": "DIV",
+    "expected_answer": 5,
+    "difficulty": "MEDIUM",
+    "page_number": 4,
+    "is_money": false,
+    "created_at": "2026-10-15T05:20:49.167312+00:00",
+    "_id": "c45cd8441c3d45e996d61664ab650e52"
+  },
+  {
+    "problem_id": "G4-MUL-001",
+    "doc_id": "doc_g4_grade_04",
+    "grade": 4,
+    "topic": "Multiplication",
+    "competency_code": "4.1",
+    "competency_desc": "ද්විත්ව සංඛ්‍යා ගුණ කිරීම (Multi-digit multiplication)",
+    "raw_problem_text": "එක් පාසල් බෑගයක මිල රුපියල් 250 කි. එවැනි බෑග් 3 ක මුළු මිල රුපියල් කීයද?",
+    "english_translation": "The price of one school bag is Rs. 250. What is the total price in rupees of 3 such bags?",
+    "operands": [
+      250,
+      3
+    ],
+    "operation": "MUL",
+    "expected_answer": 750,
+    "difficulty": "MEDIUM",
+    "page_number": 2,
+    "is_money": true,
+    "created_at": "2026-10-15T05:20:49.175246+00:00",
+    "_id": "769f52e5c89e474d92b5a256ac36ddcc"
+  },
+  {
+    "problem_id": "G4-DIV-002",
+    "doc_id": "doc_g4_grade_04",
+    "grade": 4,
+    "topic": "Division",
+    "competency_code": "4.2",
+    "competency_desc": "ශේෂය සහිත හෝ රහිත බෙදීම (Division with word problems)",
+    "raw_problem_text": "පොත් 84 ක් ළමුන් 4 දෙනෙකු අතර සමානව බෙදූ විට එක් අයෙකුට ලැබෙන පොත් ගණන කීයද?",
+    "english_translation": "If 84 books are divided equally among 4 children, how many books does each child receive?",
+    "operands": [
+      84,
+      4
+    ],
+    "operation": "DIV",
+    "expected_answer": 21,
+    "difficulty": "MEDIUM",
+    "page_number": 3,
+    "is_money": false,
+    "created_at": "2026-10-15T05:20:49.175246+00:00",
+    "_id": "7a20222b8d5a4964aa7118eb8d6eea46"
+  },
+  {
+    "problem_id": "G5-MON-001",
+    "doc_id": "doc_g5_grade_05",
+    "grade": 5,
+    "topic": "Money",
+    "competency_code": "5.1",
+    "competency_desc": "ශිෂ්‍යත්ව මට්ටමේ මුදල් හා ලාභ/අලාභ ගැටලු (Scholarship exam multi-step word problems)",
+    "raw_problem_text": "සමන් රුපියල් 1200 කට ඇඳුමක් සහ රුපියල් 450 කට සපත්තු යුගලක් මිලදී ගත්තේය. ඔහු රුපියල් 2000 ක් ගෙවූ විට ලැබෙන ඉතිරිය කීයද?",
+    "english_translation": "Saman bought a dress for Rs. 1200 and shoes for Rs. 450. When he paid Rs. 2000, what was the balance received?",
+    "operands": [
+      1200,
+      450
+    ],
+    "operation": "ADD",
+    "expected_answer": 350,
+    "difficulty": "HARD",
+    "page_number": 1,
+    "is_money": true,
+    "created_at": "2026-10-15T05:20:49.221154+00:00",
+    "_id": "4a2ed2aaaee14c0ebc4d5cb86104af37"
+  },
+  {
+    "problem_id": "G5-MUL-002",
+    "doc_id": "doc_g5_grade_05",
+    "grade": 5,
+    "topic": "Multiplication",
+    "competency_code": "5.2",
+    "competency_desc": "ගුණ කිරීම හා ඒකක පරිවර්තනය (Compound multiplication)",
+    "raw_problem_text": "දිනකට කිරි ලීටර් 15 ක් ලබා දෙන ගවයෙකුගෙන් දින 12 ක් තුළ ලබාගත හැකි මුළු කිරි ලීටර් ප්‍රමාණය කීයද?",
+    "english_translation": "How many total liters of milk can be obtained in 12 days from a cow that gives 15 liters of milk per day?",
+    "operands": [
+      15,
+      12
+    ],
+    "operation": "MUL",
+    "expected_answer": 180,
+    "difficulty": "MEDIUM",
+    "page_number": 3,
+    "is_money": false,
+    "created_at": "2026-10-15T05:20:49.221154+00:00",
+    "_id": "18df3052ca9e4894940e98c76991bdf4"
+  }
+]

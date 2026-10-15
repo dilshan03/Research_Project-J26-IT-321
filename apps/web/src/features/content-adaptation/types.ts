@@ -1,4 +1,4 @@
-// Mirrors services/content-adaptation-service/app/schemas/game_blueprint.py
+// Mirrors services/content-adaptation-service/app/schemas/game_blueprint.py & syllabus.py
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
 export type GameTheme = 'VILLAGE_MARKET' | 'JUNGLE_ADVENTURE' | 'SPACE_QUEST';
 export type BlueprintStatus = 'draft' | 'approved' | 'rejected';
@@ -35,6 +35,24 @@ export interface ADHDGameSettings {
   timer_enabled: boolean;
 }
 
+export interface GajaDialogue {
+  intro: { si: string; en: string };
+  hint: { si: string; en: string };
+  praise: { si: string; en: string };
+  retry: { si: string; en: string };
+  celebrate: { si: string; en: string };
+}
+
+export interface StoryNarrative {
+  title_si: string;
+  title_en: string;
+  backdrop_si: string;
+  backdrop_en: string;
+  quest_goal_si: string;
+  quest_goal_en: string;
+  gaja_dialogue: GajaDialogue;
+}
+
 export interface GameActivityBlueprint {
   activity_id: string;
   source_question_id: string;
@@ -44,12 +62,66 @@ export interface GameActivityBlueprint {
   adhd_game_settings: ADHDGameSettings;
   micro_steps: GameMicroStep[];
   status: BlueprintStatus;
+  story_narrative?: StoryNarrative | null;
+  cli_score?: number | null;
+  raw_sinhala_question?: string | null;
 }
 
 export interface BlueprintEnvelope {
   cli_score: number;
   raw_sinhala_question: string;
   blueprint: GameActivityBlueprint;
+}
+
+export interface SyllabusDocument {
+  doc_id: string;
+  filename: string;
+  grade: number;
+  subject: string;
+  year: number;
+  language: 'si' | 'en' | 'ta';
+  page_count: number;
+  file_size: number;
+  status: 'uploaded' | 'extracting' | 'extracted' | 'error';
+  extracted_problem_count: number;
+  gridfs_id?: string | null;
+  local_path?: string | null;
+  created_at: string;
+}
+
+export interface CurriculumProblem {
+  problem_id: string;
+  doc_id?: string | null;
+  grade: number;
+  topic: string;
+  competency_code?: string | null;
+  competency_desc?: string | null;
+  raw_problem_text: string;
+  english_translation?: string | null;
+  operands: number[];
+  operation?: 'ADD' | 'SUB' | 'MUL' | 'DIV' | null;
+  expected_answer: number;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  page_number?: number | null;
+  is_money: boolean;
+  created_at: string;
+}
+
+export interface AdaptProblemRequest {
+  adhd_risk_level: RiskLevel;
+  game_theme?: GameTheme | null;
+  custom_gaja_notes?: string | null;
+}
+
+export interface DocumentUploadResponse {
+  document: SyllabusDocument;
+  message: string;
+}
+
+export interface SeedSyllabiResponse {
+  imported_documents: number;
+  extracted_problems: number;
+  documents: SyllabusDocument[];
 }
 
 export interface GenerateBlueprintRequest {

@@ -1,9 +1,14 @@
 export { LearnersPage } from './pages/LearnersPage';
 export { OnboardingPlaceholderPage } from './pages/OnboardingPlaceholderPage';
+export { ParentOverviewPage } from './pages/ParentOverviewPage';
+export { ParentChildrenPage } from './pages/ParentChildrenPage';
+export { ParentLearnerProfilesPage } from './pages/ParentLearnerProfilesPage';
+export { ParentAssessmentsPage } from './pages/ParentAssessmentsPage';
+export { ParentRecommendationsPage } from './pages/ParentRecommendationsPage';
 export { LearnerCard } from './components/LearnerCard';
 export { LearnerModal } from './components/LearnerModal';
 export { learnerApi } from './services/learnerApi';
 export { onboardingApi } from './services/onboardingApi';
+export { profileApi } from './services/profileApi';
 export * from './types';
 export * from './types/onboarding';
-

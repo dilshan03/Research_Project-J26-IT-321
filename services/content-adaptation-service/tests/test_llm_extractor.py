@@ -30,8 +30,10 @@ def test_math_verification_subtraction_primary_invariants():
     assert MathVerificationService.verify_calculation([10, 4], "SUB", 5) is False
     assert MathVerificationService.execute_calculation([25, 12], "SUB") == 13
     # Subtraction yielding negative values must fail grade invariant check
-    assert MathVerificationService.verify_grade_invariants(1, [3, 7], "SUB") is False
-    assert MathVerificationService.verify_grade_invariants(1, [7, 3], "SUB") is True
+    assert MathVerificationService.verify_grade_invariants(2, [3, 7], "SUB") is False
+    assert MathVerificationService.verify_grade_invariants(2, [7, 3], "SUB") is True
+    # Grade 1 strictly forbids subtraction equations
+    assert MathVerificationService.verify_grade_invariants(1, [7, 3], "SUB") is False
 
 
 def test_math_verification_multiplication_and_division():
@@ -46,10 +48,12 @@ def test_math_verification_multiplication_and_division():
 
 
 def test_grade_max_operand_invariants():
-    # Grade 1 max operand is 20
-    assert MathVerificationService.verify_grade_invariants(1, [15, 5], "ADD") is True
-    assert MathVerificationService.verify_grade_invariants(1, [100, 50], "ADD") is False
-    # Grade 2 max operand is 100
+    # Grade 1 strictly pre-math/counting max operand is 20, no ADD
+    assert MathVerificationService.verify_grade_invariants(1, [15], "COUNT") is True
+    assert MathVerificationService.verify_grade_invariants(1, [25], "COUNT") is False
+    assert MathVerificationService.verify_grade_invariants(1, [15, 5], "ADD") is False
+    # Grade 2 allows ADD and SUB up to 100
+    assert MathVerificationService.verify_grade_invariants(2, [15, 5], "ADD") is True
     assert MathVerificationService.verify_grade_invariants(2, [75, 20], "ADD") is True
     assert MathVerificationService.verify_grade_invariants(2, [500, 200], "ADD") is False
 
@@ -90,9 +94,9 @@ async def test_upload_and_extract_problems_fallback_schema():
         assert isinstance(p, CurriculumProblem)
         assert p.grade == 1
         assert p.doc_id == "test_doc_01"
-        assert len(p.operands) >= 2
+        assert len(p.operands) >= 1
         # Deterministically verify every single problem's arithmetic
-        assert MathVerificationService.verify_calculation(p.operands, p.operation or "ADD", p.expected_answer) is True
+        assert MathVerificationService.verify_calculation(p.operands, p.operation or "COUNT", p.expected_answer) is True
 
 
 @pytest.mark.anyio

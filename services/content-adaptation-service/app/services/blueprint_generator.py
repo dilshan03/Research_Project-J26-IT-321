@@ -23,6 +23,9 @@ OPERATION_LABELS = {
     "SUB": ("අඩු කිරීම (−)", "Subtraction (−)"),
     "MUL": ("ගුණ කිරීම (×)", "Multiplication (×)"),
     "DIV": ("බෙදීම (÷)", "Division (÷)"),
+    "COUNT": ("ගණන් කිරීම", "Counting"),
+    "COMPARE": ("ප්‍රමාණ සැසඳීම", "Comparison"),
+    "IDENTIFY": ("හඳුනා ගැනීම", "Identification"),
 }
 
 # Which wrong operator an impulsive learner most often picks.
@@ -100,13 +103,14 @@ def _operator_options(correct_op: str, distractor_count: int) -> List[GameChoice
 
 
 def _identify_step(operands: List[int], order: int, settings: ADHDGameSettings, is_money: bool) -> GameMicroStep:
-    a, b = operands[0], operands[1]
-    correct = f"{a}, {b}"
+    a = operands[0]
+    b = operands[1] if len(operands) > 1 else operands[0]
+    correct = f"{a}, {b}" if len(operands) > 1 else f"{a}"
     opts = [GameChoiceOption(text_si=correct, text_en=correct, is_correct=True, distractor_type="NONE")]
     wrong = [
-        (f"{a}, {a + b}", "WORKING_MEMORY_OVERFLOW", "Confuses an intermediate sum with original numbers."),
+        (f"{a}, {a + b}" if len(operands) > 1 else f"{a + 1}", "WORKING_MEMORY_OVERFLOW", "Confuses intermediate count with quantity."),
         (f"{b}", "IMPULSIVITY", "Quickly picks single salient number without scanning both."),
-        (f"{a + 1}, {b}", "MAGNITUDE_SLIP", "Off-by-one error reading the numbers."),
+        (f"{a + 1}, {b}" if len(operands) > 1 else f"{max(0, a - 1)}", "MAGNITUDE_SLIP", "Off-by-one error reading the numbers."),
         (f"{a}", "IMPULSIVITY", "Picks first observed number immediately."),
     ]
     for text, dtype, rat in wrong[: settings.distractor_count]:
@@ -117,12 +121,12 @@ def _identify_step(operands: List[int], order: int, settings: ADHDGameSettings, 
     return GameMicroStep(
         step_order=order,
         action_type="IDENTIFY_ENTITY",
-        instruction_si="ගැටලුවේ ඇති සංඛ්‍යා දෙක සොයන්න",
-        instruction_en="Find the two quantities in the problem",
+        instruction_si="ගැටලුවේ ඇති සංඛ්‍යා හඳුනාගන්න",
+        instruction_en="Find the quantities in the problem",
         target_visual_asset=_quantity_asset(is_money),
         correct_target_value=correct,
         game_options=_shuffle(opts, seed=a + b),
-        operands=[a, b],
+        operands=operands,
     )
 
 
@@ -168,11 +172,44 @@ def build_micro_steps(
     settings: ADHDGameSettings,
     is_money: bool = False,
     partial_results: Optional[List[int]] = None,
+    grade: int = 2,
 ) -> List[GameMicroStep]:
+    op = operations[0] if operations else ("COUNT" if grade == 1 else "ADD")
+
+    # SPECIALIZED GRADE 1 WORKFLOW:
+    # In Sri Lanka, Grade 1 does not use formal addition/subtraction signs (+, -).
+    # Instead, learners identify items (NumberHunt/BasketCount) and pick the count/item directly.
+    if grade == 1 or op in ("COUNT", "COMPARE", "IDENTIFY"):
+        steps: List[GameMicroStep] = [
+            GameMicroStep(
+                step_order=1,
+                action_type="IDENTIFY_ENTITY",
+                instruction_si="ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
+                instruction_en="Find and count the items in the problem",
+                target_visual_asset=_quantity_asset(is_money),
+                correct_target_value=str(final_answer),
+                game_options=_numeric_options(final_answer, settings.distractor_count, operands, op),
+                operands=operands,
+                operation=op,  # type: ignore
+            ),
+            GameMicroStep(
+                step_order=2,
+                action_type="CALCULATE_MICROSTEP",
+                instruction_si="නිවැරදි පිළිතුර තෝරන්න",
+                instruction_en="Select the correct count or answer",
+                target_visual_asset=VisualAssetTag.NUMBER_BLOCK,
+                correct_target_value=str(final_answer),
+                game_options=_numeric_options(final_answer, settings.distractor_count, operands, op),
+                operands=operands,
+                operation=op,  # type: ignore
+            ),
+        ]
+        return steps
+
     if len(operands) < 2:
         raise ValueError("Could not find at least two numeric quantities in the question.")
 
-    # Multi-step balance pattern (e.g., sum items, then subtract from paid note)
+    # Multi-step balance pattern (Grade 3-5 e.g., sum items, then subtract from paid note)
     if len(operations) >= 2 and partial_results:
         subtotal = partial_results[0]
         paid = operands[-1]
@@ -183,7 +220,7 @@ def build_micro_steps(
             _calc_step(3, final_answer, operands=[paid, subtotal], op=operations[-1], settings=settings, final=True),
         ]
 
-    op = operations[0] if operations else "ADD"
+    # Standard Arithmetic Workflow (Grade 2 to 5)
     steps: List[GameMicroStep] = []
     if settings.step_granularity == "MAXIMAL_THREE_TIER":
         steps.append(_identify_step(operands[:2], 1, settings, is_money))
@@ -204,8 +241,15 @@ def generate_blueprint(
 ) -> Tuple[GameActivityBlueprint, float, ParsedProblem]:
     """Generates an ADHD-friendly GameActivityBlueprint from raw Sinhala text."""
     parsed = parse_problem(raw_sinhala_question, operation_hint)
-    if len(parsed.numbers) < 2 or parsed.final_answer is None:
-        raise ValueError("Could not find at least two numeric quantities in the question.")
+    if not parsed.numbers or parsed.final_answer is None:
+        raise ValueError("Could not find numeric quantities in the question.")
+
+    if grade == 1 or "count" in topic.lower() or "compare" in topic.lower():
+        if not parsed.operations:
+            parsed.operations = ["COUNT"]
+    else:
+        if len(parsed.numbers) < 2:
+            raise ValueError("Could not find at least two numeric quantities in the question.")
 
     op_count = max(1, len(parsed.operations))
     cli = compute_cli(raw_sinhala_question, operation_count=op_count)
@@ -220,6 +264,7 @@ def generate_blueprint(
         settings=settings,
         is_money=parsed.is_money,
         partial_results=parsed.partial_results,
+        grade=grade,
     )
 
     blueprint = GameActivityBlueprint(
@@ -251,12 +296,15 @@ async def generate_blueprint_from_curriculum_problem(
     3. Enriches cultural narrative and Gaja dialogue.
     4. Deconstructs into ADHD micro-steps with cognitive distractors.
     """
-    op = problem.operation or "ADD"
-    operands = problem.operands if len(problem.operands) >= 2 else [problem.expected_answer // 2 or 1, problem.expected_answer // 2 or 1]
+    op = problem.operation or ("COUNT" if problem.grade == 1 else "ADD")
+    operands = problem.operands if problem.operands else [problem.expected_answer]
 
     # Deterministic verification
     MathVerificationService.verify_grade_invariants(problem.grade, operands, op)
-    verified_answer = MathVerificationService.execute_calculation(operands, op)
+    if op in ("COUNT", "COMPARE", "IDENTIFY"):
+        verified_answer = problem.expected_answer
+    else:
+        verified_answer = MathVerificationService.execute_calculation(operands, op)
 
     # CLI Score computation
     cli = compute_cli(problem.raw_problem_text, operation_count=1)
@@ -275,6 +323,7 @@ async def generate_blueprint_from_curriculum_problem(
         final_answer=verified_answer,
         settings=settings,
         is_money=problem.is_money,
+        grade=problem.grade,
     )
 
     blueprint = GameActivityBlueprint(

@@ -20,6 +20,52 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 
+# Supported models in priority order
+GEMINI_MODELS = [
+    "gemini-3.5-flash-lite",
+    "gemini-flash-latest",
+    "gemini-3-flash-preview",
+    "gemini-3.8-flash",
+]
+
+
+def _generate_with_gemini(client, contents: Any, schema_json: bool = True) -> str:
+    """Tries Gemini models in order with automatic fallback on 404/503."""
+    from google.genai import types
+
+    last_exc = None
+    for model_name in GEMINI_MODELS:
+        try:
+            config = types.GenerateContentConfig(response_mime_type="application/json") if schema_json else None
+            response = client.models.generate_content(
+                model=model_name,
+                contents=contents,
+                config=config,
+            )
+            if response and response.text:
+                return response.text
+        except Exception as e:
+            last_exc = e
+            continue
+    raise RuntimeError(f"All Gemini models failed. Last error: {last_exc}")
+
+
+def _get_pdf_bytes(pdf_source: Any) -> Optional[bytes]:
+    """Retrieve raw PDF bytes from file path, bytes, or file-like object."""
+    try:
+        if isinstance(pdf_source, bytes) and pdf_source:
+            return pdf_source
+        if isinstance(pdf_source, (str, Path)) and os.path.exists(pdf_source):
+            return Path(pdf_source).read_bytes()
+        if hasattr(pdf_source, "read"):
+            data = pdf_source.read()
+            if hasattr(pdf_source, "seek"):
+                pdf_source.seek(0)
+            return data
+    except Exception as e:
+        print(f"[_get_pdf_bytes] Warning: {e}")
+    return None
+
 
 class MathVerificationService:
     """
@@ -27,6 +73,11 @@ class MathVerificationService:
     Guarantees that:
     1. Calculations are NEVER delegated to LLMs.
     2. Operands and operations follow primary mathematics constraints (Grade 1-5).
+       - Grade 1: Pre-math, Counting (1-10), Comparing (More/Less), Currency coins.
+         NO formal addition or subtraction equations.
+       - Grade 2: Single-step addition and subtraction within 20/50.
+       - Grade 3: Multiplication, Division, Addition/Subtraction up to 1000, Money balances.
+       - Grade 4-5: Multi-digit operations, Scholarship word problems.
     3. Intermediate values and expected answers are deterministically verified.
     4. Distractors are verified to be distinct from correct answers and non-negative.
     """
@@ -41,9 +92,15 @@ class MathVerificationService:
 
     @classmethod
     def execute_calculation(cls, operands: List[int], operation: str) -> int:
-        if not operands or len(operands) < 2:
-            raise ValueError(f"At least two operands required for calculation, got {operands}")
+        if not operands:
+            raise ValueError(f"At least one operand required, got {operands}")
         op = operation.upper()
+        if op in ("COUNT", "IDENTIFY"):
+            return operands[0]
+        if op == "COMPARE":
+            return max(operands)
+        if len(operands) == 1:
+            return operands[0]
         if op == "ADD":
             return sum(operands)
         elif op == "SUB":
@@ -60,11 +117,16 @@ class MathVerificationService:
             if operands[1] == 0:
                 raise ZeroDivisionError("Cannot divide by zero")
             return operands[0] // operands[1]
-        raise ValueError(f"Unsupported arithmetic operation: {operation}")
+        return operands[0]
 
     @classmethod
     def verify_calculation(cls, operands: List[int], operation: str, expected_answer: int) -> bool:
         try:
+            op = operation.upper()
+            if op == "COMPARE":
+                return expected_answer in operands
+            if op in ("COUNT", "IDENTIFY"):
+                return expected_answer in operands or (len(operands) > 0 and operands[0] == expected_answer)
             actual = cls.execute_calculation(operands, operation)
             return actual == expected_answer
         except Exception:
@@ -72,14 +134,24 @@ class MathVerificationService:
 
     @classmethod
     def verify_grade_invariants(cls, grade: int, operands: List[int], operation: str) -> bool:
+        op = operation.upper()
+        if grade == 1:
+            # Grade 1 national curriculum rule: strictly no formal addition, subtraction, multiplication, or division equations!
+            # Pre-mathematics only: COUNT, COMPARE, IDENTIFY with numbers <= 20
+            if op in ("ADD", "SUB", "MUL", "DIV"):
+                return False
+            if any(n > 20 or n < 0 for n in operands):
+                return False
+            return True
+
         max_allowed = cls.GRADE_MAX_OPERANDS.get(grade, 100000)
         if any(n > max_allowed or n < 0 for n in operands):
             return False
-        if operation.upper() == "SUB":
+        if op == "SUB":
             # Primary mathematics should not produce negative quantities
             if len(operands) >= 2 and operands[0] < operands[1]:
                 return False
-        if operation.upper() == "DIV":
+        if op == "DIV":
             if len(operands) >= 2 and (operands[1] == 0 or operands[0] % operands[1] != 0):
                 return False
         return True
@@ -111,61 +183,99 @@ class MathVerificationService:
         """
         candidates: List[Tuple[int, str, str]] = []
         used = {correct_answer}
+        op = operation.upper()
 
-        # 1. Impulsive operator confusion
-        wrong_ops = {"ADD": "SUB", "SUB": "ADD", "MUL": "ADD", "DIV": "SUB"}
-        alt_op = wrong_ops.get(operation, "ADD")
-        try:
-            if alt_op == "SUB" and len(operands) >= 2 and operands[0] < operands[1]:
-                inv_val = operands[1] - operands[0]
-            else:
-                inv_val = cls.execute_calculation(operands, alt_op)
+        if op in ("COUNT", "IDENTIFY"):
+            # Early childhood counting distractors (off-by-one / off-by-two)
+            for delta in [-1, 1, -2, 2]:
+                val = correct_answer + delta
+                if val >= 0:
+                    candidates.append((
+                        val,
+                        "MAGNITUDE_SLIP",
+                        f"Off-by-{abs(delta)} counting skip while counting objects.",
+                    ))
+            if correct_answer > 1:
+                candidates.append((
+                    1,
+                    "IMPULSIVITY",
+                    "Selected single item without counting the entire group.",
+                ))
             candidates.append((
-                inv_val,
-                "IMPULSIVITY",
-                "Impulsively applied the opposite arithmetic operation without checking the sign.",
-            ))
-        except Exception:
-            pass
-
-        # 2. Impulsive operand echo (surface cue selection)
-        for op in operands:
-            candidates.append((
-                op,
-                "IMPULSIVITY",
-                "Selected a number directly visible in the problem text due to rapid stimulus response.",
-            ))
-
-        # 3. Working memory overflow (place value or carry slip)
-        candidates.append((
-            correct_answer + 10,
-            "WORKING_MEMORY_OVERFLOW",
-            "Lost track of carry/borrow in tens place during mental calculation.",
-        ))
-        if correct_answer > 10:
-            candidates.append((
-                correct_answer - 10,
+                correct_answer + 10,
                 "WORKING_MEMORY_OVERFLOW",
-                "Omitted carried ten during multi-digit mental computation.",
+                "Working memory place-value confusion.",
             ))
 
-        # 4. Magnitude slip (off-by-one counting error)
-        for delta in [1, -1, 2, -2]:
-            candidates.append((
-                correct_answer + delta,
-                "MAGNITUDE_SLIP",
-                f"Off-by-{abs(delta)} counting skip while tracking sequence on fingers or mental line.",
-            ))
+        elif op == "COMPARE":
+            # Comparison: picking the other comparison number impulsively
+            for num in operands:
+                if num != correct_answer and num >= 0:
+                    candidates.append((
+                        num,
+                        "IMPULSIVITY",
+                        "Impulsively picked the smaller quantity instead of the greater one.",
+                    ))
+            for delta in [-1, 1, 2]:
+                val = correct_answer + delta
+                if val >= 0:
+                    candidates.append((
+                        val,
+                        "MAGNITUDE_SLIP",
+                        "Magnitude slip near the comparison value.",
+                    ))
 
-        # 5. Inversion (digit transposition)
-        s = str(correct_answer)
-        if len(s) == 2 and s[0] != s[1]:
-            transposed = int(s[1] + s[0])
+        else:
+            # Standard arithmetic distractors (Grades 2-5)
+            wrong_ops = {"ADD": "SUB", "SUB": "ADD", "MUL": "ADD", "DIV": "SUB"}
+            alt_op = wrong_ops.get(op, "ADD")
+            try:
+                if alt_op == "SUB" and len(operands) >= 2 and operands[0] < operands[1]:
+                    inv_val = operands[1] - operands[0]
+                else:
+                    inv_val = cls.execute_calculation(operands, alt_op)
+                candidates.append((
+                    inv_val,
+                    "IMPULSIVITY",
+                    "Impulsively applied the opposite arithmetic operation without checking the sign.",
+                ))
+            except Exception:
+                pass
+
+            for o in operands:
+                candidates.append((
+                    o,
+                    "IMPULSIVITY",
+                    "Selected a number directly visible in the problem text due to rapid stimulus response.",
+                ))
+
             candidates.append((
-                transposed,
-                "MAGNITUDE_SLIP",
-                "Transposed adjacent digits while reading the number representation.",
+                correct_answer + 10,
+                "WORKING_MEMORY_OVERFLOW",
+                "Lost track of carry/borrow in tens place during mental calculation.",
             ))
+            if correct_answer > 10:
+                candidates.append((
+                    correct_answer - 10,
+                    "WORKING_MEMORY_OVERFLOW",
+                    "Omitted carried ten during multi-digit mental computation.",
+                ))
+
+            for delta in [1, -1, 2, -2]:
+                candidates.append((
+                    correct_answer + delta,
+                    "MAGNITUDE_SLIP",
+                    f"Off-by-{abs(delta)} counting skip while tracking sequence on fingers or mental line.",
+                ))
+
+            s = str(correct_answer)
+            if len(s) == 2 and s[0] != s[1]:
+                transposed = int(s[1] + s[0])
+                candidates.append((
+                    transposed,
+                    "MAGNITUDE_SLIP",
+                    "Transposed adjacent digits while reading the number representation.",
+                ))
 
         results: List[Tuple[int, str, str]] = []
         for val, dtype, rationale in candidates:
@@ -175,7 +285,7 @@ class MathVerificationService:
                 used.add(val)
                 results.append((val, dtype, rationale))
 
-        # Fallback if candidates were insufficient
+        # Fill if needed
         delta = 3
         while len(results) < distractor_count:
             fallback_val = correct_answer + delta
@@ -191,53 +301,53 @@ class MathVerificationService:
         return results
 
 
-# Built-in curriculum repository matching official NIE primary mathematics syllabus
+# Built-in curriculum repository strictly matching official Sri Lankan NIE primary mathematics syllabus
 CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
     1: [
         {
-            "problem_id": "G1-NUM-001",
+            "problem_id": "G1-CNT-001",
             "grade": 1,
-            "topic": "Addition",
+            "topic": "Counting",
             "competency_code": "1.1",
-            "competency_desc": "එකතු කිරීම - 1 සිට 10 දක්වා සංඛ්‍යා එකතු කිරීම (Adds quantities up to 10)",
-            "raw_problem_text": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
-            "english_translation": "Mala has 5 apples. Nimal gave her 3 more apples. How many apples does Mala have now?",
-            "operands": [5, 3],
-            "operation": "ADD",
-            "expected_answer": 8,
+            "competency_desc": "1 සිට 10 දක්වා ද්‍රව්‍ය ගණන් කිරීම (Counting objects 1 to 10)",
+            "raw_problem_text": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව තෝරන්න.",
+            "english_translation": "Count the 5 mangoes in the basket and select the correct number.",
+            "operands": [5],
+            "operation": "COUNT",
+            "expected_answer": 5,
             "difficulty": "EASY",
             "page_number": 1,
             "is_money": False,
         },
         {
-            "problem_id": "G1-SUB-002",
+            "problem_id": "G1-CMP-002",
             "grade": 1,
-            "topic": "Subtraction",
+            "topic": "Comparison",
             "competency_code": "1.2",
-            "competency_desc": "අඩු කිරීම - 10 ට අඩු සංඛ්‍යා අඩු කිරීම (Subtracts single-digit numbers)",
-            "raw_problem_text": "ගසේ කුරුල්ලන් 7 ක් සිටියා. උන්ගෙන් 3 ක් පියාඹා ගියා. දැන් ගසේ ඉතිරි කුරුල්ලන් ගණන කීයද?",
-            "english_translation": "There were 7 birds on a tree. 3 flew away. How many birds are left on the tree?",
-            "operands": [7, 3],
-            "operation": "SUB",
-            "expected_answer": 4,
+            "competency_desc": "ප්‍රමාණ සැසඳීම - වැඩි හා අඩු (Comparing quantities: More vs Less)",
+            "raw_problem_text": "මල් 6 ක් ඇති බඳුන සහ මල් 4 ක් ඇති බඳුන අතරින් වැඩි මල් ගණන කුමක්ද?",
+            "english_translation": "Between a vase with 6 flowers and a vase with 4 flowers, which has more?",
+            "operands": [6, 4],
+            "operation": "COMPARE",
+            "expected_answer": 6,
             "difficulty": "EASY",
             "page_number": 2,
             "is_money": False,
         },
         {
-            "problem_id": "G1-CNT-003",
+            "problem_id": "G1-MON-003",
             "grade": 1,
-            "topic": "Counting",
-            "competency_code": "1.3",
-            "competency_desc": "ද්‍රව්‍ය ගණන් කිරීම හා එකතු කිරීම (Counting objects and adding within 15)",
-            "raw_problem_text": "කූඩයේ අඹ 6 ක් ඇත. අම්මා තවත් අඹ 4 ක් දැමුවාය. දැන් කූඩයේ ඇති මුළු අඹ ගණන කීයද?",
-            "english_translation": "There are 6 mangoes in the basket. Mother added 4 more mangoes. What is the total number of mangoes in the basket now?",
-            "operands": [6, 4],
-            "operation": "ADD",
-            "expected_answer": 10,
+            "topic": "Money",
+            "competency_code": "1.4",
+            "competency_desc": "කාසි හඳුනා ගැනීම (Recognizing currency coins: Rs. 1, 2, 5)",
+            "raw_problem_text": "ගජා ළඟ ඇති රුපියල් 5 කාසියේ වටිනාකම තෝරන්න.",
+            "english_translation": "Select the numerical value of the 5-rupee coin Gaja is holding.",
+            "operands": [5],
+            "operation": "IDENTIFY",
+            "expected_answer": 5,
             "difficulty": "EASY",
             "page_number": 3,
-            "is_money": False,
+            "is_money": True,
         },
     ],
     2: [
@@ -438,73 +548,127 @@ async def upload_and_extract_problems(
         try:
             from google import genai
             from google.genai import types
-
             client = genai.Client(api_key=GEMINI_API_KEY)
+            pdf_bytes = _get_pdf_bytes(pdf_file_path_or_bytes)
             pdf_text = _extract_pdf_text(pdf_file_path_or_bytes)
+
+            # Grade-specific curriculum guidance for Gemini
+            if grade == 1:
+                curriculum_guide = """
+CRITICAL SRI LANKAN SYLLABUS RULE FOR GRADE 1:
+- Grade 1 DOES NOT contain any formal addition or subtraction equations (strictly NO '+' or '-' operations).
+- Grade 1 mathematics in Sri Lanka (NIE) is strictly limited to:
+  1. Pre-mathematics: More vs Less (වැඩි/අඩු), Big vs Small (ලොකු/කුඩා), Long vs Short (දිග/කෙටි), Heavy vs Light (බර වැඩි/අඩු).
+  2. Counting objects from 1 to 10 (1 සිට 10 දක්වා ද්‍රව්‍ය ගණන් කර නිවැරදි සංඛ්‍යාව තෝරාගැනීම).
+  3. Identifying currency coins (රුපියල 1, 2, 5 කාසි හඳුනාගැනීම).
+- "operation" MUST be one of: "COUNT", "COMPARE", or "IDENTIFY".
+- "operands": [target_count] (e.g. [5]) or [item1_count, item2_count] (e.g. [6, 4] for comparing which is more).
+- "expected_answer": integer (e.g. 5, or 6).
+- Under NO circumstances generate arithmetic equations for Grade 1.
+"""
+            elif grade == 2:
+                curriculum_guide = """
+GRADE 2 SYLLABUS RULES:
+- Single-step addition and subtraction within 20, expanding up to 50.
+- Currency combinations up to Rs. 50.
+- "operation": "ADD" or "SUB".
+"""
+            elif grade == 3:
+                curriculum_guide = """
+GRADE 3 SYLLABUS RULES:
+- Addition and subtraction within 1000.
+- Multiplication tables for 2, 3, 4, 5, 10.
+- Equal division without remainder.
+- Multi-step money balance problems.
+- "operation": "ADD", "SUB", "MUL", or "DIV".
+"""
+            else:
+                curriculum_guide = """
+GRADE 4/5 SYLLABUS RULES:
+- Multi-digit multiplication and division.
+- Scholarship level reasoning and word problems.
+"""
 
             prompt = f"""
 You are an expert Sri Lankan primary mathematics curriculum extractor.
-Analyze the following text from an official Sri Lankan NIE Mathematics Syllabus for Grade {grade}.
-Extract 3 to 6 structured mathematics competency problems suitable for primary school learners.
+Analyze the curriculum document for Grade {grade}.
+{curriculum_guide}
+
+Extract 3 structured mathematics competency problems suitable for primary school learners.
 Return a valid JSON array of objects with the following schema:
 [
   {{
     "problem_id": "G{grade}-EXT-001",
     "grade": {grade},
-    "topic": "Addition or Subtraction or Money or Multiplication",
-    "competency_code": "e.g. {grade}.1",
-    "competency_desc": "Description in Sinhala or English",
-    "raw_problem_text": "Sinhala problem statement",
+    "topic": "Counting or Comparison or Addition or Money",
+    "competency_code": "{grade}.1",
+    "competency_desc": "Curriculum competency description",
+    "raw_problem_text": "Authentic Sinhala problem statement",
     "english_translation": "English translation",
-    "operands": [first_number, second_number],
-    "operation": "ADD or SUB or MUL or DIV",
+    "operands": [numbers],
+    "operation": "{'COUNT or COMPARE or IDENTIFY' if grade == 1 else 'ADD or SUB or MUL or DIV'}",
     "expected_answer": integer_answer,
-    "difficulty": "EASY or MEDIUM or HARD",
+    "difficulty": "EASY",
     "page_number": 1,
     "is_money": false
   }}
 ]
-DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are mathematically exact.
-PDF text preview:
-{pdf_text[:3000]}
+DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are mathematically exact and age-appropriate.
 """
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt,
-                config=types.GenerateContentConfig(response_mime_type="application/json"),
-            )
-            raw_json = response.text
+            contents: Any
+            if pdf_bytes:
+                contents = [
+                    types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf"),
+                    prompt,
+                ]
+            elif pdf_text:
+                contents = f"{prompt}\n\nPDF text preview:\n{pdf_text[:3000]}"
+            else:
+                contents = prompt
+
+            raw_json = _generate_with_gemini(client, contents, schema_json=True)
+            # Strip markdown formatting if any
+            if "```" in raw_json:
+                raw_json = re.sub(r"```(?:json)?\s*([\s\S]*?)\s*```", r"\1", raw_json).strip()
+
             items = json.loads(raw_json)
             if isinstance(items, list):
                 for item in items:
-                    ops = item.get("operands", [])
-                    op = item.get("operation", "ADD")
+                    ops = item.get("operands", [item.get("expected_answer", 1)])
+                    op = item.get("operation", "COUNT" if grade == 1 else "ADD")
                     ans = item.get("expected_answer")
-                    # Deterministically recalculate and verify math
-                    if len(ops) >= 2:
-                        calc_ans = MathVerificationService.execute_calculation(ops, op)
-                        if ans != calc_ans:
-                            ans = calc_ans  # Correct LLM calculation errors deterministically
-                        if MathVerificationService.verify_grade_invariants(grade, ops, op):
-                            prob = CurriculumProblem(
-                                problem_id=item.get("problem_id", f"G{grade}-LLM-{uuid.uuid4().hex[:4]}"),
-                                doc_id=doc_id,
-                                grade=grade,
-                                topic=item.get("topic", topic or "Mathematics"),
-                                competency_code=item.get("competency_code", f"{grade}.1"),
-                                competency_desc=item.get("competency_desc", "Competency extraction"),
-                                raw_problem_text=item.get("raw_problem_text", ""),
-                                english_translation=item.get("english_translation", ""),
-                                operands=ops,
-                                operation=op,
-                                expected_answer=ans,
-                                difficulty=item.get("difficulty", "MEDIUM"),
-                                page_number=item.get("page_number", 1),
-                                is_money=bool(item.get("is_money", False)),
-                            )
-                            extracted_problems.append(prob)
+                    if ans is None and ops:
+                        ans = ops[0]
+
+                    # Strictly enforce Grade 1 constraints
+                    if grade == 1 and op in ("ADD", "SUB", "MUL", "DIV"):
+                        op = "COUNT"
+                        ops = [ans] if ans is not None else [1]
+
+                    calc_ans = MathVerificationService.execute_calculation(ops, op)
+                    if ans != calc_ans and op in ("ADD", "SUB", "MUL", "DIV"):
+                        ans = calc_ans
+
+                    if MathVerificationService.verify_grade_invariants(grade, ops, op):
+                        prob = CurriculumProblem(
+                            problem_id=item.get("problem_id", f"G{grade}-LLM-{uuid.uuid4().hex[:4]}"),
+                            doc_id=doc_id,
+                            grade=grade,
+                            topic=item.get("topic", topic or ("Counting" if grade == 1 else "Mathematics")),
+                            competency_code=item.get("competency_code", f"{grade}.1"),
+                            competency_desc=item.get("competency_desc", "Competency extraction"),
+                            raw_problem_text=item.get("raw_problem_text", ""),
+                            english_translation=item.get("english_translation", ""),
+                            operands=ops,
+                            operation=op,
+                            expected_answer=ans,
+                            difficulty=item.get("difficulty", "EASY" if grade == 1 else "MEDIUM"),
+                            page_number=item.get("page_number", 1),
+                            is_money=bool(item.get("is_money", False)),
+                        )
+                        extracted_problems.append(prob)
         except Exception as e:
-            print(f"[upload_and_extract_problems] Gemini API failed or unavailable ({e}). Using deterministic NIE fallback.")
+            print(f"[upload_and_extract_problems] Gemini API extraction note ({e}). Using deterministic NIE fallback.")
 
     # Fallback to authentic NIE primary mathematics syllabus matrix
     if not extracted_problems:
@@ -517,7 +681,6 @@ PDF text preview:
         for p_dict in grade_problems:
             p = dict(p_dict)
             p["doc_id"] = doc_id
-            # Verify and enforce deterministic math
             MathVerificationService.verify_calculation(p["operands"], p["operation"], p["expected_answer"])
             extracted_problems.append(CurriculumProblem(**p))
 
@@ -535,12 +698,10 @@ async def enrich_gameplay_narrative(
     """
     selected_theme = theme or ("VILLAGE_MARKET" if problem.is_money else "JUNGLE_ADVENTURE")
 
-    # If Gemini API key is available, attempt narrative generation
+    # If Gemini API key is available, attempt narrative generation with resilient model fallback
     if GEMINI_API_KEY:
         try:
             from google import genai
-            from google.genai import types
-
             client = genai.Client(api_key=GEMINI_API_KEY)
             prompt = f"""
 You are a creative learning narrative designer specializing in primary education and ADHD accessibility in Sri Lanka.
@@ -569,12 +730,10 @@ Return valid JSON with:
   }}
 }}
 """
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt,
-                config=types.GenerateContentConfig(response_mime_type="application/json"),
-            )
-            data = json.loads(response.text)
+            raw_json = _generate_with_gemini(client, prompt, schema_json=True)
+            if "```" in raw_json:
+                raw_json = re.sub(r"```(?:json)?\s*([\s\S]*?)\s*```", r"\1", raw_json).strip()
+            data = json.loads(raw_json)
             return StoryNarrative(**data)
         except Exception as e:
             print(f"[enrich_gameplay_narrative] Gemini narrative failed ({e}), using cultural fallback templates.")

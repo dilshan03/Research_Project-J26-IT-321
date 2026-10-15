@@ -24,7 +24,7 @@ export interface GameMicroStep {
   correct_target_value: string;
   game_options: GameChoiceOption[];
   operands?: number[] | null;
-  operation?: 'ADD' | 'SUB' | 'MUL' | 'DIV' | null;
+  operation?: 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'COUNT' | 'COMPARE' | 'IDENTIFY' | null;
 }
 
 export interface ADHDGameSettings {
@@ -99,7 +99,7 @@ export interface CurriculumProblem {
   raw_problem_text: string;
   english_translation?: string | null;
   operands: number[];
-  operation?: 'ADD' | 'SUB' | 'MUL' | 'DIV' | null;
+  operation?: 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'COUNT' | 'COMPARE' | 'IDENTIFY' | null;
   expected_answer: number;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   page_number?: number | null;

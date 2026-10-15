@@ -1,68 +1,5 @@
 [
   {
-    "problem_id": "G1-NUM-001",
-    "doc_id": "doc_g1_grade_01",
-    "grade": 1,
-    "topic": "Addition",
-    "competency_code": "1.1",
-    "competency_desc": "එකතු කිරීම - 1 සිට 10 දක්වා සංඛ්‍යා එකතු කිරීම (Adds quantities up to 10)",
-    "raw_problem_text": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
-    "english_translation": "Mala has 5 apples. Nimal gave her 3 more apples. How many apples does Mala have now?",
-    "operands": [
-      5,
-      3
-    ],
-    "operation": "ADD",
-    "expected_answer": 8,
-    "difficulty": "EASY",
-    "page_number": 1,
-    "is_money": false,
-    "created_at": "2026-10-15T05:21:40.461874+00:00",
-    "_id": "a6f72a3350c744dbbad41b108aab29e5"
-  },
-  {
-    "problem_id": "G1-SUB-002",
-    "doc_id": "doc_g1_grade_01",
-    "grade": 1,
-    "topic": "Subtraction",
-    "competency_code": "1.2",
-    "competency_desc": "අඩු කිරීම - 10 ට අඩු සංඛ්‍යා අඩු කිරීම (Subtracts single-digit numbers)",
-    "raw_problem_text": "ගසේ කුරුල්ලන් 7 ක් සිටියා. උන්ගෙන් 3 ක් පියාඹා ගියා. දැන් ගසේ ඉතිරි කුරුල්ලන් ගණන කීයද?",
-    "english_translation": "There were 7 birds on a tree. 3 flew away. How many birds are left on the tree?",
-    "operands": [
-      7,
-      3
-    ],
-    "operation": "SUB",
-    "expected_answer": 4,
-    "difficulty": "EASY",
-    "page_number": 2,
-    "is_money": false,
-    "created_at": "2026-10-15T05:21:40.461874+00:00",
-    "_id": "7c67bd0f10134ff6bf0771d76fccbd6f"
-  },
-  {
-    "problem_id": "G1-CNT-003",
-    "doc_id": "doc_g1_grade_01",
-    "grade": 1,
-    "topic": "Counting",
-    "competency_code": "1.3",
-    "competency_desc": "ද්‍රව්‍ය ගණන් කිරීම හා එකතු කිරීම (Counting objects and adding within 15)",
-    "raw_problem_text": "කූඩයේ අඹ 6 ක් ඇත. අම්මා තවත් අඹ 4 ක් දැමුවාය. දැන් කූඩයේ ඇති මුළු අඹ ගණන කීයද?",
-    "english_translation": "There are 6 mangoes in the basket. Mother added 4 more mangoes. What is the total number of mangoes in the basket now?",
-    "operands": [
-      6,
-      4
-    ],
-    "operation": "ADD",
-    "expected_answer": 10,
-    "difficulty": "EASY",
-    "page_number": 3,
-    "is_money": false,
-    "created_at": "2026-10-15T05:21:40.461874+00:00",
-    "_id": "dad4c358db364e48803371182d6592bf"
-  },
-  {
     "problem_id": "G2-ADD-001",
     "doc_id": "doc_g2_grade_02",
     "grade": 2,
@@ -80,7 +17,7 @@
     "difficulty": "MEDIUM",
     "page_number": 1,
     "is_money": false,
-    "created_at": "2026-10-15T05:21:40.473197+00:00",
+    "created_at": "2026-10-15T05:40:42.169825+00:00",
     "_id": "f42be7c627264fc391d4bb0e32f07a39"
   },
   {
@@ -101,7 +38,7 @@
     "difficulty": "MEDIUM",
     "page_number": 2,
     "is_money": false,
-    "created_at": "2026-10-15T05:21:40.473197+00:00",
+    "created_at": "2026-10-15T05:40:42.169825+00:00",
     "_id": "4f57a91622b944a4aefcb92162561765"
   },
   {
@@ -122,7 +59,7 @@
     "difficulty": "MEDIUM",
     "page_number": 3,
     "is_money": true,
-    "created_at": "2026-10-15T05:21:40.473197+00:00",
+    "created_at": "2026-10-15T05:40:42.169825+00:00",
     "_id": "b129e37ffda44485a57a9dba5b081fa1"
   },
   {
@@ -143,7 +80,7 @@
     "difficulty": "HARD",
     "page_number": 2,
     "is_money": true,
-    "created_at": "2026-10-15T05:21:40.495556+00:00",
+    "created_at": "2026-10-15T05:40:42.178556+00:00",
     "_id": "0068a2d6d8554909a0e0f4f3a47b26fa"
   },
   {
@@ -164,7 +101,7 @@
     "difficulty": "MEDIUM",
     "page_number": 3,
     "is_money": false,
-    "created_at": "2026-10-15T05:21:40.495556+00:00",
+    "created_at": "2026-10-15T05:40:42.178556+00:00",
     "_id": "7a9dc833606946fc8cb326f9232d343a"
   },
   {
@@ -185,7 +122,7 @@
     "difficulty": "MEDIUM",
     "page_number": 4,
     "is_money": false,
-    "created_at": "2026-10-15T05:21:40.495556+00:00",
+    "created_at": "2026-10-15T05:40:42.178556+00:00",
     "_id": "c45cd8441c3d45e996d61664ab650e52"
   },
   {
@@ -206,7 +143,7 @@
     "difficulty": "MEDIUM",
     "page_number": 2,
     "is_money": true,
-    "created_at": "2026-10-15T05:21:40.506476+00:00",
+    "created_at": "2026-10-15T05:40:42.189050+00:00",
     "_id": "769f52e5c89e474d92b5a256ac36ddcc"
   },
   {
@@ -227,7 +164,7 @@
     "difficulty": "MEDIUM",
     "page_number": 3,
     "is_money": false,
-    "created_at": "2026-10-15T05:21:40.506476+00:00",
+    "created_at": "2026-10-15T05:40:42.189050+00:00",
     "_id": "7a20222b8d5a4964aa7118eb8d6eea46"
   },
   {
@@ -248,7 +185,7 @@
     "difficulty": "HARD",
     "page_number": 1,
     "is_money": true,
-    "created_at": "2026-10-15T05:21:40.512329+00:00",
+    "created_at": "2026-10-15T05:40:42.194556+00:00",
     "_id": "4a2ed2aaaee14c0ebc4d5cb86104af37"
   },
   {
@@ -269,7 +206,319 @@
     "difficulty": "MEDIUM",
     "page_number": 3,
     "is_money": false,
-    "created_at": "2026-10-15T05:21:40.512329+00:00",
+    "created_at": "2026-10-15T05:40:42.194556+00:00",
     "_id": "18df3052ca9e4894940e98c76991bdf4"
+  },
+  {
+    "problem_id": "G1-EXT-001",
+    "doc_id": "doc_g1_grade_01",
+    "grade": 1,
+    "topic": "Counting",
+    "competency_code": "2.0",
+    "competency_desc": "1 සිට 9 දක්වා සංඛ්‍යාවලට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණය දැක්වීම.",
+    "raw_problem_text": "1 සිට 9 තෙක් ඇතැම් අයිතමයේ වර්ණ, හැඩ සහ තරම අනුව ප්‍රමාණය හඳුනා ගැනීම.",
+    "english_translation": "Count objects up to 9 and identify the correct number.",
+    "operation": "COUNT",
+    "expected_answer": 5,
+    "difficulty": "EASY",
+    "page_number": 4,
+    "is_money": false,
+    "created_at": "2026-10-15T06:38:17.669722+00:00",
+    "_id": "fec3694bc8e24c11afa1897f18693afc",
+    "operands": [
+      5
+    ]
+  },
+  {
+    "problem_id": "G1-EXT-002",
+    "doc_id": "doc_g1_grade_01",
+    "grade": 1,
+    "topic": "Comparison",
+    "competency_code": "3.0",
+    "competency_desc": "දිග, බර සහ ධාරිතාව සංසන්දනය කිරීම.",
+    "raw_problem_text": "පැහැදිලි වෙනසක් ඇති වස්තු දෙකක්, එකක් අනෙකට වඩා බර වැඩි, බර අඩු වශයෙන් සැසඳීම.",
+    "english_translation": "Compare two objects with clear difference in weight as heavier or lighter.",
+    "operation": "COMPARE",
+    "expected_answer": 1,
+    "difficulty": "EASY",
+    "page_number": 5,
+    "is_money": false,
+    "created_at": "2026-10-15T06:38:17.669722+00:00",
+    "_id": "45d8979dc92049c2b095aa170b5c563d",
+    "operands": [
+      2
+    ]
+  },
+  {
+    "problem_id": "G1-EXT-003",
+    "doc_id": "doc_g1_grade_01",
+    "grade": 1,
+    "topic": "Money",
+    "competency_code": "4.0",
+    "competency_desc": "මුදල් හඳුනා ගැනීම.",
+    "raw_problem_text": "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම.",
+    "english_translation": "Identify currency coins: 1 rupee, 2 rupees, and 5 rupees.",
+    "operation": "IDENTIFY",
+    "expected_answer": 5,
+    "difficulty": "EASY",
+    "page_number": 5,
+    "is_money": true,
+    "created_at": "2026-10-15T06:38:17.669722+00:00",
+    "_id": "e7a8f33a68b546ddb5be865cbad201a2",
+    "operands": [
+      5
+    ]
+  },
+  {
+    "problem_id": "G2-EXT-001",
+    "doc_id": "doc_g2_grade_02",
+    "grade": 2,
+    "topic": "Addition",
+    "competency_code": "2.0",
+    "competency_desc": "Addition up to 99",
+    "raw_problem_text": "පන්තියේ ළmයින් 12 දෙනෙක් සිටිති. තවත් ළමයින් 7 දෙනෙක් පැමිණියහ. දැන් මුළු ළමයින් ගණන කීයද?",
+    "english_translation": "There were 12 children in the class. Another 7 children arrived. How many total children are there now?",
+    "operation": "ADD",
+    "expected_answer": 19,
+    "difficulty": "EASY",
+    "page_number": 4,
+    "is_money": false,
+    "created_at": "2026-10-15T06:32:49.343605+00:00",
+    "_id": "667dd5e600344672842c8bb652d5bd80",
+    "operands": [
+      12,
+      7
+    ]
+  },
+  {
+    "problem_id": "G2-EXT-002",
+    "doc_id": "doc_g2_grade_02",
+    "grade": 2,
+    "topic": "Subtraction",
+    "competency_code": "2.0",
+    "competency_desc": "Subtraction up to 99",
+    "raw_problem_text": "ගෙඩි 18 කින් ගෙඩි 5 ක් ඉවත් කළ විට ඉතිරි ගෙඩි ගණන කීයද?",
+    "english_translation": "When 5 fruits are removed from 18 fruits, how many fruits are remaining?",
+    "operation": "SUB",
+    "expected_answer": 13,
+    "difficulty": "EASY",
+    "page_number": 4,
+    "is_money": false,
+    "created_at": "2026-10-15T06:32:49.343605+00:00",
+    "_id": "40344379b8c74a3e97e1f5ac5fe30949",
+    "operands": [
+      18,
+      5
+    ]
+  },
+  {
+    "problem_id": "G2-EXT-003",
+    "doc_id": "doc_g2_grade_02",
+    "grade": 2,
+    "topic": "Money",
+    "competency_code": "4.0",
+    "competency_desc": "Currency combinations up to Rs. 50",
+    "raw_problem_text": "රුපියල් 20 ක නෝට්ටුවකුත් රුපියල් 10 ක කාසියකුත් ඇත. මුළු මුදල කොපමණද?",
+    "english_translation": "There is a 20 rupees note and a 10 rupees coin. What is the total amount of money?",
+    "operation": "ADD",
+    "expected_answer": 30,
+    "difficulty": "EASY",
+    "page_number": 5,
+    "is_money": true,
+    "created_at": "2026-10-15T06:32:49.343605+00:00",
+    "_id": "5d11d99459504b5d9ce5b12b3a617d06",
+    "operands": [
+      20,
+      10
+    ]
+  },
+  {
+    "problem_id": "G3-EXT-001",
+    "doc_id": "doc_g3_grade_03",
+    "grade": 3,
+    "topic": "Addition",
+    "competency_code": "2.1",
+    "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා දෙකක් හෝ තුනක් එකතු කරයි.",
+    "raw_problem_text": "කඩයක ළඟ තිබූ පොත් 345 ක් සහ අලුතින් ගෙන온 පොත් 232 ක් එකතු කළ විට මුළු පොත් සංඛ්‍යාව කීයද?",
+    "english_translation": "When 345 books previously in a shop and 232 newly brought books are added, what is the total number of books?",
+    "operation": "ADD",
+    "expected_answer": 577,
+    "difficulty": "EASY",
+    "page_number": 2,
+    "is_money": false,
+    "created_at": "2026-10-15T06:32:54.074595+00:00",
+    "_id": "6da6dec550bf42349f1ec7369ad90931",
+    "operands": [
+      345,
+      232
+    ]
+  },
+  {
+    "problem_id": "G3-EXT-002",
+    "doc_id": "doc_g3_grade_03",
+    "grade": 3,
+    "topic": "Subtraction",
+    "competency_code": "2.2",
+    "competency_desc": "99ට නොවැඩි සංඛ්‍යාවකින් තවත් සංඛ්‍යාවක් අඩු කරයි.",
+    "raw_problem_text": "ළමයෙකු ළඟ තිබූ පැන්සල් 85 කින් පැන්සල් 32 ක් දුන්නේ නම්, දැන් ඔහු ළඟ ඉතිරි පැන්සල් ගණන කීයද?",
+    "english_translation": "If a child gave away 32 pencils out of 85 pencils he had, what is the number of pencils remaining with him now?",
+    "operation": "SUB",
+    "expected_answer": 53,
+    "difficulty": "EASY",
+    "page_number": 2,
+    "is_money": false,
+    "created_at": "2026-10-15T06:32:54.074595+00:00",
+    "_id": "2a68d95a33074987ab1c8b1837a7e64b",
+    "operands": [
+      85,
+      32
+    ]
+  },
+  {
+    "problem_id": "G3-EXT-003",
+    "doc_id": "doc_g3_grade_03",
+    "grade": 3,
+    "topic": "Money",
+    "competency_code": "4.1",
+    "competency_desc": "රුපියල්ජයින් හෝ සතවලින් හෝ රුපියල් හා සතවලින් හෝ කරන සරල ගනුදෙනුවල නිරත වෙයි.",
+    "raw_problem_text": "රුපියල් 150 ක් දී පෑනක් මිලදී ගත් විට, රුපියල් 200 ක නෝට්ටුවකින් ඉතිරි මුදල් ලෙස ලැබෙන ප්‍රමාණය කොපමණද?",
+    "english_translation": "When a pen is purchased for 150 rupees, how much is received as change from a 200 rupee note?",
+    "operation": "SUB",
+    "expected_answer": 50,
+    "difficulty": "EASY",
+    "page_number": 3,
+    "is_money": true,
+    "created_at": "2026-10-15T06:32:54.074595+00:00",
+    "_id": "cfdbf933df7f4cf0b595767afa539dc0",
+    "operands": [
+      200,
+      150
+    ]
+  },
+  {
+    "problem_id": "G4-EXT-001",
+    "doc_id": "doc_g4_grade_04",
+    "grade": 4,
+    "topic": "Money",
+    "competency_code": "4.1",
+    "competency_desc": "රෙම්ශ,අ 2000 ක්‌ දක්වා මූල්‍ය කෝට්‌ඩු භාවිත කරයි.",
+    "raw_problem_text": "කඩේකින් රුපියල් 750 ක බඩුත්, තවත් කඩේකින් රුපියල් 450 ක බඩුත් මිලදී ගත්තේ නම්, මුළු වියදම කොපමණද?",
+    "english_translation": "If you bought goods worth 750 rupees from one shop and goods worth 450 rupees from another shop, what is the total expenditure?",
+    "operation": "ADD",
+    "expected_answer": 1200,
+    "difficulty": "EASY",
+    "page_number": 3,
+    "is_money": true,
+    "created_at": "2026-10-15T06:32:58.294172+00:00",
+    "_id": "af3a19e4b8d34ee5af42dc72a55617a2",
+    "operands": [
+      750,
+      450
+    ]
+  },
+  {
+    "problem_id": "G4-EXT-002",
+    "doc_id": "doc_g4_grade_04",
+    "grade": 4,
+    "topic": "Addition",
+    "competency_code": "2.1",
+    "competency_desc": "බලලී තුනක්‌ දක්වා වූ සංඛ්‍යා දෙකක්‌ හෝ තුනක්‌ ගෙන යාම එකම ස්ථානයකින් පමණක්‌ සහිත ව එකතු කරයි.",
+    "raw_problem_text": "පාසල් පුස්‌තකාලයේ සිංහල පොත් 1450 ක්‌ සහ ඉංග්‍රීසි පොත් 320 ක්‌ ඇත. පුස්‌තකාලයේ ඇති මුළු පොත් සංඛ්‍යාව කීයද?",
+    "english_translation": "There are 1450 Sinhala books and 320 English books in the school library. What is the total number of books in the library?",
+    "operation": "ADD",
+    "expected_answer": 1770,
+    "difficulty": "EASY",
+    "page_number": 2,
+    "is_money": false,
+    "created_at": "2026-10-15T06:32:58.294172+00:00",
+    "_id": "1e5284a3c7674cd0a2e4c1f80d3eb6b6",
+    "operands": [
+      1450,
+      320
+    ]
+  },
+  {
+    "problem_id": "G4-EXT-003",
+    "doc_id": "doc_g4_grade_04",
+    "grade": 4,
+    "topic": "Multiplication",
+    "competency_code": "2.3",
+    "competency_desc": "බලලී දෙකකට fkdjeä jk සංඛ්‍යා 2, 5 සහ 10 කින් ගුණ කරයි.",
+    "raw_problem_text": "එක්‌ පෙට්ටියක පැන්සල් 25 බැගින් පෙти 5 ක ඇති මුළු පැන්සල් සංඛ්‍යාව කීයද?",
+    "english_translation": "What is the total number of pencils in 5 boxes, with each box containing 25 pencils?",
+    "operation": "MUL",
+    "expected_answer": 125,
+    "difficulty": "EASY",
+    "page_number": 2,
+    "is_money": false,
+    "created_at": "2026-10-15T06:32:58.294172+00:00",
+    "_id": "2d98a9878fda42b695a5c444385d0a7e",
+    "operands": [
+      25,
+      5
+    ]
+  },
+  {
+    "problem_id": "G5-EXT-001",
+    "doc_id": "doc_g5_grade_05",
+    "grade": 5,
+    "topic": "Money",
+    "competency_code": "4.1",
+    "competency_desc": "රෙම්ෂ, යුගල හා ගනුදෙනු (Money transactions)",
+    "raw_problem_text": "පන්තියේ ළමයින් 25 දෙනෙකු එක්ව ගුරු දිනය වෙනුවෙන් තිළිණයක් මිලදී ගැනීමට රුපියල් 2000 ක මුදලක් එකතු කළහ. තිළිණයේ මිල රුපියල් 1750 ක් නම්, ඉතිරි වූ මුදල් කීයද?",
+    "english_translation": "25 children in the class pooled together Rs. 2000 to buy a gift for Teacher's Day. If the price of the gift is Rs. 1750, how much money was left?",
+    "operation": "SUB",
+    "expected_answer": 250,
+    "difficulty": "EASY",
+    "page_number": 3,
+    "is_money": true,
+    "created_at": "2026-10-15T06:33:02.442443+00:00",
+    "_id": "1bd41f6a2f9a42db8277982e4e53fda5",
+    "operands": [
+      2000,
+      1750
+    ]
+  },
+  {
+    "problem_id": "G5-EXT-002",
+    "doc_id": "doc_g5_grade_05",
+    "grade": 5,
+    "topic": "Multiplication",
+    "competency_code": "2.3",
+    "competency_desc": "ගුණ කිරීම (Multiplication)",
+    "raw_problem_text": "එක් බස් රථයක මගීන් 45 දෙනෙකු ගමන් කළ හැක නම්, එවැනි බස් රථ 12 ක ගමන් කළ හැකි මුළු මගීන් සංඛ්‍යාව කොපමණද?",
+    "english_translation": "If one bus can carry 45 passengers, what is the total number of passengers that can travel in 12 such buses?",
+    "operation": "MUL",
+    "expected_answer": 540,
+    "difficulty": "MEDIUM",
+    "page_number": 2,
+    "is_money": false,
+    "created_at": "2026-10-15T06:33:02.442443+00:00",
+    "_id": "5eb5075126a14a99a27c8dabc086d80a",
+    "operands": [
+      45,
+      12
+    ]
+  },
+  {
+    "problem_id": "G5-EXT-003",
+    "doc_id": "doc_g5_grade_05",
+    "grade": 5,
+    "topic": "Division",
+    "competency_code": "2.4",
+    "competency_desc": "බෙදීම (Division)",
+    "raw_problem_text": "ශිෂ්‍යයන් 96 දෙනෙකු සමාන කණ්ඩායම් 8 කට බෙදුවේ නම්, එක් කණ්ඩායමක සිටින ශිෂ්‍යයන් සංඛ්‍යාව කොපමණද?",
+    "english_translation": "If 96 students are divided into 8 equal groups, what is the number of students in one group?",
+    "operation": "DIV",
+    "expected_answer": 12,
+    "difficulty": "EASY",
+    "page_number": 2,
+    "is_money": false,
+    "created_at": "2026-10-15T06:33:02.442443+00:00",
+    "_id": "180720558ba245539170fdfaca075b03",
+    "operands": [
+      96,
+      8
+    ]
   }
 ]

@@ -44,8 +44,8 @@ class GameMicroStep(BaseModel):
     operands: Optional[List[int]] = Field(
         None, description="Quantities this step works on (used by the game layer for manipulatives)"
     )
-    operation: Optional[Literal['ADD', 'SUB', 'MUL', 'DIV']] = Field(
-        None, description="Arithmetic operation this step applies to the operands"
+    operation: Optional[Literal['ADD', 'SUB', 'MUL', 'DIV', 'COUNT', 'COMPARE', 'IDENTIFY']] = Field(
+        None, description="Arithmetic or cognitive action this step applies"
     )
 
 

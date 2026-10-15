@@ -25,10 +25,16 @@ def test_parser_detects_operations():
 
 
 def test_low_risk_blueprint_is_two_tier():
-    bp, _, _ = generate_blueprint("Q1", 1, "Addition", ADD_Q, "LOW")
+    bp, _, _ = generate_blueprint("Q1", 2, "Addition", ADD_Q, "LOW")
     assert bp.adhd_game_settings.step_granularity == "TWO_TIER"
     assert [s.action_type for s in bp.micro_steps] == ["SELECT_OPERATOR", "CALCULATE_MICROSTEP"]
     assert bp.micro_steps[-1].correct_target_value == "8"
+
+
+def test_grade_1_no_operator_selection():
+    bp, _, _ = generate_blueprint("G1-1", 1, "Counting", "ගස්වල ඇති අඹ 5 ක් ගණන් කරන්න.", "LOW")
+    assert [s.action_type for s in bp.micro_steps] == ["IDENTIFY_ENTITY", "CALCULATE_MICROSTEP"]
+    assert "SELECT_OPERATOR" not in [s.action_type for s in bp.micro_steps]
 
 
 def test_high_risk_blueprint_is_three_tier_with_two_distractors():

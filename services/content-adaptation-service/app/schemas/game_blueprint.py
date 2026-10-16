@@ -44,8 +44,8 @@ class GameMicroStep(BaseModel):
     operands: Optional[List[int]] = Field(
         None, description="Quantities this step works on (used by the game layer for manipulatives)"
     )
-    operation: Optional[Literal['ADD', 'SUB', 'MUL', 'DIV']] = Field(
-        None, description="Arithmetic operation this step applies to the operands"
+    operation: Optional[Literal['ADD', 'SUB', 'MUL', 'DIV', 'COUNT', 'COMPARE', 'IDENTIFY']] = Field(
+        None, description="Arithmetic or cognitive action this step applies"
     )
 
 
@@ -70,6 +70,9 @@ class GameActivityBlueprint(BaseModel):
     adhd_game_settings: ADHDGameSettings = Field(..., description="Settings specifically tailored to ADHD traits")
     micro_steps: List[GameMicroStep] = Field(..., description="The breakdown of the problem into interactive micro-steps")
     status: Literal['draft', 'approved', 'rejected'] = Field(..., description="Approval status of the blueprint")
+    story_narrative: Optional[dict] = Field(None, description="Culturally resonant story backdrop and Gaja mascot dialogue")
+    cli_score: Optional[float] = Field(None, description="Calculated Cognitive Load Index")
+    raw_sinhala_question: Optional[str] = Field(None, description="Original question text")
 
 
 class CurriculumAdaptationRequest(BaseModel):

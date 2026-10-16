@@ -14,3 +14,10 @@ dist/
 
 # Logs
 *.log
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+**/db_store/gridfs/
+

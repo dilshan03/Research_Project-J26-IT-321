@@ -68,30 +68,37 @@ export function useLearnerState({
       // 1. Hint-Aware BKT Step
       effSlip = Math.max(0.18, Math.min(0.45, 0.18 + 0.22 * inatt));
       const hintFraction = Math.max(0.0, Math.min(1.0, hintLvl / 4.0));
-      effGuess = 0.25 + 0.85 * hintFraction * (1.0 - 0.25);
 
-      let numHA, denHA;
       if (isCorrect) {
-        numHA = p_hintAware * (1.0 - effSlip);
-        denHA = numHA + (1.0 - p_hintAware) * effGuess;
+        // Scaffolding guess boost applies when answer is correct
+        effGuess = 0.25 + 0.85 * hintFraction * (1.0 - 0.25);
+        const numHA = p_hintAware * (1.0 - effSlip);
+        const denHA = numHA + (1.0 - p_hintAware) * effGuess;
+        const postHA = denHA > 0 ? numHA / denHA : p_hintAware;
+        const updatedHA = postHA + (1.0 - postHA) * 0.15;
+        p_hintAware = Math.max(p_hintAware, Math.min(1.0, updatedHA));
       } else {
-        numHA = p_hintAware * effSlip;
-        denHA = numHA + (1.0 - p_hintAware) * (1.0 - effGuess);
+        // On error: hints do not aid failure. Base guess applies.
+        effGuess = 0.25;
+        const numHA = p_hintAware * effSlip;
+        const denHA = numHA + (1.0 - p_hintAware) * (1.0 - effGuess);
+        const postHA = denHA > 0 ? numHA / denHA : p_hintAware;
+        // Knowledge must strictly decrease on errors
+        p_hintAware = Math.min(p_hintAware * 0.95, postHA);
       }
-      const postHA = denHA > 0 ? numHA / denHA : p_hintAware;
-      p_hintAware = Math.max(0.0, Math.min(1.0, postHA + (1.0 - postHA) * 0.15));
 
       // 2. Standard Baseline BKT Step (ignores hints, ignores inattention slip)
-      let numStd, denStd;
       if (isCorrect) {
-        numStd = p_std * (1.0 - 0.18);
-        denStd = numStd + (1.0 - p_std) * 0.25;
+        const numStd = p_std * (1.0 - 0.18);
+        const denStd = numStd + (1.0 - p_std) * 0.25;
+        const postStd = denStd > 0 ? numStd / denStd : p_std;
+        p_std = Math.max(p_std, Math.min(1.0, postStd + (1.0 - postStd) * 0.15));
       } else {
-        numStd = p_std * 0.18;
-        denStd = numStd + (1.0 - p_std) * (1.0 - 0.25);
+        const numStd = p_std * 0.18;
+        const denStd = numStd + (1.0 - p_std) * (1.0 - 0.25);
+        const postStd = denStd > 0 ? numStd / denStd : p_std;
+        p_std = Math.min(p_std * 0.95, postStd);
       }
-      const postStd = denStd > 0 ? numStd / denStd : p_std;
-      p_std = Math.max(0.0, Math.min(1.0, postStd + (1.0 - postStd) * 0.15));
     }
 
     const predNext = p_hintAware * (1.0 - 0.18) + (1.0 - p_hintAware) * 0.25;

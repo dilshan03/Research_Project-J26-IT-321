@@ -81,7 +81,10 @@ class HintAwareBKT:
 
         # 2. Adapt guess based on progressive hint level assistance
         hint_fraction = float(np.clip(hint_level / 4.0, 0.0, 1.0))
-        effective_guess = float(self.p_g + self.gamma * hint_fraction * (1.0 - self.p_g))
+        if is_correct:
+            effective_guess = float(self.p_g + self.gamma * hint_fraction * (1.0 - self.p_g))
+        else:
+            effective_guess = float(self.p_g)
 
         # 3. Compute Posterior Knowledge via Bayes' Rule
         if is_correct:
@@ -94,8 +97,12 @@ class HintAwareBKT:
         p_posterior = float(numerator / denominator) if denominator > 0 else float(p_prior)
 
         # 4. Learning Transition
-        p_updated = float(p_posterior + (1.0 - p_posterior) * self.p_t)
-        p_updated = float(np.clip(p_updated, 0.0, 1.0))
+        if is_correct:
+            p_updated = float(p_posterior + (1.0 - p_posterior) * self.p_t)
+            p_updated = float(np.clip(p_updated, p_prior, 1.0))
+        else:
+            p_updated = float(min(p_prior * 0.95, p_posterior))
+            p_updated = float(np.clip(p_updated, 0.0, 1.0))
 
         # 5. Predicted probability of answering the NEXT question correctly
         predicted_next_correct = float(p_updated * (1.0 - self.p_s) + (1.0 - p_updated) * self.p_g)

@@ -38,8 +38,12 @@ export class HintAwareBKT {
     const effectiveSlip = Math.max(this.p_s, Math.min(0.45, this.p_s + this.alpha_slip * clippedInattention));
 
     // 2. Scaffolding Guess Boost (Progressive Hints)
+    // Applied to guess probability only when the student answers correctly.
+    // Hints aid producing a correct guess; they do not aid making an error.
     const hintFraction = Math.max(0.0, Math.min(1.0, hintLevel / 4.0));
-    const effectiveGuess = this.p_g + this.gamma * hintFraction * (1.0 - this.p_g);
+    const effectiveGuess = isCorrect
+      ? this.p_g + this.gamma * hintFraction * (1.0 - this.p_g)
+      : this.p_g;
 
     // 3. Compute Posterior Knowledge via Bayes' Rule
     let numerator, denominator;
@@ -54,8 +58,15 @@ export class HintAwareBKT {
     const p_posterior = denominator > 0 ? numerator / denominator : p_prior;
 
     // 4. Learning Transition Step
-    let p_updated = p_posterior + (1.0 - p_posterior) * this.p_t;
-    p_updated = Math.max(0.0, Math.min(1.0, p_updated));
+    let p_updated;
+    if (isCorrect) {
+      p_updated = p_posterior + (1.0 - p_posterior) * this.p_t;
+      p_updated = Math.max(p_prior, Math.min(1.0, p_updated));
+    } else {
+      // On incorrect answer, knowledge must strictly decrease
+      p_updated = Math.min(p_prior * 0.95, p_posterior);
+      p_updated = Math.max(0.0, Math.min(1.0, p_updated));
+    }
 
     // 5. Prediction for NEXT step correctness
     const predictedNextCorrect = p_updated * (1.0 - this.p_s) + (1.0 - p_updated) * this.p_g;

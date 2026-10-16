@@ -94,4 +94,37 @@ const bkt = new HintAwareBKT({
   console.log(`✅ Test 4 Passed: Repeated success achieved mastery P(L)=${traj.currentKnowledge} (isMastered: ${traj.isMastered})`);
 }
 
-console.log('\nAll 4 HintAwareBKT Tests Passed! 🎯');
+// Test 5: Consecutive wrong answers monotonically decrease knowledge
+{
+  const wrongInteractions = [
+    { eventType: 'ANSWER_SUBMIT', isCorrect: false, hintLevel: 0, inattentionIndex: 0.0 },
+    { eventType: 'ANSWER_SUBMIT', isCorrect: false, hintLevel: 2, inattentionIndex: 0.1 },
+    { eventType: 'ANSWER_SUBMIT', isCorrect: false, hintLevel: 4, inattentionIndex: 0.0 },
+  ];
+
+  const traj = bkt.predictTrajectory(wrongInteractions);
+  assert(traj.trajectory[0].updatedKnowledge < 0.20, `Step 0 must decrease from 0.20, got ${traj.trajectory[0].updatedKnowledge}`);
+  assert(traj.trajectory[1].updatedKnowledge < traj.trajectory[0].updatedKnowledge, `Step 1 must decrease further`);
+  assert(traj.trajectory[2].updatedKnowledge < traj.trajectory[1].updatedKnowledge, `Step 2 must decrease further`);
+  assert(traj.currentKnowledge < 0.05, `Knowledge should drop to near zero on consecutive errors, got ${traj.currentKnowledge}`);
+  console.log(`✅ Test 5 Passed: Consecutive wrong answers monotonically decreased P(L): 0.20 -> ${traj.trajectory[0].updatedKnowledge} -> ${traj.trajectory[1].updatedKnowledge} -> ${traj.currentKnowledge}`);
+}
+
+// Test 6: High hint level + wrong answer should strictly decrease knowledge (no Bayes denominator inversion)
+{
+  const prior = 0.50;
+  const errorWithMaxHint = bkt.updateStep({
+    p_prior: prior,
+    isCorrect: false,
+    hintLevel: 4,
+    inattentionIndex: 0.0
+  });
+
+  assert(errorWithMaxHint.updatedKnowledge < prior,
+    `Error with hint level 4 must decrease P(L) below prior ${prior}, got ${errorWithMaxHint.updatedKnowledge}`
+  );
+  assert.strictEqual(errorWithMaxHint.effectiveGuess, 0.25, 'Effective guess on error must remain base guess (0.25)');
+  console.log(`✅ Test 6 Passed: Error at Level 4 hint safely decreased P(L) from ${prior} to ${errorWithMaxHint.updatedKnowledge}`);
+}
+
+console.log('\nAll 6 HintAwareBKT Tests Passed! 🎯');

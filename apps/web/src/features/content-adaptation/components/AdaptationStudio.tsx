@@ -30,6 +30,8 @@ import type {
   SyllabusDocument,
 } from '../types';
 import { GamePlayer } from '../game/GamePlayer';
+import { CompanionWardrobeModal } from '../game/CompanionWardrobeModal';
+import { useCompanion } from '../game/useCompanion';
 
 type StudioTab = 'library' | 'bank' | 'review' | 'preview';
 
@@ -69,6 +71,8 @@ function CliMeter({ score }: { score: number }) {
 
 export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) => void }) {
   const [activeTab, setActiveTab] = useState<StudioTab>('library');
+  const [isWardrobeOpen, setIsWardrobeOpen] = useState(false);
+  const { companion } = useCompanion();
 
   // Documents State
   const [documents, setDocuments] = useState<SyllabusDocument[]>([]);
@@ -244,6 +248,16 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            id="open-wardrobe-btn"
+            onClick={() => setIsWardrobeOpen(true)}
+            className="btn btn-secondary !text-xs !py-2 !px-3.5 flex items-center gap-1.5 shadow-sm border border-amber-300 text-amber-900 bg-amber-50 hover:bg-amber-100"
+            title="Customize Companion Mascot & Wardrobe"
+          >
+            <span>🎨</span>
+            <span>Companion Wardrobe ({companion.nickname})</span>
+          </button>
+
           <button
             id="seed-syllabi-btn"
             disabled={isSeeding}
@@ -945,6 +959,12 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
           )}
         </div>
       )}
+
+      {/* Companion Dressing Room Wardrobe Modal */}
+      <CompanionWardrobeModal
+        isOpen={isWardrobeOpen}
+        onClose={() => setIsWardrobeOpen(false)}
+      />
     </div>
   );
 }

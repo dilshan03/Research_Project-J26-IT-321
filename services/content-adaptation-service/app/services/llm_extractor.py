@@ -480,6 +480,51 @@ CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
             "page_number": 4,
             "is_money": False,
         },
+        {
+            "problem_id": "G2-SHP-005",
+            "grade": 2,
+            "topic": "Shapes",
+            "competency_code": "2.6",
+            "competency_desc": "ත්‍රිමාන වස්තු හඳුනාගැනීම - ඝනකය (3D Shapes: Cube)",
+            "raw_problem_text": "පැති 6 ක් ඇති ඝනක හැඩැති රූපය තෝරන්න.",
+            "child_prompt_si": "ගජාගේ සෙල්ලම් පෙට්ටියේ ඇති ඝනකය (Cube) සොයා ගනිමු! 🧊",
+            "child_prompt_en": "Can you help Gaja find the 3D cube shape? 🧊",
+            "english_translation": "Identify the 3D shape that is a cube.",
+            "operands": [1],
+            "operation": "SHAPE",
+            "expected_answer": 1,
+            "visual_props": {
+                "shape_si": "ඝනකය",
+                "shape_en": "cube",
+                "target_shape": "SQUARE",
+                "distractor_shapes": ["CIRCLE", "TRIANGLE", "RECTANGLE"],
+            },
+            "difficulty": "EASY",
+            "page_number": 5,
+            "is_money": False,
+        },
+        {
+            "problem_id": "G2-PAT-006",
+            "grade": 2,
+            "topic": "Patterns",
+            "competency_code": "2.7",
+            "competency_desc": "සංඛ්‍යා රටා - 2 න් 2 ට ඉදිරියට ගණන් කිරීම (Number pattern counting by 2s)",
+            "raw_problem_text": "2, 4, 6 යන රටාවේ ඊළඟ සංඛ්‍යාව කීයද?",
+            "child_prompt_si": "2, 4, 6... ඊළඟට දුම්රිය මැදිරියට එන සංඛ්‍යාව ගජාට පෙන්වමු! 🚂",
+            "child_prompt_en": "2, 4, 6... What number comes next on the train? 🚂",
+            "english_translation": "In the sequence 2, 4, 6... what is the next number?",
+            "operands": [8],
+            "operation": "PATTERN",
+            "expected_answer": 8,
+            "visual_props": {
+                "sequence": ["2", "4", "6"],
+                "target": "8",
+                "choices": ["7", "8", "9"],
+            },
+            "difficulty": "EASY",
+            "page_number": 5,
+            "is_money": False,
+        },
     ],
     3: [
         {
@@ -604,6 +649,23 @@ CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
             "page_number": 3,
             "is_money": False,
         },
+        {
+            "problem_id": "G4-GEO-004",
+            "grade": 4,
+            "topic": "Geometry",
+            "competency_code": "4.4",
+            "competency_desc": "පරිමිතිය ගණනය කිරීම (Perimeter calculation of rectangles)",
+            "raw_problem_text": "දිග මීටර 8 ක් සහ පළල මීටර 5 ක් වන සෘජුකෝණාස්‍රාකාර මල් පාත්තියේ පරිමිතිය මීටර කීයද?",
+            "child_prompt_si": "මල් පාත්තියේ වටේටම දිග (පරිමිතිය) ගජා සමඟ එකතු කරමු! 🌸",
+            "child_prompt_en": "Let's find the total perimeter of the rectangle flower bed! 🌸",
+            "english_translation": "What is the perimeter in meters of a flower bed with length 8m and width 5m?",
+            "operands": [8, 5, 8, 5],
+            "operation": "ADD",
+            "expected_answer": 26,
+            "difficulty": "MEDIUM",
+            "page_number": 4,
+            "is_money": False,
+        },
     ],
     5: [
         {
@@ -685,68 +747,83 @@ async def upload_and_extract_problems(
             pdf_bytes = _get_pdf_bytes(pdf_file_path_or_bytes)
             pdf_text = _extract_pdf_text(pdf_file_path_or_bytes)
 
-            # Grade-specific curriculum guidance for Gemini
+            # Grade-specific curriculum guidance for Gemini matching official Sri Lankan NIE primary syllabi
             if grade == 1:
                 curriculum_guide = """
-CRITICAL SRI LANKAN SYLLABUS RULE FOR GRADE 1:
-- Grade 1 DOES NOT contain any formal addition or subtraction equations (strictly NO '+' or '-' operations).
-- Grade 1 mathematics in Sri Lanka (NIE) is strictly limited to:
-  1. Pre-mathematics: More vs Less (වැඩි/අඩු), Big vs Small (ලොකු/කුඩා), Long vs Short (දිග/කෙටි), Heavy vs Light (බර වැඩි/අඩු).
-  2. Counting objects from 1 to 10 (1 සිට 10 දක්වා ද්‍රව්‍ය ගණන් කර නිවැරදි සංඛ්‍යාව තෝරාගැනීම).
-  3. Identifying currency coins (රුපියල 1, 2, 5 කාසි හඳුනාගැනීම).
-- "operation" MUST be one of: "COUNT", "COMPARE", or "IDENTIFY".
-- "operands": [target_count] (e.g. [5]) or [item1_count, item2_count] (e.g. [6, 4] for comparing which is more).
-- "expected_answer": integer (e.g. 5, or 6).
-- Under NO circumstances generate arithmetic equations for Grade 1.
+CRITICAL SRI LANKAN NATIONAL CURRICULUM (NIE) RULES FOR GRADE 1:
+- Grade 1 mathematics in Sri Lanka DOES NOT contain any formal arithmetic equations (+, -, *, /).
+- Content strictly covers:
+  1. Shapes & Space (හැඩතල): Identifying 2D shapes: Circle (රවුම), Triangle (ත්‍රිකෝණය), Square (සමචතුරස්‍රය), Rectangle (සෘජුකෝණාස්‍රය).
+     "operation": "SHAPE", "operands": [1], "expected_answer": 1,
+     "visual_props": {"shape_si": "රවුම", "shape_en": "circle", "target_shape": "CIRCLE", "distractor_shapes": ["TRIANGLE", "SQUARE", "RECTANGLE"]}
+  2. Patterns (රටා): Color and shape repeating sequence completion (e.g. Red, Blue, Red... what is next?).
+     "operation": "PATTERN", "operands": [2], "expected_answer": 2,
+     "visual_props": {"sequence": ["RED", "BLUE", "RED"], "target": "BLUE", "choices": ["RED", "BLUE", "YELLOW"]}
+  3. Pre-mathematics comparison: Big vs Small (ලොකු/කුඩා), More vs Less (වැඩි/අඩු), Heavy vs Light (බර වැඩි/අඩු), Long vs Short (දිග/කෙටි).
+     "operation": "COMPARE", "operands": [8, 3], "expected_answer": 8,
+     "visual_props": {"compare_type": "BIG_SMALL", "target": "BIG"}
+  4. Counting objects 1 to 10 (1 සිට 10 දක්වා ද්‍රව්‍ය ගණන් කිරීම).
+     "operation": "COUNT", "operands": [5], "expected_answer": 5
+  5. Currency identification: Re. 1, Rs. 2, Rs. 5 coins (රුපියල් කාසි හඳුනාගැනීම).
+     "operation": "IDENTIFY", "operands": [5], "expected_answer": 5, "is_money": true
+- "operation" MUST be one of: "SHAPE", "PATTERN", "COMPARE", "COUNT", or "IDENTIFY".
+- Under NO circumstances generate arithmetic equations (+, -, *, /) for Grade 1.
 """
             elif grade == 2:
                 curriculum_guide = """
-GRADE 2 SYLLABUS RULES:
-- Single-step addition and subtraction within 20, expanding up to 50.
-- Currency combinations up to Rs. 50.
-- "operation": "ADD" or "SUB".
+GRADE 2 SYLLABUS RULES (Sri Lanka NIE):
+- Addition and Subtraction within 50 (single-step real-world problems). "operation": "ADD" or "SUB".
+- Sri Lankan currency transactions up to Rs. 50 (is_money: true).
+- 2D & 3D Shapes (sides, corners, faces of circle, triangle, square, rectangle, cube, sphere). "operation": "SHAPE".
+- Patterns & Number Sequences (+2, +5, color sequences). "operation": "PATTERN".
+- Measurement & Comparison: Length, Mass (heavy/light), Capacity. "operation": "COMPARE".
 """
             elif grade == 3:
                 curriculum_guide = """
-GRADE 3 SYLLABUS RULES:
-- Addition and subtraction within 1000.
-- Multiplication tables for 2, 3, 4, 5, 10.
-- Equal division without remainder.
-- Multi-step money balance problems.
-- "operation": "ADD", "SUB", "MUL", or "DIV".
+GRADE 3 SYLLABUS RULES (Sri Lanka NIE):
+- Addition and subtraction within 1000. "operation": "ADD" or "SUB".
+- Multiplication tables for 2, 3, 4, 5, 10. "operation": "MUL".
+- Equal sharing division without remainder. "operation": "DIV".
+- Multi-step currency transactions up to Rs. 1000 with change calculation (is_money: true).
+- Simple fractions (1/2, 1/4, 3/4). "operation": "FRACTION".
+- Measurement: Length (m, cm), Mass (kg, g), Capacity (l, ml).
 """
             else:
                 curriculum_guide = """
-GRADE 4/5 SYLLABUS RULES:
-- Multi-digit multiplication and division.
-- Scholarship level reasoning and word problems.
+GRADE 4/5 SYLLABUS RULES (Sri Lanka NIE):
+- Multi-digit multiplication and division. "operation": "MUL" or "DIV".
+- Multi-step word problems and Scholarship examination (ශිෂ්‍යත්ව විභාගය) preparation.
+- Fractions and Decimals. "operation": "FRACTION".
+- Perimeter and Area. "operation": "ADD" or "MUL".
+- Time & Currency multi-stage problems.
 """
 
             prompt = f"""
-You are an expert Sri Lankan primary mathematics curriculum extractor.
+You are an expert Sri Lankan primary mathematics curriculum extractor working with the National Institute of Education (NIE) syllabus.
 Analyze the curriculum document for Grade {grade}.
 {curriculum_guide}
 
-Extract 3 structured mathematics competency problems suitable for primary school learners.
+Extract 5 to 7 structured mathematics competency problems covering different topics in the syllabus (Shapes, Patterns, Comparison, Counting, Arithmetic, and Money).
 Return a valid JSON array of objects with the following schema:
 [
   {{
     "problem_id": "G{grade}-EXT-001",
     "grade": {grade},
-    "topic": "Counting or Comparison or Addition or Money",
+    "topic": "Shapes / Patterns / Comparison / Counting / Addition / Subtraction / Multiplication / Division / Money",
     "competency_code": "{grade}.1",
     "competency_desc": "Curriculum competency description",
     "raw_problem_text": "Authentic Sinhala problem statement",
     "english_translation": "English translation",
     "operands": [numbers],
-    "operation": "{'COUNT or COMPARE or IDENTIFY' if grade == 1 else 'ADD or SUB or MUL or DIV'}",
+    "operation": "{'SHAPE or PATTERN or COMPARE or COUNT or IDENTIFY' if grade == 1 else 'ADD or SUB or MUL or DIV or SHAPE or PATTERN or COMPARE'}",
     "expected_answer": integer_answer,
+    "visual_props": {{}},
     "difficulty": "EASY",
     "page_number": 1,
     "is_money": false
   }}
 ]
-DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are mathematically exact and age-appropriate.
+DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are mathematically exact and strictly follow Grade {grade} NIE guidelines.
 """
             contents: Any
             if pdf_bytes:
@@ -786,13 +863,32 @@ DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are math
                         raw_txt = item.get("raw_problem_text", "")
                         child_si = item.get("child_prompt_si")
                         child_en = item.get("child_prompt_en")
+                        v_props = item.get("visual_props", {})
+
+                        # Enrich visual_props if omitted
+                        if op == "SHAPE" and not v_props:
+                            v_props = {
+                                "shape_si": "රවුම",
+                                "shape_en": "circle",
+                                "target_shape": "CIRCLE",
+                                "distractor_shapes": ["TRIANGLE", "SQUARE", "RECTANGLE"],
+                            }
+                        elif op == "PATTERN" and not v_props:
+                            v_props = {
+                                "sequence": ["RED", "BLUE", "RED"],
+                                "target": "BLUE",
+                                "choices": ["RED", "BLUE", "YELLOW"],
+                            }
+                        elif op == "COMPARE" and not v_props:
+                            v_props = {"compare_type": "BIG_SMALL", "target": "BIG"}
+
                         if not child_si:
                             child_si, child_en = format_child_friendly_question(
                                 grade=grade,
                                 topic=item.get("topic", ""),
                                 raw_text=raw_txt,
                                 operation=op,
-                                visual_props=item.get("visual_props"),
+                                visual_props=v_props,
                             )
 
                         prob = CurriculumProblem(
@@ -809,7 +905,7 @@ DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are math
                             operands=ops,
                             operation=op,
                             expected_answer=ans,
-                            visual_props=item.get("visual_props", {}),
+                            visual_props=v_props,
                             difficulty=item.get("difficulty", "EASY" if grade == 1 else "MEDIUM"),
                             page_number=item.get("page_number", 1),
                             is_money=bool(item.get("is_money", False) or "රුපියල්" in raw_txt or "මුදල්" in raw_txt or "money" in item.get("topic", "").lower()),
@@ -818,15 +914,18 @@ DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are math
         except Exception as e:
             print(f"[upload_and_extract_problems] Gemini API extraction note ({e}). Using deterministic NIE fallback.")
 
-    # Fallback to authentic NIE primary mathematics syllabus matrix
-    if not extracted_problems:
-        grade_problems = CURRICULUM_MATRIX.get(grade, CURRICULUM_MATRIX[1])
-        if topic:
-            filtered = [p for p in grade_problems if topic.lower() in p["topic"].lower()]
-            if filtered:
-                grade_problems = filtered
+    # Complement or fallback with authentic NIE primary mathematics syllabus matrix
+    grade_problems = CURRICULUM_MATRIX.get(grade, CURRICULUM_MATRIX[1])
+    if topic:
+        filtered = [p for p in grade_problems if topic.lower() in p["topic"].lower()]
+        if filtered:
+            grade_problems = filtered
 
-        for p_dict in grade_problems:
+    # If Gemini returned fewer than 3 problems or is missing key topics (like shapes/patterns in Grade 1), supplement from matrix
+    existing_ops = {p.operation for p in extracted_problems}
+    for p_dict in grade_problems:
+        # If we have no problems, or this is a key early childhood topic missing from extraction
+        if not extracted_problems or (grade == 1 and p_dict["operation"] not in existing_ops):
             p = dict(p_dict)
             p["doc_id"] = doc_id
             if "child_prompt_si" not in p or not p["child_prompt_si"]:
@@ -841,6 +940,7 @@ DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are math
                 p["child_prompt_en"] = c_en
             MathVerificationService.verify_calculation(p["operands"], p["operation"], p["expected_answer"])
             extracted_problems.append(CurriculumProblem(**p))
+            existing_ops.add(p_dict["operation"])
 
     return extracted_problems
 

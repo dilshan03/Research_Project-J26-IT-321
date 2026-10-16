@@ -13,6 +13,8 @@ import { ShapeMatcher } from './mechanics/ShapeMatcher';
 import { PatternTrain } from './mechanics/PatternTrain';
 import { ComparisonScale } from './mechanics/ComparisonScale';
 import type { MechanicProps } from './mechanics/types';
+import { useCompanion } from './useCompanion';
+import { CompanionWardrobeModal } from './CompanionWardrobeModal';
 
 interface Attempt {
   step_order: number;
@@ -58,6 +60,8 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
   const [lang, setLang] = useState<Lang>('si');
   const [voiceOn, setVoiceOn] = useState(true);
   const [phase, setPhase] = useState<'intro' | 'play' | 'done'>('intro');
+  const [isWardrobeOpen, setIsWardrobeOpen] = useState(false);
+  const { companion } = useCompanion();
   const [stepIndex, setStepIndex] = useState(0);
   const [mood, setMood] = useState<Mood>('happy');
   const [line, setLine] = useState<Line | null>(story.intro);
@@ -190,6 +194,15 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
               </motion.div>
             )}
           </AnimatePresence>
+          <button
+            id="open-companion-wardrobe"
+            onClick={() => setIsWardrobeOpen(true)}
+            title="මිතුරා සරසන්න (Customize Companion)"
+            className="px-3 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-300 text-xs font-bold text-amber-900 flex items-center gap-1.5 shadow"
+          >
+            <span>🎨</span>
+            <span className="hidden sm:inline">{companion.nickname}</span>
+          </button>
           <button id="toggle-voice" onClick={() => setVoiceOn(v => !v)} aria-label="Toggle voice"
             className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-mq-primary shadow">
             {voiceOn ? <Volume2 size={18} /> : <VolumeX size={18} />}
@@ -213,7 +226,7 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
               <h1 className={`text-4xl md:text-5xl font-extrabold text-mq-text-strong drop-shadow-sm mb-4 ${lang === 'si' ? 'sinhala' : ''}`}>
                 {story.title[lang]}
               </h1>
-              <Gaja mood="happy" line={story.intro} lang={lang} calm={calm} size="lg" />
+              <Gaja mood="happy" line={story.intro} lang={lang} calm={calm} size="lg" companionConfig={companion} />
               <motion.button id="start-quest" onClick={start}
                 whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 className="btn btn-primary mt-8 text-2xl px-10 py-4 !min-h-0">
@@ -272,13 +285,18 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
       {/* Companion stays in the corner during play */}
       {phase !== 'intro' && (
         <div className="fixed left-4 bottom-4 z-30">
-          <Gaja mood={mood} line={line} lang={lang} calm={calm} />
+          <Gaja mood={mood} line={line} lang={lang} calm={calm} companionConfig={companion} />
         </div>
       )}
 
       <AnimatePresence>
         {onBreak && <BreathingBreak lang={lang} onDone={() => { setOnBreak(false); say(LINES.nudge, 'happy'); }} />}
       </AnimatePresence>
+
+      <CompanionWardrobeModal
+        isOpen={isWardrobeOpen}
+        onClose={() => setIsWardrobeOpen(false)}
+      />
     </div>
   );
 }

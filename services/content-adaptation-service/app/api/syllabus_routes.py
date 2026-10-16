@@ -1,3 +1,4 @@
+import asyncio
 import io
 import os
 import uuid
@@ -45,6 +46,17 @@ async def upload_syllabus_document(
 
     doc_id = f"doc_{uuid.uuid4().hex[:8]}"
 
+    # Save to local uploads dir as reliable backup
+    local_upload_dir = Path(__file__).resolve().parents[1] / "data" / "db_store" / "uploads"
+    local_upload_dir.mkdir(parents=True, exist_ok=True)
+    local_file_path = local_upload_dir / f"{doc_id}_{file.filename}"
+    saved_local_path: Optional[str] = None
+    try:
+        local_file_path.write_bytes(content)
+        saved_local_path = str(local_file_path)
+    except Exception as e:
+        print(f"[upload_syllabus_document] Local backup save note: {e}")
+
     # Save to GridFS / disk fallback
     gridfs = db_service.get_gridfs()
     gridfs_id = await gridfs.upload_from_stream(
@@ -65,6 +77,7 @@ async def upload_syllabus_document(
         status="uploaded",
         extracted_problem_count=0,
         gridfs_id=str(gridfs_id),
+        local_path=saved_local_path,
     )
 
     docs_col = db_service.get_syllabus_documents()
@@ -106,16 +119,43 @@ async def extract_problems_from_document(doc_id: str):
     doc = SyllabusDocument(**doc_dict)
     await docs_col.update_one({"doc_id": doc_id}, {"$set": {"status": "extracting"}})
 
-    # Fetch file content from GridFS / fallback
+    # Fetch file content from local path or GridFS
     pdf_bytes = b""
-    if doc.gridfs_id:
+    if doc.local_path and os.path.exists(doc.local_path):
+        try:
+            pdf_bytes = Path(doc.local_path).read_bytes()
+        except Exception as e:
+            print(f"[extract_problems_from_document] Local read error: {e}")
+
+    if not pdf_bytes and doc.gridfs_id:
         try:
             gridfs = db_service.get_gridfs()
-            stream = await gridfs.open_download_stream(doc.gridfs_id)
+            # If MongoDB is connected, GridFS expects an ObjectId
+            file_id: Any = doc.gridfs_id
+            if db_service.is_connected:
+                from bson import ObjectId
+                try:
+                    file_id = ObjectId(doc.gridfs_id)
+                except Exception:
+                    file_id = doc.gridfs_id
+            stream = await gridfs.open_download_stream(file_id)
             if hasattr(stream, "read"):
-                pdf_bytes = stream.read()
+                read_res = stream.read()
+                if asyncio.iscoroutine(read_res):
+                    pdf_bytes = await read_res
+                else:
+                    pdf_bytes = read_res
         except Exception as e:
             print(f"[extract_problems_from_document] GridFS read error: {e}")
+
+    # Fallback to local syllabus dataset if matches Grade
+    if not pdf_bytes:
+        default_local = Path(__file__).resolve().parents[2] / "data" / "syllabi" / f"Grade_0{doc.grade}.pdf"
+        if default_local.exists():
+            try:
+                pdf_bytes = default_local.read_bytes()
+            except Exception:
+                pass
 
     try:
         problems = await upload_and_extract_problems(

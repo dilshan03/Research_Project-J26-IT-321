@@ -104,8 +104,8 @@ def test_syllabus_adapt_problem_flow():
     # Seed to ensure problems exist
     client.post("/api/v1/syllabus/seed-local")
 
-    # Get a problem
-    probs = client.get("/api/v1/syllabus/problems?grade=1").json()
+    # Get a problem (Grade 2 arithmetic for multi-tier micro-step verification)
+    probs = client.get("/api/v1/syllabus/problems?grade=2").json()
     target = probs[0]
     prob_id = target["problem_id"]
 

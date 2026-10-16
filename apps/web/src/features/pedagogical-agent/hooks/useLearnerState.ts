@@ -131,7 +131,7 @@ export function useLearnerState({
           if (data.success) {
             setFsmDecision(data);
 
-            if (autoIntervene && data.decision?.action !== 'IDLE_OBSERVE') {
+            if (autoIntervene && data.decision?.action !== 'IDLE_OBSERVE' && data.decision?.shouldTriggerAnimation !== false) {
               let targetAction: AgentActionName = 'thinking';
               const anim = data.decision.animation;
               if (anim === 'wave') targetAction = 'wave';

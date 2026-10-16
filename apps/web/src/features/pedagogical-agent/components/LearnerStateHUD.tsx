@@ -415,6 +415,74 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                 >
                   🛑 Rule 5: Impulsive &lt; 1.5s (Brake)
                 </button>
+
+                <button
+                  onClick={() => onTriggerFSMRule && onTriggerFSMRule({ isFrustrated: true, consecutiveErrors: 3, frustrationIndex: 0.8 })}
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: fsmDecision.rule.id === 'RULE_FRUSTRATION' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                    border: fsmDecision.rule.id === 'RULE_FRUSTRATION' ? '1px solid #F87171' : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_FRUSTRATION' ? '#F87171' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  ❤️‍🩹 Rule: Frustration (Calm)
+                </button>
+
+                <button
+                  onClick={() => onTriggerFSMRule && onTriggerFSMRule({ lastAnswerIsCorrect: true, highestHintLevel: 0 })}
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: fsmDecision.rule.id === 'RULE_AUTONOMY_PRAISE' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                    border: fsmDecision.rule.id === 'RULE_AUTONOMY_PRAISE' ? '1px solid #38BDF8' : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_AUTONOMY_PRAISE' ? '#38BDF8' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🌟 Rule: Autonomous Success (Praise)
+                </button>
+
+                <button
+                  onClick={() => onTriggerFSMRule && onTriggerFSMRule({ consecutiveErrors: 1, highestHintLevel: 0, bktKnowledge: 0.78, lastAnswerIsCorrect: false })}
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: fsmDecision.rule.id === 'RULE_KNOWLEDGE_SLIP' ? 'rgba(129, 140, 248, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                    border: fsmDecision.rule.id === 'RULE_KNOWLEDGE_SLIP' ? '1px solid #818CF8' : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_KNOWLEDGE_SLIP' ? '#818CF8' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🔍 Rule: High P(L) Slip (Verify)
+                </button>
+
+                <button
+                  onClick={() => onTriggerFSMRule && onTriggerFSMRule({ consecutiveErrors: 2, highestHintLevel: 1 })}
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: fsmDecision.rule.id === 'RULE_6' ? 'rgba(168, 85, 247, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                    border: fsmDecision.rule.id === 'RULE_6' ? '1px solid #C084FC' : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_6' ? '#C084FC' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  📈 Rule 6: Escalate (Hint 2)
+                </button>
               </div>
             </div>
           )}

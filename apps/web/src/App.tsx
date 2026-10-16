@@ -24,6 +24,12 @@ import TeacherLearnersPage from './pages/teacher/TeacherLearnersPage';
 import TeacherLearnerProfilesPage from './pages/teacher/TeacherLearnerProfilesPage';
 import TeacherRecommendationsPage from './pages/teacher/TeacherRecommendationsPage';
 
+// -------------------------------------------------------------
+// [DEV TEMP] Pedagogical Agent Test Page Import (Remove later)
+// -------------------------------------------------------------
+import AgentTestPage from './pages/test/AgentTestPage';
+// -------------------------------------------------------------
+
 function useHashRoute() {
   const [hash, setHash] = useState(window.location.hash);
   useEffect(() => {
@@ -44,6 +50,20 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        {/* ------------------------------------------------------------- */}
+        {/* [DEV TEMP] Quick Floating Button to Test 3D Agent (Remove later) */}
+        {/* ------------------------------------------------------------- */}
+        {window.location.pathname !== '/agent-test' && (
+          <a
+            href="/agent-test"
+            className="fixed bottom-6 right-6 z-50 px-4 py-2 bg-emerald-600 text-white font-bold rounded-full shadow-2xl hover:bg-emerald-700 transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40"
+          >
+            <span>🤖</span>
+            <span>Test 3D Agent</span>
+          </a>
+        )}
+        {/* ------------------------------------------------------------- */}
+
         <Routes>
           {/* ========================================================= */}
           {/* 1. Public & Core Authentication Routes                    */}
@@ -64,6 +84,11 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* ------------------------------------------------------------- */}
+          {/* [DEV TEMP] Pedagogical Agent Test Route (Remove later) */}
+          {/* ------------------------------------------------------------- */}
+          <Route path="/agent-test" element={<AgentTestPage />} />
+          {/* ------------------------------------------------------------- */}
           {/* Canonical My Children Route (Unified in Parent Portal Layout) */}
           <Route
             path="/learners"

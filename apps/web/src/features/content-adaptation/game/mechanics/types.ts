@@ -16,4 +16,12 @@ export interface MechanicProps {
   onSay: (line: Line) => void;
 }
 
-export const OP_SYMBOL = { ADD: '+', SUB: '−', MUL: '×', DIV: '÷' } as const;
+export const OP_SYMBOL: Record<string, string> = {
+  ADD: '+',
+  SUB: '−',
+  MUL: '×',
+  DIV: '÷',
+  COUNT: '#',
+  COMPARE: '≶',
+  IDENTIFY: '=',
+};

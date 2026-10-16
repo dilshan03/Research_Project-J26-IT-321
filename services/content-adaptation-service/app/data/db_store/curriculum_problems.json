@@ -520,5 +520,66 @@
       96,
       8
     ]
+  },
+  {
+    "problem_id": "G1-CNT-001",
+    "doc_id": "doc_g1_grade_01",
+    "grade": 1,
+    "topic": "Counting",
+    "competency_code": "1.1",
+    "competency_desc": "1 සිට 10 දක්වා ද්‍රව්‍ය ගණන් කිරීම (Counting objects 1 to 10)",
+    "raw_problem_text": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව තෝරන්න.",
+    "english_translation": "Count the 5 mangoes in the basket and select the correct number.",
+    "operation": "COUNT",
+    "operands": [
+      5
+    ],
+    "expected_answer": 5,
+    "difficulty": "EASY",
+    "page_number": 1,
+    "is_money": false,
+    "created_at": "2026-10-16T01:38:56.827118+00:00",
+    "_id": "114071a00761476d9a8e65fff104d441"
+  },
+  {
+    "problem_id": "G1-CMP-002",
+    "doc_id": "doc_g1_grade_01",
+    "grade": 1,
+    "topic": "Comparison",
+    "competency_code": "1.2",
+    "competency_desc": "ප්‍රමාණ සැසඳීම - වැඩි හා අඩු (Comparing quantities: More vs Less)",
+    "raw_problem_text": "මල් 6 ක් ඇති බඳුන සහ මල් 4 ක් ඇති බඳුන අතරින් වැඩි මල් ගණන කුමක්ද?",
+    "english_translation": "Between a vase with 6 flowers and a vase with 4 flowers, which has more?",
+    "operation": "COMPARE",
+    "operands": [
+      6,
+      4
+    ],
+    "expected_answer": 6,
+    "difficulty": "EASY",
+    "page_number": 2,
+    "is_money": false,
+    "created_at": "2026-10-16T01:38:56.827192+00:00",
+    "_id": "e1486e27d17642b480e80bff554def80"
+  },
+  {
+    "problem_id": "G1-MON-003",
+    "doc_id": "doc_g1_grade_01",
+    "grade": 1,
+    "topic": "Money",
+    "competency_code": "1.4",
+    "competency_desc": "කාසි හඳුනා ගැනීම (Recognizing currency coins: Rs. 1, 2, 5)",
+    "raw_problem_text": "ගජා ළඟ ඇති රුපියල් 5 කාසියේ වටිනාකම තෝරන්න.",
+    "english_translation": "Select the numerical value of the 5-rupee coin Gaja is holding.",
+    "operation": "IDENTIFY",
+    "operands": [
+      5
+    ],
+    "expected_answer": 5,
+    "difficulty": "EASY",
+    "page_number": 3,
+    "is_money": true,
+    "created_at": "2026-10-16T01:38:56.827225+00:00",
+    "_id": "80da8de9c1a04c1ba7dfd10e94e345f5"
   }
 ]

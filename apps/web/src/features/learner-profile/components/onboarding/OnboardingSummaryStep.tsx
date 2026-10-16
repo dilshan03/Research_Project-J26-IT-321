@@ -34,40 +34,46 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
   return (
     <div className="space-y-6">
       {/* Success Celebration Card */}
-      <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-5 animate-fade-in">
-        <div className="flex items-center gap-4">
+      <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 lg:p-7 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-5 animate-fade-in">
+        <div className="flex items-start sm:items-center gap-3.5 sm:gap-4.5 min-w-0 flex-1">
           <div
-            className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center text-4xl sm:text-5xl shadow-sm border ${avatar.bgColor} ${avatar.borderColor} shrink-0`}
+            className={`w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl lg:text-5xl shadow-sm border ${avatar.bgColor} ${avatar.borderColor} shrink-0`}
           >
             <span>{avatar.icon}</span>
           </div>
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-green text-mq-success mb-1">
-              <CheckCircle2 size={14} />
-              <span>ආරම්භක ඇගයීම් සාර්ථකව සම්පූර්ණයි (Onboarding Complete)</span>
+          <div className="min-w-0 flex-1 space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-green text-mq-success border border-mq-success/20 max-w-full">
+                <CheckCircle2 size={14} className="shrink-0" />
+                <span className="leading-snug">ආරම්භක ඇගයීම් සාර්ථකව සම්පූර්ණයි (Onboarding Complete)</span>
+              </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong font-sinhala">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-mq-text-strong font-sinhala leading-tight break-words">
               {learner.firstName} ගේ පුද්ගලීකරණය කළ පැතිකඩ
             </h1>
-            <p className="text-xs sm:text-sm text-mq-text-muted mt-0.5 font-sinhala">
-              {learner.grade} වන ශ්‍රේණිය • වයස අවුරුදු {learner.age} • {learner.preferredLanguage} මාධ්‍යය
+            <p className="text-xs sm:text-sm text-mq-text-muted font-sinhala flex items-center gap-1.5 flex-wrap">
+              <span>{learner.grade} වන ශ්‍රේණිය</span>
+              <span className="text-mq-border">•</span>
+              <span>වයස අවුරුදු {learner.age}</span>
+              <span className="text-mq-border">•</span>
+              <span>{learner.preferredLanguage} මාධ්‍යය</span>
             </p>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-2.5 shrink-0">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 shrink-0 w-full xl:w-auto xl:justify-end border-t xl:border-t-0 pt-4 xl:pt-0 border-mq-border/60">
           <Link
             to="/learners"
-            className="btn btn-secondary text-xs py-2.5 px-4 rounded-full font-bold font-sinhala text-center inline-flex items-center justify-center gap-1.5 shadow-xs"
+            className="btn btn-secondary text-xs py-2.5 px-4 rounded-full font-bold font-sinhala text-center inline-flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap"
           >
             <span>මගේ දරුවන්ගේ ලැයිස්තුව (Learners Overview)</span>
           </Link>
           <a
             href="#/play"
-            className="btn btn-primary text-xs py-2.5 px-5 rounded-full font-bold font-sinhala inline-flex items-center justify-center gap-1.5 shadow-sm"
+            className="btn btn-primary text-xs py-2.5 px-5 rounded-full font-bold font-sinhala inline-flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap"
           >
             <span>අනුවර්තී ක්‍රීඩා අරඹමු (Start Adaptive Play)</span>
-            <ArrowRight size={14} strokeWidth={2.5} />
+            <ArrowRight size={14} strokeWidth={2.5} className="shrink-0" />
           </a>
         </div>
       </div>
@@ -143,27 +149,27 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
           {snap ? (
             <div className="space-y-3 font-sinhala">
               <div className="grid grid-cols-2 gap-2 text-center">
-                <div className="p-3 rounded-xl bg-mq-surface-soft border border-mq-border/60">
-                  <span className="text-[11px] text-mq-text-muted block">අවධානය (Inattention):</span>
-                  <span className="text-lg font-extrabold text-mq-primary block mt-0.5">
+                <div className="p-2.5 sm:p-3 rounded-xl bg-mq-surface-soft border border-mq-border/60 min-w-0">
+                  <span className="text-[11px] text-mq-text-muted block leading-tight break-words">අවධානය (Inattention):</span>
+                  <span className="text-base sm:text-lg font-extrabold text-mq-primary block mt-0.5">
                     {snap.inattentionTotal} / 27
                   </span>
-                  <span className="text-[10px] text-mq-text-muted">
+                  <span className="text-[10px] text-mq-text-muted block mt-0.5 leading-tight">
                     සාමාන්‍යය: {snap.inattentionAverage.toFixed(2)}
                   </span>
                 </div>
-                <div className="p-3 rounded-xl bg-mq-surface-soft border border-mq-border/60">
-                  <span className="text-[11px] text-mq-text-muted block">ක්‍රියාශීලීත්වය (Hyper):</span>
-                  <span className="text-lg font-extrabold text-mq-success block mt-0.5">
+                <div className="p-2.5 sm:p-3 rounded-xl bg-mq-surface-soft border border-mq-border/60 min-w-0">
+                  <span className="text-[11px] text-mq-text-muted block leading-tight break-words">ක්‍රියාශීලීත්වය (Hyper):</span>
+                  <span className="text-base sm:text-lg font-extrabold text-mq-success block mt-0.5">
                     {snap.hyperactivityTotal} / 27
                   </span>
-                  <span className="text-[10px] text-mq-text-muted">
+                  <span className="text-[10px] text-mq-text-muted block mt-0.5 leading-tight">
                     සාමාන්‍යය: {snap.hyperactivityAverage.toFixed(2)}
                   </span>
                 </div>
               </div>
 
-              <div className="p-2.5 rounded-xl bg-mq-surface-yellow border border-mq-warning/30 text-[10px] text-mq-text-muted leading-relaxed">
+              <div className="p-2.5 rounded-xl bg-mq-surface-yellow border border-mq-warning/30 text-[10px] text-mq-text-muted leading-relaxed break-words">
                 <strong>පර්යේෂණ දැන්වීම:</strong> {snap.disclaimer}
               </div>
             </div>
@@ -197,7 +203,7 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                 </span>
                 <div className="mt-2 flex items-center justify-center gap-2 flex-wrap">
                   <span
-                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border max-w-full text-center leading-tight ${
                       math.evidenceLevel === 'SUFFICIENT'
                         ? 'bg-mq-surface-green text-mq-success border-mq-success/20'
                         : 'bg-mq-surface-yellow text-mq-warning border-mq-warning/20'
@@ -206,13 +212,13 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                     සාක්ෂි තත්ත්වය: {math.evidenceLevel === 'SUFFICIENT' ? 'ප්‍රමාණවත් (Sufficient)' : 'අප්‍රමාණවත් (Insufficient)'}
                   </span>
                   {elpx && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary border border-mq-primary/20">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary border border-mq-primary/20 shrink-0">
                       {elpx.algorithmVersion}
                     </span>
                   )}
                 </div>
               </div>
-              <p className="text-[10px] text-mq-text-muted text-left leading-relaxed">
+              <p className="text-[10px] text-mq-text-muted text-left leading-relaxed break-words">
                 <strong>ප්‍රමිති දැන්වීම:</strong> පර්යේෂණාත්මක ආදර්ශන මිනුම් (Provisional Estimates). මෙම අගයන් සායනික හෝ රෝග විනිශ්චය සහතික නොවේ.
               </p>
             </div>
@@ -274,12 +280,12 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                 >
                   {/* Skill Title & Provisional Badge */}
                   <div>
-                    <div className="flex items-start justify-between gap-1">
-                      <span className="text-sm font-bold text-mq-text-strong block">
+                    <div className="flex items-start justify-between gap-1.5 flex-wrap">
+                      <span className="text-sm font-bold text-mq-text-strong block min-w-0 break-words flex-1">
                         {s.skillNameSi}
                       </span>
                       <span
-                        className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+                        className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full shrink-0 ${
                           s.provisionalSkillLevel === 'PROFICIENT'
                             ? 'bg-mq-success-bg text-mq-success border border-mq-success/30'
                             : s.provisionalSkillLevel === 'DEVELOPING'
@@ -294,7 +300,7 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                           : `${s.provisionalSkillLevel} (තාවකාලික)`}
                       </span>
                     </div>
-                    <span className="text-[11px] text-mq-text-muted block mt-0.5">
+                    <span className="text-[11px] text-mq-text-muted block mt-0.5 break-words">
                       {s.skillName}
                     </span>
                   </div>
@@ -302,32 +308,32 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                   {/* Quantitative Metrics (Observed vs Estimated) */}
                   <div className="space-y-2 pt-1 border-t border-mq-border/60 text-xs">
                     {/* Observed Row */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-1 flex-wrap">
                       <span className="text-[11px] text-mq-text-muted">නිරීක්ෂිත ලකුණු:</span>
-                      <span className="font-mono font-bold text-mq-text-strong">
+                      <span className="font-mono font-bold text-mq-text-strong text-right">
                         {s.rawAccuracyPercentage}% ({s.correctFirstResponses}/{s.distinctQuestionsAssessed} ප්‍රශ්න)
                       </span>
                     </div>
 
                     {/* Bayesian Estimated Proficiency */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-1 flex-wrap">
                       <span className="text-[11px] text-mq-text-muted">ELP-X ඇස්තමේන්තුව:</span>
-                      <span className="font-mono font-extrabold text-mq-primary">
+                      <span className="font-mono font-extrabold text-mq-primary text-right">
                         {s.estimatedProficiencyPercentage}%
                       </span>
                     </div>
 
                     {/* 95% Bayesian Credible Interval */}
-                    <div className="flex items-center justify-between text-[10px] text-mq-text-muted">
+                    <div className="flex items-center justify-between gap-1 flex-wrap text-[10px] text-mq-text-muted">
                       <span>95% විශ්වාස පරාසය:</span>
-                      <span className="font-mono font-semibold text-mq-text">
+                      <span className="font-mono font-semibold text-mq-text text-right">
                         [{(s.credibleInterval.lower * 100).toFixed(1)}% - {(s.credibleInterval.upper * 100).toFixed(1)}%]
                       </span>
                     </div>
 
                     {/* Uncertainty Progress Bar */}
                     <div className="space-y-1 pt-0.5">
-                      <div className="flex items-center justify-between text-[9px] text-mq-text-muted">
+                      <div className="flex items-center justify-between gap-1 flex-wrap text-[9px] text-mq-text-muted">
                         <span>අවිනිශ්චිතතා පළල: {(s.credibleIntervalWidth * 100).toFixed(1)}%</span>
                         <span>α={s.posteriorAlpha}, β={s.posteriorBeta}</span>
                       </div>
@@ -388,18 +394,18 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
                 elpx.structuredRecommendations.map((rec) => (
                   <div
                     key={rec.recommendationId}
-                    className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/80 flex flex-col justify-between space-y-2.5 hover:border-mq-primary/40 transition-colors"
+                    className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/80 flex flex-col justify-between space-y-2.5 hover:border-mq-primary/40 transition-colors min-w-0"
                   >
-                    <div>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-bold text-mq-text-strong">
+                    <div className="min-w-0">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <span className="text-xs font-bold text-mq-text-strong min-w-0 break-words">
                           {rec.titleSi || rec.titleEn}
                         </span>
                         <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary border border-mq-primary/20 shrink-0">
                           {rec.strategyCode}
                         </span>
                       </div>
-                      <p className="text-xs text-mq-text mt-1 leading-relaxed">
+                      <p className="text-xs text-mq-text mt-1 leading-relaxed break-words">
                         {rec.descriptionSi || rec.descriptionEn}
                       </p>
                     </div>

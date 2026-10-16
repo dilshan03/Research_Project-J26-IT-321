@@ -19,7 +19,7 @@ export const OnboardingStatusBadge: React.FC<OnboardingStatusBadgeProps> = ({
   switch (status) {
     case 'COMPLETED':
       return (
-        <span className={`inline-flex items-center gap-1.5 rounded-full font-bold bg-mq-success-bg text-mq-success border border-mq-success/30 ${sizeClasses}`}>
+        <span className={`inline-flex items-center gap-1.5 rounded-full font-bold bg-mq-success-bg text-mq-success border border-mq-success/30 whitespace-nowrap max-w-full ${sizeClasses}`}>
           <CheckCircle2 size={iconSize} className="shrink-0" />
           <span>
             {showSinhala ? 'සම්පූර්ණයි (Completed)' : 'Completed'}
@@ -28,7 +28,7 @@ export const OnboardingStatusBadge: React.FC<OnboardingStatusBadgeProps> = ({
       );
     case 'IN_PROGRESS':
       return (
-        <span className={`inline-flex items-center gap-1.5 rounded-full font-bold bg-mq-surface-blue text-mq-primary border border-mq-primary/30 ${sizeClasses}`}>
+        <span className={`inline-flex items-center gap-1.5 rounded-full font-bold bg-mq-surface-blue text-mq-primary border border-mq-primary/30 whitespace-nowrap max-w-full ${sizeClasses}`}>
           <Clock size={iconSize} className="shrink-0" />
           <span>
             {showSinhala ? 'ක්‍රියාත්මකයි (In Progress)' : 'In Progress'}
@@ -38,7 +38,7 @@ export const OnboardingStatusBadge: React.FC<OnboardingStatusBadgeProps> = ({
     case 'NOT_STARTED':
     default:
       return (
-        <span className={`inline-flex items-center gap-1.5 rounded-full font-bold bg-mq-warning-bg text-mq-warning border border-mq-warning/30 ${sizeClasses}`}>
+        <span className={`inline-flex items-center gap-1.5 rounded-full font-bold bg-mq-warning-bg text-mq-warning border border-mq-warning/30 whitespace-nowrap max-w-full ${sizeClasses}`}>
           <Sparkles size={iconSize} className="shrink-0" />
           <span>
             {showSinhala ? 'ආරම්භ කිරීමට ඇත (Needs Profiling)' : 'Needs Profiling'}

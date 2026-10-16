@@ -2,6 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import dns from 'dns';
+
+// Fix for Node.js DNS SRV query ECONNREFUSED on local ISP resolvers
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 import { connectToDatabase } from '@mathquest/db';
 import authRoutes from './routes/authRoutes.js';
 import { initDatabaseIndexes } from './models/userModel.js';

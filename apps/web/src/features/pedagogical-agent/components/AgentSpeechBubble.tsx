@@ -6,7 +6,38 @@ import { ACTION_SPEECH_MAP } from '../dialogue/actionSpeechMap';
  * Helper to split long dialogue into 2 balanced lines for clean speech bubble presentation
  */
 function formatDialogue(text: string): React.ReactNode {
-  if (!text || text.length < 28) {
+  if (!text) return text;
+
+  // 0. If text begins with "හෝඩුවාව X:" or "පියවර පැහැදිලි කිරීම:", render prefix in a distinct color badge
+  const hintPrefixMatch = text.match(
+    /^(හෝඩුවාව\s*\d+\s*:|පියවර පැහැදිලි කිරීම\s*:|Hint\s*\d+\s*:)\s*(.+)$/
+  );
+  if (hintPrefixMatch) {
+    const prefix = hintPrefixMatch[1];
+    const body = hintPrefixMatch[2];
+    return (
+      <>
+        <span
+          style={{
+            color: '#275F88',
+            background: '#E9F3FF',
+            border: '1px solid #BFD2DF',
+            padding: '1px 7px',
+            borderRadius: '6px',
+            marginRight: '6px',
+            fontWeight: 800,
+            fontSize: '0.8rem',
+            display: 'inline-block',
+          }}
+        >
+          {prefix}
+        </span>
+        <span>{body}</span>
+      </>
+    );
+  }
+
+  if (text.length < 28) {
     return text;
   }
 

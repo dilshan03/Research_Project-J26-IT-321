@@ -1,4 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+// If this file is in a different folder, adjust this relative import.
+import { useGameplayTracker } from '../../behaviour-monitoring/useGameplayTracker';
 import { ArrowLeft, CheckCircle2, RotateCcw, Sparkles, Star, Volume2 } from 'lucide-react';
 import type {
   BlueprintEnvelope, DistractorType, GameChoiceOption, GameMicroStep, GameTheme, VisualAssetTag,
@@ -87,12 +89,21 @@ function OptionCard({
   );
 }
 
-export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; onExit: () => void }) {
+export function GamePlayer({ envelope, onExit, learnerId = 'local-demo-learner' }: { envelope: BlueprintEnvelope; onExit: () => void; learnerId?: string }) {
   const { blueprint } = envelope;
   const settings = blueprint.adhd_game_settings;
   const theme = THEMES[blueprint.game_theme];
   const calm = settings.stimulus_density === 'LOW';
 
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+  const activityId = useMemo(() => `mathquest-${blueprint.game_theme}-${blueprint.grade}-${blueprint.topic}`, [blueprint.game_theme, blueprint.grade, blueprint.topic]);
+  const tracker = useGameplayTracker({ learnerId, activityId, gameTheme: blueprint.game_theme, grade: blueprint.grade, containerRef: gameContainerRef });
+  const { isTracking, onStepStart, onAnswerSelect, onAnswerSubmit, onGameExit } = tracker;
+  const [trackedClicks, setTrackedClicks] = useState(0);
+  const [trackedAnswers, setTrackedAnswers] = useState(0);
+  const [lastAction, setLastAction] = useState('Waiting for gameplay...');
+  const [idleSeconds, setIdleSeconds] = useState(0);
+  const lastInteractionRef = useRef(Date.now());
   const [lang, setLang] = useState<Lang>('si');
   const [stepIndex, setStepIndex] = useState(0);
   const [wrongPicks, setWrongPicks] = useState<Set<string>>(new Set());
@@ -103,6 +114,27 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
   const steps = blueprint.micro_steps;
   const finished = stepIndex >= steps.length;
   const step: GameMicroStep | undefined = steps[stepIndex];
+  useEffect(() => {
+    if (isTracking && step) {
+      onStepStart(step.step_order, step.action_type);
+      setLastAction(`Started step ${step.step_order}`);
+      lastInteractionRef.current = Date.now();
+      setIdleSeconds(0);
+    }
+  }, [isTracking, stepIndex, step?.step_order]);
+  useEffect(() => {
+    const timer = window.setInterval(() => setIdleSeconds(Math.floor((Date.now() - lastInteractionRef.current) / 1000)), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const recordClick = () => {
+    setTrackedClicks(v => v + 1);
+    lastInteractionRef.current = Date.now();
+    setIdleSeconds(0);
+  };
+  const exitGame = async () => {
+    try { await onGameExit(); } catch (error) { console.error('Failed to finish tracking session', error); }
+    onExit();
+  };
   const stars = useMemo(() => {
     const mistakes = attempts.filter(a => !a.correct).length;
     return mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
@@ -110,6 +142,10 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
 
   const pick = (opt: GameChoiceOption) => {
     if (!step || solved) return;
+    onAnswerSelect(opt.text_en);
+    onAnswerSubmit(opt.text_en, opt.is_correct);
+    setTrackedAnswers(v => v + 1);
+    setLastAction(opt.is_correct ? 'Correct answer submitted' : 'Incorrect answer submitted');
     setAttempts(a => [...a, {
       step_order: step.step_order, option: opt.text_en, correct: opt.is_correct, distractor_type: opt.distractor_type,
     }]);
@@ -130,11 +166,12 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
   };
 
   const restart = () => {
+    setTrackedAnswers(0); setTrackedClicks(0); setLastAction('Restarted game');
     setStepIndex(0); setWrongPicks(new Set()); setSolved(false); setFeedback(null); setAttempts([]);
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} relative overflow-hidden`}>
+    <div ref={gameContainerRef} onClickCapture={recordClick} className={`min-h-screen bg-gradient-to-br ${theme.bg} relative overflow-hidden`}>
       {/* Decorative background is removed when the visual-clutter filter + low density are on */}
       {!(settings.visual_clutter_filter && calm) && (
         <>
@@ -144,7 +181,7 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
       )}
 
       <header className="relative z-10 flex items-center justify-between px-6 py-4">
-        <button id="game-exit" onClick={onExit} className="btn btn-secondary"><ArrowLeft size={18} /> {lang === 'si' ? 'ආපසු' : 'Back'}</button>
+        <button id="game-exit" onClick={() => void exitGame()} className="btn btn-secondary"><ArrowLeft size={18} /> {lang === 'si' ? 'ආපසු' : 'Back'}</button>
         <div className="text-center">
           <p className="text-xs uppercase tracking-widest text-mq-text-muted font-semibold">{blueprint.topic} · Grade {blueprint.grade}</p>
           <p className={`font-bold text-mq-text-strong ${lang === 'si' ? 'sinhala' : ''}`}>
@@ -161,6 +198,13 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
         </div>
       </header>
 
+      <aside className="relative z-10 max-w-3xl mx-auto px-6 py-3 mb-2 bg-white/90 border border-slate-200 rounded-2xl text-sm" aria-live="polite">
+        <p className="font-bold">Component 4 · Live gameplay monitor (development)</p>
+        <p>Tracking session: <strong>{isTracking ? 'ACTIVE' : 'NOT CONNECTED'}</strong></p>
+        <p>UI clicks: {trackedClicks} · Answers submitted: {trackedAnswers} · Time since last click: {idleSeconds}s</p>
+        <p>Last action: {lastAction}</p>
+        <p className="text-xs text-slate-500">These counters show UI activity only. Check server logs/database to verify that events were saved. Webcam tracking and interventions are not enabled by this change.</p>
+      </aside>
       <main className="relative z-10 max-w-3xl mx-auto px-6 pb-16">
         {/* Progress path: one dot per micro-step, no countdown timer */}
         <div className="flex items-center justify-center gap-3 my-6" aria-label="Progress">
@@ -242,7 +286,7 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
             </div>
             <div className="flex justify-center gap-3">
               <button id="game-restart" onClick={restart} className="btn btn-secondary"><RotateCcw size={18} /> {lang === 'si' ? 'නැවත' : 'Play again'}</button>
-              <button id="game-finish" onClick={onExit} className="btn btn-primary">{lang === 'si' ? 'අවසන්' : 'Finish'}</button>
+              <button id="game-finish" onClick={() => void exitGame()} className="btn btn-primary">{lang === 'si' ? 'අවසන්' : 'Finish'}</button>
             </div>
           </section>
         )}

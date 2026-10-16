@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   PedagogicalCompanion, 
   AgentDevPanel, 
+  LearnerStateHUD,
   usePedagogicalAgent, 
   useInteractionLogger,
+  useLearnerState,
   useAgentStore 
 } from '../../features/pedagogical-agent';
+import type { InteractionEvent, HintLevel } from '../../features/pedagogical-agent';
 
 export function AgentTestPage() {
   const { playAction, onGameEvent, resetHints } = usePedagogicalAgent();
@@ -23,7 +26,7 @@ export function AgentTestPage() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [showDevPanel, setShowDevPanel] = useState<boolean>(false);
-  const [showLogsDrawer, setShowLogsDrawer] = useState<boolean>(false);
+  const [showLogsDrawer, setShowLogsDrawer] = useState<boolean>(true); // Default open for live inspection
 
   // Initialize Research Telemetry Logger (Task #17)
   const { logs, metrics, logAnswer, logHint, clearLogs } = useInteractionLogger({
@@ -32,6 +35,20 @@ export function AgentTestPage() {
     questionId: question.id,
     concept: question.concept
   });
+
+  // Initialize Real-time Learner State Builder (Task #19)
+  const { learnerState, isLoading: isStateLoading, evaluateInteractions } = useLearnerState({
+    studentId: 'student_trial_01',
+    sessionId: 'sess_adhd_study_01',
+    autoIntervene: true // Automatically triggers 3D agent reaction & speech bubble
+  });
+
+  // Evaluate state when logs array changes
+  useEffect(() => {
+    if (logs.length > 0) {
+      evaluateInteractions(logs);
+    }
+  }, [logs, evaluateInteractions]);
 
   const handleSelectOption = (num: number) => {
     setSelectedOption(num);
@@ -54,6 +71,101 @@ export function AgentTestPage() {
     setFeedback(null);
     resetHints();
     playAction('wave');
+  };
+
+  // --- Real-time Simulator Test Triggers (For immediate researcher verification) ---
+  const handleSimulateInattention = () => {
+    const simEvent: InteractionEvent = {
+      id: 'sim_inatt_' + Math.random().toString(36).substring(2, 7),
+      sessionId: 'sess_adhd_study_01',
+      studentId: 'student_trial_01',
+      questionId: question.id,
+      concept: question.concept,
+      eventType: 'QUESTION_VIEW',
+      attemptNumber: 0,
+      hintLevelReached: 0,
+      totalHintsRequested: 0,
+      responseTimeMs: 25000,
+      idleTimeBeforeFirstActionMs: 22000,
+      timestamp: new Date().toISOString()
+    };
+    evaluateInteractions([...logs, simEvent]);
+  };
+
+  const handleSimulateFrustration = () => {
+    const simEvents: InteractionEvent[] = [
+      {
+        id: 'sim_err1_' + Math.random().toString(36).substring(2, 7),
+        sessionId: 'sess_adhd_study_01',
+        studentId: 'student_trial_01',
+        questionId: question.id,
+        concept: question.concept,
+        eventType: 'ANSWER_SUBMIT',
+        attemptNumber: 1,
+        selectedAnswer: 6,
+        isCorrect: false,
+        hintLevelReached: 0,
+        totalHintsRequested: 0,
+        responseTimeMs: 4000,
+        idleTimeBeforeFirstActionMs: 1500,
+        timestamp: new Date().toISOString()
+      },
+      {
+        id: 'sim_err2_' + Math.random().toString(36).substring(2, 7),
+        sessionId: 'sess_adhd_study_01',
+        studentId: 'student_trial_01',
+        questionId: question.id,
+        concept: question.concept,
+        eventType: 'ANSWER_SUBMIT',
+        attemptNumber: 2,
+        selectedAnswer: 7,
+        isCorrect: false,
+        hintLevelReached: 0,
+        totalHintsRequested: 0,
+        responseTimeMs: 3500,
+        idleTimeBeforeFirstActionMs: 1000,
+        timestamp: new Date().toISOString()
+      }
+    ];
+    evaluateInteractions([...logs, ...simEvents]);
+  };
+
+  const handleSimulateFocusedFlow = () => {
+    const simEvents: InteractionEvent[] = [
+      {
+        id: 'sim_flow1_' + Math.random().toString(36).substring(2, 7),
+        sessionId: 'sess_adhd_study_01',
+        studentId: 'student_trial_01',
+        questionId: question.id,
+        concept: question.concept,
+        eventType: 'ANSWER_SUBMIT',
+        attemptNumber: 1,
+        selectedAnswer: 8,
+        isCorrect: true,
+        hintLevelReached: 0,
+        totalHintsRequested: 0,
+        responseTimeMs: 5000,
+        idleTimeBeforeFirstActionMs: 1200,
+        timestamp: new Date().toISOString()
+      },
+      {
+        id: 'sim_flow2_' + Math.random().toString(36).substring(2, 7),
+        sessionId: 'sess_adhd_study_01',
+        studentId: 'student_trial_01',
+        questionId: question.id,
+        concept: question.concept,
+        eventType: 'ANSWER_SUBMIT',
+        attemptNumber: 1,
+        selectedAnswer: 8,
+        isCorrect: true,
+        hintLevelReached: 0,
+        totalHintsRequested: 0,
+        responseTimeMs: 4800,
+        idleTimeBeforeFirstActionMs: 1100,
+        timestamp: new Date().toISOString()
+      }
+    ];
+    evaluateInteractions([...logs, ...simEvents]);
   };
 
   return (
@@ -126,32 +238,35 @@ export function AgentTestPage() {
             <span style={{ color: '#94A3B8' }}>⏱️ {metrics.avgResponseTimeMs ? `${(metrics.avgResponseTimeMs / 1000).toFixed(1)}s` : '0s'}</span>
           </div>
 
+          {/* Real-time State Badge (Task #19 Visual Indicator) */}
           <button
             onClick={() => setShowLogsDrawer(!showLogsDrawer)}
             style={{
               padding: '6px 12px',
-              background: showLogsDrawer ? '#10B981' : 'rgba(255, 255, 255, 0.08)',
-              color: showLogsDrawer ? '#0B1120' : '#E2E8F0',
+              background: showLogsDrawer ? 'rgba(56, 189, 248, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+              color: showLogsDrawer ? '#38BDF8' : '#E2E8F0',
               borderRadius: '8px',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              border: showLogsDrawer ? '1px solid rgba(56, 189, 248, 0.5)' : '1px solid rgba(255, 255, 255, 0.15)',
               fontSize: '0.78rem',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '5px'
+              gap: '6px'
             }}
           >
-            <span>📊</span>
-            <span>Logger ({logs.length})</span>
+            <span>🧠</span>
+            <span>
+              ADHD State: <b style={{ color: '#F8FAFC' }}>{learnerState?.cognitiveState || 'SYNCING'}</b>
+            </span>
           </button>
 
           <button
             onClick={() => setShowDevPanel(!showDevPanel)}
             style={{
               padding: '6px 12px',
-              background: showDevPanel ? '#38BDF8' : 'rgba(255, 255, 255, 0.08)',
-              color: showDevPanel ? '#0B1120' : '#E2E8F0',
+              background: showDevPanel ? '#8B5CF6' : 'rgba(255, 255, 255, 0.08)',
+              color: '#FFFFFF',
               borderRadius: '8px',
               border: '1px solid rgba(255, 255, 255, 0.15)',
               fontSize: '0.78rem',
@@ -168,7 +283,7 @@ export function AgentTestPage() {
         </div>
       </header>
 
-      {/* Main Horizontal Work Area: Left = Game Area | Right = Pedagogical Companion */}
+      {/* Main Horizontal Work Area: Left = Game Area | Right = Pedagogical Companion | Far Right = HUD Drawer */}
       <div style={{ display: 'flex', flex: 1, height: 'calc(100vh - 56px)', overflow: 'hidden' }}>
         
         {/* Left Side: Mock Math Game Workspace */}
@@ -327,24 +442,35 @@ export function AgentTestPage() {
           style={{ width: '420px', minWidth: '380px' }}
         />
 
-        {/* Telemetry Logger Drawer (Task #17 Live Inspection) */}
+        {/* Telemetry & ADHD Learner State Drawer (Task #17 & #19 Live Inspection) */}
         {showLogsDrawer && (
           <aside
             style={{
-              width: '360px',
+              width: '380px',
+              minWidth: '360px',
               background: '#0F172A',
               borderLeft: '1px solid rgba(255, 255, 255, 0.12)',
               padding: '16px',
               overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column',
-              gap: '12px',
+              gap: '14px',
               zIndex: 20
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#10B981' }}>
-                📊 Telemetry Logs ({logs.length})
+            {/* Visual Task 19 HUD: Real-time Inattention, Frustration, Persistence Gauges */}
+            <LearnerStateHUD
+              learnerState={learnerState}
+              isLoading={isStateLoading}
+              onSimulateInattention={handleSimulateInattention}
+              onSimulateFrustration={handleSimulateFrustration}
+              onSimulateFocusedFlow={handleSimulateFocusedFlow}
+            />
+
+            {/* Raw Interaction Event Stream */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+              <span style={{ fontSize: '0.84rem', fontWeight: 800, color: '#10B981' }}>
+                📊 Interaction Stream ({logs.length})
               </span>
               <button
                 onClick={clearLogs}

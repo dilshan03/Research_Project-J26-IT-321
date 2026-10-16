@@ -1,4 +1,4 @@
-import type { HintLevel } from './agent.types';
+import type { HintLevel, AgentAnimation } from './agent.types';
 
 /**
  * Standard Telemetry Schema for Pedagogical Engine & Hint-Aware BKT
@@ -32,4 +32,54 @@ export interface SessionMetrics {
   totalHintsCount: number;
   avgResponseTimeMs: number;
   streak: number;
+}
+
+/**
+ * Real-time Cognitive State classifications for ADHD learners
+ */
+export type CognitiveState =
+  | 'NORMAL'
+  | 'FOCUSED_FLOW'
+  | 'INATTENTIVE_DRIFT'
+  | 'FRUSTRATED_STRUGGLE'
+  | 'IMPULSIVE_GUESSING'
+  | 'PRODUCTIVE_STRUGGLE';
+
+export interface LearnerMetrics {
+  inattentionIndex: number; // 0.0 to 1.0
+  frustrationIndex: number; // 0.0 to 1.0
+  persistenceScore: number; // 0.0 to 1.0
+  accuracyRate: number;     // 0.0 to 1.0
+  consecutiveErrors: number;
+  consecutiveCorrect: number;
+  totalAttempts: number;
+  correctCount: number;
+  wrongCount: number;
+  totalHintsUsed: number;
+  highestHintLevel: number;
+}
+
+export interface LearnerFlags {
+  isInattentive: boolean;
+  isFrustrated: boolean;
+  isImpulsive: boolean;
+  needsHintPrompt: boolean;
+}
+
+export interface PedagogicalIntervention {
+  action: 'GENTLE_PROMPT' | 'OFFER_ASSISTANCE' | 'ENCOURAGE_PAUSE' | 'PRAISE_EFFORT' | 'CELEBRATE' | 'IDLE_OBSERVE';
+  animation: AgentAnimation;
+  targetHintLevel: HintLevel | null;
+  messageSinhala: string;
+  reason: string;
+}
+
+export interface LearnerState {
+  studentId: string;
+  sessionId: string;
+  evaluatedAt: string;
+  metrics: LearnerMetrics;
+  flags: LearnerFlags;
+  cognitiveState: CognitiveState;
+  recommendedIntervention: PedagogicalIntervention;
 }

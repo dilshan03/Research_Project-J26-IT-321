@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { saveInteractionLog, getInteractionLogs } from '../models/interactionModel.js';
+import { buildLearnerState } from '../engine/learnerStateBuilder.js';
 
 // Local file-system telemetry persistence fallback path
 const LOCAL_STORAGE_PATH = fileURLToPath(new URL('../../data/pedagogical_interactions.json', import.meta.url));
@@ -130,6 +131,71 @@ export async function getInteractions(req, res) {
     });
   } catch (error) {
     console.error('Failed to retrieve interaction telemetry:', error.message);
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * GET /api/telemetry/learner-state
+ * Fetches recent student interactions and computes real-time learner state metrics
+ * (Inattention index, Frustration flag, Persistence score, Recommended Intervention)
+ */
+export async function getLearnerState(req, res) {
+  try {
+    const { studentId, sessionId, limit = 20 } = req.query;
+
+    let logs = [];
+    try {
+      logs = await getInteractionLogs({
+        studentId,
+        sessionId,
+        limit: parseInt(limit, 10) || 20
+      });
+    } catch (dbErr) {
+      logs = readFromLocalStorage({ studentId, sessionId, limit });
+    }
+
+    // If MongoDB returned no records (e.g. offline fallback used earlier), check fallback
+    if (!logs || logs.length === 0) {
+      logs = readFromLocalStorage({ studentId, sessionId, limit });
+    }
+
+    const learnerState = buildLearnerState(logs);
+
+    return res.json({
+      success: true,
+      studentId: studentId || learnerState.studentId,
+      interactionsAnalyzed: logs.length,
+      learnerState
+    });
+  } catch (error) {
+    console.error('Failed to compute learner state:', error.message);
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * POST /api/telemetry/learner-state/evaluate
+ * Evaluates an arbitrary array of telemetry interactions directly on demand
+ */
+export async function evaluateLearnerState(req, res) {
+  try {
+    const { interactions = [] } = req.body;
+    const learnerState = buildLearnerState(interactions);
+
+    return res.json({
+      success: true,
+      interactionsAnalyzed: interactions.length,
+      learnerState
+    });
+  } catch (error) {
+    console.error('Failed to evaluate interaction array:', error.message);
     return res.status(500).json({
       success: false,
       error: error.message

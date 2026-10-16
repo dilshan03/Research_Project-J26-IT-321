@@ -7,7 +7,9 @@ import dns from 'dns';
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 import { connectToDatabase } from '@mathquest/db';
-import { saveInteractionLog, getInteractionLogs, initInteractionIndexes } from './models/interactionModel.js';
+import telemetryRoutes from './routes/telemetryRoutes.js';
+import { initInteractionIndexes } from './models/interactionModel.js';
+import { ensureLocalStorage } from './controllers/telemetryController.js';
 
 // Load environment variables from project root (.env)
 dotenv.config({
@@ -21,6 +23,9 @@ const PORT = process.env.PEDAGOGICAL_DECISION_PORT || 5002;
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
+// Telemetry & Pedagogical Routes
+app.use('/api/telemetry', telemetryRoutes);
+
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
   res.json({
@@ -31,146 +36,43 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-/**
- * POST /api/telemetry/interactions
- * Primary endpoint called by useInteractionLogger to persist telemetry in MongoDB
- */
-app.post('/api/telemetry/interactions', async (req, res) => {
+// Database Health Check Endpoint
+app.get('/api/health/database', async (req, res) => {
   try {
-    const logData = req.body;
-
-    if (!logData || !logData.eventType) {
-      return res.status(400).json({
-        success: false,
-        error: 'Missing required field: eventType'
-      });
-    }
-
-    // Attempt MongoDB save first, fallback to JSON file if Atlas is offline
-    let recordId = 'local_' + Date.now();
-    try {
-      if (isDatabaseConnected) {
-        const savedRecord = await saveInteractionLog(logData);
-        recordId = savedRecord._id;
-      } else {
-        throw new Error('Database is in offline fallback mode');
-      }
-    } catch (dbErr) {
-      // Save locally to JSON file
-      const raw = fs.readFileSync(LOCAL_STORAGE_PATH, 'utf-8');
-      const list = JSON.parse(raw || '[]');
-      const doc = {
-        ...logData,
-        _id: recordId,
-        receivedAt: new Date().toISOString()
-      };
-      list.push(doc);
-      fs.writeFileSync(LOCAL_STORAGE_PATH, JSON.stringify(list, null, 2));
-    }
-
-    console.log(`[Telemetry Saved] Event: ${logData.eventType} | Student: ${logData.studentId} | Correct: ${logData.isCorrect ?? '-'}`);
-
-    res.status(201).json({
-      success: true,
-      message: 'Telemetry interaction persisted successfully.',
-      recordId
-    });
-  } catch (error) {
-    console.error('Failed to save interaction telemetry:', error.message);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
-  }
-});
-
-/**
- * GET /api/telemetry/interactions
- * Query research logs for training & evaluation
- */
-app.get('/api/telemetry/interactions', async (req, res) => {
-  try {
-    const { studentId, sessionId, limit = 100 } = req.query;
-
-    if (isDatabaseConnected) {
-      try {
-        const logs = await getInteractionLogs({
-          studentId,
-          sessionId,
-          limit: limit ? parseInt(limit, 10) : 100
-        });
-
-        return res.json({
-          success: true,
-          source: 'MongoDB Atlas',
-          count: logs.length,
-          logs
-        });
-      } catch (dbErr) {
-        console.warn('MongoDB query failed, falling back to local storage:', dbErr.message);
-      }
-    }
-
-    // Read from local JSON storage fallback
-    const raw = fs.readFileSync(LOCAL_STORAGE_PATH, 'utf-8');
-    let logs = JSON.parse(raw || '[]');
-
-    if (studentId) logs = logs.filter((l) => l.studentId === studentId);
-    if (sessionId) logs = logs.filter((l) => l.sessionId === sessionId);
-
-    logs = logs.slice(-parseInt(limit, 10)).reverse();
-
+    const db = await connectToDatabase();
+    const ping = await db.command({ ping: 1 });
     res.json({
       success: true,
-      source: 'Local Storage Fallback',
-      count: logs.length,
-      logs
+      message: 'MongoDB Atlas connection active.',
+      ping
     });
-  } catch (error) {
-    console.error('Failed to retrieve interaction telemetry:', error.message);
-    res.status(500).json({
+  } catch (err) {
+    res.status(503).json({
       success: false,
-      error: error.message
+      message: 'Database connection offline (local fallback active).',
+      error: err.message
     });
   }
 });
-
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Local file-system telemetry persistence fallback
-const LOCAL_STORAGE_PATH = fileURLToPath(new URL('../data/pedagogical_interactions.json', import.meta.url));
-
-function ensureLocalStorage() {
-  const dir = path.dirname(LOCAL_STORAGE_PATH);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  if (!fs.existsSync(LOCAL_STORAGE_PATH)) {
-    fs.writeFileSync(LOCAL_STORAGE_PATH, JSON.stringify([], null, 2));
-  }
-}
-
-let isDatabaseConnected = false;
 
 // Start Server
 async function startServer() {
   ensureLocalStorage();
 
+  let isDatabaseConnected = false;
   try {
-    await connectToDatabase();
+    const db = await connectToDatabase();
     await initInteractionIndexes();
     isDatabaseConnected = true;
-    console.log(`📁 Connected to MongoDB Database for Research Telemetry`);
+    console.log(`[MongoDB] Connected to MongoDB Atlas for Research Telemetry`);
   } catch (err) {
-    console.warn(`⚠️ MongoDB Atlas unavailable (${err.message}). Using local JSON fallback: ${LOCAL_STORAGE_PATH}`);
+    console.warn(`[MongoDB Warning] Atlas connection unavailable (${err.message}). Local fallback enabled.`);
   }
 
   app.listen(PORT, () => {
     console.log(`=======================================================`);
     console.log(`🚀 Pedagogical Decision API running on http://localhost:${PORT}`);
-    console.log(`📊 Mode: ${isDatabaseConnected ? 'MongoDB Atlas' : 'Local File Persistence (Offline Resilient)'}`);
+    console.log(`📊 Mode: ${isDatabaseConnected ? 'MongoDB Atlas (Online)' : 'Local File Persistence (Offline Fallback)'}`);
     console.log(`=======================================================`);
   });
 }

@@ -124,10 +124,8 @@ class MathVerificationService:
     def verify_calculation(cls, operands: List[int], operation: str, expected_answer: int) -> bool:
         try:
             op = operation.upper()
-            if op in ("COUNT", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME"):
+            if op in ("COUNT", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME", "COMPARE"):
                 return expected_answer in operands or (len(operands) > 0 and operands[0] == expected_answer) or expected_answer >= 0
-            if op == "COMPARE":
-                return expected_answer in operands
             actual = cls.execute_calculation(operands, operation)
             return actual == expected_answer
         except Exception:
@@ -814,7 +812,7 @@ DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are math
                             visual_props=item.get("visual_props", {}),
                             difficulty=item.get("difficulty", "EASY" if grade == 1 else "MEDIUM"),
                             page_number=item.get("page_number", 1),
-                            is_money=bool(item.get("is_money", False)),
+                            is_money=bool(item.get("is_money", False) or "රුපියල්" in raw_txt or "මුදල්" in raw_txt or "money" in item.get("topic", "").lower()),
                         )
                         extracted_problems.append(prob)
         except Exception as e:

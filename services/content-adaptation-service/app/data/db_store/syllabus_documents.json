@@ -10,9 +10,9 @@
     "file_size": 56071,
     "status": "extracted",
     "extracted_problem_count": 3,
-    "gridfs_id": "fs_891706b5d320",
+    "gridfs_id": "fs_b3869145bb08",
     "local_path": "C:\\Users\\dilshan\\Desktop\\Research_Project-J26-IT-321\\services\\content-adaptation-service\\data\\syllabi\\Grade_01.pdf",
-    "created_at": "2026-10-15T06:32:38.665228+00:00",
+    "created_at": "2026-10-16T04:50:01.328466+00:00",
     "_id": "0f764dafa5e845d6b1c4861980115a19"
   },
   {
@@ -26,9 +26,9 @@
     "file_size": 55817,
     "status": "extracted",
     "extracted_problem_count": 3,
-    "gridfs_id": "fs_a4f41ffe4cd0",
+    "gridfs_id": "fs_7c655ae8ca67",
     "local_path": "C:\\Users\\dilshan\\Desktop\\Research_Project-J26-IT-321\\services\\content-adaptation-service\\data\\syllabi\\Grade_02.pdf",
-    "created_at": "2026-10-15T06:32:44.228030+00:00",
+    "created_at": "2026-10-16T04:50:09.422535+00:00",
     "_id": "989af6e513f2459e8a26103ba09516f9"
   },
   {
@@ -42,9 +42,9 @@
     "file_size": 86055,
     "status": "extracted",
     "extracted_problem_count": 3,
-    "gridfs_id": "fs_af811a81a65a",
+    "gridfs_id": "fs_4de5a3b227c0",
     "local_path": "C:\\Users\\dilshan\\Desktop\\Research_Project-J26-IT-321\\services\\content-adaptation-service\\data\\syllabi\\Grade_03.pdf",
-    "created_at": "2026-10-15T06:32:49.359769+00:00",
+    "created_at": "2026-10-16T04:50:14.142395+00:00",
     "_id": "1b434af365764531ae3fff23533cf729"
   },
   {
@@ -58,9 +58,9 @@
     "file_size": 98708,
     "status": "extracted",
     "extracted_problem_count": 3,
-    "gridfs_id": "fs_54dfdb0a828d",
+    "gridfs_id": "fs_2d1514736cab",
     "local_path": "C:\\Users\\dilshan\\Desktop\\Research_Project-J26-IT-321\\services\\content-adaptation-service\\data\\syllabi\\Grade_04.pdf",
-    "created_at": "2026-10-15T06:32:54.074595+00:00",
+    "created_at": "2026-10-16T04:50:18.425149+00:00",
     "_id": "b072b8620e21437ba23cfc08967d145f"
   },
   {
@@ -74,9 +74,9 @@
     "file_size": 98793,
     "status": "extracted",
     "extracted_problem_count": 3,
-    "gridfs_id": "fs_37be153e674d",
+    "gridfs_id": "fs_5e7707ed1571",
     "local_path": "C:\\Users\\dilshan\\Desktop\\Research_Project-J26-IT-321\\services\\content-adaptation-service\\data\\syllabi\\Grade_05.pdf",
-    "created_at": "2026-10-15T06:32:58.312747+00:00",
+    "created_at": "2026-10-16T04:50:22.855523+00:00",
     "_id": "e38358c75048463f996bd1b3ccf21c1b"
   },
   {
@@ -238,5 +238,21 @@
     "local_path": null,
     "created_at": "2026-10-15T06:30:56.743527+00:00",
     "_id": "doc_2e977871"
+  },
+  {
+    "doc_id": "doc_cdc87627",
+    "filename": "custom_grade2_math.pdf",
+    "grade": 2,
+    "subject": "Mathematics",
+    "year": 2024,
+    "language": "si",
+    "page_count": 1,
+    "file_size": 76,
+    "status": "uploaded",
+    "extracted_problem_count": 0,
+    "gridfs_id": "fs_1ca9fb7c04db",
+    "local_path": null,
+    "created_at": "2026-10-16T04:28:29.918703+00:00",
+    "_id": "doc_cdc87627"
   }
 ]

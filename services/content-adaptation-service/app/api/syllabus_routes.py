@@ -49,7 +49,7 @@ async def upload_syllabus_document(
     gridfs = db_service.get_gridfs()
     gridfs_id = await gridfs.upload_from_stream(
         filename=file.filename,
-        source_bytes=content,
+        source=content,
         metadata={"grade": grade, "subject": subject, "year": year, "language": language},
     )
 
@@ -64,7 +64,7 @@ async def upload_syllabus_document(
         file_size=len(content),
         status="uploaded",
         extracted_problem_count=0,
-        gridfs_id=gridfs_id,
+        gridfs_id=str(gridfs_id),
     )
 
     docs_col = db_service.get_syllabus_documents()
@@ -161,7 +161,7 @@ async def list_curriculum_problems(
     problems = [CurriculumProblem(**p) for p in items]
     if topic:
         t = topic.lower()
-        problems = [p for p in problems if t in p.topic.lower()]
+        problems = [p for p in problems if t in p.topic.lower() or (t == "money" and p.is_money)]
     return problems
 
 

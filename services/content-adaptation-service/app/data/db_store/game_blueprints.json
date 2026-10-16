@@ -3088,5 +3088,189 @@
       "raw_sinhala_question": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව තෝරන්න."
     },
     "_id": "d990f9c898de4278b353b6a91cba59ca"
+  },
+  {
+    "activity_id": "act_219127d414",
+    "cli_score": 2.4,
+    "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
+    "blueprint": {
+      "activity_id": "act_219127d414",
+      "source_question_id": "G3-MON-001",
+      "grade": 3,
+      "topic": "Money",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා හඳුනාගන්න",
+          "instruction_en": "Find the quantities in the problem",
+          "target_visual_asset": "COIN_BAG",
+          "correct_target_value": "50, 20",
+          "game_options": [
+            {
+              "text_si": "50, 70",
+              "text_en": "50, 70",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses intermediate count with quantity.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "20",
+              "text_en": "20",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "50, 20",
+              "text_en": "50, 20",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": null,
+          "visual_props": {}
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD",
+          "visual_props": {}
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "70",
+          "game_options": [
+            {
+              "text_si": "70",
+              "text_en": "70",
+              "numeric_value": 70.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "30",
+              "text_en": "30",
+              "numeric_value": 30.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "50",
+              "text_en": "50",
+              "numeric_value": 50.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD",
+          "visual_props": {}
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ ගම්මානේ වෙළඳපොළ චාරිකාව",
+        "title_en": "Village Market Trip with Gaja",
+        "backdrop_si": "අද අපි ගමේ සති පොළේ දී කමල්ට උදව් කරන්නෙමු. පොතක් සහ පෑනක් මිලදී ගෙන ඉතිරි මුදල සොයා ගැනීමට ගජා අපට උදව් වේ.",
+        "backdrop_en": "Today we are helping Kamal at the village fair. Gaja is here to help us buy a book and a pen and figure out the correct change.",
+        "quest_goal_si": "කඩකාරයාට රුපියල් 100 ක් දී, නිවැරදි ඉතිරි මුදල වන රුපියල් 30 ගණනය කර කමල්ට බාර දීමට ගජා සමඟ එක්වන්න.",
+        "quest_goal_en": "Join Gaja to calculate the correct balance of Rs. 30 after giving Rs. 100 to the shopkeeper, and help Kamal complete his shopping.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අද අපි කමල්ට පොතයි පෑනයි අරන් ඉතිරි සල්ලි ටික හරියටම හොයාගමුද?",
+            "en": "Hello! I am Gaja. Shall we help Kamal buy his book and pen and find the right change today?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න... මුලින්ම පොතේ මිලයි පෑනේ මිලයි එකතු කරමුද? (50 + 20)",
+            "en": "Take your time... Let's add the price of the book and the pen first! (50 + 20)"
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා ගොඩක් දක්ෂයි!",
+            "en": "Awesome! You are super smart!"
+          },
+          "retry": {
+            "si": "කමක් නෑ, හදිසි නැහැ. අපි තව වතාවක් සන්සුන්ව උත්සාහ කරමු!",
+            "en": "That's okay, no rush at all. Let's take a deep breath and try once more!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි ඉතිරි මුදල හරියටම හොයාගත්තා!",
+            "en": "Quest Complete! We found the exact balance!"
+          }
+        }
+      },
+      "cli_score": 2.4,
+      "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?"
+    },
+    "_id": "ca078c2225bb4057b48eaafb7e9f51b6"
   }
 ]

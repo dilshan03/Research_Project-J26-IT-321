@@ -214,41 +214,46 @@
     "doc_id": "doc_g1_grade_01",
     "grade": 1,
     "topic": "Counting",
-    "competency_code": "2.0",
+    "competency_code": "2.1",
     "competency_desc": "1 සිට 9 දක්වා සංඛ්‍යාවලට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණය දැක්වීම.",
-    "raw_problem_text": "1 සිට 9 තෙක් ඇතැයි එක එක සංඛ්‍යාවට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණය හඳුනා ගැනීම, කියවීම.",
-    "english_translation": "Identify and read the quantity of objects corresponding to numbers 1 to 9.",
+    "raw_problem_text": "1 සිට 9 තෙක් එක් එක් සංඛ්‍යාවට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණය දැක්වීම.",
+    "english_translation": "Showing the quantity of objects and pictures corresponding to each number from 1 to 9.",
     "operation": "COUNT",
     "expected_answer": 5,
     "difficulty": "EASY",
     "page_number": 4,
     "is_money": false,
-    "created_at": "2026-10-16T03:38:20.523515+00:00",
+    "created_at": "2026-10-16T04:50:09.410682+00:00",
     "_id": "fec3694bc8e24c11afa1897f18693afc",
     "operands": [
       5
-    ]
+    ],
+    "child_prompt_si": "ගජා යාළුවා සමඟ බලන්න, මෙතනින් වඩා විශාල හෝ වැඩි ප්‍රමාණය කුමක්ද? 🐘",
+    "child_prompt_en": "Look with Gaja! Which one is bigger or has more? 🐘",
+    "visual_props": {}
   },
   {
     "problem_id": "G1-EXT-002",
     "doc_id": "doc_g1_grade_01",
     "grade": 1,
     "topic": "Comparison",
-    "competency_code": "3.0",
-    "competency_desc": "ද්‍රව්‍ය හෝ ද්‍රව්‍ය ප්‍රමාණ දෙකක් ලොකු කුඩා හෝ වැඩි අඩු හෝ වශයෙන් වෙන් කර හඳුනා ගැනීම.",
-    "raw_problem_text": "ද්‍රව්‍ය හෝ ද්‍රව්‍ය ප්‍රමාණ දෙකක් ලොකු කුඩා හෝ වැඩි අඩු හෝ වශයෙන් වෙන් කර හඳුනා ගැනීම.",
-    "english_translation": "Identify and distinguish two objects or quantities as bigger/smaller or more/less.",
+    "competency_code": "3.1",
+    "competency_desc": "දිග එකිනෙකට වෙනස් වස්තු තුනක් හෝ පුද්ගලයන් තිදෙනෙකු අතරුන් දිග ම, මිටි ම වස්තුව හෝ පුද්ගලයා හඳුනා ගැනීම.",
+    "raw_problem_text": "දිග එකිනෙකට වෙනස් වස්තු තුනක් හෝ පුද්ගලයන් තිදෙනෙකු අතරුන් දිග ම, මිටි ම වස්තුව හෝ පුද්ගලයා හඳුනා ගැනීම.",
+    "english_translation": "Identifying the longest or shortest object/person among three objects or persons of different lengths.",
     "operation": "COMPARE",
-    "expected_answer": 8,
+    "expected_answer": 1,
     "difficulty": "EASY",
     "page_number": 4,
     "is_money": false,
-    "created_at": "2026-10-16T03:38:20.523515+00:00",
+    "created_at": "2026-10-16T04:50:09.410682+00:00",
     "_id": "45d8979dc92049c2b095aa170b5c563d",
     "operands": [
-      8,
-      5
-    ]
+      3
+    ],
+    "child_prompt_si": "ගජා යාළුවා සමඟ බලන්න, මෙතනින් වඩා විශාල හෝ වැඩි ප්‍රමාණය කුමක්ද? 🐘",
+    "child_prompt_en": "Look with Gaja! Which one is bigger or has more? 🐘",
+    "visual_props": {}
   },
   {
     "problem_id": "G1-EXT-003",
@@ -258,17 +263,20 @@
     "competency_code": "4.0",
     "competency_desc": "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම.",
     "raw_problem_text": "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම.",
-    "english_translation": "Identify the 1 rupee, 2 rupees, and 5 rupees coins.",
+    "english_translation": "Identifying the one rupee, two rupees, and five rupees coins.",
     "operation": "IDENTIFY",
     "expected_answer": 5,
     "difficulty": "EASY",
     "page_number": 5,
     "is_money": true,
-    "created_at": "2026-10-16T03:38:20.523515+00:00",
+    "created_at": "2026-10-16T04:50:09.410682+00:00",
     "_id": "e7a8f33a68b546ddb5be865cbad201a2",
     "operands": [
       5
-    ]
+    ],
+    "child_prompt_si": "ගජා ළඟ තියෙන කාසිය හඳුනාගෙන නිවැරදි අගය කියමු! 🪙",
+    "child_prompt_en": "Look at the coin Gaja has and pick its value! 🪙",
+    "visual_props": {}
   },
   {
     "problem_id": "G2-EXT-001",
@@ -277,19 +285,22 @@
     "topic": "Addition",
     "competency_code": "2.0",
     "competency_desc": "Addition up to 99",
-    "raw_problem_text": "පන්තියේ ළmයින් 12 දෙනෙක් සිටිති. තවත් ළමයින් 7 දෙනෙක් පැමිණියහ. දැන් මුළු ළමයින් ගණන කීයද?",
-    "english_translation": "There were 12 children in the class. Another 7 children arrived. How many total children are there now?",
+    "raw_problem_text": "කඩයකින් පෑන 12ක් සහ පැන්සල් 5ක් මිලදී ගත්තේ නම්, මුළු භාණ්ඩ සංඛ්‍යාව කොපමණද?",
+    "english_translation": "If 12 pens and 5 pencils were bought from a shop, what is the total number of items?",
     "operation": "ADD",
-    "expected_answer": 19,
+    "expected_answer": 17,
     "difficulty": "EASY",
     "page_number": 4,
     "is_money": false,
-    "created_at": "2026-10-15T06:32:49.343605+00:00",
+    "created_at": "2026-10-16T04:50:14.142395+00:00",
     "_id": "667dd5e600344672842c8bb652d5bd80",
     "operands": [
       12,
-      7
-    ]
+      5
+    ],
+    "child_prompt_si": "ඔක්කොම එකතු කළ විට මුළු ගණන කීයද කියා ගජාට පෙන්වමු! 🌟",
+    "child_prompt_en": "Let's count them all together to show Gaja the total! 🌟",
+    "visual_props": {}
   },
   {
     "problem_id": "G2-EXT-002",
@@ -298,19 +309,22 @@
     "topic": "Subtraction",
     "competency_code": "2.0",
     "competency_desc": "Subtraction up to 99",
-    "raw_problem_text": "ගෙඩි 18 කින් ගෙඩි 5 ක් ඉවත් කළ විට ඉතිරි ගෙඩි ගණන කීයද?",
-    "english_translation": "When 5 fruits are removed from 18 fruits, how many fruits are remaining?",
+    "raw_problem_text": "ළඟ තිබූ ගෙඩි 18කින් ගෙඩි 6ක් කා දැමූ විට ඉතිරි ගෙඩි ගණන කොපමණද?",
+    "english_translation": "When 6 fruits were eaten out of 18 fruits on hand, what is the remaining number of fruits?",
     "operation": "SUB",
-    "expected_answer": 13,
+    "expected_answer": 12,
     "difficulty": "EASY",
     "page_number": 4,
     "is_money": false,
-    "created_at": "2026-10-15T06:32:49.343605+00:00",
+    "created_at": "2026-10-16T04:50:14.142395+00:00",
     "_id": "40344379b8c74a3e97e1f5ac5fe30949",
     "operands": [
       18,
-      5
-    ]
+      6
+    ],
+    "child_prompt_si": "මිතුරාට බෙදා දුන් පසු දැන් ඉතිරි වී ඇති ගණන කීයදැයි සොයමු! 🎒",
+    "child_prompt_en": "Let's see how many are left after sharing with a friend! 🎒",
+    "visual_props": {}
   },
   {
     "problem_id": "G2-EXT-003",
@@ -318,20 +332,23 @@
     "grade": 2,
     "topic": "Money",
     "competency_code": "4.0",
-    "competency_desc": "Currency combinations up to Rs. 50",
-    "raw_problem_text": "රුපියල් 20 ක නෝට්ටුවකුත් රුපියල් 10 ක කාසියකුත් ඇත. මුළු මුදල කොපමණද?",
-    "english_translation": "There is a 20 rupees note and a 10 rupees coin. What is the total amount of money?",
-    "operation": "ADD",
-    "expected_answer": 30,
+    "competency_desc": "Currency transactions and combinations",
+    "raw_problem_text": "රුපියල් 20ක් දී රුපියල් 15ක බටු ඇට පැකට් එකක් මිලදී ගත් විට ලැබෙන ඉතිරි මුදල කොපමණද?",
+    "english_translation": "When a packet of seeds worth Rs. 15 is bought by giving Rs. 20, what is the remaining amount received?",
+    "operation": "SUB",
+    "expected_answer": 5,
     "difficulty": "EASY",
     "page_number": 5,
     "is_money": true,
-    "created_at": "2026-10-15T06:32:49.343605+00:00",
+    "created_at": "2026-10-16T04:50:14.142395+00:00",
     "_id": "5d11d99459504b5d9ce5b12b3a617d06",
     "operands": [
       20,
-      10
-    ]
+      15
+    ],
+    "child_prompt_si": "මිතුරාට බෙදා දුන් පසු දැන් ඉතිරි වී ඇති ගණන කීයදැයි සොයමු! 🎒",
+    "child_prompt_en": "Let's see how many are left after sharing with a friend! 🎒",
+    "visual_props": {}
   },
   {
     "problem_id": "G3-EXT-001",
@@ -340,40 +357,46 @@
     "topic": "Addition",
     "competency_code": "2.1",
     "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා දෙකක් හෝ තුනක් එකතු කරයි.",
-    "raw_problem_text": "කඩයක ළඟ තිබූ පොත් 345 ක් සහ අලුතින් ගෙන온 පොත් 232 ක් එකතු කළ විට මුළු පොත් සංඛ්‍යාව කීයද?",
-    "english_translation": "When 345 books previously in a shop and 232 newly brought books are added, what is the total number of books?",
+    "raw_problem_text": "කඩයක ළඟ තිබిన පොත් 342 ක් සහ අලුතින් ගෙන온 පොත් 235 ක් එකතු කළ විට මුළු පොත් සංඛ්‍යාව කීයද?",
+    "english_translation": "When 342 books available in a shop and 235 newly brought books are added, what is the total number of books?",
     "operation": "ADD",
     "expected_answer": 577,
     "difficulty": "EASY",
     "page_number": 2,
     "is_money": false,
-    "created_at": "2026-10-15T06:32:54.074595+00:00",
+    "created_at": "2026-10-16T04:50:18.409233+00:00",
     "_id": "6da6dec550bf42349f1ec7369ad90931",
     "operands": [
-      345,
-      232
-    ]
+      342,
+      235
+    ],
+    "child_prompt_si": "ගජා සමඟ ප්‍රශ්නය විසඳමු: කඩයක ළඟ තිබిన පොත් 342 ක් සහ අලුතින් ගෙන온 පොත් 235 ක් එකතු කළ විට මුළු පොත් සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "Let's solve with Gaja: කඩයක ළඟ තිබిన පොත් 342 ක් සහ අලුතින් ගෙන온 පොත් 235 ක් එකතු කළ විට මුළු පොත් සංඛ්‍යාව කීයද?",
+    "visual_props": {}
   },
   {
     "problem_id": "G3-EXT-002",
     "doc_id": "doc_g3_grade_03",
     "grade": 3,
-    "topic": "Subtraction",
-    "competency_code": "2.2",
-    "competency_desc": "99ට නොවැඩි සංඛ්‍යාවකින් තවත් සංඛ්‍යාවක් අඩු කරයි.",
-    "raw_problem_text": "ළමයෙකු ළඟ තිබූ පැන්සල් 85 කින් පැන්සල් 32 ක් දුන්නේ නම්, දැන් ඔහු ළඟ ඉතිරි පැන්සල් ගණන කීයද?",
-    "english_translation": "If a child gave away 32 pencils out of 85 pencils he had, what is the number of pencils remaining with him now?",
-    "operation": "SUB",
-    "expected_answer": 53,
+    "topic": "Multiplication",
+    "competency_code": "2.3",
+    "competency_desc": "ප්‍රායෝගික ක්‍රම උපයෝගී කර ගනිමින් 2, 5 සහ 10 ගුණන වගු හඳුනාගෙන භාවිත කරයි.",
+    "raw_problem_text": "එක් පැකට්ටුවක චොක්ලට් 5 බැගින් පැකට්ටු 8 ක ඇති මුළු චොක්ලට් සංඛ්‍යාව කීයද?",
+    "english_translation": "What is the total number of chocolates in 8 packets, with 5 chocolates in each packet?",
+    "operation": "MUL",
+    "expected_answer": 40,
     "difficulty": "EASY",
     "page_number": 2,
     "is_money": false,
-    "created_at": "2026-10-15T06:32:54.074595+00:00",
+    "created_at": "2026-10-16T04:50:18.409233+00:00",
     "_id": "2a68d95a33074987ab1c8b1837a7e64b",
     "operands": [
-      85,
-      32
-    ]
+      5,
+      8
+    ],
+    "child_prompt_si": "පෙට්ටිවල ඇති ද්‍රව්‍ය ගජාගේ ගුණ කිරීමේ උපක්‍රමයෙන් ඉක්මනින් ගණන් කරමු! 📦",
+    "child_prompt_en": "Let's multiply with Gaja to find the total items in the boxes! 📦",
+    "visual_props": {}
   },
   {
     "problem_id": "G3-EXT-003",
@@ -382,19 +405,22 @@
     "topic": "Money",
     "competency_code": "4.1",
     "competency_desc": "රුපියල්ජයින් හෝ සතවලින් හෝ රුපියල් හා සතවලින් හෝ කරන සරල ගනුදෙනුවල නිරත වෙයි.",
-    "raw_problem_text": "රුපියල් 150 ක් දී පෑනක් මිලදී ගත් විට, රුපියල් 200 ක නෝට්ටුවකින් ඉතිරි මුදල් ලෙස ලැබෙන ප්‍රමාණය කොපමණද?",
-    "english_translation": "When a pen is purchased for 150 rupees, how much is received as change from a 200 rupee note?",
+    "raw_problem_text": "රුපියල් 150 ක් දී රුපියල් 125 ක් වටිනා පොතක් මිලදී ගත්තේ නම් ඉතිරි මුදන කීයද?",
+    "english_translation": "If a book worth 125 rupees is purchased by giving 150 rupees, what is the remaining money?",
     "operation": "SUB",
-    "expected_answer": 50,
+    "expected_answer": 25,
     "difficulty": "EASY",
     "page_number": 3,
     "is_money": true,
-    "created_at": "2026-10-15T06:32:54.074595+00:00",
+    "created_at": "2026-10-16T04:50:18.409233+00:00",
     "_id": "cfdbf933df7f4cf0b595767afa539dc0",
     "operands": [
-      200,
-      150
-    ]
+      150,
+      125
+    ],
+    "child_prompt_si": "පොළෙන් බඩු ගෙන මුදල් ගෙවූ විට ලැබෙන ඉතිරි මුදල ගණනය කරමු! 🛒",
+    "child_prompt_en": "Let's calculate the balance money after our market purchase! 🛒",
+    "visual_props": {}
   },
   {
     "problem_id": "G4-EXT-001",
@@ -402,62 +428,71 @@
     "grade": 4,
     "topic": "Money",
     "competency_code": "4.1",
-    "competency_desc": "රෙම්ශ,අ 2000 ක්‌ දක්වා මූල්‍ය කෝට්‌ඩු භාවිත කරයි.",
-    "raw_problem_text": "කඩේකින් රුපියල් 750 ක බඩුත්, තවත් කඩේකින් රුපියල් 450 ක බඩුත් මිලදී ගත්තේ නම්, මුළු වියදම කොපමණද?",
-    "english_translation": "If you bought goods worth 750 rupees from one shop and goods worth 450 rupees from another shop, what is the total expenditure?",
-    "operation": "ADD",
-    "expected_answer": 1200,
+    "competency_desc": "රෙම්ශ,අ 2000 ක්‌ දක්වා මූල්‌ නෝට්ටු භාවිත කරයි.",
+    "raw_problem_text": "කඩේකට ගොස් රුපියල් 750 ක බඩු මිලදී ගෙන රුපියල් 1000 ක නෝට්ටුවක් දුන් විට ඉතිරි මුදල් කීයද?",
+    "english_translation": "If you buy goods worth 750 Rupees from a shop and give a 1000 Rupee note, what is the remaining change?",
+    "operation": "SUB",
+    "expected_answer": 250,
     "difficulty": "EASY",
     "page_number": 3,
     "is_money": true,
-    "created_at": "2026-10-15T06:32:58.294172+00:00",
+    "created_at": "2026-10-16T04:50:22.855523+00:00",
     "_id": "af3a19e4b8d34ee5af42dc72a55617a2",
     "operands": [
-      750,
-      450
-    ]
+      1000,
+      750
+    ],
+    "child_prompt_si": "ගජාගේ වික්‍රමාන්විත ගවේෂණය: කඩේකට ගොස් රුපියල් 750 ක බඩු මිලදී ගෙන රුපියල් 1000 ක නෝට්ටුවක් දුන් විට ඉතිරි මුදල් කීයද?",
+    "child_prompt_en": "Gaja's Quest: කඩේකට ගොස් රුපියල් 750 ක බඩු මිලදී ගෙන රුපියල් 1000 ක නෝට්ටුවක් දුන් විට ඉතිරි මුදල් කීයද?",
+    "visual_props": {}
   },
   {
     "problem_id": "G4-EXT-002",
     "doc_id": "doc_g4_grade_04",
     "grade": 4,
-    "topic": "Addition",
-    "competency_code": "2.1",
-    "competency_desc": "බලලී තුනක්‌ දක්වා වූ සංඛ්‍යා දෙකක්‌ හෝ තුනක්‌ ගෙන යාම එකම ස්ථානයකින් පමණක්‌ සහිත ව එකතු කරයි.",
-    "raw_problem_text": "පාසල් පුස්‌තකාලයේ සිංහල පොත් 1450 ක්‌ සහ ඉංග්‍රීසි පොත් 320 ක්‌ ඇත. පුස්‌තකාලයේ ඇති මුළු පොත් සංඛ්‍යාව කීයද?",
-    "english_translation": "There are 1450 Sinhala books and 320 English books in the school library. What is the total number of books in the library?",
-    "operation": "ADD",
-    "expected_answer": 1770,
+    "topic": "Multiplication",
+    "competency_code": "2.3",
+    "competency_desc": "සංඛ්‍යා 3, 4, 6 සහ 8 න් ගුණ කරයි.",
+    "raw_problem_text": "පාසල් පුස්තකාලයේ පෝලිම් 4 ක එක් පෝලිමක පොත් 25 බැගින් ඇත. පුස්තකාලයේ ඇති මුළු පොත් සංඛ්‍යාව කීයද?",
+    "english_translation": "There are 4 rows of books in the school library, with 25 books in each row. What is the total number of books in the library?",
+    "operation": "MUL",
+    "expected_answer": 100,
     "difficulty": "EASY",
     "page_number": 2,
     "is_money": false,
-    "created_at": "2026-10-15T06:32:58.294172+00:00",
+    "created_at": "2026-10-16T04:50:22.855523+00:00",
     "_id": "1e5284a3c7674cd0a2e4c1f80d3eb6b6",
     "operands": [
-      1450,
-      320
-    ]
+      25,
+      4
+    ],
+    "child_prompt_si": "ගජාගේ වික්‍රමාන්විත ගවේෂණය: පාසල් පුස්තකාලයේ පෝලිම් 4 ක එක් පෝලිමක පොත් 25 බැගින් ඇත. පුස්තකාලයේ ඇති මුළු පොත් සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "Gaja's Quest: පාසල් පුස්තකාලයේ පෝලිම් 4 ක එක් පෝලිමක පොත් 25 බැගින් ඇත. පුස්තකාලයේ ඇති මුළු පොත් සංඛ්‍යාව කීයද?",
+    "visual_props": {}
   },
   {
     "problem_id": "G4-EXT-003",
     "doc_id": "doc_g4_grade_04",
     "grade": 4,
-    "topic": "Multiplication",
-    "competency_code": "2.3",
-    "competency_desc": "බලලී දෙකකට fkdjeä jk සංඛ්‍යා 2, 5 සහ 10 කින් ගුණ කරයි.",
-    "raw_problem_text": "එක්‌ පෙට්ටියක පැන්සල් 25 බැගින් පෙти 5 ක ඇති මුළු පැන්සල් සංඛ්‍යාව කීයද?",
-    "english_translation": "What is the total number of pencils in 5 boxes, with each box containing 25 pencils?",
-    "operation": "MUL",
-    "expected_answer": 125,
+    "topic": "Division",
+    "competency_code": "2.4",
+    "competency_desc": "බලලං දෙකේ සංඛ්‍යා 2, 3, 4 සහ 5න් බෙදයි.",
+    "raw_problem_text": "ළමුන් 48 දෙනෙකු සමාන කණ්ඩායම් 4 කට බෙදුවහොත් එක් කණ්ඩායමකට සිටින ළමුන් සංඛ්‍යාව කීයද?",
+    "english_translation": "If 48 children are divided into 4 equal groups, what is the number of children in one group?",
+    "operation": "DIV",
+    "expected_answer": 12,
     "difficulty": "EASY",
     "page_number": 2,
     "is_money": false,
-    "created_at": "2026-10-15T06:32:58.294172+00:00",
+    "created_at": "2026-10-16T04:50:22.855523+00:00",
     "_id": "2d98a9878fda42b695a5c444385d0a7e",
     "operands": [
-      25,
-      5
-    ]
+      48,
+      4
+    ],
+    "child_prompt_si": "ගජාගේ වික්‍රමාන්විත ගවේෂණය: ළමුන් 48 දෙනෙකු සමාන කණ්ඩායම් 4 කට බෙදුවහොත් එක් කණ්ඩායමකට සිටින ළමුන් සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "Gaja's Quest: ළමුන් 48 දෙනෙකු සමාන කණ්ඩායම් 4 කට බෙදුවහොත් එක් කණ්ඩායමකට සිටින ළමුන් සංඛ්‍යාව කීයද?",
+    "visual_props": {}
   },
   {
     "problem_id": "G5-EXT-001",
@@ -465,20 +500,23 @@
     "grade": 5,
     "topic": "Money",
     "competency_code": "4.1",
-    "competency_desc": "රෙම්ෂ, යුගල හා ගනුදෙනු (Money transactions)",
-    "raw_problem_text": "පන්තියේ ළමයින් 25 දෙනෙකු එක්ව ගුරු දිනය වෙනුවෙන් තිළිණයක් මිලදී ගැනීමට රුපියල් 2000 ක මුදලක් එකතු කළහ. තිළිණයේ මිල රුපියල් 1750 ක් නම්, ඉතිරි වූ මුදල් කීයද?",
-    "english_translation": "25 children in the class pooled together Rs. 2000 to buy a gift for Teacher's Day. If the price of the gift is Rs. 1750, how much money was left?",
+    "competency_desc": "රෙම්ශ, අ සහ i;j,ska .kqfokq lrhs, ì,am;a ilia lsÍu iy ta wdY%s; .eg¨ úi|hs",
+    "raw_problem_text": "සමරු ප්‍රදර්ශනයක් සඳහා රුපියල් 2000 ක මුදලකින් රුපියල් 450 ක පොත් මිලදී ගත්තේ නම්, ඉතිරි මුදල් කීයද?",
+    "english_translation": "If books worth 450 rupees were purchased using a sum of 2000 rupees for a commemorative exhibition, how much is the remaining money?",
     "operation": "SUB",
-    "expected_answer": 250,
+    "expected_answer": 1550,
     "difficulty": "EASY",
     "page_number": 3,
     "is_money": true,
-    "created_at": "2026-10-15T06:33:02.442443+00:00",
+    "created_at": "2026-10-16T04:50:26.940740+00:00",
     "_id": "1bd41f6a2f9a42db8277982e4e53fda5",
     "operands": [
       2000,
-      1750
-    ]
+      450
+    ],
+    "child_prompt_si": "ගජා සමඟ ප්‍රශ්නය විසඳමු: සමරු ප්‍රදර්ශනයක් සඳහා රුපියල් 2000 ක මුදලකින් රුපියල් 450 ක පොත් මිලදී ගත්තේ නම්, ඉතිරි මුදල් කීයද?",
+    "child_prompt_en": "Let's solve with Gaja: සමරු ප්‍රදර්ශනයක් සඳහා රුපියල් 2000 ක මුදලකින් රුපියල් 450 ක පොත් මිලදී ගත්තේ නම්, ඉතිරි මුදල් කීයද?",
+    "visual_props": {}
   },
   {
     "problem_id": "G5-EXT-002",
@@ -486,20 +524,23 @@
     "grade": 5,
     "topic": "Multiplication",
     "competency_code": "2.3",
-    "competency_desc": "ගුණ කිරීම (Multiplication)",
-    "raw_problem_text": "එක් බස් රථයක මගීන් 45 දෙනෙකු ගමන් කළ හැක නම්, එවැනි බස් රථ 12 ක ගමන් කළ හැකි මුළු මගීන් සංඛ්‍යාව කොපමණද?",
-    "english_translation": "If one bus can carry 45 passengers, what is the total number of passengers that can travel in 12 such buses?",
+    "competency_desc": "බ්‍රැලලෟල් follg fkdjeä jk ixLHd 3, 4, 6 iy 8ka .=K lrhs",
+    "raw_problem_text": "එක් පෙට්ටියක පැන්සල් 24 බැගින් පෙட்டி 8 ක ඇති මුළු පැන්සල් ගණන කීයද?",
+    "english_translation": "What is the total number of pencils in 8 boxes if there are 24 pencils in each box?",
     "operation": "MUL",
-    "expected_answer": 540,
-    "difficulty": "MEDIUM",
+    "expected_answer": 192,
+    "difficulty": "EASY",
     "page_number": 2,
     "is_money": false,
-    "created_at": "2026-10-15T06:33:02.442443+00:00",
+    "created_at": "2026-10-16T04:50:26.940740+00:00",
     "_id": "5eb5075126a14a99a27c8dabc086d80a",
     "operands": [
-      45,
-      12
-    ]
+      24,
+      8
+    ],
+    "child_prompt_si": "ගජා සමඟ ප්‍රශ්නය විසඳමු: එක් පෙට්ටියක පැන්සල් 24 බැගින් පෙட்டி 8 ක ඇති මුළු පැන්සල් ගණන කීයද?",
+    "child_prompt_en": "Let's solve with Gaja: එක් පෙට්ටියක පැන්සල් 24 බැගින් පෙட்டி 8 ක ඇති මුළු පැන්සල් ගණන කීයද?",
+    "visual_props": {}
   },
   {
     "problem_id": "G5-EXT-003",
@@ -507,20 +548,23 @@
     "grade": 5,
     "topic": "Division",
     "competency_code": "2.4",
-    "competency_desc": "බෙදීම (Division)",
-    "raw_problem_text": "ශිෂ්‍යයන් 96 දෙනෙකු සමාන කණ්ඩායම් 8 කට බෙදුවේ නම්, එක් කණ්ඩායමක සිටින ශිෂ්‍යයන් සංඛ්‍යාව කොපමණද?",
-    "english_translation": "If 96 students are divided into 8 equal groups, what is the number of students in one group?",
+    "competency_desc": "බ්‍රැලලෟල් fofla ixLHd 2, 3, 4 iy 5ka fohs",
+    "raw_problem_text": "මිලදීගත් දූෂණ ලේඛන 132 ක් ළමුන් 4 දෙනෙකු අතර සමානව බෙදා දුන් විට එක් අයෙකුට ලැබෙන ලේඛන සංඛ්‍යාව කොපමණද?",
+    "english_translation": "When 132 exercise books are distributed equally among 4 children, how many books does each person get?",
     "operation": "DIV",
-    "expected_answer": 12,
+    "expected_answer": 33,
     "difficulty": "EASY",
     "page_number": 2,
     "is_money": false,
-    "created_at": "2026-10-15T06:33:02.442443+00:00",
+    "created_at": "2026-10-16T04:50:26.940740+00:00",
     "_id": "180720558ba245539170fdfaca075b03",
     "operands": [
-      96,
-      8
-    ]
+      132,
+      4
+    ],
+    "child_prompt_si": "ගජා සමඟ ප්‍රශ්නය විසඳමු: මිලදීගත් දූෂණ ලේඛන 132 ක් ළමුන් 4 දෙනෙකු අතර සමානව බෙදා දුන් විට එක් අයෙකුට ලැබෙන ලේඛන සංඛ්‍යාව කොපමණද?",
+    "child_prompt_en": "Let's solve with Gaja: මිලදීගත් දූෂණ ලේඛන 132 ක් ළමුන් 4 දෙනෙකු අතර සමානව බෙදා දුන් විට එක් අයෙකුට ලැබෙන ලේඛන සංඛ්‍යාව කොපමණද?",
+    "visual_props": {}
   },
   {
     "problem_id": "G1-CNT-001",

@@ -168,17 +168,20 @@ class FallbackGridFSBucket:
         self.root_dir = root_dir
         self.root_dir.mkdir(parents=True, exist_ok=True)
 
-    async def upload_from_stream(self, filename: str, source_bytes: bytes, metadata: Optional[Dict[str, Any]] = None) -> str:
+    async def upload_from_stream(self, filename: str, source: Any = None, source_bytes: bytes = b"", metadata: Optional[Dict[str, Any]] = None) -> str:
+        data = source if source is not None else source_bytes
+        if hasattr(data, "read"):
+            data = data.read()
         file_id = f"fs_{uuid.uuid4().hex[:12]}"
         file_path = self.root_dir / f"{file_id}_{filename}"
         with open(file_path, "wb") as f:
-            f.write(source_bytes)
+            f.write(data)
         meta_path = self.root_dir / f"{file_id}.json"
         with open(meta_path, "w", encoding="utf-8") as f:
             json.dump({
                 "file_id": file_id,
                 "filename": filename,
-                "length": len(source_bytes),
+                "length": len(data),
                 "metadata": metadata or {},
                 "local_path": str(file_path),
             }, f, indent=2)
@@ -212,8 +215,29 @@ class DatabaseService:
         self._fallback_blueprints = FallbackCollection("game_blueprints", DATA_DIR / "game_blueprints.json")
         self._fallback_gridfs = FallbackGridFSBucket(GRIDFS_DIR)
 
+    def _ensure_active_client(self):
+        try:
+            current_loop = asyncio.get_running_loop()
+        except RuntimeError:
+            return
+        if self.is_connected and self.client is not None:
+            try:
+                io_loop = self.client.get_io_loop()
+                if io_loop.is_closed() or io_loop != current_loop:
+                    client = AsyncIOMotorClient(
+                        MONGODB_URI,
+                        serverSelectionTimeoutMS=2000,
+                        connectTimeoutMS=2000,
+                    )
+                    self.client = client
+                    self.db = client[MONGODB_DB_NAME]
+                    self.gridfs = AsyncIOMotorGridFSBucket(self.db)
+            except Exception:
+                pass
+
     async def initialize(self):
         if self._init_done:
+            self._ensure_active_client()
             return
         self._init_done = True
         if MONGODB_URI and "mongodb" in MONGODB_URI:
@@ -238,21 +262,25 @@ class DatabaseService:
             print("[DatabaseService] No MONGODB_URI configured. Running in local fallback mode.")
 
     def get_syllabus_documents(self):
+        self._ensure_active_client()
         if self.is_connected and self.db is not None:
             return self.db["syllabus_documents"]
         return self._fallback_docs
 
     def get_curriculum_problems(self):
+        self._ensure_active_client()
         if self.is_connected and self.db is not None:
             return self.db["curriculum_problems"]
         return self._fallback_problems
 
     def get_game_blueprints(self):
+        self._ensure_active_client()
         if self.is_connected and self.db is not None:
             return self.db["game_blueprints"]
         return self._fallback_blueprints
 
     def get_gridfs(self):
+        self._ensure_active_client()
         if self.is_connected and self.gridfs is not None:
             return self.gridfs
         return self._fallback_gridfs

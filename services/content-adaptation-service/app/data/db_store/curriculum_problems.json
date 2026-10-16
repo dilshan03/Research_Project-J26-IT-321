@@ -216,14 +216,14 @@
     "topic": "Counting",
     "competency_code": "2.0",
     "competency_desc": "1 සිට 9 දක්වා සංඛ්‍යාවලට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණය දැක්වීම.",
-    "raw_problem_text": "1 සිට 9 තෙක් ඇතැම් අයිතමයේ වර්ණ, හැඩ සහ තරම අනුව ප්‍රමාණය හඳුනා ගැනීම.",
-    "english_translation": "Count objects up to 9 and identify the correct number.",
+    "raw_problem_text": "1 සිට 9 තෙක් ඇතැයි එක එක සංඛ්‍යාවට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණය හඳුනා ගැනීම, කියවීම.",
+    "english_translation": "Identify and read the quantity of objects corresponding to numbers 1 to 9.",
     "operation": "COUNT",
     "expected_answer": 5,
     "difficulty": "EASY",
     "page_number": 4,
     "is_money": false,
-    "created_at": "2026-10-15T06:38:17.669722+00:00",
+    "created_at": "2026-10-16T03:38:20.523515+00:00",
     "_id": "fec3694bc8e24c11afa1897f18693afc",
     "operands": [
       5
@@ -235,18 +235,19 @@
     "grade": 1,
     "topic": "Comparison",
     "competency_code": "3.0",
-    "competency_desc": "දිග, බර සහ ධාරිතාව සංසන්දනය කිරීම.",
-    "raw_problem_text": "පැහැදිලි වෙනසක් ඇති වස්තු දෙකක්, එකක් අනෙකට වඩා බර වැඩි, බර අඩු වශයෙන් සැසඳීම.",
-    "english_translation": "Compare two objects with clear difference in weight as heavier or lighter.",
+    "competency_desc": "ද්‍රව්‍ය හෝ ද්‍රව්‍ය ප්‍රමාණ දෙකක් ලොකු කුඩා හෝ වැඩි අඩු හෝ වශයෙන් වෙන් කර හඳුනා ගැනීම.",
+    "raw_problem_text": "ද්‍රව්‍ය හෝ ද්‍රව්‍ය ප්‍රමාණ දෙකක් ලොකු කුඩා හෝ වැඩි අඩු හෝ වශයෙන් වෙන් කර හඳුනා ගැනීම.",
+    "english_translation": "Identify and distinguish two objects or quantities as bigger/smaller or more/less.",
     "operation": "COMPARE",
-    "expected_answer": 1,
+    "expected_answer": 8,
     "difficulty": "EASY",
-    "page_number": 5,
+    "page_number": 4,
     "is_money": false,
-    "created_at": "2026-10-15T06:38:17.669722+00:00",
+    "created_at": "2026-10-16T03:38:20.523515+00:00",
     "_id": "45d8979dc92049c2b095aa170b5c563d",
     "operands": [
-      2
+      8,
+      5
     ]
   },
   {
@@ -255,15 +256,15 @@
     "grade": 1,
     "topic": "Money",
     "competency_code": "4.0",
-    "competency_desc": "මුදල් හඳුනා ගැනීම.",
+    "competency_desc": "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම.",
     "raw_problem_text": "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම.",
-    "english_translation": "Identify currency coins: 1 rupee, 2 rupees, and 5 rupees.",
+    "english_translation": "Identify the 1 rupee, 2 rupees, and 5 rupees coins.",
     "operation": "IDENTIFY",
     "expected_answer": 5,
     "difficulty": "EASY",
     "page_number": 5,
     "is_money": true,
-    "created_at": "2026-10-15T06:38:17.669722+00:00",
+    "created_at": "2026-10-16T03:38:20.523515+00:00",
     "_id": "e7a8f33a68b546ddb5be865cbad201a2",
     "operands": [
       5

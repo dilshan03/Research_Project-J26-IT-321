@@ -9,6 +9,9 @@ import { NumberHunt } from './mechanics/NumberHunt';
 import { OperatorDrop } from './mechanics/OperatorDrop';
 import { BasketCount } from './mechanics/BasketCount';
 import { BalanceScale } from './mechanics/BalanceScale';
+import { ShapeMatcher } from './mechanics/ShapeMatcher';
+import { PatternTrain } from './mechanics/PatternTrain';
+import { ComparisonScale } from './mechanics/ComparisonScale';
 import type { MechanicProps } from './mechanics/types';
 
 interface Attempt {
@@ -23,6 +26,15 @@ const BREAK_AFTER_WRONG = 3;
 const IDLE_NUDGE_MS = 20000;
 
 function pickMechanic(step: GameMicroStep): { Comp: (p: MechanicProps) => React.ReactElement; intro: Line } {
+  if (step.action_type === 'MATCH_SHAPE' || step.operation === 'SHAPE') {
+    return { Comp: ShapeMatcher, intro: { si: 'යාළුවේ! ගජා සොයන නිවැරදි හැඩය තෝරමු!', en: "Let's find the shape Gaja is looking for!" } };
+  }
+  if (step.action_type === 'COMPLETE_PATTERN' || step.operation === 'PATTERN') {
+    return { Comp: PatternTrain, intro: { si: 'ලස්සන දුම්රිය රටාවේ ඊළඟට එන වර්ණය තෝරමු!', en: "Let's find what comes next in the train pattern!" } };
+  }
+  if (step.action_type === 'COMPARE_QUANTITY' || step.operation === 'COMPARE') {
+    return { Comp: ComparisonScale, intro: { si: 'වඩා විශාල හෝ වැඩි ප්‍රමාණය තෝරමු!', en: "Let's compare and find the bigger one!" } };
+  }
   if (step.action_type === 'IDENTIFY_ENTITY') return { Comp: NumberHunt, intro: LINES.identify };
   if (step.action_type === 'SELECT_OPERATOR') return { Comp: OperatorDrop, intro: LINES.operator };
   const ops = step.operands ?? [];

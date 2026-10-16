@@ -616,6 +616,20 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
                       {prob.raw_problem_text}
                     </p>
 
+                    {prob.child_prompt_si && (
+                      <div className="mt-2.5 p-2.5 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-xs text-amber-900 flex items-start gap-2">
+                        <span className="text-lg select-none">🐘</span>
+                        <div>
+                          <span className="font-bold block text-[10px] uppercase text-amber-800">
+                            Gaja Child Voice (ළමා ආමන්ත්‍රණය):
+                          </span>
+                          <span className="sinhala font-medium text-amber-950 text-xs leading-relaxed">
+                            {prob.child_prompt_si}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                     {prob.english_translation && (
                       <p className="text-xs text-mq-text-muted italic mt-1.5">
                         "{prob.english_translation}"

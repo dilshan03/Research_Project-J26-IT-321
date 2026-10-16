@@ -176,10 +176,69 @@ def build_micro_steps(
 ) -> List[GameMicroStep]:
     op = operations[0] if operations else ("COUNT" if grade == 1 else "ADD")
 
+    if op == "SHAPE":
+        shape_opts = [
+            GameChoiceOption(text_si="රවුම (Circle)", text_en="Circle", numeric_value=1, is_correct=True, distractor_type="NONE", icon_or_shape="CIRCLE"),
+            GameChoiceOption(text_si="ත්‍රිකෝණය (Triangle)", text_en="Triangle", numeric_value=2, is_correct=False, distractor_type="IMPULSIVITY", icon_or_shape="TRIANGLE"),
+            GameChoiceOption(text_si="කොටුව (Square)", text_en="Square", numeric_value=3, is_correct=False, distractor_type="MAGNITUDE_SLIP", icon_or_shape="SQUARE"),
+        ]
+        return [
+            GameMicroStep(
+                step_order=1,
+                action_type="MATCH_SHAPE",
+                instruction_si="ගජා සොයන රවුම් හැඩය හඳුනාගන්න 🟡",
+                instruction_en="Identify the circle shape Gaja is looking for 🟡",
+                target_visual_asset=VisualAssetTag.SHAPE_CARD,
+                correct_target_value="1",
+                game_options=shape_opts,
+                operands=[1],
+                operation="SHAPE",
+            )
+        ]
+
+    if op == "PATTERN":
+        pattern_opts = [
+            GameChoiceOption(text_si="නිල් පාට (Blue)", text_en="Blue", numeric_value=2, is_correct=True, distractor_type="NONE", icon_or_shape="BLUE"),
+            GameChoiceOption(text_si="රතු පාට (Red)", text_en="Red", numeric_value=1, is_correct=False, distractor_type="IMPULSIVITY", icon_or_shape="RED"),
+            GameChoiceOption(text_si="කහ පාට (Yellow)", text_en="Yellow", numeric_value=3, is_correct=False, distractor_type="MAGNITUDE_SLIP", icon_or_shape="YELLOW"),
+        ]
+        return [
+            GameMicroStep(
+                step_order=1,
+                action_type="COMPLETE_PATTERN",
+                instruction_si="රටාවේ හිස් තැනට එන නිවැරදි වර්ණය හෝ හැඩය තෝරන්න 🚂",
+                instruction_en="Choose what comes next in the pattern 🚂",
+                target_visual_asset=VisualAssetTag.PATTERN_TRAIN,
+                correct_target_value="2",
+                game_options=pattern_opts,
+                operands=[2],
+                operation="PATTERN",
+            )
+        ]
+
+    if op == "COMPARE":
+        comp_opts = [
+            GameChoiceOption(text_si="විශාල ප්‍රමාණය (Bigger)", text_en="Bigger", numeric_value=final_answer, is_correct=True, distractor_type="NONE"),
+            GameChoiceOption(text_si="කුඩා ප්‍රමාණය (Smaller)", text_en="Smaller", numeric_value=min(operands) if len(operands) > 1 else 1, is_correct=False, distractor_type="IMPULSIVITY"),
+        ]
+        return [
+            GameMicroStep(
+                step_order=1,
+                action_type="COMPARE_QUANTITY",
+                instruction_si="වඩා විශාල හෝ වැඩි ප්‍රමාණය තෝරන්න 🐘",
+                instruction_en="Select the bigger or greater amount 🐘",
+                target_visual_asset=VisualAssetTag.COMPARISON_SCALE,
+                correct_target_value=str(final_answer),
+                game_options=comp_opts,
+                operands=operands,
+                operation="COMPARE",
+            )
+        ]
+
     # SPECIALIZED GRADE 1 WORKFLOW:
     # In Sri Lanka, Grade 1 does not use formal addition/subtraction signs (+, -).
     # Instead, learners identify items (NumberHunt/BasketCount) and pick the count/item directly.
-    if grade == 1 or op in ("COUNT", "COMPARE", "IDENTIFY"):
+    if grade == 1 or op in ("COUNT", "IDENTIFY"):
         steps: List[GameMicroStep] = [
             GameMicroStep(
                 step_order=1,
@@ -301,7 +360,7 @@ async def generate_blueprint_from_curriculum_problem(
 
     # Deterministic verification
     MathVerificationService.verify_grade_invariants(problem.grade, operands, op)
-    if op in ("COUNT", "COMPARE", "IDENTIFY"):
+    if op in ("COUNT", "COMPARE", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME"):
         verified_answer = problem.expected_answer
     else:
         verified_answer = MathVerificationService.execute_calculation(operands, op)
@@ -337,6 +396,6 @@ async def generate_blueprint_from_curriculum_problem(
         status="draft",
         story_narrative=narrative.model_dump(),
         cli_score=round(cli, 2),
-        raw_sinhala_question=problem.raw_problem_text,
+        raw_sinhala_question=problem.child_prompt_si or problem.raw_problem_text,
     )
     return blueprint, cli

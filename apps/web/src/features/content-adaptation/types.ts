@@ -3,7 +3,8 @@ export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
 export type GameTheme = 'VILLAGE_MARKET' | 'JUNGLE_ADVENTURE' | 'SPACE_QUEST';
 export type BlueprintStatus = 'draft' | 'approved' | 'rejected';
 export type VisualAssetTag =
-  | 'COIN_BAG' | 'FRUIT_BASKET' | 'OPERATOR_CHEST' | 'NUMBER_BLOCK' | 'CHARACTER_AVATAR';
+  | 'COIN_BAG' | 'FRUIT_BASKET' | 'OPERATOR_CHEST' | 'NUMBER_BLOCK' | 'CHARACTER_AVATAR'
+  | 'SHAPE_CARD' | 'PATTERN_TRAIN' | 'COMPARISON_SCALE';
 export type DistractorType = 'IMPULSIVITY' | 'WORKING_MEMORY_OVERFLOW' | 'MAGNITUDE_SLIP' | 'NONE';
 
 export interface GameChoiceOption {
@@ -13,18 +14,28 @@ export interface GameChoiceOption {
   is_correct: boolean;
   distractor_type?: DistractorType | null;
   distractor_rationale?: string | null;
+  icon_or_shape?: string | null;
 }
 
 export interface GameMicroStep {
   step_order: number;
-  action_type: 'IDENTIFY_ENTITY' | 'SELECT_OPERATOR' | 'CALCULATE_MICROSTEP';
+  action_type:
+    | 'IDENTIFY_ENTITY'
+    | 'SELECT_OPERATOR'
+    | 'CALCULATE_MICROSTEP'
+    | 'MATCH_SHAPE'
+    | 'COMPLETE_PATTERN'
+    | 'COMPARE_QUANTITY';
   instruction_si: string;
   instruction_en: string;
   target_visual_asset: VisualAssetTag;
   correct_target_value: string;
   game_options: GameChoiceOption[];
   operands?: number[] | null;
-  operation?: 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'COUNT' | 'COMPARE' | 'IDENTIFY' | null;
+  operation?:
+    | 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'COUNT' | 'COMPARE' | 'IDENTIFY'
+    | 'SHAPE' | 'PATTERN' | 'COLOR' | 'FRACTION' | 'TIME' | null;
+  visual_props?: Record<string, any> | null;
 }
 
 export interface ADHDGameSettings {
@@ -97,10 +108,15 @@ export interface CurriculumProblem {
   competency_code?: string | null;
   competency_desc?: string | null;
   raw_problem_text: string;
+  child_prompt_si?: string | null;
+  child_prompt_en?: string | null;
   english_translation?: string | null;
   operands: number[];
-  operation?: 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'COUNT' | 'COMPARE' | 'IDENTIFY' | null;
+  operation?:
+    | 'ADD' | 'SUB' | 'MUL' | 'DIV' | 'COUNT' | 'COMPARE' | 'IDENTIFY'
+    | 'SHAPE' | 'PATTERN' | 'COLOR' | 'FRACTION' | 'TIME' | null;
   expected_answer: number;
+  visual_props?: Record<string, any> | null;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   page_number?: number | null;
   is_money: boolean;

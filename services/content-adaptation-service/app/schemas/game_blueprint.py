@@ -16,6 +16,9 @@ class VisualAssetTag(str, Enum):
     OPERATOR_CHEST = "OPERATOR_CHEST"
     NUMBER_BLOCK = "NUMBER_BLOCK"
     CHARACTER_AVATAR = "CHARACTER_AVATAR"
+    SHAPE_CARD = "SHAPE_CARD"
+    PATTERN_TRAIN = "PATTERN_TRAIN"
+    COMPARISON_SCALE = "COMPARISON_SCALE"
 
 
 class GameChoiceOption(BaseModel):
@@ -29,13 +32,19 @@ class GameChoiceOption(BaseModel):
     distractor_rationale: Optional[str] = Field(
         None, description="Explanation for why a learner with ADHD might pick this distractor"
     )
+    icon_or_shape: Optional[str] = Field(None, description="Visual shape/color/emoji code if applicable")
 
 
 class GameMicroStep(BaseModel):
     step_order: int = Field(..., ge=1, le=3, description="Order of the micro-step (1, 2, or 3)")
-    action_type: Literal['IDENTIFY_ENTITY', 'SELECT_OPERATOR', 'CALCULATE_MICROSTEP'] = Field(
-        ..., description="The type of cognitive action required"
-    )
+    action_type: Literal[
+        'IDENTIFY_ENTITY',
+        'SELECT_OPERATOR',
+        'CALCULATE_MICROSTEP',
+        'MATCH_SHAPE',
+        'COMPLETE_PATTERN',
+        'COMPARE_QUANTITY',
+    ] = Field(..., description="The type of cognitive action required")
     instruction_si: str = Field(..., description="Short, encouraging Sinhala audio-visual instruction")
     instruction_en: str = Field(..., description="Short, equivalent English instruction")
     target_visual_asset: VisualAssetTag = Field(..., description="The main visual asset type used in this step")
@@ -44,9 +53,10 @@ class GameMicroStep(BaseModel):
     operands: Optional[List[int]] = Field(
         None, description="Quantities this step works on (used by the game layer for manipulatives)"
     )
-    operation: Optional[Literal['ADD', 'SUB', 'MUL', 'DIV', 'COUNT', 'COMPARE', 'IDENTIFY']] = Field(
-        None, description="Arithmetic or cognitive action this step applies"
-    )
+    operation: Optional[Literal[
+        'ADD', 'SUB', 'MUL', 'DIV', 'COUNT', 'COMPARE', 'IDENTIFY', 'SHAPE', 'PATTERN', 'COLOR', 'FRACTION', 'TIME'
+    ]] = Field(None, description="Arithmetic or cognitive action this step applies")
+    visual_props: Optional[dict] = Field(default_factory=dict, description="Metadata for shapes, colors, or visual patterns")
 
 
 class ADHDGameSettings(BaseModel):

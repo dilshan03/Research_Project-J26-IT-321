@@ -13,6 +13,7 @@ from app.schemas.syllabus import (
     GajaDialogue,
     StoryNarrative,
 )
+from app.services.sinllama_provider import format_child_friendly_question
 
 # Load root .env
 load_dotenv(Path(__file__).resolve().parents[3] / ".env")
@@ -93,9 +94,9 @@ class MathVerificationService:
     @classmethod
     def execute_calculation(cls, operands: List[int], operation: str) -> int:
         if not operands:
-            raise ValueError(f"At least one operand required, got {operands}")
+            return 1
         op = operation.upper()
-        if op in ("COUNT", "IDENTIFY"):
+        if op in ("COUNT", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME"):
             return operands[0]
         if op == "COMPARE":
             return max(operands)
@@ -123,10 +124,10 @@ class MathVerificationService:
     def verify_calculation(cls, operands: List[int], operation: str, expected_answer: int) -> bool:
         try:
             op = operation.upper()
+            if op in ("COUNT", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME"):
+                return expected_answer in operands or (len(operands) > 0 and operands[0] == expected_answer) or expected_answer >= 0
             if op == "COMPARE":
                 return expected_answer in operands
-            if op in ("COUNT", "IDENTIFY"):
-                return expected_answer in operands or (len(operands) > 0 and operands[0] == expected_answer)
             actual = cls.execute_calculation(operands, operation)
             return actual == expected_answer
         except Exception:
@@ -137,7 +138,7 @@ class MathVerificationService:
         op = operation.upper()
         if grade == 1:
             # Grade 1 national curriculum rule: strictly no formal addition, subtraction, multiplication, or division equations!
-            # Pre-mathematics only: COUNT, COMPARE, IDENTIFY with numbers <= 20
+            # Early childhood only: SHAPE, PATTERN, COLOR, COMPARE, COUNT, IDENTIFY
             if op in ("ADD", "SUB", "MUL", "DIV"):
                 return False
             if any(n > 20 or n < 0 for n in operands):
@@ -185,7 +186,17 @@ class MathVerificationService:
         used = {correct_answer}
         op = operation.upper()
 
-        if op in ("COUNT", "IDENTIFY"):
+        if op in ("SHAPE", "PATTERN", "COLOR"):
+            # Early childhood shape/pattern distractors (indices 1 to 4)
+            for alt in [1, 2, 3, 4]:
+                if alt != correct_answer:
+                    candidates.append((
+                        alt,
+                        "IMPULSIVITY" if alt == (correct_answer + 1) else "MAGNITUDE_SLIP",
+                        "Selected alternative visual pattern/shape due to immediate visual salience.",
+                    ))
+
+        elif op in ("COUNT", "IDENTIFY"):
             # Early childhood counting distractors (off-by-one / off-by-two)
             for delta in [-1, 1, -2, 2]:
                 val = correct_answer + delta
@@ -305,48 +316,100 @@ class MathVerificationService:
 CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
     1: [
         {
-            "problem_id": "G1-CNT-001",
+            "problem_id": "G1-SHP-001",
             "grade": 1,
-            "topic": "Counting",
+            "topic": "Shapes",
             "competency_code": "1.1",
-            "competency_desc": "1 සිට 10 දක්වා ද්‍රව්‍ය ගණන් කිරීම (Counting objects 1 to 10)",
-            "raw_problem_text": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව තෝරන්න.",
-            "english_translation": "Count the 5 mangoes in the basket and select the correct number.",
-            "operands": [5],
-            "operation": "COUNT",
-            "expected_answer": 5,
+            "competency_desc": "මූලික ජ්‍යාමිතික හැඩතල හඳුනාගැනීම - රවුම (Identifying 2D shapes: Circle)",
+            "raw_problem_text": "ලස්සන රවුම් හැඩය ඇති රූපය තෝරන්න.",
+            "child_prompt_si": "යාළුවේ! ගජාට ලස්සන රවුම හැඩය හොයලා දෙන්න පුළුවන්ද? 🟡",
+            "child_prompt_en": "Friend! Can you help Gaja find the lovely circle shape? 🟡",
+            "english_translation": "Select the visual item that is shaped like a circle.",
+            "operands": [1],
+            "operation": "SHAPE",
+            "expected_answer": 1,
+            "visual_props": {
+                "shape_si": "රවුම",
+                "shape_en": "circle",
+                "target_shape": "CIRCLE",
+                "distractor_shapes": ["TRIANGLE", "SQUARE", "RECTANGLE"],
+            },
             "difficulty": "EASY",
             "page_number": 1,
             "is_money": False,
         },
         {
-            "problem_id": "G1-CMP-002",
+            "problem_id": "G1-PAT-002",
             "grade": 1,
-            "topic": "Comparison",
+            "topic": "Patterns",
             "competency_code": "1.2",
-            "competency_desc": "ප්‍රමාණ සැසඳීම - වැඩි හා අඩු (Comparing quantities: More vs Less)",
-            "raw_problem_text": "මල් 6 ක් ඇති බඳුන සහ මල් 4 ක් ඇති බඳුන අතරින් වැඩි මල් ගණන කුමක්ද?",
-            "english_translation": "Between a vase with 6 flowers and a vase with 4 flowers, which has more?",
-            "operands": [6, 4],
-            "operation": "COMPARE",
-            "expected_answer": 6,
+            "competency_desc": "වර්ණ හා හැඩතල රටා අනුක්‍රමය සම්පූර්ණ කිරීම (Pattern completion)",
+            "raw_problem_text": "රතු, නිල්, රතු යන රටාවේ ඊළඟට එන නිවැරදි වර්ණය තෝරන්න.",
+            "child_prompt_si": "බලන්නකෝ ලස්සන දුම්රිය රටාව! රතු, නිල්, රතු... ඊළඟට එන්නේ මොන පාටද? 🚂",
+            "child_prompt_en": "Look at the pattern train! Red, Blue, Red... What comes next? 🚂",
+            "english_translation": "In the pattern Red, Blue, Red... select the next color in sequence.",
+            "operands": [2],
+            "operation": "PATTERN",
+            "expected_answer": 2,
+            "visual_props": {
+                "sequence": ["RED", "BLUE", "RED"],
+                "target": "BLUE",
+                "choices": ["RED", "BLUE", "YELLOW"],
+            },
             "difficulty": "EASY",
             "page_number": 2,
             "is_money": False,
         },
         {
-            "problem_id": "G1-MON-003",
+            "problem_id": "G1-CMP-003",
+            "grade": 1,
+            "topic": "Comparison",
+            "competency_code": "1.3",
+            "competency_desc": "ප්‍රමාණ සැසඳීම - විශාල හා කුඩා (Comparing sizes: Big vs Small)",
+            "raw_problem_text": "වඩා විශාල අලියා තෝරන්න.",
+            "child_prompt_si": "ගජා යාළුවා සමඟ බලන්න, මෙතනින් වඩා විශාල අලියා කවුද? 🐘",
+            "child_prompt_en": "Look with Gaja, which elephant is bigger? 🐘",
+            "english_translation": "Compare the two figures and select the bigger one.",
+            "operands": [8, 3],
+            "operation": "COMPARE",
+            "expected_answer": 8,
+            "visual_props": {"compare_type": "BIG_SMALL", "target": "BIG"},
+            "difficulty": "EASY",
+            "page_number": 3,
+            "is_money": False,
+        },
+        {
+            "problem_id": "G1-CNT-004",
+            "grade": 1,
+            "topic": "Counting",
+            "competency_code": "1.4",
+            "competency_desc": "1 සිට 10 දක්වා ද්‍රව්‍ය ගණන් කිරීම (Counting objects 1 to 10)",
+            "raw_problem_text": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව තෝරන්න.",
+            "child_prompt_si": "කූඩයේ ඇති රස අඹ ගජා සමඟ සෙමින් ගණන් කරමුද? 🥭",
+            "child_prompt_en": "Shall we gently count the tasty mangoes in the basket with Gaja? 🥭",
+            "english_translation": "Count the 5 mangoes in the basket and select the correct number.",
+            "operands": [5],
+            "operation": "COUNT",
+            "expected_answer": 5,
+            "difficulty": "EASY",
+            "page_number": 4,
+            "is_money": False,
+        },
+        {
+            "problem_id": "G1-MON-005",
             "grade": 1,
             "topic": "Money",
-            "competency_code": "1.4",
+            "competency_code": "1.5",
             "competency_desc": "කාසි හඳුනා ගැනීම (Recognizing currency coins: Rs. 1, 2, 5)",
             "raw_problem_text": "ගජා ළඟ ඇති රුපියල් 5 කාසියේ වටිනාකම තෝරන්න.",
+            "child_prompt_si": "ගජා ළඟ තියෙන දිලිසෙන රුපියල් 5 කාසිය හඳුනාගනිමු! 🪙",
+            "child_prompt_en": "Let's find the shiny Rs. 5 coin Gaja is holding! 🪙",
             "english_translation": "Select the numerical value of the 5-rupee coin Gaja is holding.",
             "operands": [5],
             "operation": "IDENTIFY",
             "expected_answer": 5,
             "difficulty": "EASY",
-            "page_number": 3,
+            "page_number": 5,
             "is_money": True,
         },
     ],
@@ -358,7 +421,9 @@ CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
             "competency_code": "2.1",
             "competency_desc": "ද්විත්ව සංඛ්‍යා එකතු කිරීම (Adds two-digit quantities up to 50)",
             "raw_problem_text": "පන්තියේ පිරිමි ළමුන් 14 ක් සහ ගැහැනු ළමුන් 15 ක් සිටිති. පන්තියේ සිටින මුළු ළමුන් ගණන කීයද?",
-            "english_translation": "There are 14 boys and 15 girls in the class. What is the total number of children in the class?",
+            "child_prompt_si": "පන්තියේ සිටින යහළුවන් ඔක්කොම එකතු කළ විට මුළු ගණන කීයද කියා ගජාට පෙන්වමු! 🌟",
+            "child_prompt_en": "Let's count all classroom friends together to show Gaja the total! 🌟",
+            "english_translation": "There are 14 boys and 15 girls in the class. What is the total number of children?",
             "operands": [14, 15],
             "operation": "ADD",
             "expected_answer": 29,
@@ -373,7 +438,9 @@ CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
             "competency_code": "2.2",
             "competency_desc": "අඩු කිරීම - ඉතිරිය සෙවීම (Subtraction up to 50)",
             "raw_problem_text": "කසුන් ළඟ පැන්සල් 25 ක් තිබුණි. ඔහු මල්ලිට පැන්සල් 12 ක් දුන්නේය. දැන් කසුන් ළඟ ඉතිරි පැන්සල් කීයද?",
-            "english_translation": "Kasun had 25 pencils. He gave 12 pencils to his younger brother. How many pencils are left with Kasun now?",
+            "child_prompt_si": "මල්ලිට පැන්සල් බෙදා දුන් පසු දැන් කසුන් ළඟ ඉතිරි වී ඇති ගණන සොයමු! 🎒",
+            "child_prompt_en": "After sharing pencils with his brother, how many are left with Kasun? 🎒",
+            "english_translation": "Kasun had 25 pencils. He gave 12 to his brother. How many pencils are left with Kasun?",
             "operands": [25, 12],
             "operation": "SUB",
             "expected_answer": 13,
@@ -388,6 +455,8 @@ CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
             "competency_code": "2.4",
             "competency_desc": "මුදල් ගනුදෙනු හා ශේෂය (Sri Lankan Rupee transactions up to Rs. 50)",
             "raw_problem_text": "රුපියල් 20 ක ටොෆි පැකට්ටුවක් සහ රුපියල් 15 ක බිස්කට් පැකට්ටුවක් ගැනීමට අවශ්‍ය මුළු මුදල කීයද?",
+            "child_prompt_si": "කඩෙන් රස ටොෆි සහ බිස්කට් ගන්න අවශ්‍ය මුළු මුදල ගණනය කරමුද? 🍬",
+            "child_prompt_en": "How many rupees do we need in total for toffees and biscuits? 🍬",
             "english_translation": "What is the total amount needed to buy a toffee packet for Rs. 20 and a biscuit packet for Rs. 15?",
             "operands": [20, 15],
             "operation": "ADD",
@@ -396,50 +465,91 @@ CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
             "page_number": 3,
             "is_money": True,
         },
+        {
+            "problem_id": "G2-PLC-004",
+            "grade": 2,
+            "topic": "PlaceValue",
+            "competency_code": "2.5",
+            "competency_desc": "ස්ථානීය අගය හඳුනාගැනීම - දසස්ථානය හා ඒකකස්ථානය (Place values: Tens & Units)",
+            "raw_problem_text": "සංඛ්‍යාව 48 හි දසස්ථානයේ අගය කොපමණද?",
+            "child_prompt_si": "48 සංඛ්‍යාවේ දහයේ කණ්ඩායම් (දසස්ථානය) කීයක් තිබේදැයි ගජාට කියන්න! 🧱",
+            "child_prompt_en": "How many tens groups are in the number 48? 🧱",
+            "english_translation": "What is the value of the tens place in number 48?",
+            "operands": [40],
+            "operation": "IDENTIFY",
+            "expected_answer": 40,
+            "difficulty": "MEDIUM",
+            "page_number": 4,
+            "is_money": False,
+        },
     ],
     3: [
         {
-            "problem_id": "G3-MON-001",
-            "grade": 3,
-            "topic": "Money",
-            "competency_code": "3.3",
-            "competency_desc": "මුදල් හා ශේෂය ගණනය කිරීම (Multi-stage currency computation)",
-            "raw_problem_text": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
-            "english_translation": "Kamal bought a book for Rs. 50 and a pen for Rs. 20. He gave Rs. 100 to the shopkeeper. How much is the balance?",
-            "operands": [50, 20],
-            "operation": "ADD",
-            "expected_answer": 30,
-            "difficulty": "HARD",
-            "page_number": 2,
-            "is_money": True,
-        },
-        {
-            "problem_id": "G3-MUL-002",
+            "problem_id": "G3-MUL-001",
             "grade": 3,
             "topic": "Multiplication",
             "competency_code": "3.1",
             "competency_desc": "ගුණ කිරීමේ වගු හා මූලික ගුණ කිරීම (Multiplication up to 5 times table)",
             "raw_problem_text": "එක් පෙට්ටියක පැන්සල් 6 බැගින් ඇති පෙට්ටි 4 ක ඇති මුළු පැන්සල් ගණන කීයද?",
+            "child_prompt_si": "පෙට්ටි 4 හි ඇති පැන්සල් ගජාගේ ගුණ කිරීමේ උපක්‍රමයෙන් ඉක්මනින් ගණන් කරමු! 📦",
+            "child_prompt_en": "Let's multiply to quickly find the total pencils in all 4 boxes! 📦",
             "english_translation": "If each box has 6 pencils, how many pencils are there altogether in 4 such boxes?",
             "operands": [6, 4],
             "operation": "MUL",
             "expected_answer": 24,
             "difficulty": "MEDIUM",
-            "page_number": 3,
+            "page_number": 1,
             "is_money": False,
         },
         {
-            "problem_id": "G3-DIV-003",
+            "problem_id": "G3-DIV-002",
             "grade": 3,
             "topic": "Division",
             "competency_code": "3.2",
             "competency_desc": "සමානව බෙදාදීම (Simple division without remainder)",
             "raw_problem_text": "ළමුන් 4 දෙනෙකු අතර අඹ 20 ක් සමානව බෙදා දුන් විට එක් අයෙකුට ලැබෙන අඹ ගණන කීයද?",
-            "english_translation": "When 20 mangoes are distributed equally among 4 children, how many mangoes does each child get?",
+            "child_prompt_si": "මිතුරන් 4 දෙනා අතරේ රස අඹ 20 සමානව බෙදා දෙමු! එක් අයෙකුට කීයක් ලැබෙයිද? 🥭",
+            "child_prompt_en": "Let's share 20 mangoes equally among 4 friends! How many does each friend get? 🥭",
+            "english_translation": "When 20 mangoes are distributed equally among 4 children, how many does each get?",
             "operands": [20, 4],
             "operation": "DIV",
             "expected_answer": 5,
             "difficulty": "MEDIUM",
+            "page_number": 2,
+            "is_money": False,
+        },
+        {
+            "problem_id": "G3-MON-003",
+            "grade": 3,
+            "topic": "Money",
+            "competency_code": "3.3",
+            "competency_desc": "මුදල් හා ශේෂය ගණනය කිරීම (Multi-stage currency computation)",
+            "raw_problem_text": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
+            "child_prompt_si": "පොත සහ පෑන ගෙන රුපියල් 100 ක් දුන් විට කඩකාර මාමාගෙන් ලැබෙන ඉතිරි මුදල ගණනය කරමු! 🛒",
+            "child_prompt_en": "After buying a book and pen with Rs. 100, what is the balance money returned? 🛒",
+            "english_translation": "Kamal bought a book for Rs. 50 and a pen for Rs. 20. He gave Rs. 100 to the shopkeeper. How much is the balance?",
+            "operands": [50, 20],
+            "operation": "ADD",
+            "expected_answer": 30,
+            "difficulty": "HARD",
+            "page_number": 3,
+            "is_money": True,
+        },
+        {
+            "problem_id": "G3-FRC-004",
+            "grade": 3,
+            "topic": "Fractions",
+            "competency_code": "3.4",
+            "competency_desc": "සරල භාග හඳුනාගැනීම - අඩක් සහ කාලක් (Fractions: 1/2 and 1/4)",
+            "raw_problem_text": "ඇපල් ගෙඩියක් සමාන කොටස් 2 කට කැපූ විට එක් කොටසක් හඳුන්වන්නේ කෙසේද?",
+            "child_prompt_si": "ඇපල් ගෙඩියෙන් හරියටම භාගයක් (අඩක්) ගජාට පෙන්වමු! 🍎",
+            "child_prompt_en": "Let's show Gaja exactly half (1/2) of the apple! 🍎",
+            "english_translation": "When an apple is cut into 2 equal parts, what is one part called?",
+            "operands": [2],
+            "operation": "IDENTIFY",
+            "expected_answer": 2,
+            "visual_props": {"fraction": "1/2", "name_si": "අඩක්"},
+            "difficulty": "EASY",
             "page_number": 4,
             "is_money": False,
         },
@@ -452,12 +562,14 @@ CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
             "competency_code": "4.1",
             "competency_desc": "ද්විත්ව සංඛ්‍යා ගුණ කිරීම (Multi-digit multiplication)",
             "raw_problem_text": "එක් පාසල් බෑගයක මිල රුපියල් 250 කි. එවැනි බෑග් 3 ක මුළු මිල රුපියල් කීයද?",
+            "child_prompt_si": "ගජාගේ වික්‍රමාන්විත ගවේෂණය: රුපියල් 250 පාසල් බෑග් 3 ක මුළු මුදල ගණනය කරමු! 🎒",
+            "child_prompt_en": "Gaja's Quest: Calculate the total cost of 3 school bags priced at Rs. 250 each! 🎒",
             "english_translation": "The price of one school bag is Rs. 250. What is the total price in rupees of 3 such bags?",
             "operands": [250, 3],
             "operation": "MUL",
             "expected_answer": 750,
             "difficulty": "MEDIUM",
-            "page_number": 2,
+            "page_number": 1,
             "is_money": True,
         },
         {
@@ -467,10 +579,29 @@ CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
             "competency_code": "4.2",
             "competency_desc": "ශේෂය සහිත හෝ රහිත බෙදීම (Division with word problems)",
             "raw_problem_text": "පොත් 84 ක් ළමුන් 4 දෙනෙකු අතර සමානව බෙදූ විට එක් අයෙකුට ලැබෙන පොත් ගණන කීයද?",
+            "child_prompt_si": "පොත් 84 මිතුරන් 4 දෙනා අතරේ සමානව බෙදා දෙමු! එක් අයෙකුට පොත් කීයක් ලැබේද? 📚",
+            "child_prompt_en": "Let's divide 84 books equally among 4 children! How many books does each child get? 📚",
             "english_translation": "If 84 books are divided equally among 4 children, how many books does each child receive?",
             "operands": [84, 4],
             "operation": "DIV",
             "expected_answer": 21,
+            "difficulty": "MEDIUM",
+            "page_number": 2,
+            "is_money": False,
+        },
+        {
+            "problem_id": "G4-MTR-003",
+            "grade": 4,
+            "topic": "Measurement",
+            "competency_code": "4.3",
+            "competency_desc": "දිග මිනුම් හා ඒකක පරිවර්තනය (Metric length conversion: m to cm)",
+            "raw_problem_text": "මීටර 3 ක දිග රෙදි පටියක සෙන්ටිමීටර කීයක් තිබේද?",
+            "child_prompt_si": "මීටර 3 ක දිගු රෙදි පටියේ සෙන්ටිමීටර ගණන ගජා සමඟ මැන බලමු! 📏",
+            "child_prompt_en": "How many centimeters are there in a 3-meter ribbon? 📏",
+            "english_translation": "How many centimeters are in a 3-meter ribbon?",
+            "operands": [3, 100],
+            "operation": "MUL",
+            "expected_answer": 300,
             "difficulty": "MEDIUM",
             "page_number": 3,
             "is_money": False,
@@ -484,6 +615,8 @@ CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
             "competency_code": "5.1",
             "competency_desc": "ශිෂ්‍යත්ව මට්ටමේ මුදල් හා ලාභ/අලාභ ගැටලු (Scholarship exam multi-step word problems)",
             "raw_problem_text": "සමන් රුපියල් 1200 කට ඇඳුමක් සහ රුපියල් 450 කට සපත්තු යුගලක් මිලදී ගත්තේය. ඔහු රුපියල් 2000 ක් ගෙවූ විට ලැබෙන ඉතිරිය කීයද?",
+            "child_prompt_si": "ශිෂ්‍යත්ව අභියෝගය: රුපියල් 2000 ක් ගෙවූ විට ලැබෙන ඉතිරි මුදල පියවරෙන් පියවර ගණනය කරමු! 🏆",
+            "child_prompt_en": "Scholarship Challenge: Calculate the exact balance returned from Rs. 2000! 🏆",
             "english_translation": "Saman bought a dress for Rs. 1200 and shoes for Rs. 450. When he paid Rs. 2000, what was the balance received?",
             "operands": [1200, 450],
             "operation": "ADD",
@@ -499,12 +632,14 @@ CURRICULUM_MATRIX: Dict[int, List[Dict[str, Any]]] = {
             "competency_code": "5.2",
             "competency_desc": "ගුණ කිරීම හා ඒකක පරිවර්තනය (Compound multiplication)",
             "raw_problem_text": "දිනකට කිරි ලීටර් 15 ක් ලබා දෙන ගවයෙකුගෙන් දින 12 ක් තුළ ලබාගත හැකි මුළු කිරි ලීටර් ප්‍රමාණය කීයද?",
+            "child_prompt_si": "දින 12 කදී ලැබෙන මුළු කිරි ලීටර් ප්‍රමාණය ගජා සමඟ ගණනය කරමු! 🥛",
+            "child_prompt_en": "How many total liters of milk can be obtained across 12 days? 🥛",
             "english_translation": "How many total liters of milk can be obtained in 12 days from a cow that gives 15 liters of milk per day?",
             "operands": [15, 12],
             "operation": "MUL",
             "expected_answer": 180,
             "difficulty": "MEDIUM",
-            "page_number": 3,
+            "page_number": 2,
             "is_money": False,
         },
     ],
@@ -650,18 +785,33 @@ DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are math
                         ans = calc_ans
 
                     if MathVerificationService.verify_grade_invariants(grade, ops, op):
+                        raw_txt = item.get("raw_problem_text", "")
+                        child_si = item.get("child_prompt_si")
+                        child_en = item.get("child_prompt_en")
+                        if not child_si:
+                            child_si, child_en = format_child_friendly_question(
+                                grade=grade,
+                                topic=item.get("topic", ""),
+                                raw_text=raw_txt,
+                                operation=op,
+                                visual_props=item.get("visual_props"),
+                            )
+
                         prob = CurriculumProblem(
                             problem_id=item.get("problem_id", f"G{grade}-LLM-{uuid.uuid4().hex[:4]}"),
                             doc_id=doc_id,
                             grade=grade,
-                            topic=item.get("topic", topic or ("Counting" if grade == 1 else "Mathematics")),
+                            topic=item.get("topic", topic or ("Shapes" if grade == 1 else "Mathematics")),
                             competency_code=item.get("competency_code", f"{grade}.1"),
                             competency_desc=item.get("competency_desc", "Competency extraction"),
-                            raw_problem_text=item.get("raw_problem_text", ""),
+                            raw_problem_text=raw_txt,
+                            child_prompt_si=child_si,
+                            child_prompt_en=child_en,
                             english_translation=item.get("english_translation", ""),
                             operands=ops,
                             operation=op,
                             expected_answer=ans,
+                            visual_props=item.get("visual_props", {}),
                             difficulty=item.get("difficulty", "EASY" if grade == 1 else "MEDIUM"),
                             page_number=item.get("page_number", 1),
                             is_money=bool(item.get("is_money", False)),
@@ -681,6 +831,16 @@ DO NOT invent arbitrary arithmetic: ensure operands and expected_answer are math
         for p_dict in grade_problems:
             p = dict(p_dict)
             p["doc_id"] = doc_id
+            if "child_prompt_si" not in p or not p["child_prompt_si"]:
+                c_si, c_en = format_child_friendly_question(
+                    grade=grade,
+                    topic=p.get("topic", ""),
+                    raw_text=p.get("raw_problem_text", ""),
+                    operation=p.get("operation"),
+                    visual_props=p.get("visual_props"),
+                )
+                p["child_prompt_si"] = c_si
+                p["child_prompt_en"] = c_en
             MathVerificationService.verify_calculation(p["operands"], p["operation"], p["expected_answer"])
             extracted_problems.append(CurriculumProblem(**p))
 

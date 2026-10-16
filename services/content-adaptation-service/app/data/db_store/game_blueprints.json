@@ -2957,5 +2957,136 @@
       "raw_sinhala_question": "පන්තියේ පිරිමි ළමුන් 14 ක් සහ ගැහැනු ළමුන් 15 ක් සිටිති. පන්තියේ සිටින මුළු ළමුන් ගණන කීයද?"
     },
     "_id": "01f3c4d6e0ca4644a65dec2dc4dd05ad"
+  },
+  {
+    "activity_id": "act_aa940d7cfe",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව තෝරන්න.",
+    "blueprint": {
+      "activity_id": "act_aa940d7cfe",
+      "source_question_id": "G1-CNT-001",
+      "grade": 1,
+      "topic": "Counting",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
+          "instruction_en": "Find and count the items in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "5",
+          "game_options": [
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            },
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            }
+          ],
+          "operands": [
+            5
+          ],
+          "operation": "COUNT"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "නිවැරදි පිළිතුර තෝරන්න",
+          "instruction_en": "Select the correct count or answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "5",
+          "game_options": [
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            },
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            }
+          ],
+          "operands": [
+            5
+          ],
+          "operation": "COUNT"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ අඹ වෙළඳපොළේදී",
+        "title_en": "Mango Market Adventure with Gaja",
+        "backdrop_si": "අපි අද ගම්මානයේ සජීවී පොළට ගොස් නැවුම් සහ සුවඳවත් අඹ ගණන් කරමු!",
+        "backdrop_en": "Let's visit the lively village market today to count fresh and fragrant mangoes!",
+        "quest_goal_si": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව සොයා ගැනීමට ගජාට උදව් කරන්න.",
+        "quest_goal_en": "Help Gaja count the 5 mangoes in the basket and select the correct number.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් පුංචි යාළුවා! මම ගජා. අද අපි පොළේ අඹ කූඩය ළඟ ඉන්නේ. කූඩයේ අඹ කීයක් තියෙනවද බලමුද?",
+            "en": "Hello little friend! I am Gaja. Today we are at the market near the mango basket. Shall we see how many mangoes are in the basket?"
+          },
+          "hint": {
+            "si": "සෙමින්, එකින් එක අඹ මත අත තබා ගණන් කරන්න. මම ඔයාත් එක්කම ඉන්නවා!",
+            "en": "Take your time, touch and count the mangoes one by one. I am right here with you!"
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා හරිම දක්ෂයි!",
+            "en": "Awesome! You are super smart!"
+          },
+          "retry": {
+            "si": "කමක් නෑ පුංචි යාළුවා, අපි නැවත වතාවක් සෙමින් ගණන් කරමු!",
+            "en": "That's okay little friend, let's count slowly once more!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි සාර්ථකව අඹ ගණන් කළා!",
+            "en": "Quest Complete! We successfully counted the mangoes!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව තෝරන්න."
+    },
+    "_id": "d990f9c898de4278b353b6a91cba59ca"
   }
 ]

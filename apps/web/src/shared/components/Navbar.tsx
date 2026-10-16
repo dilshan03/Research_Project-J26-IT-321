@@ -1,178 +1,261 @@
-import { useState } from 'react';
-import { ArrowRight, User as UserIcon, LogOut, Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import {
+  ArrowRight,
+  Menu,
+  X,
+  LayoutDashboard,
+  LogOut,
+} from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { UserMenu } from './UserMenu';
 
-export const Navbar = () => {
+export const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Close menus on route/hash changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname, location.hash]);
+
+  const isHome = location.pathname === '/';
+  const dashboardLink = user?.role === 'teacher' ? '/teacher/dashboard' : '/parent/dashboard';
+  const dashboardLabel = user?.role === 'teacher' ? 'Teacher Dashboard' : 'Parent Dashboard';
+
+  const handleSignOut = () => {
+    setIsMobileMenuOpen(false);
+    logout();
+  };
+
   return (
-    <nav className="w-full bg-mq-surface/95 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b border-mq-border">
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-5 lg:px-6 xl:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-2 lg:gap-3 xl:gap-6 min-w-0">
-        {/* Left: Branding */}
-        <Link to="/" className="flex flex-col shrink-0 min-w-0 text-left group">
-          <h1 className="text-xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight flex items-center">
+    <nav
+      className="w-full bg-white/95 backdrop-blur-md sticky top-0 z-50 shadow-xs border-b border-mq-border h-16"
+      aria-label="Main Public Navigation"
+    >
+      <div className="w-full max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
+        {/* ========================================================= */}
+        {/* 1. Left: Branding & Logo                                  */}
+        {/* ========================================================= */}
+        <Link
+          to="/"
+          className="flex flex-col shrink-0 min-w-0 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary/40 rounded-lg p-0.5"
+          aria-label="MathQuest Home"
+        >
+          <span className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center">
             <span className="text-mq-primary-dark">Math</span>
             <span className="text-mq-secondary">Quest</span>
-            <span className="text-mq-accent-yellow ml-0.5 sm:ml-1 text-2xl sm:text-3xl xl:text-4xl leading-none -mt-2 sm:-mt-2.5 xl:-mt-3">*</span>
-          </h1>
-          <span className="text-mq-text-muted text-[9px] sm:text-[10px] xl:text-xs font-semibold tracking-wider xl:tracking-widest uppercase mt-0.5 whitespace-nowrap">
+            <span className="text-mq-accent-yellow ml-0.5 sm:ml-1 text-2xl leading-none -mt-2">
+              *
+            </span>
+          </span>
+          <span className="text-mq-text-muted text-[9px] sm:text-[10px] font-semibold tracking-wider uppercase mt-0.5 whitespace-nowrap">
             Small Steps Big Progress
           </span>
         </Link>
 
-        {/* Center: Desktop Navigation Links (Visible on lg screens 1024px+) */}
-        <div className="hidden lg:flex items-center gap-1.5 xl:gap-3 2xl:gap-5 font-semibold text-mq-text text-xs xl:text-[14px] 2xl:text-[15px] min-w-0">
-          <a href="#" className="text-mq-primary relative font-bold whitespace-nowrap px-1.5 py-1 xl:px-2.5">
+        {/* ========================================================= */}
+        {/* 2. Center: Public Website Navigation Links (Desktop)      */}
+        {/* ========================================================= */}
+        <div className="hidden lg:flex items-center gap-1.5 xl:gap-3 font-semibold text-xs xl:text-sm">
+          <Link
+            to="/"
+            className={`py-1.5 px-3 rounded-lg transition-colors whitespace-nowrap ${
+              isHome
+                ? 'text-mq-primary font-bold'
+                : 'text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft'
+            }`}
+          >
             Home
-            <span className="absolute bottom-0 left-1.5 right-1.5 xl:left-2.5 xl:right-2.5 h-[2.5px] bg-mq-primary rounded-full"></span>
-          </a>
-          <a href="#" className="hover:text-mq-primary transition-colors whitespace-nowrap px-1.5 py-1 xl:px-2.5">
+          </Link>
+
+          <a
+            href="/#features"
+            className="py-1.5 px-3 text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft rounded-lg transition-colors whitespace-nowrap"
+          >
             Features
           </a>
-          <a href="#" className="hover:text-mq-primary transition-colors whitespace-nowrap px-1.5 py-1 xl:px-2.5">
+          <a
+            href="/#for-parents-teachers"
+            className="py-1.5 px-3 text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft rounded-lg transition-colors whitespace-nowrap"
+          >
             For Parents & Teachers
           </a>
-          <a href="#" className="hover:text-mq-primary transition-colors whitespace-nowrap px-1.5 py-1 xl:px-2.5">
+          <a
+            href="/#about"
+            className="py-1.5 px-3 text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft rounded-lg transition-colors whitespace-nowrap"
+          >
             About
           </a>
-          <a href="#" className="hover:text-mq-primary transition-colors whitespace-nowrap px-1.5 py-1 xl:px-2.5">
+          <a
+            href="/#contact"
+            className="py-1.5 px-3 text-mq-text hover:text-mq-primary hover:bg-mq-surface-soft rounded-lg transition-colors whitespace-nowrap"
+          >
             Contact
           </a>
         </div>
 
-        {/* Right: Authentication & Action Buttons (Visible on lg screens 1024px+) */}
-        <div className="hidden lg:flex items-center gap-1.5 xl:gap-2.5 shrink-0">
+        {/* ========================================================= */}
+        {/* 3. Right: Contextual Portal CTA & Profile / Sign In       */}
+        {/* ========================================================= */}
+        <div className="hidden lg:flex items-center gap-3 shrink-0">
           {isAuthenticated && user ? (
-            <div className="flex items-center gap-1.5 xl:gap-2">
-              {/* Compact User Profile Badge */}
+            <div className="flex items-center gap-3">
               <Link
-                to="/profile"
-                className="flex items-center gap-1.5 px-2 py-1 bg-mq-surface-blue border border-mq-border hover:border-mq-primary/60 hover:bg-mq-surface-soft active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-mq-primary/40 rounded-full shadow-sm max-w-[115px] xl:max-w-[155px] shrink-0 transition-all cursor-pointer group"
-                title="View Profile"
-                aria-label="View user profile"
+                to={dashboardLink}
+                className="btn btn-primary text-xs py-2 px-4 rounded-full whitespace-nowrap inline-flex items-center gap-1.5 shadow-xs"
               >
-                <div className="w-5 h-5 xl:w-6 xl:h-6 bg-mq-primary group-hover:bg-mq-primary-hover text-white rounded-full flex items-center justify-center font-bold text-[10px] xl:text-xs shrink-0 transition-colors">
-                  {user.fullName ? user.fullName.charAt(0).toUpperCase() : <UserIcon size={12} />}
-                </div>
-                <div className="flex flex-col text-left overflow-hidden min-w-0">
-                  <span className="text-[11px] xl:text-xs font-bold text-mq-text-strong group-hover:text-mq-primary leading-tight truncate transition-colors">
-                    {user.fullName || user.email.split('@')[0]}
-                  </span>
-                  <span className="text-[8px] xl:text-[9px] font-semibold text-mq-primary capitalize leading-none">
-                    {user.role}
-                  </span>
-                </div>
+                <LayoutDashboard size={14} />
+                <span>{dashboardLabel}</span>
+                <ArrowRight size={13} strokeWidth={2.5} />
               </Link>
 
-              {/* Sign Out Button */}
-              <button
-                onClick={logout}
-                className="btn btn-secondary text-xs py-1.5 px-2 xl:px-3 rounded-full flex items-center gap-1 text-mq-text-muted hover:text-mq-danger hover:border-mq-danger/40 transition-colors whitespace-nowrap shrink-0"
-                title="Sign Out"
-              >
-                <LogOut size={13} />
-                <span>Sign Out</span>
-              </button>
+              <UserMenu />
             </div>
           ) : (
-            <Link to="/sign-in" className="btn btn-secondary text-xs xl:text-sm py-1.5 px-2.5 xl:px-3.5 whitespace-nowrap shrink-0">
-              Sign In
+            <div className="flex items-center gap-2">
+              <Link
+                to="/sign-in"
+                className="btn btn-secondary text-xs py-1.5 px-4 rounded-full whitespace-nowrap"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/sign-up"
+                className="btn btn-primary text-xs py-1.5 px-4 rounded-full whitespace-nowrap inline-flex items-center gap-1.5"
+              >
+                <span>Start Learning</span>
+                <ArrowRight size={13} strokeWidth={2.5} />
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* ========================================================= */}
+        {/* 4. Mobile Navigation Menu Toggle                          */}
+        {/* ========================================================= */}
+        <div className="flex items-center gap-2 lg:hidden shrink-0">
+          {isAuthenticated && (
+            <Link
+              to={dashboardLink}
+              className="btn btn-primary text-xs py-1.5 px-3 rounded-full inline-flex items-center gap-1"
+            >
+              <span>Dashboard</span>
+              <ArrowRight size={12} strokeWidth={2.5} />
             </Link>
           )}
 
-          <button className="btn btn-primary text-xs xl:text-sm py-1.5 px-2.5 xl:px-3.5 whitespace-nowrap shrink-0">
-            Start Learning <ArrowRight size={14} className="xl:w-[15px] xl:h-[15px]" strokeWidth={3} />
-          </button>
-        </div>
-
-        {/* Hamburger Menu Button & Mobile/Tablet Action (Visible below lg screens < 1024px) */}
-        <div className="flex items-center gap-2 lg:hidden shrink-0">
-          {/* Quick Action Button on Tablet */}
-          <button className="hidden sm:inline-flex btn btn-primary text-xs py-1.5 px-3 whitespace-nowrap">
-            Start Learning <ArrowRight size={14} strokeWidth={3} />
-          </button>
-
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-xl text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft transition-colors outline-none border border-mq-border/50"
-            aria-label="Toggle Navigation Menu"
+            type="button"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            className="p-2 rounded-xl text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary border border-mq-border/60"
+            aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-navigation-menu"
           >
-            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile / Tablet Dropdown Menu */}
+      {/* ========================================================= */}
+      {/* 5. Mobile & Tablet Collapsible Menu Drawer                */}
+      {/* ========================================================= */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-mq-border bg-mq-surface px-6 py-4 space-y-4 animate-fade-in shadow-lg">
-          <div className="flex flex-col space-y-2.5 font-semibold text-mq-text text-sm">
-            <a href="#" className="text-mq-primary font-bold py-1" onClick={() => setIsMobileMenuOpen(false)}>
+        <div
+          id="mobile-navigation-menu"
+          className="lg:hidden border-t border-mq-border bg-white px-5 py-4 space-y-4 animate-fade-in shadow-xl"
+        >
+          {/* Public Links */}
+          <div className="flex flex-col space-y-1 font-semibold text-mq-text text-sm">
+            <Link
+              to="/"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`py-2 px-3 rounded-xl transition-colors ${
+                isHome
+                  ? 'bg-mq-surface-blue text-mq-primary font-bold'
+                  : 'hover:bg-mq-surface-soft hover:text-mq-primary'
+              }`}
+            >
               Home
-            </a>
-            <a href="#" className="hover:text-mq-primary py-1" onClick={() => setIsMobileMenuOpen(false)}>
+            </Link>
+            <a
+              href="/#features"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="py-2 px-3 rounded-xl hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
+            >
               Features
             </a>
-            <a href="#" className="hover:text-mq-primary py-1" onClick={() => setIsMobileMenuOpen(false)}>
+            <a
+              href="/#for-parents-teachers"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="py-2 px-3 rounded-xl hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
+            >
               For Parents & Teachers
             </a>
-            <a href="#" className="hover:text-mq-primary py-1" onClick={() => setIsMobileMenuOpen(false)}>
+            <a
+              href="/#about"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="py-2 px-3 rounded-xl hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
+            >
               About
             </a>
-            <a href="#" className="hover:text-mq-primary py-1" onClick={() => setIsMobileMenuOpen(false)}>
+            <a
+              href="/#contact"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="py-2 px-3 rounded-xl hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
+            >
               Contact
             </a>
           </div>
 
+          {/* Mobile Profile & Actions Section */}
           <div className="pt-3 border-t border-mq-border flex flex-col gap-2.5">
             {isAuthenticated && user ? (
               <>
                 <Link
-                  to="/profile"
+                  to={dashboardLink}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 bg-mq-surface-blue border border-mq-border hover:border-mq-primary/60 hover:bg-mq-surface-soft active:scale-[0.99] focus:outline-none focus:ring-2 focus:ring-mq-primary/40 rounded-2xl transition-all cursor-pointer group"
-                  title="View Profile"
-                  aria-label="View user profile"
+                  className="btn btn-primary w-full justify-center gap-2 text-xs py-2.5 rounded-xl font-bold"
                 >
-                  <div className="w-8 h-8 bg-mq-primary group-hover:bg-mq-primary-hover text-white rounded-full flex items-center justify-center font-bold text-sm shrink-0 transition-colors">
-                    {user.fullName ? user.fullName.charAt(0).toUpperCase() : <UserIcon size={16} />}
-                  </div>
-                  <div className="flex flex-col text-left overflow-hidden">
-                    <span className="text-sm font-bold text-mq-text-strong group-hover:text-mq-primary truncate transition-colors">
-                      {user.fullName || user.email.split('@')[0]}
-                    </span>
-                    <span className="text-xs font-semibold text-mq-primary capitalize">
-                      {user.role}
-                    </span>
-                  </div>
+                  <LayoutDashboard size={15} />
+                  <span>Go to {dashboardLabel}</span>
                 </Link>
+
                 <button
-                  onClick={() => {
-                    logout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="btn btn-secondary w-full justify-center gap-2 text-xs py-2 text-mq-danger hover:bg-mq-danger-bg"
+                  type="button"
+                  onClick={handleSignOut}
+                  className="btn btn-secondary w-full justify-center gap-2 text-xs py-2 rounded-xl text-mq-danger hover:bg-mq-danger-bg border-mq-border"
                 >
-                  <LogOut size={16} /> Sign Out
+                  <LogOut size={15} />
+                  <span>Sign Out ({user.email})</span>
                 </button>
               </>
             ) : (
-              <Link
-                to="/sign-in"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="btn btn-secondary w-full justify-center text-xs py-2"
-              >
-                Sign In
-              </Link>
+              <div className="flex flex-col gap-2 pt-1">
+                <Link
+                  to="/sign-in"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="btn btn-secondary w-full justify-center text-xs py-2.5 rounded-full font-bold"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/sign-up"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="btn btn-primary w-full justify-center text-xs py-2.5 rounded-full font-bold inline-flex items-center gap-2"
+                >
+                  <span>Start Learning</span>
+                  <ArrowRight size={14} strokeWidth={2.5} />
+                </Link>
+              </div>
             )}
-
-            <button className="btn btn-primary w-full justify-center text-xs py-2">
-              Start Learning <ArrowRight size={16} strokeWidth={3} />
-            </button>
           </div>
         </div>
       )}
     </nav>
   );
 };
+
+export default Navbar;

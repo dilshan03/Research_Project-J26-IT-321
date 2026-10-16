@@ -1,0 +1,143 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SanitizedLearnerProfileResponse",
+  "description": "Standard cross-component contract for sanitized ELP-X learner profile consumed by Content Adaptation and Pedagogical Engine. Excludes sensitive parent questionnaire notes and psychological diagnostic scales.",
+  "type": "object",
+  "properties": {
+    "learnerId": {
+      "type": "string",
+      "description": "Unique identifier of the child learner profile"
+    },
+    "grade": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5,
+      "description": "Primary school grade level (1 to 5)"
+    },
+    "preferredLanguage": {
+      "type": "string",
+      "enum": ["Sinhala", "English", "Bilingual"],
+      "default": "Sinhala"
+    },
+    "profileVersion": {
+      "type": "string",
+      "const": "ELP-X-PROFILE-v1.0"
+    },
+    "algorithmVersion": {
+      "type": "string",
+      "const": "ELP-X-v1.0"
+    },
+    "evidenceStatus": {
+      "type": "string",
+      "enum": ["SUFFICIENT", "INSUFFICIENT"]
+    },
+    "isOverallEvidenceSufficient": {
+      "type": "boolean"
+    },
+    "totalDistinctQuestionsEvaluated": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "skillId": { "type": "string" },
+          "skillName": { "type": "string" },
+          "skillNameSi": { "type": "string" },
+          "distinctQuestionsAssessed": { "type": "integer", "minimum": 0 },
+          "correctFirstResponses": { "type": "integer", "minimum": 0 },
+          "rawAccuracy": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+          "rawAccuracyPercentage": { "type": "number", "minimum": 0.0, "maximum": 100.0 },
+          "posteriorAlpha": { "type": "number" },
+          "posteriorBeta": { "type": "number" },
+          "estimatedProficiency": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+          "estimatedProficiencyPercentage": { "type": "number", "minimum": 0.0, "maximum": 100.0 },
+          "credibleInterval": {
+            "type": "object",
+            "properties": {
+              "lower": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "upper": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+              "confidenceLevel": { "type": "number", "default": 0.95 }
+            },
+            "required": ["lower", "upper", "confidenceLevel"]
+          },
+          "credibleIntervalWidth": { "type": "number" },
+          "posteriorVariance": { "type": "number" },
+          "evidenceSufficiency": {
+            "type": "string",
+            "enum": ["SUFFICIENT", "INSUFFICIENT"]
+          },
+          "isEvidenceSufficient": { "type": "boolean" },
+          "provisionalSkillLevel": {
+            "type": "string",
+            "enum": ["INSUFFICIENT_EVIDENCE", "EMERGING", "DEVELOPING", "PROFICIENT"]
+          },
+          "isProvisional": { "type": "boolean", "default": true }
+        },
+        "required": [
+          "skillId",
+          "distinctQuestionsAssessed",
+          "correctFirstResponses",
+          "rawAccuracy",
+          "estimatedProficiency",
+          "credibleInterval",
+          "provisionalSkillLevel",
+          "isEvidenceSufficient"
+        ]
+      }
+    },
+    "pedagogicalRecommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "recommendationId": { "type": "string" },
+          "skillId": { "type": ["string", "null"] },
+          "strategyCode": { "type": "string" },
+          "reasonCodes": { "type": "array", "items": { "type": "string" } },
+          "inputEvidenceSummary": { "type": "object" },
+          "recommendationRulesetVersion": { "type": "string" },
+          "titleEn": { "type": "string" },
+          "titleSi": { "type": "string" },
+          "descriptionEn": { "type": "string" },
+          "descriptionSi": { "type": "string" }
+        },
+        "required": [
+          "recommendationId",
+          "strategyCode",
+          "reasonCodes",
+          "inputEvidenceSummary",
+          "recommendationRulesetVersion"
+        ]
+      }
+    },
+    "learningAdaptations": {
+      "type": "object",
+      "properties": {
+        "visualAssistance": { "type": "string" },
+        "audioAssistance": { "type": "string" },
+        "activityPace": { "type": "string" },
+        "hintStyle": { "type": "string" },
+        "celebrationStyle": { "type": "string" }
+      }
+    },
+    "lastUpdated": { "type": "string", "format": "date-time" },
+    "disclaimer": { "type": "string" }
+  },
+  "required": [
+    "learnerId",
+    "grade",
+    "profileVersion",
+    "algorithmVersion",
+    "evidenceStatus",
+    "isOverallEvidenceSufficient",
+    "totalDistinctQuestionsEvaluated",
+    "skills",
+    "pedagogicalRecommendations",
+    "learningAdaptations",
+    "lastUpdated",
+    "disclaimer"
+  ]
+}

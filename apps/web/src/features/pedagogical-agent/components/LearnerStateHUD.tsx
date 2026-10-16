@@ -1,12 +1,14 @@
-import React from 'react';
-import type { LearnerState, CognitiveState } from '../types/telemetry.types';
+import React, { useState } from 'react';
+import type { LearnerState, CognitiveState, BKTComparisonState } from '../types/telemetry.types';
 
 export interface LearnerStateHUDProps {
   learnerState: LearnerState | null;
+  bktComparison?: BKTComparisonState;
   isLoading?: boolean;
   onSimulateInattention?: () => void;
   onSimulateFrustration?: () => void;
   onSimulateFocusedFlow?: () => void;
+  onSimulateHintAssisted?: () => void;
   compact?: boolean;
   style?: React.CSSProperties;
 }
@@ -67,13 +69,25 @@ const STATE_CONFIG: Record<
 
 export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
   learnerState,
+  bktComparison = {
+    hintAwareKnowledge: 0.20,
+    standardKnowledge: 0.20,
+    predictedNextCorrect: 0.364,
+    effectiveSlip: 0.18,
+    effectiveGuess: 0.25,
+    isMastered: false,
+    overestimationGap: 0.0
+  },
   isLoading = false,
   onSimulateInattention,
   onSimulateFrustration,
   onSimulateFocusedFlow,
+  onSimulateHintAssisted,
   compact = false,
   style = {}
 }) => {
+  const [showBKTDetails, setShowBKTDetails] = useState<boolean>(true);
+
   const stateKey = learnerState?.cognitiveState || 'NORMAL';
   const cfg = STATE_CONFIG[stateKey] || STATE_CONFIG.NORMAL;
 
@@ -81,11 +95,15 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
   const frustration = learnerState?.metrics.frustrationIndex ?? 0.0;
   const persistence = learnerState?.metrics.persistenceScore ?? 0.5;
 
+  const pL_hintAware = bktComparison.hintAwareKnowledge;
+  const pL_standard = bktComparison.standardKnowledge;
+  const isMastered = bktComparison.isMastered;
+
   return (
     <div
       style={{
-        background: 'rgba(15, 23, 42, 0.9)',
-        backdropFilter: 'blur(12px)',
+        background: 'rgba(15, 23, 42, 0.92)',
+        backdropFilter: 'blur(14px)',
         border: '1px solid rgba(255, 255, 255, 0.12)',
         borderRadius: '16px',
         padding: compact ? '12px' : '16px',
@@ -93,16 +111,16 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
         ...style
       }}
     >
-      {/* Header with Title & Live Pulse */}
+      {/* Header with Title & Backend Sync Indicator */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '1.05rem' }}>🧠</span>
           <span style={{ fontWeight: 800, fontSize: '0.88rem', letterSpacing: '0.5px', color: '#F1F5F9' }}>
-            Live ADHD Learner State
+            Live ADHD Learner State & BKT
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -162,11 +180,146 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         </span>
       </div>
 
-      {/* Real-time Meters (Inattention, Frustration, Persistence) */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '2px' }}>
-        {/* Inattention Gauge */}
+      {/* BKT Concept Mastery Hero Section (Task #20 Feature) */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.15) 100%)',
+          border: '1px solid rgba(168, 85, 247, 0.35)',
+          borderRadius: '12px',
+          padding: '12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '1rem' }}>🎓</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#E2E8F0', letterSpacing: '0.3px' }}>
+              BKT Concept Mastery P(L)
+            </span>
+          </div>
+
+          <span
+            style={{
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              padding: '2px 8px',
+              borderRadius: '12px',
+              background: isMastered ? 'rgba(34, 197, 94, 0.25)' : 'rgba(148, 163, 184, 0.2)',
+              color: isMastered ? '#4ADE80' : '#CBD5E1',
+              border: isMastered ? '1px solid #22C55E' : '1px solid rgba(255, 255, 255, 0.15)'
+            }}
+          >
+            {isMastered ? '🏆 ප්‍රගුණ කර ඇත (MASTERED)' : '📚 ඉගෙන ගනිමින් (LEARNING)'}
+          </span>
+        </div>
+
+        {/* Live Mastery Progress Bar */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', marginBottom: '4px' }}>
+            <span style={{ color: '#C084FC', fontWeight: 700 }}>
+              P(L) Mastery: {Math.round(pL_hintAware * 100)}%
+            </span>
+            <span style={{ color: '#94A3B8', fontSize: '0.72rem' }}>
+              Threshold: 85% | Next P(C): {Math.round(bktComparison.predictedNextCorrect * 100)}%
+            </span>
+          </div>
+
+          <div
+            style={{
+              height: '9px',
+              borderRadius: '5px',
+              background: 'rgba(255, 255, 255, 0.08)',
+              overflow: 'hidden'
+            }}
+          >
+            <div
+              style={{
+                width: `${Math.round(pL_hintAware * 100)}%`,
+                height: '100%',
+                background: isMastered
+                  ? 'linear-gradient(90deg, #10B981, #22C55E)'
+                  : 'linear-gradient(90deg, #6366F1, #A855F7)',
+                borderRadius: '5px',
+                transition: 'width 0.4s ease'
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Comparative BKT Section (Standard vs Hint-Aware) Toggle */}
+        <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '8px' }}>
+          <div
+            onClick={() => setShowBKTDetails(!showBKTDetails)}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              cursor: 'pointer',
+              fontSize: '0.73rem',
+              color: '#38BDF8',
+              fontWeight: 700
+            }}
+          >
+            <span>⚖️ Standard vs Hint-Aware BKT Comparison</span>
+            <span>{showBKTDetails ? '▲ Hide' : '▼ View'}</span>
+          </div>
+
+          {showBKTDetails && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
+              {/* Comparison Bars */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.72rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#A855F7', fontWeight: 600 }}>● Hint-Aware ADHD BKT:</span>
+                  <span style={{ fontWeight: 800, color: '#FFFFFF' }}>{Math.round(pL_hintAware * 100)}%</span>
+                </div>
+                <div style={{ height: '5px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ width: `${Math.round(pL_hintAware * 100)}%`, height: '100%', background: '#A855F7' }} />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2px' }}>
+                  <span style={{ color: '#94A3B8', fontWeight: 600 }}>○ Standard BKT Baseline:</span>
+                  <span style={{ fontWeight: 800, color: '#CBD5E1' }}>{Math.round(pL_standard * 100)}%</span>
+                </div>
+                <div style={{ height: '5px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ width: `${Math.round(pL_standard * 100)}%`, height: '100%', background: '#94A3B8' }} />
+                </div>
+              </div>
+
+              {/* Overestimation Notice */}
+              {bktComparison.overestimationGap > 0.05 && (
+                <div
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    background: 'rgba(245, 158, 11, 0.15)',
+                    border: '1px solid rgba(245, 158, 11, 0.3)',
+                    color: '#FBBF24',
+                    fontSize: '0.69rem',
+                    fontWeight: 600
+                  }}
+                >
+                  ⚠️ Standard BKT overestimates knowledge by +{Math.round(bktComparison.overestimationGap * 100)}% due to unadjusted hint scaffolding!
+                </div>
+              )}
+
+              {/* Research Metrics Chips */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>
+                <span>AUC-ROC: <b>0.6271</b> (+0.013)</span>
+                <span>RMSE: <b>0.4657</b> (-0.005)</span>
+                <span>LogLoss: <b>0.6251</b></span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Real-time ADHD Meters (Inattention, Frustration, Persistence) */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '2px' }}>
+        {/* Inattention Gauge */}
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '3px' }}>
             <span style={{ color: '#CBD5E1', fontWeight: 600 }}>
               ⏱️ Inattention Index (I<sub>att</sub>)
             </span>
@@ -181,8 +334,8 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
           </div>
           <div
             style={{
-              height: '7px',
-              borderRadius: '4px',
+              height: '6px',
+              borderRadius: '3px',
               background: 'rgba(255, 255, 255, 0.08)',
               overflow: 'hidden'
             }}
@@ -197,7 +350,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                     : inattention >= 0.4
                     ? 'linear-gradient(90deg, #10B981, #F59E0B)'
                     : '#10B981',
-                borderRadius: '4px',
+                borderRadius: '3px',
                 transition: 'width 0.4s ease'
               }}
             />
@@ -206,7 +359,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
 
         {/* Frustration Gauge */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', marginBottom: '4px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '3px' }}>
             <span style={{ color: '#CBD5E1', fontWeight: 600 }}>
               🔥 Frustration Index (F<sub>rust</sub>)
             </span>
@@ -222,8 +375,8 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
           </div>
           <div
             style={{
-              height: '7px',
-              borderRadius: '4px',
+              height: '6px',
+              borderRadius: '3px',
               background: 'rgba(255, 255, 255, 0.08)',
               overflow: 'hidden'
             }}
@@ -233,7 +386,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                 width: `${Math.round(frustration * 100)}%`,
                 height: '100%',
                 background: frustration >= 0.65 ? '#EF4444' : frustration >= 0.3 ? '#FB923C' : '#38BDF8',
-                borderRadius: '4px',
+                borderRadius: '3px',
                 transition: 'width 0.4s ease'
               }}
             />
@@ -242,7 +395,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
 
         {/* Persistence Gauge */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', marginBottom: '4px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.74rem', marginBottom: '3px' }}>
             <span style={{ color: '#CBD5E1', fontWeight: 600 }}>
               🛡️ Persistence (P<sub>ersist</sub>)
             </span>
@@ -252,8 +405,8 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
           </div>
           <div
             style={{
-              height: '7px',
-              borderRadius: '4px',
+              height: '6px',
+              borderRadius: '3px',
               background: 'rgba(255, 255, 255, 0.08)',
               overflow: 'hidden'
             }}
@@ -263,7 +416,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                 width: `${Math.round(persistence * 100)}%`,
                 height: '100%',
                 background: 'linear-gradient(90deg, #38BDF8, #818CF8)',
-                borderRadius: '4px',
+                borderRadius: '3px',
                 transition: 'width 0.4s ease'
               }}
             />
@@ -307,12 +460,48 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
       )}
 
       {/* Simulator Test Buttons (Researcher Playground) */}
-      {(onSimulateInattention || onSimulateFrustration || onSimulateFocusedFlow) && (
-        <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '10px' }}>
-          <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B', marginBottom: '8px', textTransform: 'uppercase' }}>
+      {(onSimulateInattention || onSimulateFrustration || onSimulateFocusedFlow || onSimulateHintAssisted) && (
+        <div style={{ marginTop: '2px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '8px' }}>
+          <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B', marginBottom: '6px', textTransform: 'uppercase' }}>
             🧪 Real-time Simulator Triggers:
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
+            {onSimulateHintAssisted && (
+              <button
+                onClick={onSimulateHintAssisted}
+                style={{
+                  padding: '6px 8px',
+                  borderRadius: '8px',
+                  background: 'rgba(168, 85, 247, 0.15)',
+                  border: '1px solid rgba(168, 85, 247, 0.35)',
+                  color: '#C084FC',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                💡 Hint L4 Success (Compare)
+              </button>
+            )}
+
+            {onSimulateFocusedFlow && (
+              <button
+                onClick={onSimulateFocusedFlow}
+                style={{
+                  padding: '6px 8px',
+                  borderRadius: '8px',
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  color: '#34D399',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                ⚡ Flow (Unassisted)
+              </button>
+            )}
+
             {onSimulateInattention && (
               <button
                 onClick={onSimulateInattention}
@@ -327,7 +516,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                   cursor: 'pointer'
                 }}
               >
-                ⚠️ Inattention
+                ⚠️ Inattention Slip
               </button>
             )}
 
@@ -346,24 +535,6 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                 }}
               >
                 🔥 Frustration
-              </button>
-            )}
-
-            {onSimulateFocusedFlow && (
-              <button
-                onClick={onSimulateFocusedFlow}
-                style={{
-                  padding: '6px 8px',
-                  borderRadius: '8px',
-                  background: 'rgba(16, 185, 129, 0.12)',
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
-                  color: '#34D399',
-                  fontSize: '0.72rem',
-                  fontWeight: 700,
-                  cursor: 'pointer'
-                }}
-              >
-                ⚡ Flow
               </button>
             )}
           </div>

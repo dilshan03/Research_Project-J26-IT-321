@@ -36,8 +36,8 @@ export function AgentTestPage() {
     concept: question.concept
   });
 
-  // Initialize Real-time Learner State Builder (Task #19)
-  const { learnerState, isLoading: isStateLoading, evaluateInteractions } = useLearnerState({
+  // Initialize Real-time Learner State Builder & Hint-Aware BKT (Tasks #19 & #20)
+  const { learnerState, bktComparison, isLoading: isStateLoading, evaluateInteractions } = useLearnerState({
     studentId: 'student_trial_01',
     sessionId: 'sess_adhd_study_01',
     autoIntervene: true // Automatically triggers 3D agent reaction & speech bubble
@@ -162,6 +162,42 @@ export function AgentTestPage() {
         totalHintsRequested: 0,
         responseTimeMs: 4800,
         idleTimeBeforeFirstActionMs: 1100,
+        timestamp: new Date().toISOString()
+      }
+    ];
+    evaluateInteractions([...logs, ...simEvents]);
+  };
+
+  const handleSimulateHintAssisted = () => {
+    const simEvents: InteractionEvent[] = [
+      {
+        id: 'sim_hint4_' + Math.random().toString(36).substring(2, 7),
+        sessionId: 'sess_adhd_study_01',
+        studentId: 'student_trial_01',
+        questionId: question.id,
+        concept: question.concept,
+        eventType: 'HINT_REQUEST',
+        attemptNumber: 1,
+        hintLevelReached: 4,
+        totalHintsRequested: 4,
+        responseTimeMs: 3000,
+        idleTimeBeforeFirstActionMs: 800,
+        timestamp: new Date().toISOString()
+      },
+      {
+        id: 'sim_hint_ans_' + Math.random().toString(36).substring(2, 7),
+        sessionId: 'sess_adhd_study_01',
+        studentId: 'student_trial_01',
+        questionId: question.id,
+        concept: question.concept,
+        eventType: 'ANSWER_SUBMIT',
+        attemptNumber: 1,
+        selectedAnswer: 8,
+        isCorrect: true,
+        hintLevelReached: 4,
+        totalHintsRequested: 4,
+        responseTimeMs: 6000,
+        idleTimeBeforeFirstActionMs: 800,
         timestamp: new Date().toISOString()
       }
     ];
@@ -458,13 +494,15 @@ export function AgentTestPage() {
               zIndex: 20
             }}
           >
-            {/* Visual Task 19 HUD: Real-time Inattention, Frustration, Persistence Gauges */}
+            {/* Visual Tasks #19 & #20 HUD: Real-time Inattention, Frustration, Persistence & BKT Mastery */}
             <LearnerStateHUD
               learnerState={learnerState}
+              bktComparison={bktComparison}
               isLoading={isStateLoading}
               onSimulateInattention={handleSimulateInattention}
               onSimulateFrustration={handleSimulateFrustration}
               onSimulateFocusedFlow={handleSimulateFocusedFlow}
+              onSimulateHintAssisted={handleSimulateHintAssisted}
             />
 
             {/* Raw Interaction Event Stream */}

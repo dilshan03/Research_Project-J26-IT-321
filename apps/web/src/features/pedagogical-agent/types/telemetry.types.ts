@@ -83,3 +83,16 @@ export interface LearnerState {
   cognitiveState: CognitiveState;
   recommendedIntervention: PedagogicalIntervention;
 }
+
+/**
+ * Real-time comparison between Standard BKT and Hint-Aware ADHD BKT
+ */
+export interface BKTComparisonState {
+  hintAwareKnowledge: number;         // P(L) in [0, 1]
+  standardKnowledge: number;          // P(L_std) in [0, 1]
+  predictedNextCorrect: number;       // P(C_{t+1}) in [0, 1]
+  effectiveSlip: number;              // P(S_eff)
+  effectiveGuess: number;             // P(G_eff)
+  isMastered: boolean;                // P(L) >= 0.85
+  overestimationGap: number;          // standardKnowledge - hintAwareKnowledge
+}

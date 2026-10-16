@@ -3,6 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { saveInteractionLog, getInteractionLogs } from '../models/interactionModel.js';
 import { buildLearnerState } from '../engine/learnerStateBuilder.js';
+import { defaultBKT } from '../engine/bktEngine.js';
 
 // Local file-system telemetry persistence fallback path
 const LOCAL_STORAGE_PATH = fileURLToPath(new URL('../../data/pedagogical_interactions.json', import.meta.url));
@@ -200,5 +201,70 @@ export async function evaluateLearnerState(req, res) {
       success: false,
       error: error.message
     });
+  }
+}
+
+/**
+ * POST /api/telemetry/bkt/step
+ * Executes a single Hint-Aware BKT knowledge update step
+ */
+export function calculateBKTStep(req, res) {
+  try {
+    const { p_prior = 0.20, isCorrect, hintLevel = 0, inattentionIndex = 0.0 } = req.body;
+
+    if (typeof isCorrect !== 'boolean') {
+      return res.status(400).json({ success: false, error: 'Missing required field: isCorrect (boolean)' });
+    }
+
+    const result = defaultBKT.updateStep({
+      p_prior: parseFloat(p_prior),
+      isCorrect,
+      hintLevel: parseInt(hintLevel, 10) || 0,
+      inattentionIndex: parseFloat(inattentionIndex) || 0.0
+    });
+
+    return res.json({
+      success: true,
+      result
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+/**
+ * GET /api/telemetry/bkt/trajectory
+ * Computes knowledge progression trajectory P(L_t) for a student
+ */
+export async function getBKTMasteryTrajectory(req, res) {
+  try {
+    const { studentId, sessionId, limit = 100 } = req.query;
+
+    let logs = [];
+    try {
+      logs = await getInteractionLogs({
+        studentId,
+        sessionId,
+        limit: parseInt(limit, 10) || 100
+      });
+    } catch (dbErr) {
+      logs = readFromLocalStorage({ studentId, sessionId, limit });
+    }
+
+    if (!logs || logs.length === 0) {
+      logs = readFromLocalStorage({ studentId, sessionId, limit });
+    }
+
+    // Ensure chronological order
+    const chronological = [...logs].reverse();
+    const trajectoryData = defaultBKT.predictTrajectory(chronological);
+
+    return res.json({
+      success: true,
+      studentId,
+      ...trajectoryData
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message });
   }
 }

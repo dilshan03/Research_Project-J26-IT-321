@@ -37,6 +37,20 @@ export function useInteractionLogger({
   const attemptCount = useRef<number>(0);
   const hintCount = useRef<number>(0);
 
+  // Helper to persist event to backend API asynchronously
+  const sendToBackend = async (event: InteractionEvent) => {
+    try {
+      await fetch('/api/telemetry/interactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(event)
+      });
+    } catch (err) {
+      // Non-blocking fallback
+      console.warn('Backend telemetry sync offline:', (err as Error).message);
+    }
+  };
+
   // Reset timestamps when questionId changes
   useEffect(() => {
     questionStartTime.current = Date.now();
@@ -62,6 +76,7 @@ export function useInteractionLogger({
     };
 
     setLogs((prev) => [...prev, viewEvent]);
+    sendToBackend(viewEvent);
     if (onLogEvent) onLogEvent(viewEvent);
   }, [questionId, sessionId, studentId, concept, onLogEvent]);
 
@@ -124,6 +139,7 @@ export function useInteractionLogger({
       });
 
       console.log('📊 [InteractionLogger] Answer logged:', answerEvent);
+      sendToBackend(answerEvent);
       if (onLogEvent) onLogEvent(answerEvent);
 
       return answerEvent;
@@ -164,6 +180,7 @@ export function useInteractionLogger({
       }));
 
       console.log('💡 [InteractionLogger] Hint logged:', hintEvent);
+      sendToBackend(hintEvent);
       if (onLogEvent) onLogEvent(hintEvent);
 
       return hintEvent;

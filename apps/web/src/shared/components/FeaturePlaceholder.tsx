@@ -1,5 +1,6 @@
 import React from 'react';
 import { Sparkles, Construction, Info, ExternalLink } from 'lucide-react';
+import { PageHeader } from './PageHeader';
 
 export interface FeaturePlaceholderProps {
   featureName: string;
@@ -21,7 +22,13 @@ export const FeaturePlaceholder: React.FC<FeaturePlaceholderProps> = ({
   actionLink,
 }) => {
   return (
-    <div className="w-full bg-white rounded-3xl border border-mq-border p-8 sm:p-12 shadow-sm text-center max-w-2xl mx-auto my-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in">
+      <PageHeader
+        title={featureName}
+        description={`Research Module: ${responsibleComponent}. ${description}`}
+      />
+
+      <div className="w-full bg-white rounded-3xl border border-mq-border p-8 sm:p-12 shadow-sm text-center max-w-2xl mx-auto my-6">
       <div className="w-16 h-16 sm:w-20 sm:h-20 bg-mq-surface-blue rounded-3xl flex items-center justify-center mx-auto mb-6 text-mq-primary border border-mq-primary/20 shadow-xs">
         <Construction size={36} className="text-mq-primary" />
       </div>
@@ -63,6 +70,7 @@ export const FeaturePlaceholder: React.FC<FeaturePlaceholderProps> = ({
           <ExternalLink size={15} />
         </a>
       )}
+      </div>
     </div>
   );
 };

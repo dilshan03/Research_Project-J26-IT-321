@@ -37,11 +37,16 @@
   
   /* Feedback */
   --color-mq-success: #4E9B78;
+  --color-mq-success-bg: #EAF7F0;
   --color-mq-warning: #D9A441;
+  --color-mq-warning-bg: #FFF7E3;
   --color-mq-danger: #C96868;
+  --color-mq-danger-bg: #FDEEEE;
   --color-mq-info: #4D8EF7;
+  --color-mq-info-bg: #EAF2FF;
   
   /* Fonts */
+  --font-sans: 'Lexend', 'Segoe UI', sans-serif;
   --font-lexend: 'Lexend', 'Segoe UI', sans-serif;
   --font-sinhala: 'Noto Sans Sinhala', 'Segoe UI', sans-serif;
 }
@@ -123,13 +128,32 @@
     font-weight: 700;
     cursor: pointer;
     transition: all var(--mq-transition);
+    text-decoration: none;
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--mq-primary);
+    outline-offset: 2px;
+  }
+  .btn:active {
+    transform: translateY(0);
+  }
+  .btn:disabled, .btn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  .btn-sm {
+    min-height: 32px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.825rem;
   }
   .btn-primary { 
     background: var(--mq-primary); 
     color: #fff; 
     box-shadow: var(--mq-shadow-sm); 
   }
-  .btn-primary:hover { 
+  .btn-primary:hover:not(:disabled) { 
     background: var(--mq-primary-hover); 
     transform: translateY(-2px); 
   }
@@ -138,7 +162,7 @@
     color: var(--mq-primary-dark); 
     border-color: var(--mq-border-strong); 
   }
-  .btn-secondary:hover { 
+  .btn-secondary:hover:not(:disabled) { 
     background: var(--mq-surface-soft); 
     border-color: var(--mq-primary); 
   }

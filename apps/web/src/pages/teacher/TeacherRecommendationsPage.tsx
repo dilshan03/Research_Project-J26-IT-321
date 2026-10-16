@@ -1,5 +1,5 @@
-import React from 'react';
-import { Sparkles, Brain, CheckCircle2, BookOpen, Lightbulb } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+import { PageHeader } from '../../shared/components/PageHeader';
 
 export const TeacherRecommendationsPage: React.FC = () => {
   const pedagogicalStrategies = [
@@ -31,6 +31,13 @@ export const TeacherRecommendationsPage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <PageHeader
+        role="teacher"
+        title="Teaching Recommendations"
+        titleSi="ඉගැන්වීම් නිර්දේශ"
+        description="Evidence-based pedagogical strategies and instructional guidelines for primary mathematics with ADHD support needs."
+      />
+
       <div className="bg-white rounded-3xl border border-mq-border p-6 shadow-sm space-y-4">
         <div className="flex items-center gap-2 pb-3 border-b border-mq-border">
           <Sparkles size={20} className="text-mq-accent-yellow" />

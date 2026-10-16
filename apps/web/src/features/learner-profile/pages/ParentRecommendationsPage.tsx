@@ -1,22 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Sparkles,
-  Brain,
-  Lightbulb,
-  CheckCircle2,
-  Clock,
-  ArrowRight,
-  Loader2,
-  AlertCircle,
-  HelpCircle,
-  ChevronRight,
-} from 'lucide-react';
+import { Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 import { learnerApi } from '../services/learnerApi';
 import { profileApi } from '../services/profileApi';
 import type { Learner } from '../types';
 import { AVATAR_OPTIONS } from '../types';
 import type { ElpxProfile, ElpxStructuredRecommendation } from '../types/onboarding';
+import { PageHeader } from '../../../shared/components/PageHeader';
+import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
 
 export const ParentRecommendationsPage: React.FC = () => {
   const [learners, setLearners] = useState<Learner[]>([]);
@@ -91,17 +82,37 @@ export const ParentRecommendationsPage: React.FC = () => {
 
   const selectedChild = learners.find((l) => l.learnerId === selectedLearnerId) || learners[0] || null;
 
-  if (isLoadingLearners) {
-    return (
-      <div className="flex items-center justify-center p-16 text-mq-primary gap-3">
-        <Loader2 size={32} className="animate-spin" />
-        <span className="font-semibold text-sm">Loading recommendations...</span>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
+      <PageHeader
+        role="parent"
+        title="Recommendations"
+        titleSi="ඉගෙනුම් නිර්දේශ"
+        description="Explainable, evidence-backed pedagogical strategies tailored to your child's cognitive and mathematical profile."
+      />
+
+      {errorMessage && (
+        <ErrorAlert message={errorMessage} onRetry={loadLearners} />
+      )}
+
+      {isLoadingLearners ? (
+        <LoadingState message="Loading pedagogical recommendations..." />
+      ) : learners.length === 0 ? (
+        <EmptyState
+          title="No children registered yet"
+          titleSi="තවමත් දරුවන් ලියාපදිංචි කර නැත"
+          description="Register your child to generate personalized cognitive and mathematical recommendations."
+          action={
+            <Link
+              to="/learners"
+              className="btn btn-primary text-xs py-2 px-5 rounded-full inline-block font-bold"
+            >
+              Add Child (දරුවෙකු එක් කරන්න)
+            </Link>
+          }
+        />
+      ) : (
+        <>
       {/* Child Switcher */}
       {learners.length > 0 && (
         <div>
@@ -238,6 +249,8 @@ export const ParentRecommendationsPage: React.FC = () => {
             </div>
           )}
         </div>
+      )}
+        </>
       )}
     </div>
   );

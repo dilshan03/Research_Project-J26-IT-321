@@ -1,9 +1,16 @@
-import React from 'react';
-import { Users, Lock, ShieldAlert, BookOpen, ExternalLink } from 'lucide-react';
+import { Lock, ShieldAlert, BookOpen, ExternalLink } from 'lucide-react';
+import { PageHeader } from '../../shared/components/PageHeader';
 
 export const TeacherLearnersPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
+      <PageHeader
+        role="teacher"
+        title="Classroom Learners"
+        titleSi="පන්තියේ ඉගෙනුම්කරුවන්"
+        description="View and manage assigned student rosters and classroom learning differentiation."
+      />
+
       <div className="bg-white rounded-3xl border border-mq-border p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-5">
         <div className="w-16 h-16 bg-mq-surface-blue text-mq-primary rounded-3xl flex items-center justify-center mx-auto">
           <Lock size={32} />

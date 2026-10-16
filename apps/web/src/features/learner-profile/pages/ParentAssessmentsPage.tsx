@@ -1,80 +1,91 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  ClipboardCheck,
-  CheckCircle2,
-  Clock,
-  Sparkles,
-  ArrowRight,
-  Loader2,
-  AlertCircle,
-} from 'lucide-react';
+import { ArrowRight, Plus } from 'lucide-react';
 import { learnerApi } from '../services/learnerApi';
 import type { Learner } from '../types';
 import { AVATAR_OPTIONS } from '../types';
+import { OnboardingStatusBadge } from '../components/OnboardingStatusBadge';
+import { PageHeader } from '../../../shared/components/PageHeader';
+import {
+  LoadingState,
+  EmptyState,
+  ErrorAlert,
+} from '../../../shared/components/ui/StateViews';
 
 export const ParentAssessmentsPage: React.FC = () => {
   const [learners, setLearners] = useState<Learner[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchLearners = async () => {
-      setIsLoading(true);
-      try {
-        const res = await learnerApi.listLearners();
-        if (res.success && res.data) {
-          setLearners(res.data);
-        } else {
-          setErrorMessage(res.message || 'Failed to load children.');
-        }
-      } catch {
-        setErrorMessage('Network connection error.');
-      } finally {
-        setIsLoading(false);
+  const fetchLearners = async () => {
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      const res = await learnerApi.listLearners();
+      if (res.success && res.data) {
+        setLearners(res.data);
+      } else {
+        setErrorMessage(res.message || 'Failed to load children profiles.');
       }
-    };
+    } catch {
+      setErrorMessage('Network connection error while connecting to service.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchLearners();
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-16 text-mq-primary gap-3">
-        <Loader2 size={32} className="animate-spin" />
-        <span className="font-semibold text-sm">Loading onboarding assessments...</span>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
-      {/* Intro Banner */}
-      <div className="bg-white rounded-3xl border border-mq-border p-6 shadow-sm space-y-2">
-        <h2 className="text-xl sm:text-2xl font-extrabold text-mq-text-strong flex items-center gap-2">
-          <ClipboardCheck size={22} className="text-mq-primary" />
-          <span>Diagnostic Assessments & Onboarding Tracker</span>
-        </h2>
-        <p className="text-xs sm:text-sm text-mq-text-muted max-w-2xl">
-          The 5-step onboarding flow gathers child-friendly learning preferences, SNAP-IV ADHD support scales,
-          social learning context, and establishes Grade-appropriate baseline mathematics levels.
-        </p>
-      </div>
+      {/* Standardized Page Header */}
+      <PageHeader
+        role="parent"
+        title="Onboarding & Diagnostic Assessments"
+        titleSi="ඇගයීම් සහ ප්‍රශ්නාවලි"
+        description="The 5-step onboarding flow gathers child-friendly learning preferences, SNAP-IV ADHD support scales, social learning context, and establishes Grade-appropriate baseline mathematics levels."
+        descriptionSi="ඉගෙනුම් මනාප, SNAP-IV ප්‍රශ්නාවලිය සහ ආරම්භක ගණිත ඇගයීම් සම්පූර්ණ කර දරුවාට ගැළපෙන ඉගෙනුම් මට්ටම තීරණය කරන්න."
+        actions={
+          <Link
+            to="/learners"
+            className="btn btn-secondary py-2 px-4 rounded-full text-xs sm:text-sm font-bold shadow-xs inline-flex items-center gap-1.5"
+          >
+            <span>Manage Children (මගේ දරුවන්)</span>
+          </Link>
+        }
+      />
 
       {errorMessage && (
-        <div className="p-4 rounded-2xl bg-red-50 text-mq-danger text-sm flex items-center gap-2">
-          <AlertCircle size={16} />
-          <span>{errorMessage}</span>
-        </div>
+        <ErrorAlert
+          message={errorMessage}
+          messageSi="දරුවන්ගේ තොරතුරු ලබාගැනීමට නොහැකි විය."
+          onRetry={fetchLearners}
+        />
       )}
 
-      {learners.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-dashed border-mq-border p-12 text-center max-w-md mx-auto space-y-3">
-          <p className="text-sm text-mq-text-muted">No child profiles found.</p>
-          <Link to="/parent/dashboard/children" className="btn btn-primary text-xs py-2 px-5 rounded-full inline-block">
-            Register Child First
-          </Link>
-        </div>
+      {isLoading ? (
+        <LoadingState
+          message="Loading onboarding assessments..."
+          messageSi="ඇගයීම් විස්තර පූරණය වෙමින් පවතී..."
+        />
+      ) : learners.length === 0 ? (
+        <EmptyState
+          title="No Child Profiles Found"
+          titleSi="තවමත් දරුවන් ලියාපදිංචි කර නැත"
+          description="Register a child profile first before initiating onboarding diagnostic assessments."
+          descriptionSi="ඇගයීම් ආරම්භ කිරීමට පෙර කරුණාකර පළමුව දරුවාගේ තොරතුරු ඇතුළත් කරන්න."
+          action={
+            <Link
+              to="/learners"
+              className="btn btn-primary text-xs sm:text-sm py-2.5 px-6 rounded-full inline-flex items-center gap-2 font-bold shadow-xs"
+            >
+              <Plus size={16} />
+              <span>Go to My Children (දරුවන් එක් කරන්න)</span>
+            </Link>
+          }
+        />
       ) : (
         <div className="space-y-4">
           {learners.map((child) => {
@@ -84,40 +95,25 @@ export const ParentAssessmentsPage: React.FC = () => {
             return (
               <div
                 key={child.learnerId}
-                className="bg-white rounded-3xl border border-mq-border p-6 shadow-sm hover:shadow-md transition-all flex flex-col md:flex-row md:items-center justify-between gap-5"
+                className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs hover:shadow-md hover:border-mq-primary/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-5"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 min-w-0">
                   <div
                     className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0 ${avatar.bgColor} border ${avatar.borderColor}`}
                   >
                     {avatar.icon}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-extrabold text-mq-text-strong">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-base font-extrabold text-mq-text-strong truncate">
                         {child.firstName} {child.preferredName && `(${child.preferredName})`}
                       </h3>
                       <span className="text-xs font-bold text-mq-text-muted">
                         Grade {child.grade}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      {child.onboardingStatus === 'COMPLETED' ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-mq-success-bg text-mq-success border border-mq-success/30">
-                          <CheckCircle2 size={13} />
-                          <span>Onboarding Completed (සම්පූර්ණයි)</span>
-                        </span>
-                      ) : child.onboardingStatus === 'IN_PROGRESS' ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-mq-surface-blue text-mq-primary border border-mq-primary/30">
-                          <Clock size={13} />
-                          <span>In Progress (ක්‍රියාත්මකයි)</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-mq-warning-bg text-mq-warning border border-mq-warning/30">
-                          <Sparkles size={13} />
-                          <span>Not Started (ආරම්භ කිරීමට ඇත)</span>
-                        </span>
-                      )}
+                    <div className="mt-1">
+                      <OnboardingStatusBadge status={child.onboardingStatus} />
                     </div>
                   </div>
                 </div>
@@ -148,13 +144,13 @@ export const ParentAssessmentsPage: React.FC = () => {
                       to="/parent/dashboard/learner-profiles"
                       className="btn btn-secondary text-xs py-2 px-4 rounded-xl font-bold inline-flex items-center gap-1.5"
                     >
-                      <span>View Results</span>
+                      <span>View Results (ප්‍රතිඵල)</span>
                       <ArrowRight size={14} />
                     </Link>
                   ) : (
                     <Link
                       to={`/learners/${child.learnerId}/onboarding`}
-                      className="btn btn-primary text-xs py-2 px-5 rounded-xl font-bold inline-flex items-center gap-2 shadow-sm"
+                      className="btn btn-primary text-xs py-2 px-5 rounded-xl font-bold inline-flex items-center gap-2 shadow-xs"
                     >
                       <span>
                         {child.onboardingStatus === 'IN_PROGRESS'

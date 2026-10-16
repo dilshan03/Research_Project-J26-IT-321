@@ -7,7 +7,6 @@ import {
   BookOpen,
   ShieldCheck,
   AlertCircle,
-  HelpCircle,
   ArrowRight,
   School,
   ExternalLink,

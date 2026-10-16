@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import type { LearnerState, CognitiveState, BKTComparisonState } from '../types/telemetry.types';
+import type { LearnerState, CognitiveState, BKTComparisonState, FSMDecision, FSMState } from '../types/telemetry.types';
 
 export interface LearnerStateHUDProps {
   learnerState: LearnerState | null;
   bktComparison?: BKTComparisonState;
+  fsmDecision?: FSMDecision;
   isLoading?: boolean;
   onSimulateInattention?: () => void;
   onSimulateFrustration?: () => void;
   onSimulateFocusedFlow?: () => void;
   onSimulateHintAssisted?: () => void;
+  onTriggerFSMRule?: (context: Record<string, any>) => void;
   compact?: boolean;
   style?: React.CSSProperties;
 }
@@ -67,6 +69,54 @@ const STATE_CONFIG: Record<
   }
 };
 
+const FSM_STATE_CONFIG: Record<
+  FSMState,
+  { label: string; sinhala: string; icon: string; color: string; bg: string }
+> = {
+  OBSERVING: {
+    label: 'OBSERVING',
+    sinhala: 'අධීක්ෂණය කරමින්',
+    icon: '👁️',
+    color: '#94A3B8',
+    bg: 'rgba(148, 163, 184, 0.15)'
+  },
+  ATTENTION_REDIRECT: {
+    label: 'ATTENTION REDIRECT',
+    sinhala: 'අවධානය යොමු කිරීම',
+    icon: '👋',
+    color: '#FBBF24',
+    bg: 'rgba(245, 158, 11, 0.2)'
+  },
+  HINT_SCAFFOLDING: {
+    label: 'HINT SCAFFOLDING',
+    sinhala: 'හෝඩුවාවෙන් මඟපෙන්වීම',
+    icon: '💡',
+    color: '#C084FC',
+    bg: 'rgba(168, 85, 247, 0.2)'
+  },
+  FRUSTRATION_REGULATION: {
+    label: 'FRUSTRATION REGULATION',
+    sinhala: 'කලකිරීම පාලනය',
+    icon: '❤️‍🩹',
+    color: '#F87171',
+    bg: 'rgba(239, 68, 68, 0.2)'
+  },
+  IMPULSE_BRAKING: {
+    label: 'IMPULSE BRAKING',
+    sinhala: 'නොසිතා පිළිතුරු දීම වැළැක්වීම',
+    icon: '🛑',
+    color: '#FB923C',
+    bg: 'rgba(249, 115, 22, 0.2)'
+  },
+  MASTERY_REINFORCEMENT: {
+    label: 'MASTERY REINFORCEMENT',
+    sinhala: 'දැනුම තහවුරු කිරීම',
+    icon: '🏆',
+    color: '#34D399',
+    bg: 'rgba(16, 185, 129, 0.2)'
+  }
+};
+
 export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
   learnerState,
   bktComparison = {
@@ -78,15 +128,35 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
     isMastered: false,
     overestimationGap: 0.0
   },
+  fsmDecision = {
+    fsmState: 'OBSERVING',
+    previousState: 'OBSERVING',
+    stateTransitionOccurred: false,
+    rule: {
+      id: 'RULE_DEFAULT',
+      name: 'Baseline Passive Observation',
+      description: 'Default state when student is engaged normally.'
+    },
+    decision: {
+      action: 'IDLE_OBSERVE',
+      animation: 'idle',
+      targetHintLevel: null,
+      messageSinhala: 'ඔයාට පුළුවන්! හොඳට හිතලා බලන්න.',
+      autoOpenHint: false
+    },
+    timestamp: new Date().toISOString()
+  },
   isLoading = false,
   onSimulateInattention,
   onSimulateFrustration,
   onSimulateFocusedFlow,
   onSimulateHintAssisted,
+  onTriggerFSMRule,
   compact = false,
   style = {}
 }) => {
   const [showBKTDetails, setShowBKTDetails] = useState<boolean>(true);
+  const [showFSMDetails, setShowFSMDetails] = useState<boolean>(true);
 
   const stateKey = learnerState?.cognitiveState || 'NORMAL';
   const cfg = STATE_CONFIG[stateKey] || STATE_CONFIG.NORMAL;
@@ -99,11 +169,13 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
   const pL_standard = bktComparison.standardKnowledge;
   const isMastered = bktComparison.isMastered;
 
+  const fsmConfig = FSM_STATE_CONFIG[fsmDecision.fsmState] || FSM_STATE_CONFIG.OBSERVING;
+
   return (
     <div
       style={{
-        background: 'rgba(15, 23, 42, 0.92)',
-        backdropFilter: 'blur(14px)',
+        background: 'rgba(15, 23, 42, 0.94)',
+        backdropFilter: 'blur(16px)',
         border: '1px solid rgba(255, 255, 255, 0.12)',
         borderRadius: '16px',
         padding: compact ? '12px' : '16px',
@@ -111,7 +183,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
         ...style
       }}
     >
@@ -120,7 +192,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '1.05rem' }}>🧠</span>
           <span style={{ fontWeight: 800, fontSize: '0.88rem', letterSpacing: '0.5px', color: '#F1F5F9' }}>
-            Live ADHD Learner State & BKT
+            Live Pedagogical Engine & FSM
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -178,6 +250,175 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         >
           {cfg.sinhala}
         </span>
+      </div>
+
+      {/* FSM Decision Engine Live Inspector (Task #21 Feature) */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)',
+          border: '1px solid rgba(56, 189, 248, 0.35)',
+          borderRadius: '12px',
+          padding: '12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '1rem' }}>🤖</span>
+            <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#38BDF8', letterSpacing: '0.3px' }}>
+              FSM Decision Engine
+            </span>
+          </div>
+
+          <span
+            style={{
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              padding: '2px 8px',
+              borderRadius: '12px',
+              background: fsmConfig.bg,
+              color: fsmConfig.color,
+              border: `1px solid ${fsmConfig.color}40`,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            <span>{fsmConfig.icon}</span>
+            <span>{fsmConfig.label}</span>
+          </span>
+        </div>
+
+        {/* Active Rule Fired Pill */}
+        <div
+          style={{
+            background: 'rgba(255, 255, 255, 0.04)',
+            borderRadius: '8px',
+            padding: '8px 10px',
+            border: '1px solid rgba(255, 255, 255, 0.06)'
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 800, color: '#F1F5F9' }}>
+              ⚡ Fired: {fsmDecision.rule.name}
+            </span>
+            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#38BDF8', background: 'rgba(56, 189, 248, 0.15)', padding: '1px 6px', borderRadius: '4px' }}>
+              {fsmDecision.rule.id}
+            </span>
+          </div>
+
+          <div style={{ fontSize: '0.73rem', color: '#94A3B8', marginTop: '2px' }}>
+            {fsmDecision.rule.description}
+          </div>
+
+          <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#E2E8F0', marginTop: '6px', fontStyle: 'italic' }}>
+            💬 "{fsmDecision.decision.messageSinhala}"
+          </div>
+
+          {fsmDecision.decision.targetHintLevel && (
+            <div style={{ marginTop: '4px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#C084FC' }}>
+                💡 Recommended Scaffolding: Level {fsmDecision.decision.targetHintLevel}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* FSM Rules Catalog Toggle */}
+        <div style={{ marginTop: '2px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
+          <div
+            onClick={() => setShowFSMDetails(!showFSMDetails)}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              cursor: 'pointer',
+              fontSize: '0.72rem',
+              color: '#38BDF8',
+              fontWeight: 700
+            }}
+          >
+            <span>📋 FSM State Machine Rules & Triggers</span>
+            <span>{showFSMDetails ? '▲ Hide' : '▼ View'}</span>
+          </div>
+
+          {showFSMDetails && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
+              {/* Interactive Rule Buttons */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
+                <button
+                  onClick={() => onTriggerFSMRule && onTriggerFSMRule({ consecutiveErrors: 2, highestHintLevel: 0 })}
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: fsmDecision.rule.id === 'RULE_1' ? 'rgba(168, 85, 247, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                    border: fsmDecision.rule.id === 'RULE_1' ? '1px solid #C084FC' : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_1' ? '#C084FC' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  💡 Rule 1: 2x Errors (Hint 1)
+                </button>
+
+                <button
+                  onClick={() => onTriggerFSMRule && onTriggerFSMRule({ currentIdleTimeMs: 16000 })}
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: fsmDecision.rule.id === 'RULE_2' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                    border: fsmDecision.rule.id === 'RULE_2' ? '1px solid #FBBF24' : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_2' ? '#FBBF24' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  👋 Rule 2: Idle &gt; 15s (Redirect)
+                </button>
+
+                <button
+                  onClick={() => onTriggerFSMRule && onTriggerFSMRule({ bktKnowledge: 0.92, consecutiveCorrect: 3 })}
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: fsmDecision.rule.id === 'RULE_4' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                    border: fsmDecision.rule.id === 'RULE_4' ? '1px solid #34D399' : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_4' ? '#34D399' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🏆 Rule 4: Mastery 90% (Celebrate)
+                </button>
+
+                <button
+                  onClick={() => onTriggerFSMRule && onTriggerFSMRule({ isImpulsive: true })}
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background: fsmDecision.rule.id === 'RULE_5' ? 'rgba(249, 115, 22, 0.3)' : 'rgba(255, 255, 255, 0.05)',
+                    border: fsmDecision.rule.id === 'RULE_5' ? '1px solid #FB923C' : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_5' ? '#FB923C' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🛑 Rule 5: Impulsive &lt; 1.5s (Brake)
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* BKT Concept Mastery Hero Section (Task #20 Feature) */}
@@ -249,7 +490,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         </div>
 
         {/* Comparative BKT Section (Standard vs Hint-Aware) Toggle */}
-        <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '8px' }}>
+        <div style={{ marginTop: '2px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
           <div
             onClick={() => setShowBKTDetails(!showBKTDetails)}
             style={{
@@ -257,7 +498,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
               justifyContent: 'space-between',
               alignItems: 'center',
               cursor: 'pointer',
-              fontSize: '0.73rem',
+              fontSize: '0.72rem',
               color: '#38BDF8',
               fontWeight: 700
             }}
@@ -424,46 +665,11 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         </div>
       </div>
 
-      {/* Recommended Pedagogical Intervention Card */}
-      {learnerState?.recommendedIntervention && (
-        <div
-          style={{
-            background: 'rgba(255, 255, 255, 0.04)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '10px',
-            padding: '10px 12px',
-            marginTop: '2px'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase' }}>
-              🤖 Agent Intervention
-            </span>
-            <span
-              style={{
-                fontSize: '0.72rem',
-                fontWeight: 800,
-                color: '#38BDF8',
-                background: 'rgba(56, 189, 248, 0.12)',
-                padding: '2px 8px',
-                borderRadius: '6px'
-              }}
-            >
-              {learnerState.recommendedIntervention.action}
-            </span>
-          </div>
-
-          <div style={{ fontSize: '0.84rem', fontWeight: 600, color: '#E2E8F0', marginTop: '4px' }}>
-            "{learnerState.recommendedIntervention.messageSinhala}"
-          </div>
-        </div>
-      )}
-
       {/* Simulator Test Buttons (Researcher Playground) */}
       {(onSimulateInattention || onSimulateFrustration || onSimulateFocusedFlow || onSimulateHintAssisted) && (
         <div style={{ marginTop: '2px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '8px' }}>
           <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748B', marginBottom: '6px', textTransform: 'uppercase' }}>
-            🧪 Real-time Simulator Triggers:
+            🧪 Quick Gameplay Simulations:
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
             {onSimulateHintAssisted && (
@@ -475,12 +681,12 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                   background: 'rgba(168, 85, 247, 0.15)',
                   border: '1px solid rgba(168, 85, 247, 0.35)',
                   color: '#C084FC',
-                  fontSize: '0.72rem',
+                  fontSize: '0.7rem',
                   fontWeight: 700,
                   cursor: 'pointer'
                 }}
               >
-                💡 Hint L4 Success (Compare)
+                💡 Hint L4 Success (Discount)
               </button>
             )}
 
@@ -493,7 +699,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                   background: 'rgba(16, 185, 129, 0.12)',
                   border: '1px solid rgba(16, 185, 129, 0.3)',
                   color: '#34D399',
-                  fontSize: '0.72rem',
+                  fontSize: '0.7rem',
                   fontWeight: 700,
                   cursor: 'pointer'
                 }}
@@ -511,7 +717,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                   background: 'rgba(245, 158, 11, 0.12)',
                   border: '1px solid rgba(245, 158, 11, 0.3)',
                   color: '#FBBF24',
-                  fontSize: '0.72rem',
+                  fontSize: '0.7rem',
                   fontWeight: 700,
                   cursor: 'pointer'
                 }}
@@ -529,12 +735,12 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                   background: 'rgba(239, 68, 68, 0.15)',
                   border: '1px solid rgba(239, 68, 68, 0.3)',
                   color: '#F87171',
-                  fontSize: '0.72rem',
+                  fontSize: '0.7rem',
                   fontWeight: 700,
                   cursor: 'pointer'
                 }}
               >
-                🔥 Frustration
+                🔥 Frustration Struggle
               </button>
             )}
           </div>

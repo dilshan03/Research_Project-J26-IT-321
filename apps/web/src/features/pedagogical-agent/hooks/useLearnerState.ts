@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { InteractionEvent, LearnerState, BKTComparisonState } from '../types/telemetry.types';
+import type { InteractionEvent, LearnerState, BKTComparisonState, FSMDecision } from '../types/telemetry.types';
 import type { AgentActionName } from '../types/agent.types';
 import { useAgentStore } from '../store/useAgentStore';
 
@@ -24,6 +24,26 @@ export function useLearnerState({
     isMastered: false,
     overestimationGap: 0.0
   });
+
+  const [fsmDecision, setFsmDecision] = useState<FSMDecision>({
+    fsmState: 'OBSERVING',
+    previousState: 'OBSERVING',
+    stateTransitionOccurred: false,
+    rule: {
+      id: 'RULE_DEFAULT',
+      name: 'Baseline Passive Observation',
+      description: 'Default state when student is engaged normally within healthy parameters.'
+    },
+    decision: {
+      action: 'IDLE_OBSERVE',
+      animation: 'idle',
+      targetHintLevel: null,
+      messageSinhala: 'ඔයාට පුළුවන්! හොඳට හිතලා බලන්න.',
+      autoOpenHint: false
+    },
+    timestamp: new Date().toISOString()
+  });
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const playAction = useAgentStore((state) => state.playAction);
 
@@ -88,18 +108,62 @@ export function useLearnerState({
   }, []);
 
   /**
-   * Evaluate state using backend Decision API and update BKT comparison
+   * Directly triggers and evaluates an arbitrary context on the FSM Decision Engine
+   */
+  const triggerFSMContext = useCallback(
+    async (context: Record<string, any>) => {
+      try {
+        const res = await fetch('/api/telemetry/fsm/evaluate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(context)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            setFsmDecision(data);
+
+            if (autoIntervene && data.decision?.action !== 'IDLE_OBSERVE') {
+              let targetAction: AgentActionName = 'thinking';
+              const anim = data.decision.animation;
+              if (anim === 'wave') targetAction = 'wave';
+              else if (anim === 'thinking') targetAction = 'thinking';
+              else if (anim === 'clap') targetAction = 'clap';
+              else if (anim === 'correctCelebrate') targetAction = 'correctCelebrate';
+              else if (anim === 'encourage') targetAction = 'encourage';
+
+              playAction(targetAction, {
+                message: data.decision.messageSinhala,
+                duration: 3.5
+              });
+            }
+
+            return data;
+          }
+        }
+      } catch (err) {
+        console.warn('[useLearnerState] FSM evaluation error:', (err as Error).message);
+      }
+      return null;
+    },
+    [autoIntervene, playAction]
+  );
+
+  /**
+   * Evaluate state using backend Decision API, BKT comparison, and FSM Engine
    */
   const evaluateInteractions = useCallback(
     async (interactions: InteractionEvent[]) => {
       if (!interactions || interactions.length === 0) return null;
 
-      // Update BKT comparative model in real time
+      // 1. Update BKT comparative model
       const bktResult = computeBKTComparison(interactions);
       setBktComparison(bktResult);
 
       try {
         setIsLoading(true);
+        // 2. Fetch Learner State from backend
         const res = await fetch('/api/telemetry/learner-state/evaluate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -113,25 +177,24 @@ export function useLearnerState({
           const state: LearnerState = data.learnerState;
           setLearnerState(state);
 
-          // Automated Agent Pedagogical Reaction
-          if (autoIntervene && state.recommendedIntervention) {
-            const { action, animation, messageSinhala } = state.recommendedIntervention;
+          // 3. Evaluate FSM Decision Engine with full learner and BKT metrics
+          const lastEvent = interactions[interactions.length - 1];
+          const lastIsCorrect = lastEvent?.eventType === 'ANSWER_SUBMIT' ? lastEvent.isCorrect : null;
 
-            if (action !== 'IDLE_OBSERVE') {
-              let targetAction: AgentActionName = 'thinking';
-              if (animation === 'wave') targetAction = 'wave';
-              else if (animation === 'thinking') targetAction = 'thinking';
-              else if (animation === 'clap') targetAction = 'clap';
-              else if (animation === 'celebrate') targetAction = 'correctCelebrate';
-              else if (animation === 'idle') targetAction = 'encourage';
+          const fsmContext = {
+            consecutiveErrors: state.metrics.consecutiveErrors,
+            consecutiveCorrect: state.metrics.consecutiveCorrect,
+            highestHintLevel: state.metrics.highestHintLevel,
+            currentIdleTimeMs: lastEvent?.idleTimeBeforeFirstActionMs || 0,
+            inattentionIndex: state.metrics.inattentionIndex,
+            frustrationIndex: state.metrics.frustrationIndex,
+            isImpulsive: state.flags.isImpulsive,
+            isFrustrated: state.flags.isFrustrated,
+            lastAnswerIsCorrect: lastIsCorrect,
+            bktKnowledge: bktResult.hintAwareKnowledge
+          };
 
-              playAction(targetAction, {
-                message: messageSinhala,
-                duration: 3.5
-              });
-            }
-          }
-
+          await triggerFSMContext(fsmContext);
           return state;
         }
       } catch (err) {
@@ -142,7 +205,7 @@ export function useLearnerState({
 
       return null;
     },
-    [autoIntervene, playAction, computeBKTComparison]
+    [computeBKTComparison, triggerFSMContext]
   );
 
   /**
@@ -173,8 +236,10 @@ export function useLearnerState({
   return {
     learnerState,
     bktComparison,
+    fsmDecision,
     isLoading,
     evaluateInteractions,
+    triggerFSMContext,
     fetchLearnerState,
     setLearnerState
   };

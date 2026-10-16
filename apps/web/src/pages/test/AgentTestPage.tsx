@@ -36,8 +36,15 @@ export function AgentTestPage() {
     concept: question.concept
   });
 
-  // Initialize Real-time Learner State Builder & Hint-Aware BKT (Tasks #19 & #20)
-  const { learnerState, bktComparison, isLoading: isStateLoading, evaluateInteractions } = useLearnerState({
+  // Initialize Real-time Learner State Builder, Hint-Aware BKT & FSM (Tasks #19, #20, #21)
+  const { 
+    learnerState, 
+    bktComparison, 
+    fsmDecision,
+    isLoading: isStateLoading, 
+    evaluateInteractions,
+    triggerFSMContext 
+  } = useLearnerState({
     studentId: 'student_trial_01',
     sessionId: 'sess_adhd_study_01',
     autoIntervene: true // Automatically triggers 3D agent reaction & speech bubble
@@ -293,7 +300,9 @@ export function AgentTestPage() {
           >
             <span>🧠</span>
             <span>
-              ADHD State: <b style={{ color: '#F8FAFC' }}>{learnerState?.cognitiveState || 'SYNCING'}</b>
+              State: <b style={{ color: '#F8FAFC' }}>{learnerState?.cognitiveState || 'SYNCING'}</b>
+              {' | '}
+              FSM: <b style={{ color: '#C084FC' }}>{fsmDecision.fsmState}</b>
             </span>
           </button>
 
@@ -494,15 +503,17 @@ export function AgentTestPage() {
               zIndex: 20
             }}
           >
-            {/* Visual Tasks #19 & #20 HUD: Real-time Inattention, Frustration, Persistence & BKT Mastery */}
+            {/* Visual Tasks #19, #20 & #21 HUD: Real-time Inattention, Frustration, BKT & FSM */}
             <LearnerStateHUD
               learnerState={learnerState}
               bktComparison={bktComparison}
+              fsmDecision={fsmDecision}
               isLoading={isStateLoading}
               onSimulateInattention={handleSimulateInattention}
               onSimulateFrustration={handleSimulateFrustration}
               onSimulateFocusedFlow={handleSimulateFocusedFlow}
               onSimulateHintAssisted={handleSimulateHintAssisted}
+              onTriggerFSMRule={triggerFSMContext}
             />
 
             {/* Raw Interaction Event Stream */}

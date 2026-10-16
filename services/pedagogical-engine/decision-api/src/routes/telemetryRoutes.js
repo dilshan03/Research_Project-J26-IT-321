@@ -5,7 +5,9 @@ import {
   getLearnerState,
   evaluateLearnerState,
   calculateBKTStep,
-  getBKTMasteryTrajectory
+  getBKTMasteryTrajectory,
+  evaluateFSMDecision,
+  getFSMRules
 } from '../controllers/telemetryController.js';
 
 const router = Router();
@@ -27,5 +29,11 @@ router.post('/bkt/step', calculateBKTStep);
 
 // Query student knowledge mastery progression trajectory
 router.get('/bkt/trajectory', getBKTMasteryTrajectory);
+
+// Evaluate FSM decision rules based on current student context
+router.post('/fsm/evaluate', evaluateFSMDecision);
+
+// Query catalog of all declarative FSM pedagogical rules
+router.get('/fsm/rules', getFSMRules);
 
 export default router;

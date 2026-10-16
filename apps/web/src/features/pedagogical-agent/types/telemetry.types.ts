@@ -96,3 +96,33 @@ export interface BKTComparisonState {
   isMastered: boolean;                // P(L) >= 0.85
   overestimationGap: number;          // standardKnowledge - hintAwareKnowledge
 }
+
+/**
+ * Finite State Machine (FSM) Decision Engine Types (Task #21)
+ */
+export type FSMState =
+  | 'OBSERVING'
+  | 'ATTENTION_REDIRECT'
+  | 'HINT_SCAFFOLDING'
+  | 'FRUSTRATION_REGULATION'
+  | 'IMPULSE_BRAKING'
+  | 'MASTERY_REINFORCEMENT';
+
+export interface FSMDecision {
+  fsmState: FSMState;
+  previousState: FSMState;
+  stateTransitionOccurred: boolean;
+  rule: {
+    id: string;
+    name: string;
+    description: string;
+  };
+  decision: {
+    action: string;
+    animation: AgentAnimation;
+    targetHintLevel: HintLevel | null;
+    messageSinhala: string;
+    autoOpenHint: boolean;
+  };
+  timestamp: string;
+}

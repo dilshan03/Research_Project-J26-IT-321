@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { saveInteractionLog, getInteractionLogs } from '../models/interactionModel.js';
 import { buildLearnerState } from '../engine/learnerStateBuilder.js';
 import { defaultBKT } from '../engine/bktEngine.js';
+import { defaultFSM, FSM_RULES, FSM_STATES } from '../engine/fsmDecisionEngine.js';
 
 // Local file-system telemetry persistence fallback path
 const LOCAL_STORAGE_PATH = fileURLToPath(new URL('../../data/pedagogical_interactions.json', import.meta.url));
@@ -266,5 +267,56 @@ export async function getBKTMasteryTrajectory(req, res) {
     });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+/**
+ * POST /api/telemetry/fsm/evaluate
+ * Evaluates the Finite State Machine rules and returns the active pedagogical decision
+ */
+export function evaluateFSMDecision(req, res) {
+  try {
+    const context = req.body || {};
+    const decisionResult = defaultFSM.evaluate(context);
+
+    return res.json({
+      success: true,
+      ...decisionResult
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * GET /api/telemetry/fsm/rules
+ * Returns the catalog of all declarative FSM rules for research inspection
+ */
+export function getFSMRules(req, res) {
+  try {
+    const rulesList = FSM_RULES.map((r) => ({
+      id: r.id,
+      name: r.name,
+      description: r.description,
+      targetState: r.targetState,
+      action: r.action,
+      animation: r.animation,
+      messageSinhala: r.messageSinhala
+    }));
+
+    return res.json({
+      success: true,
+      states: Object.values(FSM_STATES),
+      rulesCount: rulesList.length,
+      rules: rulesList
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 }

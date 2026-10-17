@@ -52,8 +52,8 @@ async def get_or_create_onboarding_progress(
     Retrieves or initializes the resumable onboarding state for a learner.
     Strictly verifies that the learner belongs to the requesting parent.
     """
-    # 1. Verify parent ownership
-    learner = await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent")
+    # 1. Verify parent ownership and active (non-archived) status
+    learner = await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent", allow_archived=False)
 
     onboarding_col = get_onboarding_collection()
     questionnaires_col = get_questionnaires_collection()
@@ -172,7 +172,7 @@ async def save_learning_preferences(
     data: LearningPreferencesRequest
 ) -> Dict[str, Any]:
     """Saves child-friendly learning preferences with question and version metadata."""
-    await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent")
+    await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent", allow_archived=False)
 
     now = datetime.now(timezone.utc)
     questionnaires_col = get_questionnaires_collection()
@@ -228,7 +228,7 @@ async def save_snap_iv_questionnaire(
     Accurately computes Inattention (items 1-9) and Hyperactivity/Impulsivity (items 10-18)
     subscale totals and averages. Strictly attaches non-diagnostic research disclaimer.
     """
-    await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent")
+    await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent", allow_archived=False)
 
     now = datetime.now(timezone.utc)
     questionnaires_col = get_questionnaires_collection()
@@ -321,7 +321,7 @@ async def save_social_context(
     data: SocialContextRequest
 ) -> Dict[str, Any]:
     """Saves optional parent-reported social learning context without assigning negative labels."""
-    await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent")
+    await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent", allow_archived=False)
 
     now = datetime.now(timezone.utc)
     questionnaires_col = get_questionnaires_collection()
@@ -379,7 +379,7 @@ async def get_math_questions_for_learner(
     parent_id: str
 ) -> List[Dict[str, Any]]:
     """Retrieves grade-specific mathematics question bank items without revealing answers."""
-    learner = await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent")
+    learner = await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent", allow_archived=False)
     grade = learner.get("grade", 1)
 
     questions = get_questions_for_grade(grade=grade, include_answers=False)
@@ -409,7 +409,7 @@ async def submit_math_assessment(
     Generates transparent rule-based recommendations.
     Marks onboarding as COMPLETED.
     """
-    learner = await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent")
+    learner = await get_learner_by_id(learner_id=learner_id, parent_id=parent_id, user_role="parent", allow_archived=False)
     grade = learner.get("grade", data.grade)
 
     now = datetime.now(timezone.utc)

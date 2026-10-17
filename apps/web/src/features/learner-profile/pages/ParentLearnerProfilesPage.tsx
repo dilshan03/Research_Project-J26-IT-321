@@ -12,7 +12,7 @@ import {
 import { learnerApi } from '../services/learnerApi';
 import { profileApi } from '../services/profileApi';
 import { onboardingApi } from '../services/onboardingApi';
-import type { Learner } from '../types';
+import type { Learner, DeletionRequest } from '../types';
 import { AVATAR_OPTIONS } from '../types';
 import type { ElpxProfile, ElpxSkillEstimate, OnboardingFullSummary } from '../types/onboarding';
 import { PageHeader } from '../../../shared/components/PageHeader';
@@ -24,6 +24,7 @@ export const ParentLearnerProfilesPage: React.FC = () => {
   const [selectedLearnerId, setSelectedLearnerId] = useState<string | null>(null);
   const [profile, setProfile] = useState<ElpxProfile | null>(null);
   const [summary, setSummary] = useState<OnboardingFullSummary | null>(null);
+  const [deletionRequests, setDeletionRequests] = useState<Record<string, DeletionRequest>>({});
 
   const [isLoadingLearners, setIsLoadingLearners] = useState(true);
   const [isLoadingProfile, setIsLoadingProfile] = useState(false);
@@ -33,7 +34,11 @@ export const ParentLearnerProfilesPage: React.FC = () => {
     setIsLoadingLearners(true);
     setErrorMessage(null);
     try {
-      const res = await learnerApi.listLearners();
+      const [res, delRes] = await Promise.all([
+        learnerApi.listLearners(false),
+        learnerApi.listDeletionRequests(),
+      ]);
+
       if (res.success && res.data) {
         setLearners(res.data);
         if (res.data.length > 0 && !selectedLearnerId) {
@@ -42,12 +47,21 @@ export const ParentLearnerProfilesPage: React.FC = () => {
       } else {
         setErrorMessage(res.message || 'Failed to retrieve learners.');
       }
+
+      if (delRes.success && delRes.data) {
+        const reqMap: Record<string, DeletionRequest> = {};
+        delRes.data.forEach((r) => {
+          reqMap[r.learnerId] = r;
+        });
+        setDeletionRequests(reqMap);
+      }
     } catch {
       setErrorMessage('Network error while connecting to learner profile service.');
     } finally {
       setIsLoadingLearners(false);
     }
   }, [selectedLearnerId]);
+
 
   useEffect(() => {
     loadLearners();
@@ -229,6 +243,14 @@ export const ParentLearnerProfilesPage: React.FC = () => {
                 <p className="text-xs sm:text-sm text-mq-text-muted mt-0.5">
                   Learner ID: <code className="font-mono text-xs">{selectedChild.learnerId}</code> · Age {selectedChild.age}
                 </p>
+                {deletionRequests[selectedChild.learnerId] && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-300">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                    <span>
+                      Deletion Request: {deletionRequests[selectedChild.learnerId].status.replace('_', ' ')} (ස්ථිරව ඉවත්කිරීමේ ඉල්ලීම)
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 

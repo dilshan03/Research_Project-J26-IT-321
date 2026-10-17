@@ -142,6 +142,9 @@ class LearnerResponse(BaseModel):
     primaryInstructionLanguage: Optional[str] = None
     avatarId: str
     onboardingStatus: str
+    isArchived: bool = False
+    archivedAt: Optional[str] = None
+    archivedBy: Optional[str] = None
     createdAt: str
     updatedAt: str
 
@@ -157,3 +160,46 @@ class LearnerListResponse(BaseModel):
     message: str = "Learner profiles retrieved successfully."
     data: List[LearnerResponse]
     total: int
+
+
+class DeletionRequestStatus(str, Enum):
+    PENDING_REVIEW = "PENDING_REVIEW"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    COMPLETED = "COMPLETED"
+
+
+class CreateDeletionRequest(BaseModel):
+    reason: Optional[str] = Field(
+        None,
+        max_length=500,
+        description="Optional reason or notes provided by the parent for requesting permanent deletion"
+    )
+
+
+class DeletionRequestResponse(BaseModel):
+    requestId: str
+    learnerId: str
+    parentId: str
+    learnerName: Optional[str] = None
+    status: DeletionRequestStatus
+    requestedAt: str
+    reviewOutcome: Optional[str] = None
+    completedAt: Optional[str] = None
+    reason: Optional[str] = None
+    createdAt: str
+    updatedAt: str
+
+
+class SingleDeletionRequestResponse(BaseModel):
+    success: bool = True
+    message: str = "Deletion request processed successfully."
+    data: Optional[DeletionRequestResponse] = None
+
+
+class DeletionRequestListResponse(BaseModel):
+    success: bool = True
+    message: str = "Deletion requests retrieved successfully."
+    data: List[DeletionRequestResponse]
+    total: int
+

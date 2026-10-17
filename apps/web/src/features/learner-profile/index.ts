@@ -7,8 +7,11 @@ export { ParentAssessmentsPage } from './pages/ParentAssessmentsPage';
 export { ParentRecommendationsPage } from './pages/ParentRecommendationsPage';
 export { LearnerCard } from './components/LearnerCard';
 export { LearnerModal } from './components/LearnerModal';
+export { ArchiveLearnerModal } from './components/ArchiveLearnerModal';
+export { RequestDeletionModal } from './components/RequestDeletionModal';
 export { learnerApi } from './services/learnerApi';
 export { onboardingApi } from './services/onboardingApi';
 export { profileApi } from './services/profileApi';
 export * from './types';
 export * from './types/onboarding';
+

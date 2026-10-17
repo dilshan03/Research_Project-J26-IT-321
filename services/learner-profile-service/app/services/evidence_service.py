@@ -63,11 +63,12 @@ async def ingest_gameplay_activity_evidence(
     - Persists gameplay events distinctly from baseline assessment.
     - Returns ingestion counts and latest profile summary.
     """
-    # Verify learner exists and authorization if parent caller
+    # Verify learner exists, active status, and authorization if parent caller
     learner = await get_learner_by_id(
         learner_id=learner_id,
         parent_id=caller_parent_id if caller_role == "parent" else None,
         user_role=caller_role,
+        allow_archived=False,
     )
 
     events_col = get_gameplay_events_collection()

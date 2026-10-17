@@ -21,6 +21,29 @@ export interface Learner {
   primaryInstructionLanguage?: PrimaryInstructionLanguage | string;
   avatarId: string;
   onboardingStatus: OnboardingStatus;
+  isArchived?: boolean;
+  archivedAt?: string | null;
+  archivedBy?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DeletionRequestStatus =
+  | 'PENDING_REVIEW'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'COMPLETED';
+
+export interface DeletionRequest {
+  requestId: string;
+  learnerId: string;
+  parentId: string;
+  learnerName?: string;
+  status: DeletionRequestStatus;
+  requestedAt: string;
+  reviewOutcome?: string | null;
+  completedAt?: string | null;
+  reason?: string | null;
   createdAt: string;
   updatedAt: string;
 }

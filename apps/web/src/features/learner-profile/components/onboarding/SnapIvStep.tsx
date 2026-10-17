@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import {
   ShieldAlert,
   ArrowRight,
@@ -247,27 +248,31 @@ export const SnapIvStep: React.FC<Props> = ({
       {/* Action Buttons */}
       <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.98 }}
             onClick={onBack}
             className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
           >
             <ArrowLeft size={15} />
             <span>ආපසු</span>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.98 }}
             disabled={isSaving}
             onClick={() => onSaveAndExit(getResponsesArray())}
             className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
           >
             <Save size={15} />
             <span>සුරැක පසුව සම්පූර්ණ කරන්න</span>
-          </button>
+          </motion.button>
         </div>
 
-        <button
+        <motion.button
           type="submit"
+          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: isSaving ? 1 : 1.01 }}
           disabled={isSaving}
           className="btn btn-primary w-full sm:w-auto px-7 py-2.5 rounded-full text-sm font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-sm"
         >
@@ -279,7 +284,7 @@ export const SnapIvStep: React.FC<Props> = ({
               <ArrowRight size={16} strokeWidth={2.5} />
             </>
           )}
-        </button>
+        </motion.button>
       </div>
     </form>
   );

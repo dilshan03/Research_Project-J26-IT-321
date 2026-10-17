@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -33,6 +34,7 @@ import { MathAssessmentStep } from '../components/onboarding/MathAssessmentStep'
 import { OnboardingSummaryStep } from '../components/onboarding/OnboardingSummaryStep';
 
 export const OnboardingPlaceholderPage: React.FC = () => {
+  const shouldReduceMotion = useReducedMotion();
   const { learnerId } = useParams<{ learnerId: string }>();
   const navigate = useNavigate();
 
@@ -352,11 +354,13 @@ export const OnboardingPlaceholderPage: React.FC = () => {
             {/* Child Profile Banner */}
             <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
-                <div
-                  className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-xs border ${avatar.bgColor} ${avatar.borderColor} shrink-0`}
+                <motion.div
+                  whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
+                  transition={{ duration: 0.2 }}
+                  className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-xs border ${avatar.bgColor} ${avatar.borderColor} shrink-0 cursor-default`}
                 >
                   <span>{avatar.icon}</span>
-                </div>
+                </motion.div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary shrink-0">
@@ -409,72 +413,95 @@ export const OnboardingPlaceholderPage: React.FC = () => {
             />
 
             {/* Toast Notification */}
-            {toastMessage && (
-              <div className="fixed bottom-6 right-6 z-50 bg-mq-text-strong text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-xs font-bold font-sinhala animate-fade-in">
-                <CheckCircle2 size={16} className="text-mq-success" />
-                <span>{toastMessage}</span>
-              </div>
-            )}
+            <AnimatePresence>
+              {toastMessage && (
+                <motion.div
+                  initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 12, scale: 0.95 }}
+                  transition={{ duration: shouldReduceMotion ? 0.05 : 0.2 }}
+                  className="fixed bottom-6 right-6 z-50 bg-mq-text-strong text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-xs font-bold font-sinhala"
+                >
+                  <CheckCircle2 size={16} className="text-mq-success" />
+                  <span>{toastMessage}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {/* Step 1: Learning Preferences */}
-            {currentStep === 'preferences' && (
-              <LearningPreferencesStep
-                initialData={savedPreferences}
-                onSave={handleSavePreferences}
-                onSaveAndExit={handlePreferencesSaveAndExit}
-                isSaving={isActionLoading}
-              />
-            )}
+            {/* Step Content with Subtle Motion Transitions (250ms, ADHD-friendly, respects reduced motion) */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -6 }}
+                transition={{
+                  duration: shouldReduceMotion ? 0.05 : 0.25,
+                  ease: 'easeOut',
+                }}
+              >
+                {/* Step 1: Learning Preferences */}
+                {currentStep === 'preferences' && (
+                  <LearningPreferencesStep
+                    initialData={savedPreferences}
+                    onSave={handleSavePreferences}
+                    onSaveAndExit={handlePreferencesSaveAndExit}
+                    isSaving={isActionLoading}
+                  />
+                )}
 
-            {/* Step 2: SNAP-IV Questionnaire */}
-            {currentStep === 'snap_iv' && (
-              <SnapIvStep
-                initialResponses={savedSnapIv}
-                onSave={handleSaveSnapIv}
-                onSaveAndExit={handleSnapIvSaveAndExit}
-                onBack={() => setCurrentStep('preferences')}
-                isSaving={isActionLoading}
-              />
-            )}
+                {/* Step 2: SNAP-IV Questionnaire */}
+                {currentStep === 'snap_iv' && (
+                  <SnapIvStep
+                    initialResponses={savedSnapIv}
+                    onSave={handleSaveSnapIv}
+                    onSaveAndExit={handleSnapIvSaveAndExit}
+                    onBack={() => setCurrentStep('preferences')}
+                    isSaving={isActionLoading}
+                  />
+                )}
 
-            {/* Step 3: Social Learning Context */}
-            {currentStep === 'social_context' && (
-              <SocialContextStep
-                initialData={savedSocialContext}
-                onSave={handleSaveSocialContext}
-                onSaveAndExit={handleSocialContextSaveAndExit}
-                onBack={() => setCurrentStep('snap_iv')}
-                isSaving={isActionLoading}
-              />
-            )}
+                {/* Step 3: Social Learning Context */}
+                {currentStep === 'social_context' && (
+                  <SocialContextStep
+                    initialData={savedSocialContext}
+                    onSave={handleSaveSocialContext}
+                    onSaveAndExit={handleSocialContextSaveAndExit}
+                    onBack={() => setCurrentStep('snap_iv')}
+                    isSaving={isActionLoading}
+                  />
+                )}
 
-            {/* Step 4: Parent Child Handover */}
-            {currentStep === 'handover' && (
-              <ParentChildHandoverStep
-                learner={learner}
-                onContinue={handleHandoverContinue}
-                onBack={() => setCurrentStep('social_context')}
-              />
-            )}
+                {/* Step 4: Parent Child Handover */}
+                {currentStep === 'handover' && (
+                  <ParentChildHandoverStep
+                    learner={learner}
+                    onContinue={handleHandoverContinue}
+                    onBack={() => setCurrentStep('social_context')}
+                  />
+                )}
 
-            {/* Step 5: Mathematics Assessment */}
-            {currentStep === 'math_assessment' && (
-              <MathAssessmentStep
-                grade={learner.grade}
-                preferredLanguage={learner.preferredLanguage}
-                primaryInstructionLanguage={learner.primaryInstructionLanguage}
-                questions={mathQuestions}
-                onSubmit={handleMathSubmit}
-                onSaveAndExit={handleMathSaveAndExit}
-                onBack={() => setCurrentStep('handover')}
-                isSubmitting={isActionLoading}
-              />
-            )}
+                {/* Step 5: Mathematics Assessment */}
+                {currentStep === 'math_assessment' && (
+                  <MathAssessmentStep
+                    grade={learner.grade}
+                    preferredLanguage={learner.preferredLanguage}
+                    primaryInstructionLanguage={learner.primaryInstructionLanguage}
+                    questions={mathQuestions}
+                    onSubmit={handleMathSubmit}
+                    onSaveAndExit={handleMathSaveAndExit}
+                    onBack={() => setCurrentStep('handover')}
+                    isSubmitting={isActionLoading}
+                    avatarId={learner.avatarId}
+                  />
+                )}
 
-            {/* Step 6: Summary & Baseline Profile */}
-            {currentStep === 'summary' && fullSummary && (
-              <OnboardingSummaryStep summary={fullSummary} />
-            )}
+                {/* Step 6: Summary & Baseline Profile */}
+                {currentStep === 'summary' && fullSummary && (
+                  <OnboardingSummaryStep summary={fullSummary} />
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         )}
       </main>

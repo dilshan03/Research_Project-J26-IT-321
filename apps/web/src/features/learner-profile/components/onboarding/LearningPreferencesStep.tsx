@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import {
   Eye,
   Volume2,
@@ -402,18 +403,21 @@ export const LearningPreferencesStep: React.FC<Props> = ({
       {/* Action Buttons: Next & Save & Exit */}
       <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.98 }}
           disabled={isSaving}
           onClick={() => onSaveAndExit(getPayload())}
           className="btn btn-secondary w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center justify-center gap-2"
         >
           <Save size={15} />
           <span>සුරැක පසුව සම්පූර්ණ කරන්න (Save & Resume Later)</span>
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
           type="submit"
+          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: isSaving ? 1 : 1.01 }}
           disabled={isSaving}
           className="btn btn-primary w-full sm:w-auto px-7 py-2.5 rounded-full text-sm font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-sm"
         >
@@ -425,7 +429,7 @@ export const LearningPreferencesStep: React.FC<Props> = ({
               <ArrowRight size={16} strokeWidth={2.5} />
             </>
           )}
-        </button>
+        </motion.button>
       </div>
     </form>
   );

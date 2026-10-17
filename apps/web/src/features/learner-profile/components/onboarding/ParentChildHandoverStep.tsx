@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import {
   Sparkles,
   ArrowRight,
@@ -6,6 +7,7 @@ import {
   Gamepad2,
 } from 'lucide-react';
 import { AVATAR_OPTIONS, type Learner } from '../../types';
+import { AnimatedCompanion } from './AnimatedCompanion';
 
 interface Props {
   learner: Learner;
@@ -31,13 +33,18 @@ export const ParentChildHandoverStep: React.FC<Props> = ({
         <span>දෙමාපියන්ගෙන් දරුවාට භාරදීම (Parent to Child Handover)</span>
       </div>
 
-      {/* Avatar Spotlight */}
-      <div className="flex flex-col items-center space-y-3">
-        <div
-          className={`w-24 h-24 sm:w-28 sm:h-28 rounded-3xl flex items-center justify-center text-5xl sm:text-6xl shadow-md border-2 animate-bounce-gentle ${avatar.bgColor} ${avatar.borderColor}`}
-        >
-          <span>{avatar.icon}</span>
-        </div>
+      {/* Avatar Spotlight with AnimatedCompanion */}
+      <div className="flex flex-col items-center space-y-4">
+        <AnimatedCompanion
+          avatarId={learner.avatarId}
+          state="welcome"
+          size="lg"
+          showSpeechBubble={true}
+          customSpeech={{
+            si: `ආයුබෝවන්, ${callingName}! අපි එකතු වී ගණිත වික්‍රමය අරඹමු!`,
+            en: `Hello, ${callingName}! Let's begin our fun math quest together!`,
+          }}
+        />
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-mq-primary block">
             {avatar.nameSi} ({avatar.name})
@@ -75,24 +82,28 @@ export const ParentChildHandoverStep: React.FC<Props> = ({
 
       {/* Action Buttons */}
       <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.98 }}
           onClick={onBack}
           className="btn btn-secondary w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center justify-center gap-1.5"
         >
           <ArrowLeft size={15} />
           <span>ආපසු දෙමාපිය ප්‍රශ්නාවලියට</span>
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.02 }}
           onClick={onContinue}
-          className="btn btn-primary w-full sm:w-auto px-8 py-3 rounded-full text-base font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-md hover:scale-102 transition-transform"
+          className="btn btn-primary w-full sm:w-auto px-8 py-3 rounded-full text-base font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-md"
         >
           <span>ගණිත වික්‍රමය අරඹමු! (Start Fun Math Tasks)</span>
           <ArrowRight size={18} strokeWidth={2.5} />
-        </button>
+        </motion.button>
       </div>
     </div>
   );
 };
+

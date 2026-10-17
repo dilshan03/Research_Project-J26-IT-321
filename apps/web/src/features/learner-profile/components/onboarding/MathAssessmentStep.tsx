@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
   ArrowRight,
   ArrowLeft,
@@ -14,7 +15,7 @@ import type {
   MathQuestion,
   MathItemAnswer,
 } from '../../types/onboarding';
-
+import { AnimatedCompanion, type CompanionState } from './AnimatedCompanion';
 
 interface Props {
   grade: number;
@@ -25,6 +26,7 @@ interface Props {
   onSaveAndExit: (answers: MathItemAnswer[]) => Promise<void>;
   onBack: () => void;
   isSubmitting: boolean;
+  avatarId?: string;
 }
 
 export const MathAssessmentStep: React.FC<Props> = ({
@@ -36,7 +38,9 @@ export const MathAssessmentStep: React.FC<Props> = ({
   onSaveAndExit,
   onBack,
   isSubmitting,
+  avatarId,
 }) => {
+  const shouldReduceMotion = useReducedMotion();
   const [currentIndex, setCurrentIndex] = useState(0);
   // Store user answers by questionId
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
@@ -44,6 +48,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
   const [attempts, setAttempts] = useState<Record<string, number>>({});
   const [showHintModal, setShowHintModal] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
+  const [companionState, setCompanionState] = useState<CompanionState>('idle');
 
   // Numeric input state
   const [numericInput, setNumericInput] = useState('');
@@ -58,6 +63,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
     questionStartTimeRef.current = Date.now();
     setShowHintModal(false);
     setShowTranslation(false);
+    setCompanionState('idle');
     // If existing answer is numeric, populate input
     if (currentQuestion && answers[currentQuestion.questionId] !== undefined) {
       setNumericInput(String(answers[currentQuestion.questionId]));
@@ -98,6 +104,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
       ...prev,
       [currentQuestion.questionId]: (prev[currentQuestion.questionId] || 0) + 1,
     }));
+    setCompanionState('encouragement');
   };
 
   const handleNumericChange = (val: string) => {
@@ -119,6 +126,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
         ...prev,
         [currentQuestion.questionId]: (prev[currentQuestion.questionId] || 0) + 1,
       }));
+      setCompanionState('encouragement');
     }
   };
 
@@ -128,6 +136,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
       ...prev,
       [currentQuestion.questionId]: true,
     }));
+    setCompanionState('hint');
     setShowHintModal(true);
   };
 
@@ -148,6 +157,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
+      setCompanionState('success');
       onSubmit(compileAnswers());
     }
   };
@@ -170,30 +180,45 @@ export const MathAssessmentStep: React.FC<Props> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top Header Card with Question Progress */}
-      <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs flex items-center justify-between gap-4">
-        <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary block">
-            {grade} වන ශ්‍රේණිය • ගණිත අභ්‍යාසය (Grade {grade} Math Quest)
-          </span>
-          <span className="text-sm font-bold text-mq-text-strong font-sinhala">
-            ප්‍රශ්න {currentIndex + 1} න් {totalQuestions}
-          </span>
+      {/* Top Header Card with Question Progress & Animated Companion */}
+      <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <AnimatedCompanion
+            avatarId={avatarId}
+            state={companionState}
+            size="md"
+            onAnimationComplete={() => {
+              if (companionState === 'encouragement') {
+                setCompanionState('idle');
+              }
+            }}
+          />
+          <div className="min-w-0">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary block">
+              {grade} වන ශ්‍රේණිය • ගණිත අභ්‍යාසය (Grade {grade} Math Quest)
+            </span>
+            <span className="text-sm font-bold text-mq-text-strong font-sinhala">
+              ප්‍රශ්න {currentIndex + 1} න් {totalQuestions}
+            </span>
+          </div>
         </div>
 
         {/* Progress Bar & Hint Button */}
         <div className="flex items-center gap-3">
-          <div className="hidden sm:block w-32 bg-mq-surface-soft h-2.5 rounded-full overflow-hidden border border-mq-border">
-            <div
-              className="bg-mq-primary h-full rounded-full transition-all duration-300"
-              style={{ width: `${progressPct}%` }}
+          <div className="w-28 sm:w-36 bg-mq-surface-soft h-2.5 rounded-full overflow-hidden border border-mq-border">
+            <motion.div
+              className="bg-mq-primary h-full rounded-full"
+              initial={false}
+              animate={{ width: `${progressPct}%` }}
+              transition={{ duration: shouldReduceMotion ? 0.05 : 0.35, ease: 'easeOut' }}
             />
           </div>
 
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.96 }}
             onClick={handleToggleHint}
-            className={`btn text-xs py-1.5 px-3.5 rounded-full flex items-center gap-1.5 font-bold transition-all ${
+            className={`btn text-xs py-1.5 px-3.5 rounded-full flex items-center gap-1.5 font-bold transition-colors cursor-pointer ${
               hintsUsed[currentQuestion?.questionId || '']
                 ? 'bg-mq-surface-yellow text-mq-warning border-mq-warning/40'
                 : 'btn-secondary text-mq-primary hover:bg-mq-surface-soft'
@@ -201,7 +226,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
           >
             <Lightbulb size={15} />
             <span>ඉඟියක් (Hint)</span>
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -408,11 +433,14 @@ export const MathAssessmentStep: React.FC<Props> = ({
                 const isSelected =
                   answers[currentQuestion.questionId] === opt.id;
                 return (
-                  <button
+                  <motion.button
                     type="button"
                     key={opt.id}
+                    whileTap={{ scale: shouldReduceMotion ? 1 : 0.985 }}
+                    whileHover={{ scale: shouldReduceMotion ? 1 : 1.01 }}
+                    transition={{ duration: 0.15 }}
                     onClick={() => handleSelectOption(opt.id)}
-                    className={`p-4 rounded-2xl border text-left flex items-center justify-between gap-3 transition-all cursor-pointer ${
+                    className={`p-4 rounded-2xl border text-left flex items-center justify-between gap-3 transition-colors cursor-pointer ${
                       isSelected
                         ? 'border-mq-primary bg-mq-surface-blue text-mq-primary ring-2 ring-mq-primary/20 shadow-xs'
                         : 'border-mq-border bg-white hover:border-mq-primary/40 hover:bg-mq-surface-soft/40'
@@ -435,7 +463,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
                         className="text-mq-primary shrink-0"
                       />
                     )}
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -460,67 +488,105 @@ export const MathAssessmentStep: React.FC<Props> = ({
       )}
 
       {/* Hint Modal / Drawer */}
-      {showHintModal && currentQuestion && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-3xl border border-mq-border max-w-md w-full p-6 space-y-4 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-mq-warning font-bold">
-                <Lightbulb size={20} />
-                <span className="text-sm font-sinhala">ප්‍රයෝජනවත් ඉඟියක් (Helpful Hint)</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowHintModal(false)}
-                className="p-1.5 rounded-full hover:bg-mq-surface-soft text-mq-text-muted"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="p-4 rounded-2xl bg-mq-surface-yellow border border-mq-warning/30 space-y-2 font-sinhala">
-              <p className="text-sm font-bold text-mq-text-strong">
-                {currentQuestion.hintSi}
-              </p>
-              <p className="text-xs text-mq-text-muted italic">
-                {currentQuestion.hintEn}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowHintModal(false)}
-              className="btn btn-primary w-full py-2.5 rounded-full text-xs font-bold font-sinhala"
+      <AnimatePresence>
+        {showHintModal && currentQuestion && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: shouldReduceMotion ? 1 : 0.95, opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: shouldReduceMotion ? 1 : 0.95, opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              className="bg-white rounded-3xl border border-mq-border max-w-md w-full p-6 space-y-4 shadow-xl"
             >
-              තේරුණා, මම පිළිතුරු දෙන්නම් (Got it!)
-            </button>
-          </div>
-        </div>
-      )}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-mq-warning font-bold">
+                  <Lightbulb size={20} />
+                  <span className="text-sm font-sinhala">ප්‍රයෝජනවත් ඉඟියක් (Helpful Hint)</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowHintModal(false);
+                    setCompanionState('idle');
+                  }}
+                  className="p-1.5 rounded-full hover:bg-mq-surface-soft text-mq-text-muted cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Companion Guidance In Hint Modal */}
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
+                <AnimatedCompanion
+                  avatarId={avatarId}
+                  state="hint"
+                  size="sm"
+                />
+                <p className="text-xs font-semibold text-mq-text-muted font-sinhala">
+                  කලබල නොවී සෙමෙන් කියවා විසඳන්න! (Take your time, you've got this!)
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-mq-surface-yellow border border-mq-warning/30 space-y-2 font-sinhala">
+                <p className="text-sm font-bold text-mq-text-strong">
+                  {currentQuestion.hintSi}
+                </p>
+                <p className="text-xs text-mq-text-muted italic">
+                  {currentQuestion.hintEn}
+                </p>
+              </div>
+              <motion.button
+                type="button"
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  setShowHintModal(false);
+                  setCompanionState('idle');
+                }}
+                className="btn btn-primary w-full py-2.5 rounded-full text-xs font-bold font-sinhala"
+              >
+                තේරුණා, මම පිළිතුරු දෙන්නම් (Got it!)
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Navigation Buttons: Prev, Next / Submit */}
       <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.98 }}
             disabled={isSubmitting}
             onClick={handlePrev}
             className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5 disabled:opacity-50"
           >
             <ArrowLeft size={15} />
             <span>{currentIndex === 0 ? 'ආපසු' : 'පෙර ප්‍රශ්නය'}</span>
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.98 }}
             disabled={isSubmitting}
             onClick={() => onSaveAndExit(compileAnswers())}
             className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
           >
             <Save size={15} />
             <span>සුරැක පසුව කරන්න</span>
-          </button>
+          </motion.button>
         </div>
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: isSubmitting || !isCurrentAnswered ? 1 : 1.01 }}
           disabled={isSubmitting || !isCurrentAnswered}
           onClick={handleNext}
           className="btn btn-primary w-full sm:w-auto px-8 py-3 rounded-full text-sm font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
@@ -538,7 +604,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
               <ArrowRight size={16} strokeWidth={2.5} />
             </>
           )}
-        </button>
+        </motion.button>
       </div>
     </div>
   );

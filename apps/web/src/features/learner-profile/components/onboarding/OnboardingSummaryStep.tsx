@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 import type { OnboardingFullSummary } from '../../types/onboarding';
-import { AVATAR_OPTIONS } from '../../types';
+import { AnimatedCompanion } from './AnimatedCompanion';
 
 interface Props {
   summary: OnboardingFullSummary;
@@ -23,8 +23,6 @@ interface Props {
 export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
   const [showFormulaExplanation, setShowFormulaExplanation] = useState<boolean>(false);
   const learner = summary.learner;
-  const avatar =
-    AVATAR_OPTIONS.find((a) => a.id === learner?.avatarId) || AVATAR_OPTIONS[0];
 
   const math = summary.mathSummary;
   const snap = summary.snapIvSummary;
@@ -36,11 +34,16 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
       {/* Success Celebration Card */}
       <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 lg:p-7 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-5 animate-fade-in">
         <div className="flex items-start sm:items-center gap-3.5 sm:gap-4.5 min-w-0 flex-1">
-          <div
-            className={`w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl lg:text-5xl shadow-sm border ${avatar.bgColor} ${avatar.borderColor} shrink-0`}
-          >
-            <span>{avatar.icon}</span>
-          </div>
+          <AnimatedCompanion
+            avatarId={learner?.avatarId}
+            state="success"
+            size="lg"
+            showSpeechBubble={true}
+            customSpeech={{
+              si: `සුබ පැතුම්, ${learner.firstName}! ඔබේ ආරම්භක පැතිකඩ සාර්ථකව සකස් විය!`,
+              en: `Congratulations, ${learner.firstName}! Your personalized learning profile is ready!`,
+            }}
+          />
           <div className="min-w-0 flex-1 space-y-1">
             <div className="flex items-center gap-2 flex-wrap">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-green text-mq-success border border-mq-success/20 max-w-full">

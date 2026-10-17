@@ -64,6 +64,27 @@ export interface StoryNarrative {
   gaja_dialogue: GajaDialogue;
 }
 
+export interface StudentBehaviorProfile {
+  learner_id?: string;
+  student_name?: string;
+  archetype_id?: string;
+  inattention_level: 'LOW' | 'MODERATE' | 'HIGH';
+  impulsivity_level: 'LOW' | 'MODERATE' | 'HIGH';
+  working_memory_support: boolean;
+  activity_pace: 'CALM_STEP_BY_STEP' | 'REGULAR' | 'FLEXIBLE';
+  visual_assistance: 'ALWAYS' | 'SOMETIMES' | 'MINIMAL';
+  audio_assistance: 'READ_EVERYTHING' | 'READ_ON_CLICK' | 'OFF';
+}
+
+export interface CustomADHDGameSettings {
+  step_granularity?: 'TWO_TIER' | 'MAXIMAL_THREE_TIER';
+  distractor_count?: number;
+  stimulus_density?: 'LOW' | 'MEDIUM';
+  visual_clutter_filter?: boolean;
+  timer_enabled?: boolean;
+  preferred_distractor_types?: string[];
+}
+
 export interface GameActivityBlueprint {
   activity_id: string;
   source_question_id: string;
@@ -75,7 +96,12 @@ export interface GameActivityBlueprint {
   status: BlueprintStatus;
   story_narrative?: StoryNarrative | null;
   cli_score?: number | null;
+  effective_cli_score?: number | null;
   raw_sinhala_question?: string | null;
+  target_learner_id?: string | null;
+  student_name?: string | null;
+  customized_by_teacher?: boolean;
+  behavior_profile?: Record<string, any> | null;
 }
 
 export interface BlueprintEnvelope {
@@ -127,7 +153,25 @@ export interface AdaptProblemRequest {
   adhd_risk_level: RiskLevel;
   game_theme?: GameTheme | null;
   custom_gaja_notes?: string | null;
+  learner_id?: string | null;
+  student_name?: string | null;
+  behavior_profile?: StudentBehaviorProfile | null;
+  custom_settings?: CustomADHDGameSettings | null;
 }
+
+export interface TuneBlueprintRequest {
+  custom_settings: CustomADHDGameSettings;
+  behavior_profile?: StudentBehaviorProfile | null;
+  custom_gaja_notes?: string | null;
+  game_theme?: GameTheme | null;
+}
+
+export interface CognitiveLoadPreviewResponse {
+  base_cli: number;
+  effective_cli: number;
+  difference: number;
+}
+
 
 export interface DocumentUploadResponse {
   document: SyllabusDocument;

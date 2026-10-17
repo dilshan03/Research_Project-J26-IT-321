@@ -7,6 +7,7 @@ import {
   Calculator,
   Award,
   Check,
+  type LucideIcon,
 } from 'lucide-react';
 import type { OnboardingStepKey } from '../../types/onboarding';
 
@@ -20,7 +21,7 @@ interface StepItem {
   key: OnboardingStepKey;
   labelEn: string;
   labelSi: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   isParentStage: boolean;
 }
 

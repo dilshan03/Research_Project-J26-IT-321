@@ -13,8 +13,18 @@ from app.schemas.game_blueprint import (
     GameMicroStep,
     VisualAssetTag,
 )
-from app.schemas.syllabus import CurriculumProblem, StoryNarrative
-from app.services.cognitive_load import compute_cli, derive_adhd_game_settings
+from app.schemas.syllabus import (
+    CurriculumProblem,
+    CustomADHDGameSettings,
+    StoryNarrative,
+    StudentBehaviorProfile,
+)
+from app.services.cognitive_load import (
+    build_custom_adhd_game_settings,
+    calculate_custom_cli,
+    compute_cli,
+    derive_adhd_game_settings,
+)
 from app.services.llm_extractor import MathVerificationService, enrich_gameplay_narrative
 from app.services.problem_parser import OPERATION_SYMBOLS, ParsedProblem, _apply, parse_problem
 
@@ -347,13 +357,17 @@ async def generate_blueprint_from_curriculum_problem(
     adhd_risk_level: str = "MEDIUM",
     game_theme: Optional[str] = None,
     custom_gaja_notes: Optional[str] = None,
+    learner_id: Optional[str] = None,
+    student_name: Optional[str] = None,
+    behavior_profile: Optional[StudentBehaviorProfile] = None,
+    custom_settings: Optional[CustomADHDGameSettings] = None,
 ) -> Tuple[GameActivityBlueprint, float]:
     """
     Asynchronous, end-to-end generator from a structured CurriculumProblem:
     1. Verifies math deterministically.
-    2. Computes CLI score and derives ADHD settings.
+    2. Computes CLI score and applies teacher customization & student behavioral profile.
     3. Enriches cultural narrative and Gaja dialogue.
-    4. Deconstructs into ADHD micro-steps with cognitive distractors.
+    4. Deconstructs into tailored ADHD micro-steps with cognitive distractors.
     """
     op = problem.operation or ("COUNT" if problem.grade == 1 else "ADD")
     operands = problem.operands if problem.operands else [problem.expected_answer]
@@ -365,9 +379,15 @@ async def generate_blueprint_from_curriculum_problem(
     else:
         verified_answer = MathVerificationService.execute_calculation(operands, op)
 
-    # CLI Score computation
+    # CLI Score computation & custom settings build
     cli = compute_cli(problem.raw_problem_text, operation_count=1)
-    settings = derive_adhd_game_settings(cli, adhd_risk_level)
+    settings, is_customized = build_custom_adhd_game_settings(
+        cli_score=cli,
+        adhd_risk_level=adhd_risk_level,
+        custom_settings=custom_settings,
+        behavior_profile=behavior_profile,
+    )
+    effective_cli = calculate_custom_cli(cli, settings, behavior_profile)
 
     # Theme selection
     chosen_theme = game_theme or _default_theme(problem.is_money, problem.topic, op)
@@ -396,6 +416,69 @@ async def generate_blueprint_from_curriculum_problem(
         status="draft",
         story_narrative=narrative.model_dump(),
         cli_score=round(cli, 2),
+        effective_cli_score=effective_cli,
         raw_sinhala_question=problem.child_prompt_si or problem.raw_problem_text,
+        target_learner_id=learner_id,
+        student_name=student_name,
+        customized_by_teacher=is_customized,
+        behavior_profile=behavior_profile.model_dump() if behavior_profile else None,
     )
-    return blueprint, cli
+    return blueprint, effective_cli
+
+
+def tune_existing_blueprint(
+    existing: GameActivityBlueprint,
+    problem: CurriculumProblem,
+    custom_settings: CustomADHDGameSettings,
+    behavior_profile: Optional[StudentBehaviorProfile] = None,
+    game_theme: Optional[str] = None,
+) -> GameActivityBlueprint:
+    """
+    Synchronously re-tunes an existing GameActivityBlueprint with updated
+    cognitive load settings, micro-steps, and distractor profiles,
+    preserving the existing story narrative and mascot dialogue.
+    """
+    op = problem.operation or ("COUNT" if problem.grade == 1 else "ADD")
+    operands = problem.operands if problem.operands else [problem.expected_answer]
+
+    if op in ("COUNT", "COMPARE", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME"):
+        verified_answer = problem.expected_answer
+    else:
+        verified_answer = MathVerificationService.execute_calculation(operands, op)
+
+    base_cli = existing.cli_score or compute_cli(problem.raw_problem_text, operation_count=1)
+
+    settings, _ = build_custom_adhd_game_settings(
+        cli_score=base_cli,
+        adhd_risk_level="MEDIUM",
+        custom_settings=custom_settings,
+        behavior_profile=behavior_profile,
+    )
+    effective_cli = calculate_custom_cli(base_cli, settings, behavior_profile)
+
+    chosen_theme = game_theme or existing.game_theme
+
+    # Re-build micro-steps with new scaffolding/distractors
+    micro_steps = build_micro_steps(
+        operands=operands,
+        operations=[op],
+        final_answer=verified_answer,
+        settings=settings,
+        is_money=problem.is_money,
+        grade=problem.grade,
+    )
+
+    updated_blueprint = existing.model_copy(
+        update={
+            "game_theme": chosen_theme,
+            "adhd_game_settings": settings,
+            "micro_steps": micro_steps,
+            "effective_cli_score": effective_cli,
+            "customized_by_teacher": True,
+            "behavior_profile": behavior_profile.model_dump() if behavior_profile else existing.behavior_profile,
+            "target_learner_id": behavior_profile.learner_id if behavior_profile and behavior_profile.learner_id else existing.target_learner_id,
+            "student_name": behavior_profile.student_name if behavior_profile and behavior_profile.student_name else existing.student_name,
+        }
+    )
+    return updated_blueprint
+

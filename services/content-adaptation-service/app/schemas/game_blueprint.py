@@ -82,7 +82,12 @@ class GameActivityBlueprint(BaseModel):
     status: Literal['draft', 'approved', 'rejected'] = Field(..., description="Approval status of the blueprint")
     story_narrative: Optional[dict] = Field(None, description="Culturally resonant story backdrop and Gaja mascot dialogue")
     cli_score: Optional[float] = Field(None, description="Calculated Cognitive Load Index")
+    effective_cli_score: Optional[float] = Field(None, description="Tuned Cognitive Load Index after teacher customization")
     raw_sinhala_question: Optional[str] = Field(None, description="Original question text")
+    target_learner_id: Optional[str] = Field(None, description="Assigned learner identifier if personalized")
+    student_name: Optional[str] = Field(None, description="Assigned learner name or archetype label")
+    customized_by_teacher: bool = Field(False, description="Flag indicating if teacher adjusted cognitive load settings")
+    behavior_profile: Optional[dict] = Field(None, description="Student behavioral profile summary snapshot")
 
 
 class CurriculumAdaptationRequest(BaseModel):

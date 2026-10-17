@@ -1,9 +1,8 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei';
 import { AgentModel } from '../engine/AgentModel';
 import { AgentSpeechBubble } from './AgentSpeechBubble';
-import { getAgentConfig } from '../agents/registry';
 import type { AgentId } from '../types/agent.types';
 
 interface AgentAvatarProps {
@@ -17,7 +16,6 @@ export function AgentAvatar({
   showSpeechBubble = true,
   interactive = false 
 }: AgentAvatarProps) {
-  const config = getAgentConfig(agentId);
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>

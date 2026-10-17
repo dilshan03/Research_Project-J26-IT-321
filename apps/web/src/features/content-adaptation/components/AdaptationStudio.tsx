@@ -14,6 +14,7 @@ import {
   Loader2,
   Play,
   Search,
+  Sliders,
   Sparkles,
   UploadCloud,
   Wand2,
@@ -25,13 +26,17 @@ import type {
   BlueprintEnvelope,
   BlueprintStatus,
   CurriculumProblem,
+  CustomADHDGameSettings,
   GameTheme,
   RiskLevel,
+  StudentBehaviorProfile,
   SyllabusDocument,
 } from '../types';
 import { GamePlayer } from '../game/GamePlayer';
 import { CompanionWardrobeModal } from '../game/CompanionWardrobeModal';
 import { useCompanion } from '../game/useCompanion';
+import { StudentBehaviorSelector } from './StudentBehaviorSelector';
+import { CognitiveLoadCustomizer } from './CognitiveLoadCustomizer';
 
 type StudioTab = 'library' | 'bank' | 'review' | 'preview';
 
@@ -89,8 +94,31 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
   const [adaptingProbId, setAdaptingProbId] = useState<string | null>(null);
 
   // Adaptation Settings State
-  const [adhdRisk, setAdhdRisk] = useState<RiskLevel>('MEDIUM');
+  const [adhdRisk] = useState<RiskLevel>('MEDIUM');
   const [gameTheme, setGameTheme] = useState<GameTheme>('VILLAGE_MARKET');
+
+  // Teacher Customization State
+  const [selectedStudentProfile, setSelectedStudentProfile] = useState<StudentBehaviorProfile>({
+    archetype_id: 'INATTENTIVE',
+    student_name: 'Inattentive Profile (අවධානය)',
+    inattention_level: 'HIGH',
+    impulsivity_level: 'LOW',
+    working_memory_support: true,
+    activity_pace: 'CALM_STEP_BY_STEP',
+    visual_assistance: 'ALWAYS',
+    audio_assistance: 'READ_ON_CLICK',
+  });
+  const [customStudentName, setCustomStudentName] = useState<string>('');
+  const [customAdhdSettings, setCustomAdhdSettings] = useState<CustomADHDGameSettings>({
+    step_granularity: 'MAXIMAL_THREE_TIER',
+    distractor_count: 2,
+    stimulus_density: 'LOW',
+    visual_clutter_filter: true,
+    timer_enabled: false,
+  });
+  const [isTuningModalOpen, setIsTuningModalOpen] = useState(false);
+  const [isTuning, setIsTuning] = useState(false);
+  const [showAdvancedCustomizer, setShowAdvancedCustomizer] = useState(true);
 
   // Blueprint Review State
   const [blueprints, setBlueprints] = useState<BlueprintEnvelope[]>([]);
@@ -199,6 +227,10 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
       const req: AdaptProblemRequest = {
         adhd_risk_level: adhdRisk,
         game_theme: gameTheme,
+        learner_id: selectedStudentProfile?.learner_id || undefined,
+        student_name: customStudentName.trim() || selectedStudentProfile?.student_name,
+        behavior_profile: selectedStudentProfile,
+        custom_settings: customAdhdSettings,
       };
       const env = await contentAdaptationApi.adaptProblem(problem.problem_id, req);
       setSelectedBlueprint(env);
@@ -212,6 +244,31 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
       setError((err as Error).message);
     } finally {
       setAdaptingProbId(null);
+    }
+  };
+
+  // Re-tune Blueprint Cognitive Load
+  const handleTuneBlueprint = async () => {
+    if (!selectedBlueprint) return;
+    setIsTuning(true);
+    setError(null);
+    try {
+      const updated = await contentAdaptationApi.tuneBlueprint(
+        selectedBlueprint.blueprint.activity_id,
+        {
+          custom_settings: customAdhdSettings,
+          behavior_profile: selectedStudentProfile,
+          game_theme: gameTheme,
+        }
+      );
+      setSelectedBlueprint(updated);
+      await refreshBlueprints();
+      setSuccessMsg('Blueprint re-tuned with updated cognitive load and micro-steps!');
+      setIsTuningModalOpen(false);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsTuning(false);
     }
   };
 
@@ -556,32 +613,44 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
             </div>
           </div>
 
-          {/* Adaptation Presets Config Drawer */}
-          <div className="rounded-3xl bg-mq-surface-soft/70 border border-mq-border p-4 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-4">
-              <span className="text-xs font-bold text-mq-text-strong flex items-center gap-1.5">
-                <Layers size={14} /> Target ADHD Profile for Adaptation:
-              </span>
-              <div className="flex rounded-xl bg-white p-1 border border-mq-border">
-                {(['LOW', 'MEDIUM', 'HIGH'] as RiskLevel[]).map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => setAdhdRisk(r)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition ${
-                      adhdRisk === r ? 'bg-mq-primary text-white' : 'text-mq-text-muted hover:text-mq-text'
-                    }`}
-                  >
-                    {r} Risk
-                  </button>
-                ))}
-              </div>
+          {/* Teacher Customization: Student Behavioral Needs & Cognitive Load Tuning */}
+          <StudentBehaviorSelector
+            selectedProfile={selectedStudentProfile}
+            onSelectProfile={(prof) => {
+              setSelectedStudentProfile(prof);
+              // Auto-tune cognitive load based on archetype
+              if (prof.inattention_level === 'HIGH') {
+                setCustomAdhdSettings((prev) => ({ ...prev, distractor_count: 2, visual_clutter_filter: true }));
+              }
+              if (prof.impulsivity_level === 'HIGH') {
+                setCustomAdhdSettings((prev) => ({ ...prev, timer_enabled: false, step_granularity: 'MAXIMAL_THREE_TIER' }));
+              }
+              if (prof.activity_pace === 'CALM_STEP_BY_STEP') {
+                setCustomAdhdSettings((prev) => ({ ...prev, timer_enabled: false, stimulus_density: 'LOW' }));
+              }
+            }}
+            customStudentName={customStudentName}
+            onCustomStudentNameChange={setCustomStudentName}
+          />
 
+          {/* Quick Controls Bar: Theme & Customizer Toggle */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-mq-surface-soft/80 border border-mq-border px-4 py-3 rounded-2xl">
+            <button
+              type="button"
+              onClick={() => setShowAdvancedCustomizer(!showAdvancedCustomizer)}
+              className="btn btn-secondary !text-xs !py-1.5 !px-3.5 flex items-center gap-1.5 shadow-2xs font-bold"
+            >
+              <Sliders size={13} className="text-mq-primary" />
+              <span>{showAdvancedCustomizer ? 'Hide Cognitive Load Knobs' : 'Fine-Tune Cognitive Load Knobs (CLI Sliders)'}</span>
+            </button>
+
+            <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5 text-xs">
-                <span className="font-bold text-mq-text-muted">Theme:</span>
+                <span className="font-bold text-mq-text-muted">Game Theme:</span>
                 <select
                   value={gameTheme}
                   onChange={(e) => setGameTheme(e.target.value as GameTheme)}
-                  className="rounded-lg border border-mq-border bg-white px-2 py-1 text-xs font-semibold focus:outline-none"
+                  className="rounded-xl border border-mq-border bg-white px-3 py-1.5 text-xs font-semibold focus:outline-none"
                 >
                   <option value="VILLAGE_MARKET">🧺 Village Market (Pola)</option>
                   <option value="JUNGLE_ADVENTURE">🐘 Jungle Adventure (Sinharaja)</option>
@@ -589,10 +658,17 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
                 </select>
               </div>
             </div>
-            <span className="text-xs text-mq-text-muted">
-              Click <strong className="text-mq-primary">"Adapt to Game"</strong> on any question below.
-            </span>
           </div>
+
+          {/* Interactive Cognitive Load Tuning Panel */}
+          {showAdvancedCustomizer && (
+            <CognitiveLoadCustomizer
+              settings={customAdhdSettings}
+              onChangeSettings={setCustomAdhdSettings}
+              behaviorProfile={selectedStudentProfile}
+              baseCli={2.4}
+            />
+          )}
 
           {/* Problem Cards Grid */}
           {problems.length === 0 ? (
@@ -676,7 +752,9 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
                       ) : (
                         <Sparkles size={13} />
                       )}
-                      Adapt to Game
+                      <span>
+                        Adapt for {customStudentName.trim() || selectedStudentProfile?.student_name?.split(' ')[0] || 'Learner'}
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -773,28 +851,70 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
 
                 {/* Cognitive Load and ADHD Metrics */}
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="rounded-2xl border border-mq-border p-4 bg-mq-surface-soft/40">
-                    <CliMeter score={selectedBlueprint.cli_score} />
+                  <div className="rounded-2xl border border-mq-border p-4 bg-mq-surface-soft/40 space-y-2">
+                    <CliMeter score={selectedBlueprint.blueprint.effective_cli_score ?? selectedBlueprint.cli_score} />
+                    {selectedBlueprint.blueprint.effective_cli_score && selectedBlueprint.blueprint.effective_cli_score !== selectedBlueprint.cli_score && (
+                      <div className="text-[10px] text-mq-text-muted flex justify-between font-bold pt-1 border-t border-mq-border/50">
+                        <span>Raw Baseline CLI: {selectedBlueprint.cli_score.toFixed(2)}</span>
+                        <span className="text-mq-success">
+                          Scaffolded Delta: {(selectedBlueprint.blueprint.effective_cli_score - selectedBlueprint.cli_score).toFixed(2)}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <div className="rounded-2xl border border-mq-border p-4 bg-mq-surface-soft/40 flex flex-wrap gap-2 content-start">
-                    <span className="badge font-bold">
-                      <Layers size={12} />
-                      {selectedBlueprint.blueprint.adhd_game_settings.step_granularity === 'MAXIMAL_THREE_TIER'
-                        ? '3-Tier Micro-Steps'
-                        : '2-Tier Micro-Steps'}
-                    </span>
-                    <span className="badge">
-                      {selectedBlueprint.blueprint.adhd_game_settings.distractor_count} Distractors / Step
-                    </span>
-                    <span className="badge">
-                      Stimulus: {selectedBlueprint.blueprint.adhd_game_settings.stimulus_density}
-                    </span>
-                    <span className="badge">
-                      {selectedBlueprint.blueprint.adhd_game_settings.visual_clutter_filter ? 'Clutter Filter ON' : 'Full Visuals'}
-                    </span>
-                    <span className="badge">
-                      {selectedBlueprint.blueprint.adhd_game_settings.timer_enabled ? 'Timer ON' : 'Untimed / Safe Pacing'}
-                    </span>
+                  <div className="rounded-2xl border border-mq-border p-4 bg-mq-surface-soft/40 flex flex-col justify-between gap-3">
+                    <div className="flex flex-wrap gap-2 content-start">
+                      <span className="badge font-bold">
+                        <Layers size={12} />
+                        {selectedBlueprint.blueprint.adhd_game_settings.step_granularity === 'MAXIMAL_THREE_TIER'
+                          ? '3-Tier Micro-Steps'
+                          : '2-Tier Micro-Steps'}
+                      </span>
+                      <span className="badge">
+                        {selectedBlueprint.blueprint.adhd_game_settings.distractor_count} Distractors / Step
+                      </span>
+                      <span className="badge">
+                        Stimulus: {selectedBlueprint.blueprint.adhd_game_settings.stimulus_density}
+                      </span>
+                      <span className="badge">
+                        {selectedBlueprint.blueprint.adhd_game_settings.visual_clutter_filter ? 'Clutter Filter ON' : 'Full Visuals'}
+                      </span>
+                      <span className="badge">
+                        {selectedBlueprint.blueprint.adhd_game_settings.timer_enabled ? 'Timer ON' : 'Untimed / Safe Pacing'}
+                      </span>
+                      {selectedBlueprint.blueprint.customized_by_teacher && (
+                        <span className="badge bg-purple-100 text-purple-800 font-bold">
+                          ✨ Teacher Customized
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-mq-border/60">
+                      <span className="text-[11px] text-mq-text-muted">
+                        {selectedBlueprint.blueprint.student_name ? (
+                          <>Target Learner: <strong className="text-mq-primary">{selectedBlueprint.blueprint.student_name}</strong></>
+                        ) : (
+                          'General Classroom Activity'
+                        )}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCustomAdhdSettings({
+                            step_granularity: selectedBlueprint.blueprint.adhd_game_settings.step_granularity,
+                            distractor_count: selectedBlueprint.blueprint.adhd_game_settings.distractor_count,
+                            stimulus_density: selectedBlueprint.blueprint.adhd_game_settings.stimulus_density,
+                            visual_clutter_filter: selectedBlueprint.blueprint.adhd_game_settings.visual_clutter_filter,
+                            timer_enabled: selectedBlueprint.blueprint.adhd_game_settings.timer_enabled,
+                          });
+                          setIsTuningModalOpen(true);
+                        }}
+                        className="btn btn-secondary !text-xs !py-1 !px-2.5 flex items-center gap-1.5 shadow-2xs font-bold"
+                      >
+                        <Sliders size={12} className="text-mq-primary" />
+                        <span>Re-tune Cognitive Load</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -965,6 +1085,74 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
         isOpen={isWardrobeOpen}
         onClose={() => setIsWardrobeOpen(false)}
       />
+
+      {/* Teacher Re-tune Modal */}
+      {isTuningModalOpen && selectedBlueprint && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs animate-fade-in">
+          <div className="bg-white rounded-3xl border border-mq-border p-6 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto space-y-4">
+            <div className="flex items-center justify-between border-b border-mq-border pb-3">
+              <div className="flex items-center gap-2">
+                <Sliders size={18} className="text-mq-primary" />
+                <h3 className="font-extrabold text-base text-mq-text-strong">
+                  Re-tune Cognitive Load & Micro-Steps
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsTuningModalOpen(false)}
+                className="p-1 rounded-full text-mq-text-muted hover:text-mq-text hover:bg-mq-surface-soft"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p className="text-xs text-mq-text-muted">
+              Dynamically adjust scaffolding, distractors, or pacing for <strong>{selectedBlueprint.blueprint.source_question_id}</strong>. Micro-steps and distractors will be deterministically recalculated while keeping the story narrative and mascot dialogue intact.
+            </p>
+
+            <CognitiveLoadCustomizer
+              settings={customAdhdSettings}
+              onChangeSettings={setCustomAdhdSettings}
+              behaviorProfile={selectedStudentProfile}
+              baseCli={selectedBlueprint.cli_score}
+            />
+
+            <div className="flex items-center justify-between pt-3 border-t border-mq-border">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="font-bold text-mq-text-muted">Theme:</span>
+                <select
+                  value={gameTheme}
+                  onChange={(e) => setGameTheme(e.target.value as GameTheme)}
+                  className="rounded-xl border border-mq-border bg-white px-2.5 py-1 text-xs font-semibold focus:outline-none"
+                >
+                  <option value="VILLAGE_MARKET">🧺 Village Market (Pola)</option>
+                  <option value="JUNGLE_ADVENTURE">🐘 Jungle Adventure (Sinharaja)</option>
+                  <option value="SPACE_QUEST">🚀 Space Quest</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsTuningModalOpen(false)}
+                  className="btn btn-secondary !text-xs !py-2 !px-4"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  disabled={isTuning}
+                  onClick={handleTuneBlueprint}
+                  className="btn btn-primary !text-xs !py-2 !px-4 flex items-center gap-1.5 shadow-sm"
+                >
+                  {isTuning ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
+                  <span>{isTuning ? 'Recalculating...' : 'Apply & Recalculate Blueprint'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

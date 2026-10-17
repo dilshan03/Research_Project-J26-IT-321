@@ -64,12 +64,44 @@ class CurriculumProblemExtraction(BaseModel):
     problems: List[CurriculumProblem]
 
 
+class StudentBehaviorProfile(BaseModel):
+    learner_id: Optional[str] = None
+    student_name: Optional[str] = None
+    archetype_id: Optional[str] = None
+    inattention_level: Literal["LOW", "MODERATE", "HIGH"] = "MODERATE"
+    impulsivity_level: Literal["LOW", "MODERATE", "HIGH"] = "MODERATE"
+    working_memory_support: bool = True
+    activity_pace: Literal["CALM_STEP_BY_STEP", "REGULAR", "FLEXIBLE"] = "CALM_STEP_BY_STEP"
+    visual_assistance: Literal["ALWAYS", "SOMETIMES", "MINIMAL"] = "ALWAYS"
+    audio_assistance: Literal["READ_EVERYTHING", "READ_ON_CLICK", "OFF"] = "READ_ON_CLICK"
+
+
+class CustomADHDGameSettings(BaseModel):
+    step_granularity: Optional[Literal["TWO_TIER", "MAXIMAL_THREE_TIER"]] = None
+    distractor_count: Optional[int] = Field(None, ge=2, le=4)
+    stimulus_density: Optional[Literal["LOW", "MEDIUM"]] = None
+    visual_clutter_filter: Optional[bool] = None
+    timer_enabled: Optional[bool] = None
+    preferred_distractor_types: Optional[List[str]] = None
+
+
 class AdaptProblemRequest(BaseModel):
     adhd_risk_level: Literal["LOW", "MEDIUM", "HIGH"] = Field("MEDIUM", description="Assessed ADHD risk level")
     game_theme: Optional[Literal["VILLAGE_MARKET", "JUNGLE_ADVENTURE", "SPACE_QUEST"]] = Field(
         None, description="Visual theme setting for the activity"
     )
     custom_gaja_notes: Optional[str] = Field(None, description="Optional custom pedagogical notes for Gaja mascot")
+    learner_id: Optional[str] = Field(None, description="Assigned learner identifier if personalized")
+    student_name: Optional[str] = Field(None, description="Assigned learner name or archetype label")
+    behavior_profile: Optional[StudentBehaviorProfile] = Field(None, description="Student behavioral and cognitive traits")
+    custom_settings: Optional[CustomADHDGameSettings] = Field(None, description="Teacher overrides for cognitive load and game settings")
+
+
+class TuneBlueprintRequest(BaseModel):
+    custom_settings: CustomADHDGameSettings
+    behavior_profile: Optional[StudentBehaviorProfile] = None
+    custom_gaja_notes: Optional[str] = None
+    game_theme: Optional[Literal["VILLAGE_MARKET", "JUNGLE_ADVENTURE", "SPACE_QUEST"]] = None
 
 
 class DocumentUploadResponse(BaseModel):

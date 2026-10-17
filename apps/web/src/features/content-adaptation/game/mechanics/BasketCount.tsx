@@ -126,7 +126,7 @@ export function BasketCount({ step, theme, isMoney, lang, calm, onWrong, onCorre
                   className={`w-24 h-24 rounded-full text-4xl font-extrabold shadow-lg border-4 transition-colors
                     ${isRight ? 'bg-mq-success text-white border-white' : isWrong ? 'bg-mq-surface-soft text-mq-border border-transparent' : 'bg-white text-mq-text-strong border-mq-accent-yellow'}`}
                 >
-                  {opt.text_en}
+                  {lang === 'si' ? opt.text_si : opt.text_en}
                 </motion.button>
               );
             })}

@@ -17,20 +17,23 @@ import {
 } from './companionTypes';
 import { useCompanion } from './useCompanion';
 import { Gaja } from './Gaja';
-import type { Mood } from './gameKit';
+import type { Mood, Lang } from './gameKit';
 
 interface CompanionWardrobeModalProps {
   isOpen: boolean;
   onClose: () => void;
+  lang?: Lang;
 }
 
 type TabType = 'archetype' | 'headwear' | 'eyewear' | 'outfit' | 'aura' | 'name';
 
-export function CompanionWardrobeModal({ isOpen, onClose }: CompanionWardrobeModalProps) {
+export function CompanionWardrobeModal({ isOpen, onClose, lang = 'si' }: CompanionWardrobeModalProps) {
   const { companion, updateCompanion, resetCompanion } = useCompanion();
   const [activeTab, setActiveTab] = useState<TabType>('archetype');
   const [previewMood, setPreviewMood] = useState<Mood>('happy');
-  const [testSpeech, setTestSpeech] = useState<string>('නියමයි! මේක මට ගොඩක් ලස්සනයි!');
+  const [testSpeech, setTestSpeech] = useState<string>(() =>
+    lang === 'si' ? 'නියමයි! මේක මට ගොඩක් ලස්සනයි!' : 'Awesome! This looks great on me!'
+  );
 
   if (!isOpen) return null;
 
@@ -83,7 +86,7 @@ export function CompanionWardrobeModal({ isOpen, onClose }: CompanionWardrobeMod
             <div className="relative">
               <Gaja
                 mood={previewMood}
-                lang="si"
+                lang={lang}
                 calm={companion.pace === 'calm'}
                 size="lg"
                 companionConfig={companion}
@@ -104,32 +107,32 @@ export function CompanionWardrobeModal({ isOpen, onClose }: CompanionWardrobeMod
           {/* Expression / Mood Test Controls */}
           <div className="w-full space-y-2">
             <div className="flex items-center justify-between text-xs text-white/80 font-medium px-1">
-              <span>චරිතයේ මනෝභාවය (Pose Test):</span>
+              <span>{lang === 'si' ? 'චරිතයේ මනෝභාවය (Pose Test):' : 'Pose & Mood Test:'}</span>
               <button
                 onClick={handleTestVoice}
                 className="flex items-center gap-1 text-amber-300 hover:text-amber-200 text-xs font-bold underline cursor-pointer"
                 title="Hear companion voice"
               >
-                <Volume2 size={13} /> ශබ්දය අසන්න
+                <Volume2 size={13} /> {lang === 'si' ? 'ශබ්දය අසන්න' : 'Test Voice'}
               </button>
             </div>
             <div className="grid grid-cols-4 gap-1.5">
               {(
                 [
-                  { id: 'happy', label: 'සතුටු 😃' },
-                  { id: 'thinking', label: 'කල්පනා 🤔' },
-                  { id: 'celebrate', label: 'ජයග්‍රහණ 🎉' },
-                  { id: 'encourage', label: 'ධෛර්යය 💪' },
+                  { id: 'happy', label: lang === 'si' ? 'සතුටු 😃' : 'Happy 😃' },
+                  { id: 'thinking', label: lang === 'si' ? 'කල්පනා 🤔' : 'Thinking 🤔' },
+                  { id: 'celebrate', label: lang === 'si' ? 'ජයග්‍රහණ 🎉' : 'Celebrate 🎉' },
+                  { id: 'encourage', label: lang === 'si' ? 'ධෛර්යය 💪' : 'Cheer 💪' },
                 ] as const
               ).map((m) => (
                 <button
                   key={m.id}
                   onClick={() => {
                     setPreviewMood(m.id);
-                    if (m.id === 'happy') setTestSpeech('මම සූදානම්! අපි ගණන් හදමු!');
-                    if (m.id === 'thinking') setTestSpeech('හ්ම්ම්... නිවැරදි පිළිතුර කුමක්ද?');
-                    if (m.id === 'celebrate') setTestSpeech('හුරේ! ඔබ නියම ගණිත ශූරයෙක්!');
-                    if (m.id === 'encourage') setTestSpeech('කමක් නැහැ, අපි ආයෙත් උත්සාහ කරමු!');
+                    if (m.id === 'happy') setTestSpeech(lang === 'si' ? 'මම සූදානම්! අපි ගණන් හදමු!' : "I'm ready! Let's solve math!");
+                    if (m.id === 'thinking') setTestSpeech(lang === 'si' ? 'හ්ම්ම්... නිවැරදි පිළිතුර කුමක්ද?' : 'Hmm... what is the correct answer?');
+                    if (m.id === 'celebrate') setTestSpeech(lang === 'si' ? 'හුරේ! ඔබ නියම ගණිත ශූරයෙක්!' : 'Hooray! You are a real math champ!');
+                    if (m.id === 'encourage') setTestSpeech(lang === 'si' ? 'කමක් නැහැ, අපි ආයෙත් උත්සාහ කරමු!' : "That's okay, let's try again!");
                   }}
                   className={`py-1.5 px-1 rounded-xl text-xs font-bold transition-all ${
                     previewMood === m.id
@@ -149,9 +152,13 @@ export function CompanionWardrobeModal({ isOpen, onClose }: CompanionWardrobeMod
           {/* Top Bar with Close Button */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
             <div>
-              <h3 className="font-extrabold text-slate-800 text-lg">මිතුරා සරසන්න (Customize)</h3>
+              <h3 className="font-extrabold text-slate-800 text-lg">
+                {lang === 'si' ? 'මිතුරා සරසන්න (Customize)' : 'Customize Companion'}
+              </h3>
               <p className="text-xs text-slate-500">
-                Choose mascot species, accessories, and glowing aura.
+                {lang === 'si'
+                  ? 'චරිත වර්ගය, ආයිත්තම් සහ ආලෝක වළල්ල තෝරන්න.'
+                  : 'Choose mascot species, accessories, and glowing aura.'}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -160,7 +167,7 @@ export function CompanionWardrobeModal({ isOpen, onClose }: CompanionWardrobeMod
                 className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-rose-600 px-2 py-1 rounded-lg hover:bg-slate-100 transition-colors"
                 title="Reset to default Gaja"
               >
-                <RotateCcw size={12} /> Reset
+                <RotateCcw size={12} /> {lang === 'si' ? 'මුල් තත්වයට' : 'Reset'}
               </button>
               <button
                 onClick={onClose}
@@ -176,12 +183,12 @@ export function CompanionWardrobeModal({ isOpen, onClose }: CompanionWardrobeMod
           <div className="flex gap-1.5 py-3 border-b border-slate-100 overflow-x-auto">
             {(
               [
-                { id: 'archetype', label: 'චරිතය (Mascot)', icon: '🐘' },
-                { id: 'headwear', label: 'තොප්පි (Hats)', icon: '👑' },
-                { id: 'eyewear', label: 'කණ්ණාඩි (Glasses)', icon: '🕶️' },
-                { id: 'outfit', label: 'ඇඳුම් (Outfits)', icon: '🦺' },
-                { id: 'aura', label: 'වර්ණය (Aura)', icon: '✨' },
-                { id: 'name', label: 'නම (Name & Pace)', icon: '🏷️' },
+                { id: 'archetype', label: lang === 'si' ? 'චරිතය (Mascot)' : 'Mascot', icon: '🐘' },
+                { id: 'headwear', label: lang === 'si' ? 'තොප්පි (Hats)' : 'Hats', icon: '👑' },
+                { id: 'eyewear', label: lang === 'si' ? 'කණ්ණාඩි (Glasses)' : 'Glasses', icon: '🕶️' },
+                { id: 'outfit', label: lang === 'si' ? 'ඇඳුම් (Outfits)' : 'Outfits', icon: '🦺' },
+                { id: 'aura', label: lang === 'si' ? 'වර්ණය (Aura)' : 'Aura', icon: '✨' },
+                { id: 'name', label: lang === 'si' ? 'නම (Name & Pace)' : 'Name & Pace', icon: '🏷️' },
               ] as const
             ).map((tab) => (
               <button

@@ -4,7 +4,7 @@ GameActivityBlueprint using the CLI score, derived game settings,
 deterministic MathVerificationService, and Gaja mascot narrative enrichment.
 """
 import uuid
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from app.schemas.game_blueprint import (
     ADHDGameSettings,
@@ -37,6 +37,34 @@ OPERATION_LABELS = {
     "COMPARE": ("ප්‍රමාණ සැසඳීම", "Comparison"),
     "IDENTIFY": ("හඳුනා ගැනීම", "Identification"),
 }
+
+FALLBACK_QUESTION_TRANSLATIONS: Dict[str, str] = {
+    "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට ඇපල් 3 ක් දුන්නේය. දැන් මාලාට ඇපල් කීයක් තිබේද?": "Mala has 5 apples. Nimal gave her 3 apples. How many apples does Mala have now?",
+    "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?": "Mala has 5 apples. Nimal gave her 3 more apples. How many apples does Mala have now?",
+    "10 න් 4 ක් අඩු කළ විට කීයද?": "10 minus 4 is how much?",
+    "ගසේ කුරුල්ලන් 12 ක් සිටියා. 5 ක් පියාඹා ගියා. ඉතිරි කුරුල්ලන් කීයද?": "There were 12 birds on a tree. 5 flew away. How many birds are left?",
+    "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?": "Kamal bought a book for Rs. 50 and a pen for Rs. 20. He gave Rs. 100 to the shopkeeper. What is the balance?",
+    "රුපියල් 20 ක ටොෆි පැකට්ටුවක් සහ රුපියල් 15 ක බිස්කට් පැකට්ටුවක් ගැනීමට අවශ්‍ය මුළු මුදල කීයද?": "How much total money is needed to buy a Rs. 20 toffee packet and a Rs. 15 biscuit packet?",
+    "1 සිට 9 තෙක් එකිනෙකට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණයට අදාළ සංඛ්‍යාව හඳුනා ගැනීම, කියවීම.": "Recognize and count numbers from 1 to 9 matching object and image quantities.",
+    "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම.": "Recognize coins of one rupee, two rupees, and five rupees.",
+}
+
+
+def resolve_english_question(question_id: Optional[str] = None, raw_text: Optional[str] = None) -> Optional[str]:
+    if raw_text:
+        cleaned = raw_text.strip()
+        if cleaned in FALLBACK_QUESTION_TRANSLATIONS:
+            return FALLBACK_QUESTION_TRANSLATIONS[cleaned]
+        for k, v in FALLBACK_QUESTION_TRANSLATIONS.items():
+            if cleaned.startswith(k[:20]):
+                return v
+    from app.data.sample_questions import SAMPLE_QUESTIONS
+    for sq in SAMPLE_QUESTIONS:
+        if question_id and sq.get("source_question_id") == question_id:
+            return sq.get("translation_en")
+        if raw_text and sq.get("raw_sinhala_question") == raw_text:
+            return sq.get("translation_en")
+    return None
 
 # Which wrong operator an impulsive learner most often picks.
 OPERATOR_CONFUSIONS = {
@@ -348,6 +376,7 @@ def generate_blueprint(
         story_narrative=story_narrative.model_dump() if story_narrative else None,
         cli_score=round(cli, 2),
         raw_sinhala_question=raw_sinhala_question,
+        raw_english_question=resolve_english_question(source_question_id, raw_sinhala_question) or (story_narrative.quest_goal_en if story_narrative else None),
     )
     return blueprint, cli, parsed
 
@@ -418,6 +447,7 @@ async def generate_blueprint_from_curriculum_problem(
         cli_score=round(cli, 2),
         effective_cli_score=effective_cli,
         raw_sinhala_question=problem.child_prompt_si or problem.raw_problem_text,
+        raw_english_question=problem.child_prompt_en or problem.english_translation or resolve_english_question(problem.problem_id, problem.raw_problem_text) or (narrative.quest_goal_en if narrative else None),
         target_learner_id=learner_id,
         student_name=student_name,
         customized_by_teacher=is_customized,
@@ -474,6 +504,7 @@ def tune_existing_blueprint(
             "adhd_game_settings": settings,
             "micro_steps": micro_steps,
             "effective_cli_score": effective_cli,
+            "raw_english_question": existing.raw_english_question or problem.child_prompt_en or problem.english_translation or resolve_english_question(problem.problem_id, problem.raw_problem_text),
             "customized_by_teacher": True,
             "behavior_profile": behavior_profile.model_dump() if behavior_profile else existing.behavior_profile,
             "target_learner_id": behavior_profile.learner_id if behavior_profile and behavior_profile.learner_id else existing.target_learner_id,

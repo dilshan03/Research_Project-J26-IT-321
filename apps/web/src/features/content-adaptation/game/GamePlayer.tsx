@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Flame, Map, RotateCcw, Star, Volume2, VolumeX } from 'lucide-react';
 import type { BlueprintEnvelope, DistractorType, GameMicroStep } from '../types';
-import { LINES, SCENES, STORY, speak, type Lang, type Line, type Mood } from './gameKit';
+import { LINES, SCENES, STORY, getEnglishQuestionFallback, speak, type Lang, type Line, type Mood } from './gameKit';
 import { Gaja } from './Gaja';
 import { BreathingBreak } from './BreathingBreak';
 import { NumberHunt } from './mechanics/NumberHunt';
@@ -51,20 +51,79 @@ function pickMechanic(step: GameMicroStep): { Comp: (p: MechanicProps) => React.
 export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; onExit: () => void }) {
   const { blueprint, raw_sinhala_question: question } = envelope;
   const settings = blueprint.adhd_game_settings;
-  const story = STORY[blueprint.game_theme];
+  const staticStory = STORY[blueprint.game_theme];
+
+  const story = useMemo(() => {
+    const sn = blueprint.story_narrative;
+    if (!sn) {
+      return {
+        title: staticStory.title,
+        intro: staticStory.intro,
+        outro: staticStory.outro,
+        backdrop: { si: '', en: '' },
+        questGoal: { si: '', en: '' },
+        dialogue: undefined,
+      };
+    }
+    return {
+      title: {
+        si: sn.title_si || staticStory.title.si,
+        en: sn.title_en || staticStory.title.en,
+      },
+      intro: {
+        si: sn.gaja_dialogue?.intro?.si || staticStory.intro.si,
+        en: sn.gaja_dialogue?.intro?.en || staticStory.intro.en,
+      },
+      outro: {
+        si: sn.gaja_dialogue?.celebrate?.si || staticStory.outro.si,
+        en: sn.gaja_dialogue?.celebrate?.en || staticStory.outro.en,
+      },
+      backdrop: {
+        si: sn.backdrop_si || '',
+        en: sn.backdrop_en || '',
+      },
+      questGoal: {
+        si: sn.quest_goal_si || '',
+        en: sn.quest_goal_en || '',
+      },
+      dialogue: sn.gaja_dialogue,
+    };
+  }, [blueprint.story_narrative, staticStory]);
+
+  const [lang, setLang] = useState<Lang>('si');
+
+  const activeQuestion = useMemo(() => {
+    if (lang === 'en') {
+      return (
+        blueprint.raw_english_question ||
+        envelope.raw_english_question ||
+        getEnglishQuestionFallback(question) ||
+        blueprint.story_narrative?.quest_goal_en ||
+        question
+      );
+    }
+    return blueprint.raw_sinhala_question || question;
+  }, [
+    lang,
+    blueprint.raw_english_question,
+    blueprint.raw_sinhala_question,
+    envelope.raw_english_question,
+    blueprint.story_narrative?.quest_goal_en,
+    question,
+  ]);
+
   const reduced = useReducedMotion();
   const calm = settings.stimulus_density === 'LOW' || !!reduced;
   const isMoney = /money/i.test(blueprint.topic) || question.includes('රුපියල්');
   const steps = blueprint.micro_steps;
 
-  const [lang, setLang] = useState<Lang>('si');
   const [voiceOn, setVoiceOn] = useState(true);
   const [phase, setPhase] = useState<'intro' | 'play' | 'done'>('intro');
   const [isWardrobeOpen, setIsWardrobeOpen] = useState(false);
   const { companion } = useCompanion();
   const [stepIndex, setStepIndex] = useState(0);
   const [mood, setMood] = useState<Mood>('happy');
-  const [line, setLine] = useState<Line | null>(story.intro);
+  const [line, setLine] = useState<Line | null>(() => story.intro);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [wrongRun, setWrongRun] = useState(0);
   const [stepHadMistake, setStepHadMistake] = useState(false);
@@ -82,6 +141,13 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
     if (m) setMood(m);
     if (voiceOn) speak(l, lang);
   }, [voiceOn, lang]);
+
+  const handleLanguageToggle = (newL: Lang) => {
+    setLang(newL);
+    if (voiceOn && line) {
+      speak(line, newL);
+    }
+  };
 
   // Idle nudge: re-engage gently if nothing happens for a while.
   const resetIdle = useCallback(() => {
@@ -118,7 +184,8 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
       setOnBreak(true);
       setWrongRun(0);
     } else {
-      say(hint ?? LINES.retry, 'encourage');
+      const customRetry = story.dialogue?.retry;
+      say(hint ?? (customRetry || LINES.retry), 'encourage');
     }
   };
 
@@ -128,7 +195,8 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
     const s = stepHadMistake ? 0 : streak + 1;
     setStreak(s);
     setBestStreak(b => Math.max(b, s));
-    say(LINES.correct, 'celebrate');
+    const customPraise = story.dialogue?.praise;
+    say(customPraise || LINES.correct, 'celebrate');
     setTimeout(() => {
       const next = stepIndex + 1;
       setStepHadMistake(false);
@@ -197,7 +265,7 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
           <button
             id="open-companion-wardrobe"
             onClick={() => setIsWardrobeOpen(true)}
-            title="මිතුරා සරසන්න (Customize Companion)"
+            title={lang === 'si' ? "මිතුරා සරසන්න (Customize Companion)" : "Customize Companion"}
             className="px-3 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 border border-amber-300 text-xs font-bold text-amber-900 flex items-center gap-1.5 shadow"
           >
             <span>🎨</span>
@@ -209,7 +277,7 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
           </button>
           <div className="flex rounded-full bg-white/90 p-1 shadow" role="group" aria-label="Language">
             {(['si', 'en'] as Lang[]).map(l => (
-              <button key={l} id={`lang-${l}`} onClick={() => setLang(l)}
+              <button key={l} id={`lang-${l}`} onClick={() => handleLanguageToggle(l)}
                 className={`px-3 py-1 rounded-full text-sm font-bold ${lang === l ? 'bg-mq-primary text-white' : 'text-mq-text-muted'}`}>
                 {l === 'si' ? 'සිං' : 'EN'}
               </button>
@@ -223,9 +291,14 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
           {phase === 'intro' && (
             <motion.section key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -20 }}
               className="flex flex-col items-center text-center pt-6">
-              <h1 className={`text-4xl md:text-5xl font-extrabold text-mq-text-strong drop-shadow-sm mb-4 ${lang === 'si' ? 'sinhala' : ''}`}>
+              <h1 className={`text-4xl md:text-5xl font-extrabold text-mq-text-strong drop-shadow-sm mb-3 ${lang === 'si' ? 'sinhala' : ''}`}>
                 {story.title[lang]}
               </h1>
+              {story.backdrop[lang] && (
+                <p className={`max-w-xl text-base md:text-lg text-mq-text-strong/80 mb-4 px-4 ${lang === 'si' ? 'sinhala' : 'font-medium'}`}>
+                  {story.backdrop[lang]}
+                </p>
+              )}
               <Gaja mood="happy" line={story.intro} lang={lang} calm={calm} size="lg" companionConfig={companion} />
               <motion.button id="start-quest" onClick={start}
                 whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
@@ -243,13 +316,15 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
                 ${nudging ? 'border-mq-accent-yellow' : 'border-white'}`}
             >
               {step.action_type !== 'IDENTIFY_ENTITY' && (
-                <p className="sinhala text-center text-lg text-mq-text mb-6 px-4 py-2 rounded-2xl bg-mq-surface-soft">{question}</p>
+                <p className={`${lang === 'si' ? 'sinhala' : 'font-medium'} text-center text-lg text-mq-text mb-6 px-4 py-2 rounded-2xl bg-mq-surface-soft`}>
+                  {activeQuestion}
+                </p>
               )}
               <h2 className={`text-center text-2xl md:text-3xl font-extrabold mb-8 ${lang === 'si' ? 'sinhala' : ''}`}>
                 {lang === 'si' ? step.instruction_si : step.instruction_en}
               </h2>
               <mechanic.Comp
-                step={step} question={question} theme={blueprint.game_theme} isMoney={isMoney}
+                step={step} question={activeQuestion} theme={blueprint.game_theme} isMoney={isMoney}
                 lang={lang} calm={calm} onWrong={onWrong} onCorrect={onCorrect} onSay={l => say(l, 'thinking')}
               />
             </motion.section>
@@ -296,6 +371,7 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
       <CompanionWardrobeModal
         isOpen={isWardrobeOpen}
         onClose={() => setIsWardrobeOpen(false)}
+        lang={lang}
       />
     </div>
   );

@@ -84,6 +84,7 @@ class GameActivityBlueprint(BaseModel):
     cli_score: Optional[float] = Field(None, description="Calculated Cognitive Load Index")
     effective_cli_score: Optional[float] = Field(None, description="Tuned Cognitive Load Index after teacher customization")
     raw_sinhala_question: Optional[str] = Field(None, description="Original question text")
+    raw_english_question: Optional[str] = Field(None, description="English translation or prompt of the question")
     target_learner_id: Optional[str] = Field(None, description="Assigned learner identifier if personalized")
     student_name: Optional[str] = Field(None, description="Assigned learner name or archetype label")
     customized_by_teacher: bool = Field(False, description="Flag indicating if teacher adjusted cognitive load settings")
@@ -95,4 +96,5 @@ class CurriculumAdaptationRequest(BaseModel):
     grade: int = Field(..., ge=1, le=5, description="Grade level (1 to 5)")
     topic: str = Field(..., description="Math topic for the question")
     raw_sinhala_question: str = Field(..., description="The raw textual Sinhala question from the curriculum")
+    raw_english_question: Optional[str] = Field(None, description="Optional English translation of the question")
     adhd_risk_level: Literal['LOW', 'MEDIUM', 'HIGH'] = Field(..., description="Assessed ADHD risk level for adaptation")

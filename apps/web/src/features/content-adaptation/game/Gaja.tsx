@@ -175,7 +175,7 @@ export function Gaja({
       <AnimatePresence mode="wait">
         {line && (
           <motion.div
-            key={line.en}
+            key={`${line.en}-${lang}`}
             role="status"
             aria-live="polite"
             initial={{ opacity: 0, y: 10, scale: 0.9 }}

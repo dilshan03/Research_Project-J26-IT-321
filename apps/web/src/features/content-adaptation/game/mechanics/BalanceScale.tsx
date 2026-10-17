@@ -69,7 +69,7 @@ export function BalanceScale({ step, lang, onWrong, onCorrect }: MechanicProps) 
               className={`w-36 h-20 rounded-b-full border-4 flex items-center justify-center shadow-md transition-colors
                 ${solved ? 'bg-[var(--mq-success-bg)] border-mq-success' : 'bg-white/90 border-dashed border-mq-primary'}`}>
               {onPan
-                ? <motion.span initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-3xl font-extrabold text-mq-text-strong">{onPan.text_en}</motion.span>
+                ? <motion.span initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-3xl font-extrabold text-mq-text-strong">{lang === 'si' ? onPan.text_si : onPan.text_en}</motion.span>
                 : <span className="text-3xl font-bold text-mq-primary/50">?</span>}
             </div>
           </motion.div>
@@ -93,11 +93,11 @@ export function BalanceScale({ step, lang, onWrong, onCorrect }: MechanicProps) 
               onClick={() => place(opt)}
               disabled={solved}
               className={`relative w-24 h-24 touch-none cursor-grab active:cursor-grabbing ${wasTried ? 'opacity-50' : ''}`}
-              aria-label={lang === 'si' ? `බර ${opt.text_en}` : `Weight ${opt.text_en}`}
+              aria-label={lang === 'si' ? `බර ${opt.text_si}` : `Weight ${opt.text_en}`}
             >
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-5 rounded-t-full border-4 border-b-0 border-[#5F7488]" />
               <div className="absolute bottom-0 inset-x-0 h-20 rounded-2xl bg-gradient-to-b from-[#8CA0B3] to-[#5F7488] shadow-lg flex items-center justify-center">
-                <span className="text-3xl font-extrabold text-white">{opt.text_en}</span>
+                <span className="text-3xl font-extrabold text-white">{lang === 'si' ? opt.text_si : opt.text_en}</span>
               </div>
             </motion.button>
           );

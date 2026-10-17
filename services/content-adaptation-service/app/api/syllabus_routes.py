@@ -247,6 +247,7 @@ async def adapt_problem_to_game(problem_id: str, req: AdaptProblemRequest):
     envelope = BlueprintEnvelope(
         cli_score=round(cli, 2),
         raw_sinhala_question=problem.child_prompt_si or problem.raw_problem_text,
+        raw_english_question=blueprint.raw_english_question,
         blueprint=blueprint,
     )
 
@@ -299,6 +300,7 @@ async def tune_game_blueprint(activity_id: str, req: TuneBlueprintRequest):
     new_envelope = BlueprintEnvelope(
         cli_score=round(tuned_blueprint.effective_cli_score or tuned_blueprint.cli_score or env.cli_score, 2),
         raw_sinhala_question=env.raw_sinhala_question,
+        raw_english_question=tuned_blueprint.raw_english_question or env.raw_english_question,
         blueprint=tuned_blueprint,
     )
 

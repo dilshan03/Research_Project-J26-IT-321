@@ -98,6 +98,7 @@ export interface GameActivityBlueprint {
   cli_score?: number | null;
   effective_cli_score?: number | null;
   raw_sinhala_question?: string | null;
+  raw_english_question?: string | null;
   target_learner_id?: string | null;
   student_name?: string | null;
   customized_by_teacher?: boolean;
@@ -107,6 +108,7 @@ export interface GameActivityBlueprint {
 export interface BlueprintEnvelope {
   cli_score: number;
   raw_sinhala_question: string;
+  raw_english_question?: string | null;
   blueprint: GameActivityBlueprint;
 }
 

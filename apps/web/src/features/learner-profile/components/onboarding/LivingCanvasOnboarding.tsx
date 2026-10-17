@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
+import type { MathQuestion, MathItemAnswer, LearningPreferencesData } from '../../types/onboarding';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
-  Sparkles,
   ArrowRight,
   ArrowLeft,
+  CheckCircle2,
+  Sparkles,
+  Loader2,
   Lightbulb,
   Languages,
   Play,
-  CheckCircle2,
-  Loader2,
+  Volume2,
 } from 'lucide-react';
-import type { MathQuestion, MathItemAnswer } from '../../types/onboarding';
 import { AnimatedCompanion, type CompanionState } from './AnimatedCompanion';
 import { LivingCanvasIsland, type RepresentationMode } from './LivingCanvasIsland';
 
@@ -18,6 +19,9 @@ interface LivingCanvasOnboardingProps {
   grade: number;
   preferredLanguage?: string;
   primaryInstructionLanguage?: string;
+  sinhalaComprehension?: string;
+  englishComprehension?: string;
+  learningPreferences?: LearningPreferencesData | null;
   questions: MathQuestion[];
   onSubmit: (answers: MathItemAnswer[]) => Promise<void>;
   onSaveAndExit: (answers: MathItemAnswer[]) => Promise<void>;
@@ -32,6 +36,9 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
   grade: _grade,
   preferredLanguage = 'Sinhala',
   primaryInstructionLanguage = 'Sinhala',
+  sinhalaComprehension: _sinhalaComp,
+  englishComprehension: _englishComp,
+  learningPreferences,
   questions,
   onSubmit,
   onSaveAndExit,
@@ -45,7 +52,7 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const currentQuestion = questions[currentIndex];
 
-  // Language management
+  // Language management - initialized strictly from parent preference
   const initialLang =
     preferredLanguage === 'English' ||
     (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
@@ -53,22 +60,30 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
       : 'si';
   const [lang, setLang] = useState<'si' | 'en'>(initialLang);
 
-  // Living Canvas Discovery Stages: Default immediately to interactive discovery
+  // Living Canvas Discovery Stages
   const [stage, setStage] = useState<CanvasStage>('B_SHAPE_ISLAND');
   const [companionState, setCompanionState] = useState<CompanionState>('idle');
   const [representationMode, setRepresentationMode] = useState<RepresentationMode>('nature');
   const [showHint, setShowHint] = useState(false);
   const [isDemonstrating, setIsDemonstrating] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<{ si: string; en: string } | null>(null);
 
-  // Interactive Object Manipulation for g1_num_count_01 (Target: 5 apples)
+  // Pool of objects: 8 apples available on tree canopy (more than target 5)
+  const TOTAL_POOL = 8;
   const TARGET_COUNT = 5;
   const [placedCount, setPlacedCount] = useState(0);
-  const [availableCount, setAvailableCount] = useState(TARGET_COUNT);
+  const availableCount = Math.max(0, TOTAL_POOL - placedCount);
 
-  // Assessment tracking
+  // Assessment evidence tracking
+  // Rule: Do not count object taps as attempts. Confirmed attempts only increment upon confirmation.
+  const [confirmedAttempts, setConfirmedAttempts] = useState(0);
+  const [selfCorrectionsCount, setSelfCorrectionsCount] = useState(0);
+  const firstConfirmedResponseRef = useRef<string | null>(null);
+  const isFirstCorrectRef = useRef<boolean | null>(null);
+
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
-  const [attempts, setAttempts] = useState<Record<string, number>>({});
   const [hintsUsed, setHintsUsed] = useState<Record<string, boolean>>({});
+  const [demonstrationsUsed, setDemonstrationsUsed] = useState<Record<string, boolean>>({});
   const questionStartTimeRef = useRef<number>(Date.now());
   const responseTimesRef = useRef<Record<string, number>>({});
 
@@ -80,7 +95,11 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
     setShowHint(false);
     setIsDemonstrating(false);
     setPlacedCount(0);
-    setAvailableCount(TARGET_COUNT);
+    setConfirmedAttempts(0);
+    setSelfCorrectionsCount(0);
+    firstConfirmedResponseRef.current = null;
+    isFirstCorrectRef.current = null;
+    setFeedbackMessage(null);
   }, [currentIndex]);
 
   const recordTime = () => {
@@ -99,33 +118,26 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
       currentQuestion.skillId === 'number_sense' ||
       currentQuestion.visualRepresentation?.type === 'icon_grid');
 
-  // Object manipulation handlers
+  // Object manipulation handlers: Child controls picking and removal freely
   const handlePlaceItem = () => {
     if (availableCount <= 0) return;
-    const newPlaced = placedCount + 1;
-    const newAvailable = availableCount - 1;
-    setPlacedCount(newPlaced);
-    setAvailableCount(newAvailable);
-    setCompanionState('encouragement');
-
-    // Record attempt
-    if (currentQuestion) {
-      setAttempts((prev) => ({
-        ...prev,
-        [currentQuestion.questionId]: (prev[currentQuestion.questionId] || 0) + 1,
-      }));
-    }
+    setPlacedCount((prev) => prev + 1);
+    setCompanionState('idle');
+    // Notice: Does NOT increment assessment attempts! Object taps are not attempts.
   };
 
   const handleRemoveItem = (_index: number) => {
     if (placedCount <= 0) return;
     setPlacedCount((prev) => prev - 1);
-    setAvailableCount((prev) => prev + 1);
+    // Track self-corrections before confirmation separately from assessment attempts
+    setSelfCorrectionsCount((prev) => prev + 1);
   };
 
   const handleReset = () => {
+    if (placedCount > 0) {
+      setSelfCorrectionsCount((prev) => prev + 1);
+    }
     setPlacedCount(0);
-    setAvailableCount(TARGET_COUNT);
     setCompanionState('idle');
   };
 
@@ -134,7 +146,7 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
     setIsDemonstrating(true);
     setCompanionState('hint');
     if (currentQuestion) {
-      setHintsUsed((prev) => ({ ...prev, [currentQuestion.questionId]: true }));
+      setDemonstrationsUsed((prev) => ({ ...prev, [currentQuestion.questionId]: true }));
     }
     setTimeout(() => {
       setIsDemonstrating(false);
@@ -152,19 +164,23 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
     }
   };
 
-  // Map island discovery result to existing question bank answer
+  // Explicit "All Done" confirmation handler
   const handleConfirmIsland = () => {
     if (!currentQuestion) return;
     recordTime();
 
+    const newAttempts = confirmedAttempts + 1;
+    setConfirmedAttempts(newAttempts);
+
     // Map placed count to option ID: 3 -> opt_3, 4 -> opt_4, 5 -> opt_5, 6 -> opt_6
-    let selectedOptionId = 'opt_5';
-    if (placedCount === 3) selectedOptionId = 'opt_3';
-    else if (placedCount === 4) selectedOptionId = 'opt_4';
-    else if (placedCount === 5) selectedOptionId = 'opt_5';
-    else if (placedCount === 6) selectedOptionId = 'opt_6';
-    else {
-      selectedOptionId = `opt_${placedCount}`;
+    const selectedOptionId = `opt_${placedCount}`;
+
+    // Record first confirmed response permanently:
+    // An incorrect first confirmed response is recorded as incorrect even if corrected later.
+    if (firstConfirmedResponseRef.current === null) {
+      firstConfirmedResponseRef.current = selectedOptionId;
+      const isCorrect = placedCount === TARGET_COUNT;
+      isFirstCorrectRef.current = isCorrect;
     }
 
     setAnswers((prev) => ({
@@ -175,13 +191,14 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
     if (placedCount === TARGET_COUNT) {
       setCompanionState('success');
       setStage('D_WORLD_READY');
+      setFeedbackMessage(null);
     } else {
       // Gentle encouragement to adjust, not a harsh "wrong answer"
       setCompanionState('encouragement');
-      setAttempts((prev) => ({
-        ...prev,
-        [currentQuestion.questionId]: (prev[currentQuestion.questionId] || 0) + 1,
-      }));
+      setFeedbackMessage({
+        si: `කූඩයේ ඇපල් ${placedCount}ක් ඇත. අපට අවශ්‍ය ඇපල් 5කි. තවත් ඇපල් එකතු කර හෝ ඉවත් කර 'සියල්ල සූදානම්' ඔබන්න!`,
+        en: `You gathered ${placedCount} apples. We need 5 apples! Try adding or removing some, then tap All Done!`,
+      });
     }
   };
 
@@ -190,19 +207,43 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
     return questions.map((q) => {
       let finalAns = answers[q.questionId];
       if (finalAns === undefined) {
-        // If it was the living canvas question and completed
         if (q.questionId === 'g1_num_count_01') {
-          finalAns = `opt_${placedCount || 5}`;
+          finalAns = `opt_${placedCount}`;
         } else {
           finalAns = '';
         }
       }
+
+      if (q.questionId === 'g1_num_count_01') {
+        const firstConfirmed = firstConfirmedResponseRef.current || `opt_${placedCount}`;
+        const isFirstCorrect =
+          isFirstCorrectRef.current !== null
+            ? isFirstCorrectRef.current
+            : placedCount === TARGET_COUNT;
+
+        return {
+          questionId: q.questionId,
+          userAnswer: finalAns,
+          attempts: Math.max(1, confirmedAttempts),
+          responseTimeSeconds: responseTimesRef.current[q.questionId] || 6.5,
+          hintUsed: Boolean(hintsUsed[q.questionId]),
+          firstConfirmedResponse: firstConfirmed,
+          isFirstResponseCorrect: isFirstCorrect,
+          demonstrationUsed: Boolean(demonstrationsUsed[q.questionId]),
+          selfCorrectionsCount: selfCorrectionsCount,
+        };
+      }
+
       return {
         questionId: q.questionId,
         userAnswer: finalAns,
-        attempts: attempts[q.questionId] || 1,
+        attempts: 1,
         responseTimeSeconds: responseTimesRef.current[q.questionId] || 6.5,
         hintUsed: Boolean(hintsUsed[q.questionId]),
+        firstConfirmedResponse: finalAns,
+        isFirstResponseCorrect: true,
+        demonstrationUsed: false,
+        selfCorrectionsCount: 0,
       };
     });
   };
@@ -220,10 +261,6 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
     setAnswers((prev) => ({
       ...prev,
       [currentQuestion.questionId]: optId,
-    }));
-    setAttempts((prev) => ({
-      ...prev,
-      [currentQuestion.questionId]: (prev[currentQuestion.questionId] || 0) + 1,
     }));
     setCompanionState('encouragement');
   };
@@ -243,6 +280,12 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
       onBack();
     }
   };
+
+  // Web Speech support detection
+  const isSpeechSupported =
+    typeof window !== 'undefined' &&
+    'speechSynthesis' in window &&
+    typeof window.SpeechSynthesisUtterance !== 'undefined';
 
   return (
     <div className="space-y-4 max-w-4xl mx-auto animate-fade-in">
@@ -303,7 +346,7 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
         </div>
       </div>
 
-      {/* Gentle Hint Drawer */}
+      {/* Gentle Hint Drawer (Adapts to parent preference: visual_clue, step_guide, audio_hint) */}
       <AnimatePresence>
         {showHint && currentQuestion && (
           <motion.div
@@ -316,20 +359,54 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
             <div className="p-2 rounded-xl bg-amber-100 text-amber-700 shrink-0">
               <Lightbulb size={18} className="fill-amber-400" />
             </div>
-            <div className="space-y-1 text-xs sm:text-sm font-sinhala flex-1">
+            <div className="space-y-1.5 text-xs sm:text-sm font-sinhala flex-1">
               <span className="font-bold text-amber-900 block">
                 {lang === 'si' ? 'මිතුරු ඉඟියක්:' : 'Gentle Clue:'}
               </span>
-              <p className="text-amber-800 leading-relaxed">
-                {lang === 'si' ? currentQuestion.hintSi : currentQuestion.hintEn}
-              </p>
+
+              {learningPreferences?.hintStyle === 'step_guide' ? (
+                <div className="space-y-1 text-amber-900 text-xs font-medium bg-amber-100/60 p-2.5 rounded-xl border border-amber-200">
+                  <p>1. {lang === 'si' ? 'ගසෙන් ඇපල් තෝරා තට්ටු කරන්න' : 'Tap apples on the tree to pick them'}</p>
+                  <p>2. {lang === 'si' ? 'ඒවා කූඩයට එකතු වේ' : 'They will settle into the basket'}</p>
+                  <p>3. {lang === 'si' ? 'කූඩයේ ඇපල් 5ක් වන තුරු ගණන් කරන්න' : 'Count until there are 5 apples in the basket'}</p>
+                  <p>4. {lang === 'si' ? "'සියල්ල සූදානම්' බොත්තම ඔබන්න" : "Tap 'All Done' when finished"}</p>
+                </div>
+              ) : (
+                <p className="text-amber-800 leading-relaxed">
+                  {lang === 'si' ? currentQuestion.hintSi : currentQuestion.hintEn}
+                </p>
+              )}
+
+              {/* Audio hint button: only when speech is supported and parent preferred audio assistance */}
+              {isSpeechSupported && learningPreferences?.audioAssistance !== 'off' && (
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const textToRead = lang === 'si' ? currentQuestion.hintSi : currentQuestion.hintEn;
+                      try {
+                        window.speechSynthesis.cancel();
+                        const utt = new SpeechSynthesisUtterance(textToRead);
+                        utt.lang = lang === 'si' ? 'si-LK' : 'en-US';
+                        window.speechSynthesis.speak(utt);
+                      } catch {
+                        // ignore
+                      }
+                    }}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 hover:text-amber-950 px-2.5 py-1 rounded-full bg-amber-200/70 hover:bg-amber-200 cursor-pointer transition-colors"
+                  >
+                    <Volume2 size={12} />
+                    <span>{lang === 'si' ? 'ඉඟියට සවන් දෙන්න' : 'Listen to clue'}</span>
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* ========================================================================= */}
-      {/* PRIMARY EXPERIENCE: The Living Canvas (Supported Discovery Slice)          */}
+      {/* PRIMARY EXPERIENCE: The Living Canvas (Phase 1 Grade 1 Corrected Activity) */}
       {/* ========================================================================= */}
       {isLivingCanvasQuestion ? (
         <div className="space-y-4">
@@ -340,8 +417,18 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
                 {lang === 'si' ? 'ගවේෂණ අභියෝගය' : 'Discovery Activity'}
               </span>
               <h3 className="text-sm sm:text-base font-extrabold text-teal-950 font-sinhala">
-                {lang === 'si' ? currentQuestion.promptSi : currentQuestion.promptEn}
+                {lang === 'si'
+                  ? 'මැජික් ගසෙන් ඇපල් 5ක් කූඩයට එකතු කරන්න. ඔබ සූදානම් වූ පසු "සියල්ල සූදානම්" ඔබන්න!'
+                  : 'Gather 5 apples from the magic tree into the basket. When you are ready, tap "All Done"!'}
               </h3>
+              {/* Optional bilingual subtitle when bilingual is preferred */}
+              {preferredLanguage === 'Bilingual' && (
+                <p className="text-xs text-slate-500 font-sans italic">
+                  {lang === 'si'
+                    ? 'Gather 5 apples from the magic tree into the basket. When ready, tap All Done!'
+                    : 'මැජික් ගසෙන් ඇපල් 5ක් කූඩයට එකතු කරන්න.'}
+                </p>
+              )}
             </div>
             <button
               type="button"
@@ -356,12 +443,13 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
           {/* Interactive Floating Island Canvas Component */}
           <LivingCanvasIsland
             placedCount={placedCount}
-            totalTarget={TARGET_COUNT}
+            targetCount={TARGET_COUNT}
+            totalPoolCount={TOTAL_POOL}
+            availableCount={availableCount}
             representationMode={representationMode}
             onToggleRepresentation={() =>
               setRepresentationMode((prev) => (prev === 'nature' ? 'stones' : 'nature'))
             }
-            availableCount={availableCount}
             onPlaceItem={handlePlaceItem}
             onRemoveItem={handleRemoveItem}
             onReset={handleReset}
@@ -370,9 +458,14 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
             language={lang}
             showHint={showHint}
             onToggleHint={handleToggleHint}
+            visualAssistance={learningPreferences?.visualAssistance}
+            audioAssistance={learningPreferences?.audioAssistance}
+            hintStyle={learningPreferences?.hintStyle}
+            celebrationStyle={learningPreferences?.celebrationStyle}
+            feedbackMessage={feedbackMessage}
           />
 
-          {/* Stage B: Confirmation Action */}
+          {/* Stage B: Explicit "All Done" Confirmation Action */}
           {stage === 'B_SHAPE_ISLAND' && (
             <div className="flex items-center justify-end gap-3 pt-1">
               <motion.button
@@ -384,8 +477,8 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
               >
                 <span>
                   {lang === 'si'
-                    ? 'මගේ ලෝකය හැඩගැසුණා! (The Island is Ready)'
-                    : 'The Island is Ready!'}
+                    ? 'සියල්ල සූදානම්! (All Done)'
+                    : 'All Done!'}
                 </span>
                 <Sparkles size={16} />
               </motion.button>
@@ -401,7 +494,7 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
               className="bg-gradient-to-r from-emerald-50 via-teal-50 to-amber-50 rounded-2xl border border-emerald-200 p-5 sm:p-6 text-center space-y-3 shadow-sm"
             >
               <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto text-2xl shadow-xs">
-                🌸
+                {learningPreferences?.celebrationStyle === 'badge_sound' ? '🏆' : '🌸'}
               </div>
               <div className="space-y-1 max-w-md mx-auto">
                 <h4 className="text-lg sm:text-xl font-extrabold text-emerald-950 font-sinhala">
@@ -446,7 +539,6 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
       ) : (
         /* ========================================================================= */
         /* FUNCTIONAL STORYBOOK FALLBACK: For unsupported activities or other grades  */
-        /* (Step 4: Clearly identified as fallback; Step 3: No grade/difficulty)     */
         /* ========================================================================= */
         <div className="bg-white rounded-3xl border border-teal-100 p-6 sm:p-8 shadow-sm space-y-5">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">

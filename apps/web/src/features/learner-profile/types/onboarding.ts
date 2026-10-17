@@ -76,6 +76,10 @@ export interface MathItemAnswer {
   attempts: number;
   responseTimeSeconds: number;
   hintUsed: boolean;
+  firstConfirmedResponse?: string | number;
+  isFirstResponseCorrect?: boolean;
+  demonstrationUsed?: boolean;
+  selfCorrectionsCount?: number;
 }
 
 export interface SkillScore {

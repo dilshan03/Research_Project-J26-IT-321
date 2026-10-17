@@ -491,6 +491,9 @@ export const OnboardingPlaceholderPage: React.FC = () => {
                     grade={learner.grade}
                     preferredLanguage={learner.preferredLanguage}
                     primaryInstructionLanguage={learner.primaryInstructionLanguage}
+                    sinhalaComprehension={learner.sinhalaComprehension}
+                    englishComprehension={learner.englishComprehension}
+                    learningPreferences={savedPreferences}
                     questions={mathQuestions}
                     onSubmit={handleMathSubmit}
                     onSaveAndExit={handleMathSaveAndExit}

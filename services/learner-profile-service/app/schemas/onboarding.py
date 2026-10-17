@@ -159,6 +159,11 @@ class MathItemAnswerSubmission(BaseModel):
     attempts: int = Field(default=1, ge=1)
     responseTimeSeconds: float = Field(default=0.0, ge=0.0)
     hintUsed: bool = Field(default=False)
+    # Valid assessment evidence tracking
+    firstConfirmedResponse: Optional[Union[str, int, float]] = None
+    isFirstResponseCorrect: Optional[bool] = None
+    demonstrationUsed: Optional[bool] = False
+    selfCorrectionsCount: Optional[int] = 0
 
 
 class MathAssessmentSubmissionRequest(BaseModel):

@@ -513,6 +513,15 @@ async def submit_math_assessment(
         # Check correctness
         expected = q_item.get("correctAnswer")
         is_correct = normalize_answer(ans.userAnswer) == normalize_answer(expected)
+        
+        # Valid assessment evidence: First confirmed response correctness is preserved separately
+        if ans.isFirstResponseCorrect is not None:
+            first_correct = bool(ans.isFirstResponseCorrect)
+        else:
+            first_correct = is_correct
+
+        first_confirmed = ans.firstConfirmedResponse if ans.firstConfirmedResponse is not None else ans.userAnswer
+
         if is_correct:
             correct_count += 1
             skill_stats[skill_id]["correct"] += 1
@@ -523,11 +532,15 @@ async def submit_math_assessment(
             "skillName": skill_name,
             "skillNameSi": skill_name_si,
             "isCorrect": is_correct,
+            "correctFirstResponse": first_correct,
+            "firstConfirmedResponse": first_confirmed,
             "userAnswer": ans.userAnswer,
             "correctAnswer": expected,
             "attempts": ans.attempts,
             "responseTimeSeconds": ans.responseTimeSeconds,
             "hintUsed": ans.hintUsed,
+            "demonstrationUsed": bool(getattr(ans, "demonstrationUsed", False)),
+            "selfCorrectionsCount": int(getattr(ans, "selfCorrectionsCount", 0)),
         })
 
     total_questions = len(evaluated_items)

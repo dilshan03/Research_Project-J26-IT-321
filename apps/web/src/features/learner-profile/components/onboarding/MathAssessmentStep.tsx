@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { MathQuestion, MathItemAnswer } from '../../types/onboarding';
+import type { MathQuestion, MathItemAnswer, LearningPreferencesData } from '../../types/onboarding';
 import { LivingCanvasOnboarding } from './LivingCanvasOnboarding';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
@@ -20,6 +20,9 @@ interface Props {
   grade: number;
   preferredLanguage?: string;
   primaryInstructionLanguage?: string;
+  sinhalaComprehension?: string;
+  englishComprehension?: string;
+  learningPreferences?: LearningPreferencesData | null;
   questions: MathQuestion[];
   onSubmit: (answers: MathItemAnswer[]) => Promise<void>;
   onSaveAndExit: (answers: MathItemAnswer[]) => Promise<void>;

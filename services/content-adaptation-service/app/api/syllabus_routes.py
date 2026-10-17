@@ -3,7 +3,7 @@ import io
 import os
 import uuid
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, List, Optional
 from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile
 from pypdf import PdfReader
 

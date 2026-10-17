@@ -1,16 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lexend:wght@400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* Tailwind Integration for the Custom Theme */
-  --color-mq-bg: #F4F8FB;
+  /* Tailwind Integration for ADHD-Friendly Theme */
+  --color-mq-bg: #F7FAFC;
   --color-mq-surface: #FFFFFF;
   --color-mq-surface-soft: #EEF6FB;
   
   /* Surfaces */
-  --color-mq-surface-blue: #E9F3FF;
-  --color-mq-surface-green: #EAF8F2;
-  --color-mq-surface-yellow: #FFF7E3;
+  --color-mq-surface-blue: #DCECF7;
+  --color-mq-surface-green: #DDEFE3;
+  --color-mq-surface-yellow: #F5E5B8;
   --color-mq-surface-purple: #F3EEFF;
   --color-mq-surface-pink: #FFF0F4;
   
@@ -18,20 +18,20 @@
   --color-mq-primary: #3C82B4;
   --color-mq-primary-hover: #2E6F9D;
   --color-mq-primary-dark: #275F88;
-  --color-mq-secondary: #63B7AF;
+  --color-mq-secondary: #5DAFA8;
   
   /* Text */
-  --color-mq-text: #16324A;
-  --color-mq-text-strong: #0D2340;
-  --color-mq-text-muted: #5F7488;
+  --color-mq-text: #24364B;
+  --color-mq-text-strong: #162638;
+  --color-mq-text-muted: #52667A;
   
   /* Borders */
   --color-mq-border: #D6E4ED;
   --color-mq-border-strong: #BFD2DF;
   
   /* Accents */
-  --color-mq-accent-yellow: #F3B944;
-  --color-mq-accent-green: #4FBF8F;
+  --color-mq-accent-yellow: #F5E5B8;
+  --color-mq-accent-green: #5DAFA8;
   --color-mq-accent-purple: #8D6CE7;
   --color-mq-accent-pink: #EB7E9E;
   
@@ -46,24 +46,27 @@
   --color-mq-info-bg: #EAF2FF;
   
   /* Fonts */
-  --font-sans: 'Lexend', 'Segoe UI', sans-serif;
-  --font-lexend: 'Lexend', 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', 'Lexend', system-ui, sans-serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-lexend: 'Lexend', system-ui, sans-serif;
   --font-sinhala: 'Noto Sans Sinhala', 'Segoe UI', sans-serif;
 }
 
 :root {
   /* Keep raw CSS variables for custom components */
-  --mq-bg: #F4F8FB;
+  --mq-bg: #F7FAFC;
   --mq-surface: #FFFFFF;
   --mq-surface-soft: #EEF6FB;
-  --mq-surface-blue: #E9F3FF;
+  --mq-surface-blue: #DCECF7;
+  --mq-surface-green: #DDEFE3;
+  --mq-surface-yellow: #F5E5B8;
   --mq-primary: #3C82B4;
   --mq-primary-hover: #2E6F9D;
   --mq-primary-dark: #275F88;
-  --mq-secondary: #63B7AF;
-  --mq-text: #16324A;
-  --mq-text-strong: #0D2340;
-  --mq-text-muted: #5F7488;
+  --mq-secondary: #5DAFA8;
+  --mq-text: #24364B;
+  --mq-text-strong: #162638;
+  --mq-text-muted: #52667A;
   --mq-border: #D6E4ED;
   --mq-border-strong: #BFD2DF;
   

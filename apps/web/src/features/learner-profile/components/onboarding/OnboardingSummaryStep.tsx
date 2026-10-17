@@ -56,7 +56,15 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
               <span className="text-mq-border">•</span>
               <span>වයස අවුරුදු {learner.age}</span>
               <span className="text-mq-border">•</span>
-              <span>{learner.preferredLanguage} මාධ්‍යය</span>
+              <span>
+                {learner.preferredLanguage === 'Bilingual'
+                  ? `දෙබසම (Bilingual${
+                      learner.primaryInstructionLanguage
+                        ? ` • ${learner.primaryInstructionLanguage}`
+                        : ''
+                    })`
+                  : `${learner.preferredLanguage} මාධ්‍යය`}
+              </span>
             </p>
           </div>
         </div>

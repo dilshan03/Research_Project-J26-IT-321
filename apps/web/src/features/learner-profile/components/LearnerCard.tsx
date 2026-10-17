@@ -127,8 +127,25 @@ export const LearnerCard: React.FC<LearnerCardProps> = ({ learner, onEdit }) => 
                 Language Preference (භාෂා මාධ්‍යය)
               </span>
               <span className="font-bold text-mq-text-strong block font-sinhala truncate">
-                {learner.preferredLanguage}
+                {learner.preferredLanguage === 'Bilingual'
+                  ? `දෙබසම (Bilingual${
+                      learner.primaryInstructionLanguage
+                        ? ` • Primary: ${learner.primaryInstructionLanguage}`
+                        : ''
+                    })`
+                  : learner.preferredLanguage}
               </span>
+              {learner.preferredLanguage === 'Bilingual' &&
+                (learner.sinhalaComprehension || learner.englishComprehension) && (
+                  <span className="text-[10px] text-mq-text-muted block truncate font-sinhala mt-0.5">
+                    {[
+                      learner.sinhalaComprehension ? `සිංහල: ${learner.sinhalaComprehension}` : null,
+                      learner.englishComprehension ? `EN: ${learner.englishComprehension}` : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </span>
+                )}
             </div>
           </div>
         </div>

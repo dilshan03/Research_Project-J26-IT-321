@@ -360,7 +360,13 @@ export const OnboardingPlaceholderPage: React.FC = () => {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary shrink-0">
-                      {learner.preferredLanguage} මාධ්‍යය
+                      {learner.preferredLanguage === 'Bilingual'
+                        ? `දෙබසම (Bilingual${
+                            learner.primaryInstructionLanguage
+                              ? ` • ${learner.primaryInstructionLanguage}`
+                              : ''
+                          })`
+                        : `${learner.preferredLanguage} මාධ්‍යය`}
                     </span>
                     <OnboardingStatusBadge
                       status={progress?.status === 'COMPLETED' ? 'COMPLETED' : 'IN_PROGRESS'}
@@ -455,6 +461,8 @@ export const OnboardingPlaceholderPage: React.FC = () => {
             {currentStep === 'math_assessment' && (
               <MathAssessmentStep
                 grade={learner.grade}
+                preferredLanguage={learner.preferredLanguage}
+                primaryInstructionLanguage={learner.primaryInstructionLanguage}
                 questions={mathQuestions}
                 onSubmit={handleMathSubmit}
                 onSaveAndExit={handleMathSaveAndExit}

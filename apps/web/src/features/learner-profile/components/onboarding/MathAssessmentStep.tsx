@@ -8,6 +8,7 @@ import {
   Save,
   Lightbulb,
   X,
+  Languages,
 } from 'lucide-react';
 import type {
   MathQuestion,
@@ -17,6 +18,8 @@ import type {
 
 interface Props {
   grade: number;
+  preferredLanguage?: string;
+  primaryInstructionLanguage?: string;
   questions: MathQuestion[];
   onSubmit: (answers: MathItemAnswer[]) => Promise<void>;
   onSaveAndExit: (answers: MathItemAnswer[]) => Promise<void>;
@@ -26,6 +29,8 @@ interface Props {
 
 export const MathAssessmentStep: React.FC<Props> = ({
   grade,
+  preferredLanguage = 'Sinhala',
+  primaryInstructionLanguage = 'Sinhala',
   questions,
   onSubmit,
   onSaveAndExit,
@@ -38,6 +43,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
   const [hintsUsed, setHintsUsed] = useState<Record<string, boolean>>({});
   const [attempts, setAttempts] = useState<Record<string, number>>({});
   const [showHintModal, setShowHintModal] = useState(false);
+  const [showTranslation, setShowTranslation] = useState(false);
 
   // Numeric input state
   const [numericInput, setNumericInput] = useState('');
@@ -51,6 +57,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
   useEffect(() => {
     questionStartTimeRef.current = Date.now();
     setShowHintModal(false);
+    setShowTranslation(false);
     // If existing answer is numeric, populate input
     if (currentQuestion && answers[currentQuestion.questionId] !== undefined) {
       setNumericInput(String(answers[currentQuestion.questionId]));
@@ -215,13 +222,60 @@ export const MathAssessmentStep: React.FC<Props> = ({
           </div>
 
           {/* Prompt */}
-          <div className="space-y-1">
-            <h3 className="text-lg sm:text-2xl font-extrabold text-mq-text-strong font-sinhala leading-snug">
-              {currentQuestion.promptSi}
-            </h3>
-            <p className="text-sm text-mq-text-muted leading-relaxed font-medium">
-              {currentQuestion.promptEn}
-            </p>
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+              <h3
+                className={`text-lg sm:text-2xl font-extrabold text-mq-text-strong leading-snug flex-1 ${
+                  preferredLanguage === 'English' ||
+                  (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
+                    ? 'font-sans'
+                    : 'font-sinhala'
+                }`}
+              >
+                {preferredLanguage === 'English' ||
+                (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
+                  ? currentQuestion.promptEn
+                  : currentQuestion.promptSi}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowTranslation((prev) => !prev)}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer self-start ${
+                  showTranslation
+                    ? 'bg-mq-surface-blue text-mq-primary border border-mq-primary/40'
+                    : 'bg-mq-surface-soft hover:bg-mq-surface-blue text-mq-text-muted hover:text-mq-primary border border-mq-border'
+                }`}
+                title={showTranslation ? 'Hide translation' : 'Show translation'}
+              >
+                <Languages size={14} />
+                <span>
+                  {showTranslation
+                    ? 'පරිවර්තනය සඟවන්න (Hide)'
+                    : preferredLanguage === 'English' ||
+                      (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
+                    ? 'සිංහල පරිවර්තනය (Sinhala)'
+                    : 'English Translation'}
+                </span>
+              </button>
+            </div>
+
+            {/* Optional Translation Accordion */}
+            {showTranslation && (
+              <div className="p-3.5 rounded-2xl bg-mq-surface-soft border border-mq-border/70 text-xs sm:text-sm text-mq-text leading-relaxed animate-fade-in font-sinhala">
+                <span className="text-[10px] font-bold text-mq-text-muted uppercase tracking-wider block mb-1">
+                  {preferredLanguage === 'English' ||
+                  (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
+                    ? 'සිංහල අනුවාදය (Sinhala Translation)'
+                    : 'English Translation'}
+                </span>
+                <p>
+                  {preferredLanguage === 'English' ||
+                  (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
+                    ? currentQuestion.promptSi
+                    : currentQuestion.promptEn}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Visual Representation (if visual type) */}

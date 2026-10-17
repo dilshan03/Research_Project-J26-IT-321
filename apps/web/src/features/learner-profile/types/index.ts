@@ -1,6 +1,11 @@
 export type OnboardingStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
 
-export type PreferredLanguage = 'Sinhala' | 'English' | 'Bilingual';
+export type LanguageComprehensionLevel =
+  | 'Understands a little'
+  | 'Understands basic instructions'
+  | 'Understands well';
+
+export type PrimaryInstructionLanguage = 'Sinhala' | 'English';
 
 export interface Learner {
   id: string;
@@ -11,6 +16,9 @@ export interface Learner {
   age: number;
   grade: number;
   preferredLanguage: string;
+  sinhalaComprehension?: LanguageComprehensionLevel | string;
+  englishComprehension?: LanguageComprehensionLevel | string;
+  primaryInstructionLanguage?: PrimaryInstructionLanguage | string;
   avatarId: string;
   onboardingStatus: OnboardingStatus;
   createdAt: string;
@@ -23,6 +31,9 @@ export interface CreateLearnerData {
   age: number;
   grade: number;
   preferredLanguage?: string;
+  sinhalaComprehension?: LanguageComprehensionLevel | string;
+  englishComprehension?: LanguageComprehensionLevel | string;
+  primaryInstructionLanguage?: PrimaryInstructionLanguage | string;
   avatarId?: string;
 }
 
@@ -32,6 +43,9 @@ export interface UpdateLearnerData {
   age?: number;
   grade?: number;
   preferredLanguage?: string;
+  sinhalaComprehension?: LanguageComprehensionLevel | string;
+  englishComprehension?: LanguageComprehensionLevel | string;
+  primaryInstructionLanguage?: PrimaryInstructionLanguage | string;
   avatarId?: string;
   onboardingStatus?: OnboardingStatus;
 }

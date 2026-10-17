@@ -26,6 +26,9 @@ def serialize_learner_doc(doc: Dict[str, Any]) -> Dict[str, Any]:
         "age": doc.get("age", 6),
         "grade": doc.get("grade", 1),
         "preferredLanguage": doc.get("preferredLanguage", "Sinhala"),
+        "sinhalaComprehension": doc.get("sinhalaComprehension"),
+        "englishComprehension": doc.get("englishComprehension"),
+        "primaryInstructionLanguage": doc.get("primaryInstructionLanguage"),
         "avatarId": doc.get("avatarId", "avatar_1"),
         "onboardingStatus": doc.get("onboardingStatus", "NOT_STARTED"),
         "createdAt": created_at.isoformat() if isinstance(created_at, datetime) else str(created_at or ""),
@@ -52,6 +55,9 @@ async def create_learner(parent_id: str, data: CreateLearnerRequest) -> Dict[str
         "age": data.age,
         "grade": data.grade,
         "preferredLanguage": data.preferredLanguage or "Sinhala",
+        "sinhalaComprehension": data.sinhalaComprehension if (data.preferredLanguage == "Bilingual") else None,
+        "englishComprehension": data.englishComprehension if (data.preferredLanguage == "Bilingual") else None,
+        "primaryInstructionLanguage": data.primaryInstructionLanguage if (data.preferredLanguage == "Bilingual") else None,
         "avatarId": data.avatarId or "avatar_1",
         "onboardingStatus": "NOT_STARTED",
         "createdAt": now,
@@ -157,6 +163,16 @@ async def update_learner(
         update_data["grade"] = data.grade
     if data.preferredLanguage is not None:
         update_data["preferredLanguage"] = data.preferredLanguage
+        if data.preferredLanguage != "Bilingual":
+            update_data["sinhalaComprehension"] = None
+            update_data["englishComprehension"] = None
+            update_data["primaryInstructionLanguage"] = None
+    if data.sinhalaComprehension is not None:
+        update_data["sinhalaComprehension"] = data.sinhalaComprehension
+    if data.englishComprehension is not None:
+        update_data["englishComprehension"] = data.englishComprehension
+    if data.primaryInstructionLanguage is not None:
+        update_data["primaryInstructionLanguage"] = data.primaryInstructionLanguage
     if data.avatarId is not None:
         update_data["avatarId"] = data.avatarId
     if data.onboardingStatus is not None:

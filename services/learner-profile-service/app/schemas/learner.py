@@ -44,6 +44,18 @@ class CreateLearnerRequest(BaseModel):
         default="Sinhala",
         description="Language for instructional audio and prompts (default: Sinhala)"
     )
+    sinhalaComprehension: Optional[str] = Field(
+        default=None,
+        description="Optional Sinhala comprehension level for bilingual learners"
+    )
+    englishComprehension: Optional[str] = Field(
+        default=None,
+        description="Optional English comprehension level for bilingual learners"
+    )
+    primaryInstructionLanguage: Optional[str] = Field(
+        default=None,
+        description="Optional primary instruction language for bilingual learners (Sinhala or English)"
+    )
     avatarId: Optional[str] = Field(
         default="avatar_1",
         description="Selected character avatar identifier"
@@ -86,6 +98,18 @@ class UpdateLearnerRequest(BaseModel):
         None,
         description="Updated preferred language"
     )
+    sinhalaComprehension: Optional[str] = Field(
+        None,
+        description="Updated Sinhala comprehension level"
+    )
+    englishComprehension: Optional[str] = Field(
+        None,
+        description="Updated English comprehension level"
+    )
+    primaryInstructionLanguage: Optional[str] = Field(
+        None,
+        description="Updated primary instruction language"
+    )
     avatarId: Optional[str] = Field(
         None,
         description="Updated avatar identifier"
@@ -113,6 +137,9 @@ class LearnerResponse(BaseModel):
     age: int
     grade: int
     preferredLanguage: str
+    sinhalaComprehension: Optional[str] = None
+    englishComprehension: Optional[str] = None
+    primaryInstructionLanguage: Optional[str] = None
     avatarId: str
     onboardingStatus: str
     createdAt: str

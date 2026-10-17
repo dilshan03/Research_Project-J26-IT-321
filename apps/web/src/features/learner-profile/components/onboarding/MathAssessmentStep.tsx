@@ -224,8 +224,8 @@ const StandardMathAssessmentView: React.FC<StandardViewProps> = ({
             }}
           />
           <div className="min-w-0">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary block">
-              {grade} වන ශ්‍රේණිය • ගණිත අභ්‍යාසය (Grade {grade} Math Quest)
+            <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary block font-sinhala">
+              ගණිත ගවේෂණය (Math Quest)
             </span>
             <span className="text-sm font-bold text-mq-text-strong font-sinhala">
               ප්‍රශ්න {currentIndex + 1} න් {totalQuestions}

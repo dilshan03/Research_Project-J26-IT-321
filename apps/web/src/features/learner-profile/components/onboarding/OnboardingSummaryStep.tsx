@@ -32,60 +32,73 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
   return (
     <div className="space-y-6">
       {/* Success Celebration Card */}
-      <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 lg:p-7 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-5 animate-fade-in">
-        <div className="flex items-start sm:items-center gap-3.5 sm:gap-4.5 min-w-0 flex-1">
-          <AnimatedCompanion
-            avatarId={learner?.avatarId}
-            state="success"
-            size="lg"
-            showSpeechBubble={true}
-            customSpeech={{
-              si: `සුබ පැතුම්, ${learner.firstName}! ඔබේ ආරම්භක පැතිකඩ සාර්ථකව සකස් විය!`,
-              en: `Congratulations, ${learner.firstName}! Your personalized learning profile is ready!`,
-            }}
-          />
-          <div className="min-w-0 flex-1 space-y-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-green text-mq-success border border-mq-success/20 max-w-full">
+      <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-7 shadow-sm space-y-5 animate-fade-in">
+        {/* Top Header Row: Learner Title on Left, Action Buttons on Right */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 border-b border-mq-border/60 pb-5">
+          <div className="flex items-center gap-4 min-w-0">
+            <AnimatedCompanion
+              avatarId={learner?.avatarId}
+              state="success"
+              size="md"
+              showSpeechBubble={false}
+            />
+            <div className="min-w-0 space-y-1.5 flex-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-green text-mq-success border border-mq-success/20">
                 <CheckCircle2 size={14} className="shrink-0" />
-                <span className="leading-snug">ආරම්භක ඇගයීම් සාර්ථකව සම්පූර්ණයි (Onboarding Complete)</span>
+                <span>ආරම්භක ඇගයීම් සාර්ථකව සම්පූර්ණයි (Onboarding Complete)</span>
               </div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-mq-text-strong font-sinhala leading-tight">
+                {learner.firstName} ගේ පුද්ගලීකරණය කළ පැතිකඩ
+              </h1>
+              <p className="text-xs sm:text-sm text-mq-text-muted font-sinhala flex items-center gap-2 flex-wrap">
+                <span>{learner.grade} වන ශ්‍රේණිය</span>
+                <span className="text-mq-border">•</span>
+                <span>වයස අවුරුදු {learner.age}</span>
+                <span className="text-mq-border">•</span>
+                <span>
+                  {learner.preferredLanguage === 'Bilingual'
+                    ? `දෙබසම (Bilingual${
+                        learner.primaryInstructionLanguage
+                          ? ` • ${learner.primaryInstructionLanguage}`
+                          : ''
+                      })`
+                    : `${learner.preferredLanguage} මාධ්‍යය`}
+                </span>
+              </p>
             </div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-mq-text-strong font-sinhala leading-tight break-words">
-              {learner.firstName} ගේ පුද්ගලීකරණය කළ පැතිකඩ
-            </h1>
-            <p className="text-xs sm:text-sm text-mq-text-muted font-sinhala flex items-center gap-1.5 flex-wrap">
-              <span>{learner.grade} වන ශ්‍රේණිය</span>
-              <span className="text-mq-border">•</span>
-              <span>වයස අවුරුදු {learner.age}</span>
-              <span className="text-mq-border">•</span>
-              <span>
-                {learner.preferredLanguage === 'Bilingual'
-                  ? `දෙබසම (Bilingual${
-                      learner.primaryInstructionLanguage
-                        ? ` • ${learner.primaryInstructionLanguage}`
-                        : ''
-                    })`
-                  : `${learner.preferredLanguage} මාධ්‍යය`}
-              </span>
-            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap sm:flex-nowrap shrink-0">
+            <Link
+              to="/learners"
+              className="btn btn-secondary text-xs sm:text-sm py-2.5 px-4 rounded-full font-bold font-sinhala text-center inline-flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap"
+            >
+              <span>මගේ දරුවන්ගේ ලැයිස්තුව (Learners Overview)</span>
+            </Link>
+            <a
+              href="#/play"
+              className="btn btn-primary text-xs sm:text-sm py-2.5 px-5 rounded-full font-bold font-sinhala inline-flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap"
+            >
+              <span>අනුවර්තී ක්‍රීඩා අරඹමු (Start Adaptive Play)</span>
+              <ArrowRight size={14} strokeWidth={2.5} className="shrink-0" />
+            </a>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 shrink-0 w-full xl:w-auto xl:justify-end border-t xl:border-t-0 pt-4 xl:pt-0 border-mq-border/60">
-          <Link
-            to="/learners"
-            className="btn btn-secondary text-xs py-2.5 px-4 rounded-full font-bold font-sinhala text-center inline-flex items-center justify-center gap-1.5 shadow-xs whitespace-nowrap"
-          >
-            <span>මගේ දරුවන්ගේ ලැයිස්තුව (Learners Overview)</span>
-          </Link>
-          <a
-            href="#/play"
-            className="btn btn-primary text-xs py-2.5 px-5 rounded-full font-bold font-sinhala inline-flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap"
-          >
-            <span>අනුවර්තී ක්‍රීඩා අරඹමු (Start Adaptive Play)</span>
-            <ArrowRight size={14} strokeWidth={2.5} className="shrink-0" />
-          </a>
+        {/* Celebration Speech Banner */}
+        <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-amber-50 rounded-2xl border border-emerald-200/80 p-4 sm:p-5 flex items-center gap-3.5">
+          <div className="text-2xl sm:text-3xl shrink-0 p-2 rounded-xl bg-white/80 border border-emerald-100 shadow-xs">
+            🎉
+          </div>
+          <div className="space-y-0.5 min-w-0">
+            <p className="font-sinhala font-extrabold text-emerald-950 text-sm sm:text-base leading-snug">
+              සුබ පැතුම්, {learner.firstName}! ඔබේ ආරම්භක පැතිකඩ සාර්ථකව සකස් විය!
+            </p>
+            <p className="text-xs sm:text-sm text-emerald-800/80 font-medium leading-tight">
+              Congratulations, {learner.firstName}! Your personalized learning profile is ready!
+            </p>
+          </div>
         </div>
       </div>
 

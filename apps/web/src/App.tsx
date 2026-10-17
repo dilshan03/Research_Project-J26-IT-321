@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import HomePage from './pages/public/HomePage';
 import ContentAdaptationPage from './features/content-adaptation/ContentAdaptationPage';
 import { SignInPage } from './features/auth/pages/SignInPage';
@@ -41,6 +41,39 @@ function useHashRoute() {
   return hash;
 }
 
+function FloatingDevControls() {
+  const location = useLocation();
+  // Hide during child-facing onboarding to eliminate distraction
+  const isStudentDashboard = location.pathname === '/student/dashboard';
+  const isAgentTest = location.pathname === '/agent-test';
+  const isOnboarding = location.pathname.includes('/onboarding');
+
+  if (isOnboarding) return null;
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5">
+      {!isStudentDashboard && (
+        <a
+          href="/student/dashboard"
+          className="px-4 py-2 bg-mq-primary-dark text-white font-bold rounded-full shadow-2xl hover:bg-mq-primary transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40 text-xs sm:text-sm"
+        >
+          <span>🎒</span>
+          <span>Student Dashboard</span>
+        </a>
+      )}
+      {!isAgentTest && (
+        <a
+          href="/agent-test"
+          className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-full shadow-2xl hover:bg-emerald-700 transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40 text-xs sm:text-sm"
+        >
+          <span>🤖</span>
+          <span>Test 3D Agent</span>
+        </a>
+      )}
+    </div>
+  );
+}
+
 function App() {
   const hash = useHashRoute();
 
@@ -51,30 +84,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        {/* ------------------------------------------------------------- */}
-        {/* [DEV TEMP] Quick Floating Buttons for Student Dashboard & 3D Agent */}
-        {/* ------------------------------------------------------------- */}
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5">
-          {window.location.pathname !== '/student/dashboard' && (
-            <a
-              href="/student/dashboard"
-              className="px-4 py-2 bg-mq-primary-dark text-white font-bold rounded-full shadow-2xl hover:bg-mq-primary transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40 text-xs sm:text-sm"
-            >
-              <span>🎒</span>
-              <span>Student Dashboard</span>
-            </a>
-          )}
-          {window.location.pathname !== '/agent-test' && (
-            <a
-              href="/agent-test"
-              className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-full shadow-2xl hover:bg-emerald-700 transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40 text-xs sm:text-sm"
-            >
-              <span>🤖</span>
-              <span>Test 3D Agent</span>
-            </a>
-          )}
-        </div>
-        {/* ------------------------------------------------------------- */}
+        <FloatingDevControls />
 
         <Routes>
           {/* ========================================================= */}

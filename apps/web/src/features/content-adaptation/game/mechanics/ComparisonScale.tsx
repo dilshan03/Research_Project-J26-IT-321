@@ -19,13 +19,7 @@ export function ComparisonScale({ step, lang, onWrong, onCorrect }: MechanicProp
   };
 
   return (
-    <div className="flex flex-col items-center gap-8 w-full max-w-xl">
-      <div className="text-center px-4 py-3 rounded-2xl bg-teal-500/10 border border-teal-400/30">
-        <p className="text-xl sm:text-2xl font-bold text-teal-200">
-          {lang === 'si' ? step.instruction_si : step.instruction_en}
-        </p>
-      </div>
-
+    <div className="flex flex-col items-center gap-8 w-full max-w-2xl mx-auto">
       {/* Two comparative interactive figures */}
       <div className="flex flex-wrap items-center justify-center gap-8 w-full">
         {step.game_options.map((opt) => {
@@ -35,16 +29,16 @@ export function ComparisonScale({ step, lang, onWrong, onCorrect }: MechanicProp
           return (
             <motion.button
               key={opt.text_en}
-              whileHover={!isWrong && !done ? { scale: 1.08, y: -4 } : {}}
+              whileHover={!isWrong && !done ? { scale: 1.06, y: -4 } : {}}
               whileTap={!isWrong && !done ? { scale: 0.95 } : {}}
               onClick={() => pick(opt)}
               disabled={isWrong || done}
-              className={`flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all shadow-xl min-w-[160px]
+              className={`flex flex-col items-center justify-center p-8 rounded-3xl border-2 transition-all shadow-xl min-w-[200px]
                 ${isWrong
-                  ? 'opacity-30 bg-slate-900 border-slate-700 cursor-not-allowed scale-95'
+                  ? 'opacity-35 bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed scale-95'
                   : done && opt.is_correct
-                  ? 'bg-emerald-500/30 border-emerald-400 ring-4 ring-emerald-400/40 scale-110'
-                  : 'bg-teal-500/20 border-teal-400/60 hover:bg-teal-500/30 cursor-pointer'
+                  ? 'bg-emerald-100 border-emerald-500 ring-4 ring-emerald-400/50 scale-110'
+                  : 'bg-teal-50 border-teal-400 hover:bg-teal-100 text-teal-950 cursor-pointer'
                 }`}
             >
               <span
@@ -54,7 +48,7 @@ export function ComparisonScale({ step, lang, onWrong, onCorrect }: MechanicProp
               >
                 🐘
               </span>
-              <span className="mt-4 text-base sm:text-lg font-bold text-slate-100 text-center">
+              <span className="mt-4 text-base sm:text-lg font-extrabold text-slate-800 text-center">
                 {lang === 'si' ? opt.text_si : opt.text_en}
               </span>
             </motion.button>

@@ -312,21 +312,23 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
             <motion.section key={`step-${stepIndex}`}
               initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -60 }}
               transition={{ type: 'spring', stiffness: 200, damping: 26 }}
-              className={`mx-auto max-w-4xl mt-4 rounded-[2.5rem] bg-white/85 backdrop-blur-md shadow-2xl border-4 p-6 md:p-10
+              className={`mx-auto max-w-4xl mt-4 rounded-[2.5rem] bg-white/90 backdrop-blur-md shadow-2xl border-4 p-6 md:p-10 flex flex-col items-center
                 ${nudging ? 'border-mq-accent-yellow' : 'border-white'}`}
             >
               {step.action_type !== 'IDENTIFY_ENTITY' && (
-                <p className={`${lang === 'si' ? 'sinhala' : 'font-medium'} text-center text-lg text-mq-text mb-6 px-4 py-2 rounded-2xl bg-mq-surface-soft`}>
+                <p className={`${lang === 'si' ? 'sinhala' : 'font-medium'} text-center text-lg text-mq-text mb-6 px-6 py-2.5 rounded-full bg-mq-surface-soft border border-mq-border/50 max-w-2xl w-full mx-auto`}>
                   {activeQuestion}
                 </p>
               )}
-              <h2 className={`text-center text-2xl md:text-3xl font-extrabold mb-8 ${lang === 'si' ? 'sinhala' : ''}`}>
+              <h2 className={`text-center text-2xl md:text-3xl font-extrabold mb-8 max-w-2xl w-full mx-auto ${lang === 'si' ? 'sinhala' : ''}`}>
                 {lang === 'si' ? step.instruction_si : step.instruction_en}
               </h2>
-              <mechanic.Comp
-                step={step} question={activeQuestion} theme={blueprint.game_theme} isMoney={isMoney}
-                lang={lang} calm={calm} onWrong={onWrong} onCorrect={onCorrect} onSay={l => say(l, 'thinking')}
-              />
+              <div className="w-full flex justify-center">
+                <mechanic.Comp
+                  step={step} question={activeQuestion} theme={blueprint.game_theme} isMoney={isMoney}
+                  lang={lang} calm={calm} onWrong={onWrong} onCorrect={onCorrect} onSay={l => say(l, 'thinking')}
+                />
+              </div>
             </motion.section>
           )}
 

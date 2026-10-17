@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
+import type { MathQuestion, MathItemAnswer } from '../../types/onboarding';
+import { LivingCanvasOnboarding } from './LivingCanvasOnboarding';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
   ArrowRight,
@@ -10,11 +12,8 @@ import {
   Lightbulb,
   X,
   Languages,
+  Palette,
 } from 'lucide-react';
-import type {
-  MathQuestion,
-  MathItemAnswer,
-} from '../../types/onboarding';
 import { AnimatedCompanion, type CompanionState } from './AnimatedCompanion';
 
 interface Props {
@@ -29,7 +28,40 @@ interface Props {
   avatarId?: string;
 }
 
-export const MathAssessmentStep: React.FC<Props> = ({
+export const MathAssessmentStep: React.FC<Props> = (props) => {
+  // Default to the new 2D watercolor Living Canvas discovery experience
+  const [viewMode, setViewMode] = useState<'canvas' | 'standard'>('canvas');
+
+  if (viewMode === 'canvas') {
+    return (
+      <div className="space-y-4">
+        {/* Living Canvas Experience */}
+        <LivingCanvasOnboarding {...props} />
+
+        {/* Small subtle accessible toggle for standard fallback if needed */}
+        <div className="flex justify-end pt-1">
+          <button
+            type="button"
+            onClick={() => setViewMode('standard')}
+            className="text-[11px] text-slate-400 hover:text-slate-600 transition-colors font-sans flex items-center gap-1 cursor-pointer"
+          >
+            <Palette size={12} />
+            <span>Switch to Standard View (සාමාන්‍ය දසුන)</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback: Standard Card Assessment View
+  return <StandardMathAssessmentView {...props} onSwitchToCanvas={() => setViewMode('canvas')} />;
+};
+
+interface StandardViewProps extends Props {
+  onSwitchToCanvas: () => void;
+}
+
+const StandardMathAssessmentView: React.FC<StandardViewProps> = ({
   grade,
   preferredLanguage = 'Sinhala',
   primaryInstructionLanguage = 'Sinhala',
@@ -39,32 +71,28 @@ export const MathAssessmentStep: React.FC<Props> = ({
   onBack,
   isSubmitting,
   avatarId,
+  onSwitchToCanvas,
 }) => {
   const shouldReduceMotion = useReducedMotion();
   const [currentIndex, setCurrentIndex] = useState(0);
-  // Store user answers by questionId
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [hintsUsed, setHintsUsed] = useState<Record<string, boolean>>({});
   const [attempts, setAttempts] = useState<Record<string, number>>({});
   const [showHintModal, setShowHintModal] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
   const [companionState, setCompanionState] = useState<CompanionState>('idle');
-
-  // Numeric input state
   const [numericInput, setNumericInput] = useState('');
 
-  // Track start time for current question
-  const questionStartTimeRef = useRef<number>(Date.now());
-  const responseTimesRef = useRef<Record<string, number>>({});
+  const questionStartTimeRef = React.useRef<number>(Date.now());
+  const responseTimesRef = React.useRef<Record<string, number>>({});
 
   const currentQuestion = questions[currentIndex];
 
-  useEffect(() => {
+  React.useEffect(() => {
     questionStartTimeRef.current = Date.now();
     setShowHintModal(false);
     setShowTranslation(false);
     setCompanionState('idle');
-    // If existing answer is numeric, populate input
     if (currentQuestion && answers[currentQuestion.questionId] !== undefined) {
       setNumericInput(String(answers[currentQuestion.questionId]));
     } else {
@@ -95,11 +123,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
   const handleSelectOption = (optionId: string) => {
     if (!currentQuestion) return;
     recordTimeForCurrent();
-
-    setAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.questionId]: optionId,
-    }));
+    setAnswers((prev) => ({ ...prev, [currentQuestion.questionId]: optionId }));
     setAttempts((prev) => ({
       ...prev,
       [currentQuestion.questionId]: (prev[currentQuestion.questionId] || 0) + 1,
@@ -132,10 +156,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
 
   const handleToggleHint = () => {
     if (!currentQuestion) return;
-    setHintsUsed((prev) => ({
-      ...prev,
-      [currentQuestion.questionId]: true,
-    }));
+    setHintsUsed((prev) => ({ ...prev, [currentQuestion.questionId]: true }));
     setCompanionState('hint');
     setShowHintModal(true);
   };
@@ -174,13 +195,24 @@ export const MathAssessmentStep: React.FC<Props> = ({
 
   const isCurrentAnswered =
     currentQuestion && answers[currentQuestion.questionId] !== undefined;
-
   const totalQuestions = questions.length;
   const progressPct = Math.round(((currentIndex + 1) / totalQuestions) * 100);
 
   return (
     <div className="space-y-6">
-      {/* Top Header Card with Question Progress & Animated Companion */}
+      {/* Return to Living Canvas Banner */}
+      <div className="flex justify-between items-center">
+        <button
+          type="button"
+          onClick={onSwitchToCanvas}
+          className="btn btn-secondary text-xs py-1.5 px-3.5 rounded-full inline-flex items-center gap-1.5 font-bold font-sinhala"
+        >
+          <Sparkles size={14} className="text-teal-600" />
+          <span>සජීවී කැන්වසය වෙත ආපසු යන්න (Back to Living Canvas)</span>
+        </button>
+      </div>
+
+      {/* Top Header Card */}
       <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5 min-w-0">
           <AnimatedCompanion
@@ -188,9 +220,7 @@ export const MathAssessmentStep: React.FC<Props> = ({
             state={companionState}
             size="md"
             onAnimationComplete={() => {
-              if (companionState === 'encouragement') {
-                setCompanionState('idle');
-              }
+              if (companionState === 'encouragement') setCompanionState('idle');
             }}
           />
           <div className="min-w-0">
@@ -230,10 +260,9 @@ export const MathAssessmentStep: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Main Question Card */}
+      {/* Question Card */}
       {currentQuestion && (
-        <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-10 shadow-sm space-y-6 animate-fade-in">
-          {/* Skill Tag */}
+        <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-10 shadow-sm space-y-6">
           <div className="flex items-center justify-between gap-2 border-b border-mq-border/70 pb-3">
             <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-mq-surface-blue text-mq-primary">
               <Sparkles size={14} />
@@ -241,22 +270,11 @@ export const MathAssessmentStep: React.FC<Props> = ({
                 {currentQuestion.skillNameSi} ({currentQuestion.skillName})
               </span>
             </span>
-            <span className="text-xs text-mq-text-muted capitalize font-semibold">
-              Difficulty: {currentQuestion.difficulty}
-            </span>
           </div>
 
-          {/* Prompt */}
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-              <h3
-                className={`text-lg sm:text-2xl font-extrabold text-mq-text-strong leading-snug flex-1 ${
-                  preferredLanguage === 'English' ||
-                  (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
-                    ? 'font-sans'
-                    : 'font-sinhala'
-                }`}
-              >
+              <h3 className="text-lg sm:text-2xl font-extrabold text-mq-text-strong leading-snug flex-1 font-sinhala">
                 {preferredLanguage === 'English' ||
                 (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
                   ? currentQuestion.promptEn
@@ -265,34 +283,22 @@ export const MathAssessmentStep: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={() => setShowTranslation((prev) => !prev)}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 cursor-pointer self-start ${
-                  showTranslation
-                    ? 'bg-mq-surface-blue text-mq-primary border border-mq-primary/40'
-                    : 'bg-mq-surface-soft hover:bg-mq-surface-blue text-mq-text-muted hover:text-mq-primary border border-mq-border'
-                }`}
-                title={showTranslation ? 'Hide translation' : 'Show translation'}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-mq-surface-soft text-mq-text-muted hover:text-mq-primary border border-mq-border cursor-pointer shrink-0"
               >
                 <Languages size={14} />
                 <span>
                   {showTranslation
-                    ? 'පරිවර්තනය සඟවන්න (Hide)'
+                    ? 'සඟවන්න'
                     : preferredLanguage === 'English' ||
                       (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
-                    ? 'සිංහල පරිවර්තනය (Sinhala)'
-                    : 'English Translation'}
+                    ? 'සිංහල'
+                    : 'English'}
                 </span>
               </button>
             </div>
 
-            {/* Optional Translation Accordion */}
             {showTranslation && (
-              <div className="p-3.5 rounded-2xl bg-mq-surface-soft border border-mq-border/70 text-xs sm:text-sm text-mq-text leading-relaxed animate-fade-in font-sinhala">
-                <span className="text-[10px] font-bold text-mq-text-muted uppercase tracking-wider block mb-1">
-                  {preferredLanguage === 'English' ||
-                  (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
-                    ? 'සිංහල අනුවාදය (Sinhala Translation)'
-                    : 'English Translation'}
-                </span>
+              <div className="p-3.5 rounded-2xl bg-mq-surface-soft border border-mq-border/70 text-xs sm:text-sm text-mq-text font-sinhala">
                 <p>
                   {preferredLanguage === 'English' ||
                   (preferredLanguage === 'Bilingual' && primaryInstructionLanguage === 'English')
@@ -303,142 +309,16 @@ export const MathAssessmentStep: React.FC<Props> = ({
             )}
           </div>
 
-          {/* Visual Representation (if visual type) */}
-          {currentQuestion.visualRepresentation && (
-            <div className="p-6 rounded-2xl bg-mq-surface-soft border border-mq-border/60 flex items-center justify-center text-center">
-              {currentQuestion.visualRepresentation.type === 'icon_grid' && (
-                <div className="flex flex-wrap items-center justify-center gap-3 text-4xl sm:text-5xl">
-                  {Array.from({ length: currentQuestion.visualRepresentation.count || 5 }).map(
-                    (_, i) => (
-                      <span
-                        key={i}
-                        className="animate-float"
-                        style={{ animationDelay: `${i * 150}ms` }}
-                      >
-                        {currentQuestion.visualRepresentation?.icon || '🍎'}
-                      </span>
-                    )
-                  )}
-                </div>
-              )}
-
-              {currentQuestion.visualRepresentation.type === 'addition_dots' && (
-                <div className="flex items-center gap-4 text-3xl sm:text-4xl">
-                  <div className="flex gap-1.5">
-                    {Array.from({
-                      length: currentQuestion.visualRepresentation.firstCount || 3,
-                    }).map((_, i) => (
-                      <span key={i}>
-                        {currentQuestion.visualRepresentation?.firstIcon || '🔵'}
-                      </span>
-                    ))}
-                  </div>
-                  <span className="text-2xl font-bold text-mq-text-muted">+</span>
-                  <div className="flex gap-1.5">
-                    {Array.from({
-                      length: currentQuestion.visualRepresentation.secondCount || 2,
-                    }).map((_, i) => (
-                      <span key={i}>
-                        {currentQuestion.visualRepresentation?.secondIcon || '🟢'}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {currentQuestion.visualRepresentation.type === 'subtraction_icons' && (
-                <div className="flex flex-wrap items-center justify-center gap-3 text-3xl sm:text-4xl">
-                  {Array.from({
-                    length: currentQuestion.visualRepresentation.total || 6,
-                  }).map((_, i) => {
-                    const isRemoved =
-                      i >=
-                      (currentQuestion.visualRepresentation?.total || 6) -
-                        (currentQuestion.visualRepresentation?.removed || 2);
-                    return (
-                      <span
-                        key={i}
-                        className={`transition-opacity ${
-                          isRemoved ? 'opacity-30 line-through' : 'opacity-100'
-                        }`}
-                      >
-                        {currentQuestion.visualRepresentation?.icon || '⭐'}
-                      </span>
-                    );
-                  })}
-                </div>
-              )}
-
-              {currentQuestion.visualRepresentation.type === 'grouped_items' && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {Array.from({
-                    length: currentQuestion.visualRepresentation.groups || 4,
-                  }).map((_, g) => (
-                    <div
-                      key={g}
-                      className="p-3 rounded-xl bg-white border border-mq-border flex flex-col items-center shadow-xs"
-                    >
-                      <span className="text-xs font-bold text-mq-text-muted mb-1 font-sinhala">
-                        පිඟාන {g + 1}
-                      </span>
-                      <div className="flex gap-1 text-2xl">
-                        {Array.from({
-                          length:
-                            currentQuestion.visualRepresentation?.itemsPerGroup ||
-                            3,
-                        }).map((_, it) => (
-                          <span key={it}>
-                            {currentQuestion.visualRepresentation?.icon || '🥭'}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {currentQuestion.visualRepresentation.type === 'fraction_circle' && (
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="w-24 h-24 rounded-full border-4 border-mq-primary relative overflow-hidden flex items-center justify-center bg-white shadow-xs">
-                    <div className="absolute top-0 right-0 w-12 h-12 bg-mq-primary/30 border-l border-b border-mq-primary" />
-                    <span className="text-xl font-bold text-mq-text-strong font-mono">1/4</span>
-                  </div>
-                  <span className="text-xs text-mq-text-muted font-sinhala">
-                    සමාන කොටස් 4කින් 1ක්
-                  </span>
-                </div>
-              )}
-
-              {currentQuestion.visualRepresentation.type === 'rectangle_dimensions' && (
-                <div className="w-48 h-28 rounded-xl border-2 border-dashed border-mq-primary flex flex-col items-center justify-center bg-white relative">
-                  <span className="absolute -top-3 px-2 bg-white text-xs font-bold text-mq-primary">
-                    දිග = {currentQuestion.visualRepresentation.length} m
-                  </span>
-                  <span className="absolute -left-7 py-1 px-1 text-xs font-bold text-mq-primary rotate-[-90deg]">
-                    {currentQuestion.visualRepresentation.width} m
-                  </span>
-                  <span className="text-xs text-mq-text-muted font-sinhala">
-                    සෘජුකෝණාස්‍රය
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Options / Answer Input Section */}
+          {/* Options */}
           {currentQuestion.options && currentQuestion.options.length > 0 ? (
-            /* Multiple Choice / Visual Cards */
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               {currentQuestion.options.map((opt) => {
-                const isSelected =
-                  answers[currentQuestion.questionId] === opt.id;
+                const isSelected = answers[currentQuestion.questionId] === opt.id;
                 return (
                   <motion.button
                     type="button"
                     key={opt.id}
                     whileTap={{ scale: shouldReduceMotion ? 1 : 0.985 }}
-                    whileHover={{ scale: shouldReduceMotion ? 1 : 1.01 }}
-                    transition={{ duration: 0.15 }}
                     onClick={() => handleSelectOption(opt.id)}
                     className={`p-4 rounded-2xl border text-left flex items-center justify-between gap-3 transition-colors cursor-pointer ${
                       isSelected
@@ -454,157 +334,95 @@ export const MathAssessmentStep: React.FC<Props> = ({
                         {opt.textEn}
                       </span>
                     </div>
-                    {opt.visualIcon && (
-                      <span className="text-xl shrink-0">{opt.visualIcon}</span>
-                    )}
-                    {isSelected && (
-                      <CheckCircle2
-                        size={20}
-                        className="text-mq-primary shrink-0"
-                      />
-                    )}
+                    {isSelected && <CheckCircle2 size={20} className="text-mq-primary shrink-0" />}
                   </motion.button>
                 );
               })}
             </div>
           ) : (
-            /* Numeric / Text Answer Input */
             <div className="max-w-md mx-auto space-y-3">
-              <label className="block text-sm font-bold text-mq-text-strong font-sinhala text-center">
-                ඔබේ පිළිතුර ඇතුළත් කරන්න (Type your answer):
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  value={numericInput}
-                  onChange={(e) => handleNumericChange(e.target.value)}
-                  placeholder="පිළිතුර මෙහි ලියන්න (e.g. 15)"
-                  className="w-full text-center text-2xl font-bold py-3.5 px-4 rounded-2xl border-2 border-mq-border focus:border-mq-primary focus:outline-none transition-colors"
-                />
-              </div>
+              <input
+                type="number"
+                value={numericInput}
+                onChange={(e) => handleNumericChange(e.target.value)}
+                placeholder="පිළිතුර මෙහි ලියන්න"
+                className="w-full text-center text-2xl font-bold py-3 px-4 rounded-2xl border-2 border-mq-border focus:border-mq-primary focus:outline-none"
+              />
             </div>
           )}
         </div>
       )}
 
-      {/* Hint Modal / Drawer */}
+      {/* Hint Modal */}
       <AnimatePresence>
         {showHintModal && currentQuestion && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
             className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
           >
-            <motion.div
-              initial={{ scale: shouldReduceMotion ? 1 : 0.95, opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: shouldReduceMotion ? 1 : 0.95, opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
-              transition={{ duration: 0.22, ease: 'easeOut' }}
-              className="bg-white rounded-3xl border border-mq-border max-w-md w-full p-6 space-y-4 shadow-xl"
-            >
+            <div className="bg-white rounded-3xl border border-mq-border max-w-md w-full p-6 space-y-4 shadow-xl">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-mq-warning font-bold">
-                  <Lightbulb size={20} />
-                  <span className="text-sm font-sinhala">ප්‍රයෝජනවත් ඉඟියක් (Helpful Hint)</span>
-                </div>
+                <span className="text-sm font-bold text-mq-warning font-sinhala">ඉඟියක්</span>
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowHintModal(false);
-                    setCompanionState('idle');
-                  }}
-                  className="p-1.5 rounded-full hover:bg-mq-surface-soft text-mq-text-muted cursor-pointer"
+                  onClick={() => setShowHintModal(false)}
+                  className="p-1 rounded-full text-mq-text-muted cursor-pointer"
                 >
                   <X size={18} />
                 </button>
               </div>
-
-              {/* Companion Guidance In Hint Modal */}
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
-                <AnimatedCompanion
-                  avatarId={avatarId}
-                  state="hint"
-                  size="sm"
-                />
-                <p className="text-xs font-semibold text-mq-text-muted font-sinhala">
-                  කලබල නොවී සෙමෙන් කියවා විසඳන්න! (Take your time, you've got this!)
-                </p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-mq-surface-yellow border border-mq-warning/30 space-y-2 font-sinhala">
-                <p className="text-sm font-bold text-mq-text-strong">
-                  {currentQuestion.hintSi}
-                </p>
-                <p className="text-xs text-mq-text-muted italic">
-                  {currentQuestion.hintEn}
-                </p>
-              </div>
-              <motion.button
+              <p className="text-sm font-bold text-mq-text-strong font-sinhala">
+                {currentQuestion.hintSi}
+              </p>
+              <button
                 type="button"
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  setShowHintModal(false);
-                  setCompanionState('idle');
-                }}
+                onClick={() => setShowHintModal(false)}
                 className="btn btn-primary w-full py-2.5 rounded-full text-xs font-bold font-sinhala"
               >
-                තේරුණා, මම පිළිතුරු දෙන්නම් (Got it!)
-              </motion.button>
-            </motion.div>
+                තේරුණා
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Navigation Buttons: Prev, Next / Submit */}
-      <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <motion.button
-            type="button"
-            whileTap={{ scale: 0.98 }}
-            disabled={isSubmitting}
-            onClick={handlePrev}
-            className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5 disabled:opacity-50"
-          >
-            <ArrowLeft size={15} />
-            <span>{currentIndex === 0 ? 'ආපසු' : 'පෙර ප්‍රශ්නය'}</span>
-          </motion.button>
-
-          <motion.button
-            type="button"
-            whileTap={{ scale: 0.98 }}
-            disabled={isSubmitting}
-            onClick={() => onSaveAndExit(compileAnswers())}
-            className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
-          >
-            <Save size={15} />
-            <span>සුරැක පසුව කරන්න</span>
-          </motion.button>
-        </div>
-
-        <motion.button
+      {/* Navigation Buttons */}
+      <div className="flex items-center justify-between gap-3 pt-2">
+        <button
           type="button"
-          whileTap={{ scale: 0.98 }}
-          whileHover={{ scale: isSubmitting || !isCurrentAnswered ? 1 : 1.01 }}
+          onClick={handlePrev}
+          className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
+        >
+          <ArrowLeft size={15} />
+          <span>{currentIndex === 0 ? 'ආපසු' : 'පෙර ප්‍රශ්නය'}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onSaveAndExit(compileAnswers())}
+          className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
+        >
+          <Save size={15} />
+          <span>සුරැක පසුව කරන්න</span>
+        </button>
+
+        <button
+          type="button"
           disabled={isSubmitting || !isCurrentAnswered}
           onClick={handleNext}
-          className="btn btn-primary w-full sm:w-auto px-8 py-3 rounded-full text-sm font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+          className="btn btn-primary px-8 py-3 rounded-full text-sm font-bold font-sinhala inline-flex items-center gap-2 shadow-sm disabled:opacity-50"
         >
           {isSubmitting ? (
             <Loader2 size={16} className="animate-spin" />
-          ) : currentIndex === totalQuestions - 1 ? (
-            <>
-              <span>ඇගයීම අවසන් කර ප්‍රතිඵල බලමු</span>
-              <Sparkles size={16} />
-            </>
           ) : (
             <>
-              <span>ඊළඟ ප්‍රශ්නය</span>
-              <ArrowRight size={16} strokeWidth={2.5} />
+              <span>{currentIndex === totalQuestions - 1 ? 'අවසන් කරමු' : 'ඊළඟ ප්‍රශ්නය'}</span>
+              <ArrowRight size={16} />
             </>
           )}
-        </motion.button>
+        </button>
       </div>
     </div>
   );

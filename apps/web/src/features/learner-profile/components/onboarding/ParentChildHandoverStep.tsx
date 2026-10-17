@@ -99,7 +99,7 @@ export const ParentChildHandoverStep: React.FC<Props> = ({
           onClick={onContinue}
           className="btn btn-primary w-full sm:w-auto px-8 py-3 rounded-full text-base font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-md"
         >
-          <span>ගණිත වික්‍රමය අරඹමු! (Start Fun Math Tasks)</span>
+          <span>අපේ පුංචි ලෝකය සොයා යමු! (Enter The Living Canvas)</span>
           <ArrowRight size={18} strokeWidth={2.5} />
         </motion.button>
       </div>

@@ -292,25 +292,25 @@ export const OnboardingPlaceholderPage: React.FC = () => {
     <div className="min-h-screen bg-mq-bg text-mq-text selection:bg-mq-surface-blue pb-16">
       {/* Step Header: Distraction-free for Child Assessment, Portal Header for Parent Steps */}
       {isMathAssessment ? (
-        <header className="bg-white border-b border-mq-border/70 sticky top-0 z-30 shadow-xs">
+        <header className="bg-white/95 backdrop-blur-xs border-b border-teal-100 sticky top-0 z-30 shadow-xs">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-9 h-9 rounded-xl bg-mq-surface-blue text-mq-primary font-bold flex items-center justify-center text-lg shrink-0">
-                🎯
+              <div className="w-9 h-9 rounded-xl bg-teal-50 text-teal-700 font-bold flex items-center justify-center text-lg shrink-0 border border-teal-200">
+                🌱
               </div>
               <div className="min-w-0">
-                <span className="text-xs font-bold text-mq-text-strong block font-sinhala truncate">
-                  {learner?.firstName} ගේ ගණිත ඇගයීම (Math Assessment)
+                <span className="text-xs font-bold text-teal-950 block font-sinhala truncate">
+                  The Living Canvas • ඔබේ පුංචි ලෝකය
                 </span>
-                <span className="text-[10px] text-mq-text-muted block truncate">
-                  Focus Mode • Minimal Distraction-Free Interface
+                <span className="text-[10px] text-teal-700/80 block truncate">
+                  A Little World That Learns About Me • සන්සුන් ගවේෂණ පරිසරය
                 </span>
               </div>
             </div>
             <button
               type="button"
               onClick={() => navigate('/learners')}
-              className="text-xs font-bold text-mq-text-muted hover:text-mq-primary px-3 py-1.5 rounded-xl border border-mq-border hover:bg-mq-surface-soft transition-colors cursor-pointer shrink-0 whitespace-nowrap"
+              className="text-xs font-bold text-slate-500 hover:text-teal-700 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
             >
               Pause & Exit (පසුවට සුරකින්න)
             </button>
@@ -351,66 +351,70 @@ export const OnboardingPlaceholderPage: React.FC = () => {
           />
         ) : (
           <div className="space-y-6">
-            {/* Child Profile Banner */}
-            <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
-                <motion.div
-                  whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
-                  transition={{ duration: 0.2 }}
-                  className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-xs border ${avatar.bgColor} ${avatar.borderColor} shrink-0 cursor-default`}
-                >
-                  <span>{avatar.icon}</span>
-                </motion.div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary shrink-0">
-                      {learner.preferredLanguage === 'Bilingual'
-                        ? `දෙබසම (Bilingual${
-                            learner.primaryInstructionLanguage
-                              ? ` • ${learner.primaryInstructionLanguage}`
-                              : ''
-                          })`
-                        : `${learner.preferredLanguage} මාධ්‍යය`}
-                    </span>
-                    <OnboardingStatusBadge
-                      status={progress?.status === 'COMPLETED' ? 'COMPLETED' : 'IN_PROGRESS'}
-                    />
+            {/* Child Profile Banner & Stepper Navigation (Only shown for Parent Stages) */}
+            {!isMathAssessment && (
+              <>
+                <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                    <motion.div
+                      whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
+                      transition={{ duration: 0.2 }}
+                      className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-xs border ${avatar.bgColor} ${avatar.borderColor} shrink-0 cursor-default`}
+                    >
+                      <span>{avatar.icon}</span>
+                    </motion.div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary shrink-0">
+                          {learner.preferredLanguage === 'Bilingual'
+                            ? `දෙබසම (Bilingual${
+                                learner.primaryInstructionLanguage
+                                  ? ` • ${learner.primaryInstructionLanguage}`
+                                  : ''
+                              })`
+                            : `${learner.preferredLanguage} මාධ්‍යය`}
+                        </span>
+                        <OnboardingStatusBadge
+                          status={progress?.status === 'COMPLETED' ? 'COMPLETED' : 'IN_PROGRESS'}
+                        />
+                      </div>
+                      <h1 className="text-xl sm:text-2xl font-extrabold text-mq-text-strong break-words leading-tight">
+                        {learner.firstName}
+                        {learner.preferredName && (
+                          <span className="text-sm font-normal text-mq-text-muted ml-2">
+                            ("{learner.preferredName}")
+                          </span>
+                        )}
+                      </h1>
+                      <p className="text-xs text-mq-text-muted font-sinhala mt-0.5">
+                        {learner.grade} ශ්‍රේණිය • වයස අවුරුදු {learner.age}
+                      </p>
+                    </div>
                   </div>
-                  <h1 className="text-xl sm:text-2xl font-extrabold text-mq-text-strong break-words leading-tight">
-                    {learner.firstName}
-                    {learner.preferredName && (
-                      <span className="text-sm font-normal text-mq-text-muted ml-2">
-                        ("{learner.preferredName}")
-                      </span>
-                    )}
-                  </h1>
-                  <p className="text-xs text-mq-text-muted font-sinhala mt-0.5">
-                    {learner.grade} ශ්‍රේණිය • වයස අවුරුදු {learner.age}
-                  </p>
+
+                  <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-mq-border/50">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-mq-text-muted block">
+                      Learner ID
+                    </span>
+                    <span className="text-xs font-mono font-bold text-mq-text-strong block">
+                      {learner.learnerId}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-mq-border/50">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-mq-text-muted block">
-                  Learner ID
-                </span>
-                <span className="text-xs font-mono font-bold text-mq-text-strong block">
-                  {learner.learnerId}
-                </span>
-              </div>
-            </div>
-
-            {/* Stepper Navigation */}
-            <OnboardingStepper
-              currentStep={currentStep}
-              completedSteps={completedSteps}
-              onSelectStep={(step) => {
-                // Allow jumping to already completed steps
-                if (completedSteps.includes(step)) {
-                  setCurrentStep(step);
-                }
-              }}
-            />
+                {/* Stepper Navigation */}
+                <OnboardingStepper
+                  currentStep={currentStep}
+                  completedSteps={completedSteps}
+                  onSelectStep={(step) => {
+                    // Allow jumping to already completed steps
+                    if (completedSteps.includes(step)) {
+                      setCurrentStep(step);
+                    }
+                  }}
+                />
+              </>
+            )}
 
             {/* Toast Notification */}
             <AnimatePresence>

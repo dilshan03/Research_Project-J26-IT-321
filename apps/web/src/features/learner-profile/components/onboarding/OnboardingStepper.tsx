@@ -5,7 +5,7 @@ import {
   ClipboardList,
   HeartHandshake,
   UserCheck,
-  Calculator,
+  Sparkles,
   Award,
   Check,
   type LucideIcon,
@@ -57,9 +57,9 @@ const STEPS: StepItem[] = [
   },
   {
     key: 'math_assessment',
-    labelEn: 'Math Tasks',
-    labelSi: 'ගණිත අභ්‍යාස',
-    icon: Calculator,
+    labelEn: 'Living Canvas',
+    labelSi: 'පුංචි ලෝකය',
+    icon: Sparkles,
     isParentStage: false,
   },
   {

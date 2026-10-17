@@ -9,6 +9,8 @@ import { AuthProvider } from './features/auth/context/AuthContext';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
 import { ProfilePage } from './pages/profile/ProfilePage';
 import { LearnersPage, OnboardingPlaceholderPage } from './features/learner-profile';
+import StandaloneDataCollection from './features/behaviour-monitoring/StandaloneDataCollection';
+import BehaviourMonitoringPage from './features/behaviour-monitoring/BehaviourMonitoringPage';
 
 function useHashRoute() {
   const [hash, setHash] = useState(window.location.hash);
@@ -57,6 +59,15 @@ function App() {
                 <OnboardingPlaceholderPage />
               </ProtectedRoute>
             }
+          />
+          <Route
+            path="/behaviour-data-collection"
+            element={<StandaloneDataCollection />}
+          />
+          
+          <Route
+          path="/behaviour-monitoring"
+          element={<BehaviourMonitoringPage />}
           />
         </Routes>
       </BrowserRouter>

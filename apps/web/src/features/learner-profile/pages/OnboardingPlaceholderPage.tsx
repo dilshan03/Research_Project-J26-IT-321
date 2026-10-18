@@ -17,6 +17,9 @@ import { AVATAR_OPTIONS } from '../types';
 import type {
   OnboardingStepKey,
   OnboardingProgress,
+  AdhdInformationData,
+  AdhdInformationRecord,
+  SnapIvStatus,
   LearningPreferencesData,
   SnapIvItemAnswer,
   SocialContextData,
@@ -26,12 +29,37 @@ import type {
 } from '../types/onboarding';
 
 import { OnboardingStepper } from '../components/onboarding/OnboardingStepper';
+import { AdhdInformationStep } from '../components/onboarding/AdhdInformationStep';
 import { LearningPreferencesStep } from '../components/onboarding/LearningPreferencesStep';
 import { SnapIvStep } from '../components/onboarding/SnapIvStep';
 import { SocialContextStep } from '../components/onboarding/SocialContextStep';
 import { ParentChildHandoverStep } from '../components/onboarding/ParentChildHandoverStep';
 import { MathAssessmentStep } from '../components/onboarding/MathAssessmentStep';
 import { OnboardingSummaryStep } from '../components/onboarding/OnboardingSummaryStep';
+
+interface StepFlags {
+  adhdDone: boolean;
+  snapDone: boolean; // completed or skipped (SNAP-IV is optional)
+  prefsDone: boolean;
+  socialDone: boolean;
+  mathDone: boolean;
+}
+
+/**
+ * First unfinished step in the parent sequence:
+ * ADHD information -> SNAP-IV (optional) -> preferences -> social context (optional) -> handover.
+ * Mirrors the backend resolver, so resumed learners never repeat finished steps.
+ */
+const resolveNextStep = (flags: StepFlags, storedStep?: string): OnboardingStepKey => {
+  if (flags.mathDone) return 'summary';
+  if (!flags.adhdDone) return 'adhd_information';
+  if (!flags.snapDone) return 'snap_iv';
+  if (!flags.prefsDone) return 'preferences';
+  // A parent who already moved past (or skipped) social context resumes at the handover.
+  if (storedStep === 'handover' || storedStep === 'math_assessment') return 'handover';
+  if (!flags.socialDone) return 'social_context';
+  return 'handover';
+};
 
 export const OnboardingPlaceholderPage: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
@@ -40,10 +68,14 @@ export const OnboardingPlaceholderPage: React.FC = () => {
 
   const [learner, setLearner] = useState<Learner | null>(null);
   const [progress, setProgress] = useState<OnboardingProgress | null>(null);
-  const [currentStep, setCurrentStep] = useState<OnboardingStepKey>('preferences');
+  const [currentStep, setCurrentStep] = useState<OnboardingStepKey>('adhd_information');
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  // Set when a parent opens ADHD information or SNAP-IV from the completed profile summary
+  const [returnToSummary, setReturnToSummary] = useState(false);
 
   // Saved responses for resuming
+  const [savedAdhd, setSavedAdhd] = useState<AdhdInformationRecord | null>(null);
+  const [snapIvStatus, setSnapIvStatus] = useState<SnapIvStatus>('NOT_STARTED');
   const [savedPreferences, setSavedPreferences] = useState<Partial<LearningPreferencesData> | undefined>(undefined);
   const [savedSnapIv, setSavedSnapIv] = useState<SnapIvItemAnswer[] | undefined>(undefined);
   const [savedSocialContext, setSavedSocialContext] = useState<Partial<SocialContextData> | undefined>(undefined);
@@ -61,6 +93,34 @@ export const OnboardingPlaceholderPage: React.FC = () => {
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const currentFlags = (): StepFlags => ({
+    adhdDone: Boolean(savedAdhd),
+    snapDone: snapIvStatus !== 'NOT_STARTED',
+    prefsDone: Boolean(savedPreferences),
+    socialDone: Boolean(savedSocialContext),
+    mathDone: progress?.status === 'COMPLETED',
+  });
+
+  const markCompleted = (step: string) =>
+    setCompletedSteps((prev) => Array.from(new Set([...prev, step])));
+
+  // Reloads the consolidated summary after an edit made from the completed profile summary
+  const goBackToSummary = async () => {
+    if (learnerId) {
+      const sumRes = await onboardingApi.getSummary(learnerId);
+      if (sumRes.success && sumRes.data) {
+        setFullSummary(sumRes.data);
+      }
+    }
+    setReturnToSummary(false);
+    setCurrentStep('summary');
+  };
+
+  const openFromSummary = (step: OnboardingStepKey) => {
+    setReturnToSummary(true);
+    setCurrentStep(step);
   };
 
   // Initial Data Fetching
@@ -95,6 +155,10 @@ export const OnboardingPlaceholderPage: React.FC = () => {
         if (p.socialContext) {
           setSavedSocialContext(p.socialContext);
         }
+        setSavedAdhd(p.adhdInformation ?? null);
+        const resumedSnapStatus: SnapIvStatus =
+          p.snapIvStatus ?? (p.snapIvCompleted ? 'COMPLETED' : 'NOT_STARTED');
+        setSnapIvStatus(resumedSnapStatus);
 
         if (p.status === 'COMPLETED') {
           setCurrentStep('summary');
@@ -102,8 +166,20 @@ export const OnboardingPlaceholderPage: React.FC = () => {
           if (sumRes.success && sumRes.data) {
             setFullSummary(sumRes.data);
           }
-        } else if (p.currentStep) {
-          setCurrentStep(p.currentStep as OnboardingStepKey);
+        } else {
+          // Resume at the first unfinished step (also covers records saved in the previous order)
+          setCurrentStep(
+            resolveNextStep(
+              {
+                adhdDone: Boolean(p.adhdInformation),
+                snapDone: resumedSnapStatus !== 'NOT_STARTED',
+                prefsDone: Boolean(p.learningPreferences),
+                socialDone: Boolean(p.socialContext),
+                mathDone: false,
+              },
+              p.currentStep
+            )
+          );
         }
       }
 
@@ -123,7 +199,83 @@ export const OnboardingPlaceholderPage: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  // Handle Step 1: Learning Preferences
+  // Handle Step 1: Parent-Reported ADHD Information
+  const saveAdhd = async (data: AdhdInformationData): Promise<boolean> => {
+    if (!learnerId) return false;
+    const res = await onboardingApi.saveAdhdInformation(learnerId, data);
+    if (res.success && res.data) {
+      setSavedAdhd(res.data.adhdInformation);
+      markCompleted('adhd_information');
+      return true;
+    }
+    showToast(res.message || 'සුරැකීමට නොහැකි විය (Could not save).');
+    return false;
+  };
+
+  const handleSaveAdhd = async (data: AdhdInformationData) => {
+    if (!learnerId || isActionLoading) return;
+    setIsActionLoading(true);
+    try {
+      if (await saveAdhd(data)) {
+        showToast('තොරතුරු සුරකින ලදී (Information saved).');
+        if (returnToSummary) {
+          await goBackToSummary();
+        } else {
+          setCurrentStep(resolveNextStep({ ...currentFlags(), adhdDone: true }));
+        }
+      }
+    } catch {
+      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleAdhdSaveAndExit = async (data: AdhdInformationData) => {
+    if (!learnerId || isActionLoading) return;
+    setIsActionLoading(true);
+    try {
+      if (await saveAdhd(data)) {
+        showToast('තොරතුරු සුරකින ලදී (Information saved).');
+        navigate('/learners');
+      }
+    } catch {
+      showToast('ජාල දෝෂයක් හටගැනිණි. සුරැකීමට නොහැකි විය.');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  // Handle Step 2: Optional SNAP-IV skip (previously saved responses are kept)
+  const handleSkipSnapIv = async () => {
+    if (!learnerId || isActionLoading) return;
+    setIsActionLoading(true);
+    try {
+      const res = await onboardingApi.skipSnapIv(learnerId);
+      if (res.success && res.data) {
+        setSnapIvStatus(res.data.snapIvStatus);
+        markCompleted('snap_iv');
+        showToast(
+          res.data.snapIvStatus === 'COMPLETED'
+            ? 'කලින් සුරැකි පිළිතුරු එලෙසම තබා ඇත (Your earlier answers were kept).'
+            : 'SNAP-IV මඟ හරින ලදී. පසුව සම්පූර්ණ කළ හැක (Skipped - you can complete it later).'
+        );
+        if (returnToSummary) {
+          await goBackToSummary();
+        } else {
+          setCurrentStep(resolveNextStep({ ...currentFlags(), snapDone: true }));
+        }
+      } else {
+        showToast(res.message || 'මඟ හැරීමට නොහැකි විය.');
+      }
+    } catch {
+      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  // Handle Step 3: Learning Preferences
   const handleSavePreferences = async (data: LearningPreferencesData) => {
     if (!learnerId || isActionLoading) return;
     setIsActionLoading(true);
@@ -131,8 +283,8 @@ export const OnboardingPlaceholderPage: React.FC = () => {
       const res = await onboardingApi.savePreferences(learnerId, data);
       if (res.success) {
         setSavedPreferences(data);
-        setCompletedSteps((prev) => Array.from(new Set([...prev, 'preferences'])));
-        setCurrentStep('snap_iv');
+        markCompleted('preferences');
+        setCurrentStep(resolveNextStep({ ...currentFlags(), prefsDone: true }));
         showToast('ඉගෙනුම් මනාපයන් සාර්ථකව සුරකින ලදී.');
       } else {
         showToast(res.message || 'සුරැකීමට නොහැකි විය.');
@@ -171,9 +323,14 @@ export const OnboardingPlaceholderPage: React.FC = () => {
       const res = await onboardingApi.submitSnapIv(learnerId, responses);
       if (res.success) {
         setSavedSnapIv(responses);
-        setCompletedSteps((prev) => Array.from(new Set([...prev, 'snap_iv'])));
-        setCurrentStep('social_context');
+        setSnapIvStatus('COMPLETED');
+        markCompleted('snap_iv');
         showToast('SNAP-IV ලකුණු සාර්ථකව සටහන් කරගන්නා ලදී.');
+        if (returnToSummary) {
+          await goBackToSummary();
+        } else {
+          setCurrentStep(resolveNextStep({ ...currentFlags(), snapDone: true }));
+        }
       } else {
         showToast(res.message || 'SNAP-IV සුරැකීමට නොහැකි විය.');
       }
@@ -191,6 +348,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
       const res = await onboardingApi.submitSnapIv(learnerId, responses);
       if (res.success) {
         setSavedSnapIv(responses);
+        setSnapIvStatus('COMPLETED');
         showToast('SNAP-IV ලකුණු සුරකින ලදී.');
         navigate('/learners');
       } else {
@@ -203,7 +361,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
     }
   };
 
-  // Handle Step 3: Social Context
+  // Handle Step 4: Social Context (optional)
   const handleSaveSocialContext = async (data: SocialContextData) => {
     if (!learnerId || isActionLoading) return;
     setIsActionLoading(true);
@@ -211,7 +369,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
       const res = await onboardingApi.saveSocialContext(learnerId, data);
       if (res.success) {
         setSavedSocialContext(data);
-        setCompletedSteps((prev) => Array.from(new Set([...prev, 'social_context'])));
+        markCompleted('social_context');
         setCurrentStep('handover');
         showToast('සමාජීය ඉගෙනුම් පසුබිම සටහන් කරගන්නා ලදී.');
       } else {
@@ -444,34 +602,50 @@ export const OnboardingPlaceholderPage: React.FC = () => {
                   ease: 'easeOut',
                 }}
               >
-                {/* Step 1: Learning Preferences */}
-                {currentStep === 'preferences' && (
-                  <LearningPreferencesStep
-                    initialData={savedPreferences}
-                    onSave={handleSavePreferences}
-                    onSaveAndExit={handlePreferencesSaveAndExit}
+                {/* Step 1: Parent-Reported ADHD Information */}
+                {currentStep === 'adhd_information' && (
+                  <AdhdInformationStep
+                    initialData={savedAdhd}
+                    onSave={handleSaveAdhd}
+                    onSaveAndExit={handleAdhdSaveAndExit}
+                    onBack={returnToSummary ? () => goBackToSummary() : undefined}
                     isSaving={isActionLoading}
                   />
                 )}
 
-                {/* Step 2: SNAP-IV Questionnaire */}
+                {/* Step 2: Optional SNAP-IV Questionnaire */}
                 {currentStep === 'snap_iv' && (
                   <SnapIvStep
                     initialResponses={savedSnapIv}
                     onSave={handleSaveSnapIv}
                     onSaveAndExit={handleSnapIvSaveAndExit}
-                    onBack={() => setCurrentStep('preferences')}
+                    onSkip={handleSkipSnapIv}
+                    onBack={() =>
+                      returnToSummary ? goBackToSummary() : setCurrentStep('adhd_information')
+                    }
                     isSaving={isActionLoading}
                   />
                 )}
 
-                {/* Step 3: Social Learning Context */}
+                {/* Step 3: Learning Preferences */}
+                {currentStep === 'preferences' && (
+                  <LearningPreferencesStep
+                    initialData={savedPreferences}
+                    onSave={handleSavePreferences}
+                    onSaveAndExit={handlePreferencesSaveAndExit}
+                    onBack={() => setCurrentStep('snap_iv')}
+                    isSaving={isActionLoading}
+                  />
+                )}
+
+                {/* Step 4: Social Learning Context (optional) */}
                 {currentStep === 'social_context' && (
                   <SocialContextStep
                     initialData={savedSocialContext}
                     onSave={handleSaveSocialContext}
                     onSaveAndExit={handleSocialContextSaveAndExit}
-                    onBack={() => setCurrentStep('snap_iv')}
+                    onBack={() => setCurrentStep('preferences')}
+                    onSkip={() => setCurrentStep('handover')}
                     isSaving={isActionLoading}
                   />
                 )}
@@ -505,7 +679,11 @@ export const OnboardingPlaceholderPage: React.FC = () => {
 
                 {/* Step 6: Summary & Baseline Profile */}
                 {currentStep === 'summary' && fullSummary && (
-                  <OnboardingSummaryStep summary={fullSummary} />
+                  <OnboardingSummaryStep
+                    summary={fullSummary}
+                    onEditAdhdInformation={() => openFromSummary('adhd_information')}
+                    onCompleteSnapIv={() => openFromSummary('snap_iv')}
+                  />
                 )}
               </motion.div>
             </AnimatePresence>

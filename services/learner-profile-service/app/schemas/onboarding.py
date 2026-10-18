@@ -1,12 +1,13 @@
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 # --- Step / Status Enums ---
 
 class OnboardingStep(str, Enum):
+    ADHD_INFORMATION = "adhd_information"
     PREFERENCES = "preferences"
     SNAP_IV = "snap_iv"
     SOCIAL_CONTEXT = "social_context"
@@ -106,6 +107,66 @@ class ChildPreferenceChoices(BaseModel):
         if not v or v.strip().lower() != "child":
             raise ValueError("ChildPreferenceChoices source must strictly be 'child'")
         return "child"
+
+
+# --- 2b. Parent-Reported ADHD Information ---
+# A parent's report of a diagnosis made by a healthcare professional. It is never verified
+# by MathQuest, never inferred from SNAP-IV or gameplay, and kept separate from:
+#   - SNAP-IV screening observations (parent questionnaire),
+#   - gameplay behaviour observations (Behaviour Signal component),
+#   - mathematics assessment evidence.
+
+ADHD_INFORMATION_VERSION = "ADHD-INFO-v1.0"
+
+
+class AdhdDiagnosisStatus(str, Enum):
+    YES = "yes"
+    NO = "no"
+    NOT_SURE = "not_sure"
+    PREFER_NOT_TO_SAY = "prefer_not_to_say"
+
+
+class AdhdReportedPresentation(str, Enum):
+    PREDOMINANTLY_INATTENTIVE = "predominantly_inattentive"
+    PREDOMINANTLY_HYPERACTIVE_IMPULSIVE = "predominantly_hyperactive_impulsive"
+    COMBINED = "combined"
+    NOT_SPECIFIED = "not_specified"
+
+
+class AdhdInformationRequest(BaseModel):
+    version: str = Field(default=ADHD_INFORMATION_VERSION, description="ADHD information form version")
+    diagnosisStatus: AdhdDiagnosisStatus = Field(
+        ...,
+        description="Parent answer: has a qualified healthcare professional diagnosed ADHD?"
+    )
+    reportedPresentation: Optional[AdhdReportedPresentation] = Field(
+        default=None,
+        description="Presentation reported by the professional. Required when diagnosisStatus is 'yes'; not allowed otherwise."
+    )
+    diagnosisReportedMonth: Optional[str] = Field(
+        default=None,
+        pattern=r"^\d{4}-(0[1-9]|1[0-2])$",
+        description="Optional month (YYYY-MM) the diagnosis was reported. Only allowed when diagnosisStatus is 'yes'."
+    )
+
+    @model_validator(mode="after")
+    def validate_consistency(self) -> "AdhdInformationRequest":
+        if self.diagnosisStatus == AdhdDiagnosisStatus.YES:
+            if self.reportedPresentation is None:
+                raise ValueError(
+                    "reportedPresentation is required when diagnosisStatus is 'yes' (use 'not_specified' if unknown)."
+                )
+        elif self.reportedPresentation is not None or self.diagnosisReportedMonth is not None:
+            raise ValueError(
+                "reportedPresentation and diagnosisReportedMonth can only be provided when diagnosisStatus is 'yes'."
+            )
+
+        if self.diagnosisReportedMonth:
+            year, month = (int(part) for part in self.diagnosisReportedMonth.split("-"))
+            now = datetime.now(timezone.utc)
+            if year < 2000 or (year, month) > (now.year, now.month):
+                raise ValueError("diagnosisReportedMonth must be between 2000-01 and the current month.")
+        return self
 
 
 # --- 3. SNAP-IV 18-Item Questionnaire ---
@@ -463,6 +524,13 @@ class OnboardingProgressResponse(BaseModel):
     imlrSummary: Optional[ImlrSummary] = Field(
         default=None,
         description="Provisional IMLR output if protocol v2 was completed"
+    )
+    # Parent-reported ADHD information and optional SNAP-IV status (Optional, additive)
+    adhdInformationCompleted: Optional[bool] = None
+    adhdInformation: Optional[Dict[str, Any]] = None
+    snapIvStatus: Optional[str] = Field(
+        default=None,
+        description="'COMPLETED', 'SKIPPED' or 'NOT_STARTED'. SNAP-IV is optional."
     )
     updatedAt: str
 

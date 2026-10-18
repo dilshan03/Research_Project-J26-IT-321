@@ -1,6 +1,6 @@
 """
 Minimal in-memory stand-in for the PyMongo async collection methods used by the
-learner-profile services. Test-only; supports equality filters plus $gt / $in,
+learner-profile services. Test-only; supports equality filters plus $gt / $in / $ne,
 find_one(sort=...), find().sort().to_list(), insert_one and update_one with
 $set / $setOnInsert / $addToSet and upsert.
 """
@@ -18,6 +18,8 @@ def _matches(doc: Dict[str, Any], query: Dict[str, Any]) -> bool:
                 if op == "$gt" and not (actual is not None and actual > value):
                     return False
                 if op == "$in" and actual not in value:
+                    return False
+                if op == "$ne" and actual == value:
                     return False
         elif actual != expected:
             return False

@@ -1,5 +1,8 @@
 import type {
   OnboardingProgress,
+  AdhdInformationData,
+  AdhdInformationRecord,
+  SnapIvStatus,
   LearningPreferencesData,
   SnapIvItemAnswer,
   SnapIvScoreSummary,
@@ -67,7 +70,55 @@ export const onboardingApi = {
   },
 
   /**
-   * Submits 18-item SNAP-IV questionnaire (Step 2).
+   * Saves the parent's answer about a professional ADHD diagnosis (Step 1).
+   * Stored as unverified parent-reported information.
+   */
+  async saveAdhdInformation(
+    learnerId: string,
+    payload: AdhdInformationData
+  ): Promise<OnboardingApiResponse<{ adhdInformation: AdhdInformationRecord; nextStep: string }>> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/learners/${learnerId}/onboarding/adhd-information`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const detail = typeof data.detail === 'string' ? data.detail : 'Please check your answers.';
+        return { success: false, message: detail, error: detail };
+      }
+      return data;
+    } catch {
+      return { success: false, message: 'Network error while saving ADHD information.', error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /**
+   * Skips the optional SNAP-IV questionnaire for now. Previously saved responses are kept.
+   */
+  async skipSnapIv(
+    learnerId: string
+  ): Promise<OnboardingApiResponse<{ snapIvStatus: SnapIvStatus; nextStep: string }>> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/learners/${learnerId}/onboarding/snap-iv/skip`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return { success: false, message: data.detail || 'Failed to skip SNAP-IV', error: data.detail };
+      }
+      return data;
+    } catch {
+      return { success: false, message: 'Network error while skipping SNAP-IV.', error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /**
+   * Submits the optional 18-item SNAP-IV questionnaire (Step 2).
    */
   async submitSnapIv(
     learnerId: string,

@@ -147,7 +147,7 @@ async def test_complete_onboarding_pipeline():
         assert res_prog.status_code == 200
         prog_data = res_prog.json()["data"]
         assert prog_data["learnerId"] == learner_id
-        assert prog_data["currentStep"] == "preferences"
+        assert prog_data["currentStep"] == "adhd_information"
         assert prog_data["status"] == "IN_PROGRESS"
         assert prog_data["preferencesCompleted"] is False
 
@@ -164,6 +164,15 @@ async def test_complete_onboarding_pipeline():
             headers={"Authorization": f"Bearer {TEST_TEACHER_SESSION}"},
         )
         assert res_teacher.status_code == 403
+
+        # Step 3b: Parent-reported ADHD information (first parent step)
+        res_adhd = await client.post(
+            f"/api/v1/learners/{learner_id}/onboarding/adhd-information",
+            headers={"Authorization": f"Bearer {TEST_PARENT_A_SESSION}"},
+            json={"diagnosisStatus": "no"},
+        )
+        assert res_adhd.status_code == 200
+        assert res_adhd.json()["data"]["nextStep"] == "snap_iv"
 
         # Step 4: Save Learning Preferences
         res_pref = await client.post(
@@ -309,9 +318,9 @@ async def test_snap_iv_validation_rejects_missing_items():
 async def test_mandatory_stages_cannot_be_bypassed():
     """
     Issue 3: Verifies that direct API calls cannot bypass mandatory onboarding stages.
-    - Skipping Learning Preferences to call SNAP-IV directly -> HTTP 400
-    - Skipping SNAP-IV to call Social Context directly -> HTTP 400
-    - Skipping mandatory stages to call Math Assessment directly -> HTTP 400
+    - SNAP-IV is optional and has no prerequisite -> HTTP 200 before Learning Preferences
+    - Skipping Learning Preferences to call Social Context directly -> HTTP 400
+    - Skipping Learning Preferences to call Math Assessment directly -> HTTP 400
     - Calling Summary endpoint before completing mandatory stages -> HTTP 400
     """
     transport = ASGITransport(app=app)
@@ -325,17 +334,16 @@ async def test_mandatory_stages_cannot_be_bypassed():
         assert res_create.status_code == 201
         learner_id = res_create.json()["data"]["learnerId"]
 
-        # 1. Try to submit SNAP-IV before learning preferences
+        # 1. SNAP-IV is optional and may be submitted before learning preferences
         snap_responses = [{"itemId": i, "score": 1} for i in range(1, 19)]
-        res_skip_pref = await client.post(
+        res_snap_first = await client.post(
             f"/api/v1/learners/{learner_id}/onboarding/snap-iv",
             headers={"Authorization": f"Bearer {TEST_PARENT_A_SESSION}"},
             json={"version": "SNAP-IV-18-v1.0", "responses": snap_responses, "respondentRelation": "parent"},
         )
-        assert res_skip_pref.status_code == 400
-        assert "Learning Preferences" in res_skip_pref.json()["detail"]
+        assert res_snap_first.status_code == 200
 
-        # 2. Try to submit social context before learning preferences & SNAP-IV
+        # 2. Try to submit social context before learning preferences
         res_skip_soc = await client.post(
             f"/api/v1/learners/{learner_id}/onboarding/social-context",
             headers={"Authorization": f"Bearer {TEST_PARENT_A_SESSION}"},
@@ -350,7 +358,7 @@ async def test_mandatory_stages_cannot_be_bypassed():
         assert res_skip_soc.status_code == 400
         assert "Learning Preferences" in res_skip_soc.json()["detail"]
 
-        # 3. Try to submit math assessment directly (skipping preferences & SNAP-IV)
+        # 3. Try to submit math assessment directly (skipping preferences)
         res_skip_math = await client.post(
             f"/api/v1/learners/{learner_id}/onboarding/math-assessment",
             headers={"Authorization": f"Bearer {TEST_PARENT_A_SESSION}"},
@@ -543,6 +551,13 @@ async def test_save_and_resume_later_state_preservation():
             json={"firstName": "ResumeChild", "age": 7, "grade": 1},
         )
         learner_id = res_create.json()["data"]["learnerId"]
+
+        # Step 0: Parent-reported ADHD information (first parent step)
+        await client.post(
+            f"/api/v1/learners/{learner_id}/onboarding/adhd-information",
+            headers={"Authorization": f"Bearer {TEST_PARENT_A_SESSION}"},
+            json={"diagnosisStatus": "prefer_not_to_say"},
+        )
 
         # Step 1: Save Preferences
         await client.post(

@@ -9,6 +9,7 @@ import {
   Save,
   Loader2,
   Users2,
+  SkipForward,
 } from 'lucide-react';
 
 import type { SocialContextData } from '../../types/onboarding';
@@ -18,6 +19,8 @@ interface Props {
   onSave: (data: SocialContextData) => Promise<void>;
   onSaveAndExit: (data: SocialContextData) => Promise<void>;
   onBack: () => void;
+  /** Social context is optional; skipping continues without saving. */
+  onSkip?: () => void;
   isSaving: boolean;
 }
 
@@ -26,6 +29,7 @@ export const SocialContextStep: React.FC<Props> = ({
   onSave,
   onSaveAndExit,
   onBack,
+  onSkip,
   isSaving,
 }) => {
   const [learningEnvironment, setLearningEnvironment] = useState<string>(
@@ -63,7 +67,7 @@ export const SocialContextStep: React.FC<Props> = ({
       {/* Header */}
       <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-xs space-y-2">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-yellow text-mq-warning">
-          <span>පියවර 3: ඉගෙනුම් පසුබිම (Step 3 of 5 - Optional Parent Context)</span>
+          <span>පියවර 4: ඉගෙනුම් පසුබිම (Step 4 of 6 - Optional Parent Context)</span>
         </div>
         <h2 className="text-xl sm:text-2xl font-extrabold text-mq-text-strong font-sinhala">
           සමාජීය ඉගෙනුම් පසුබිම සහ දිරිගැන්වීම (Social Learning Context)
@@ -345,22 +349,36 @@ export const SocialContextStep: React.FC<Props> = ({
           </motion.button>
         </div>
 
-        <motion.button
-          type="submit"
-          whileTap={{ scale: 0.98 }}
-          whileHover={{ scale: isSaving ? 1 : 1.01 }}
-          disabled={isSaving}
-          className="btn btn-primary w-full sm:w-auto px-7 py-2.5 rounded-full text-sm font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-sm"
-        >
-          {isSaving ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <>
-              <span>මීළඟ පියවර: දරුවාට භාරදීම</span>
-              <ArrowRight size={16} strokeWidth={2.5} />
-            </>
+        <div className="flex flex-col-reverse sm:flex-row items-center gap-2 w-full sm:w-auto">
+          {onSkip && (
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.98 }}
+              disabled={isSaving}
+              onClick={onSkip}
+              className="btn btn-secondary w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center justify-center gap-1.5"
+            >
+              <SkipForward size={15} />
+              <span>දැනට මඟ හරින්න (Skip for now)</span>
+            </motion.button>
           )}
-        </motion.button>
+          <motion.button
+            type="submit"
+            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: isSaving ? 1 : 1.01 }}
+            disabled={isSaving}
+            className="btn btn-primary w-full sm:w-auto px-7 py-2.5 rounded-full text-sm font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-sm"
+          >
+            {isSaving ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <>
+                <span>මීළඟ පියවර: දරුවාට භාරදීම</span>
+                <ArrowRight size={16} strokeWidth={2.5} />
+              </>
+            )}
+          </motion.button>
+        </div>
       </div>
     </form>
   );

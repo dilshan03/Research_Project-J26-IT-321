@@ -6,6 +6,7 @@ import {
   Clock,
   HelpCircle,
   ArrowRight,
+  ArrowLeft,
   Save,
   Loader2,
   Trophy,
@@ -17,6 +18,7 @@ interface Props {
   initialData?: Partial<LearningPreferencesData>;
   onSave: (data: LearningPreferencesData) => Promise<void>;
   onSaveAndExit: (data: LearningPreferencesData) => Promise<void>;
+  onBack?: () => void;
   isSaving: boolean;
 }
 
@@ -24,6 +26,7 @@ export const LearningPreferencesStep: React.FC<Props> = ({
   initialData,
   onSave,
   onSaveAndExit,
+  onBack,
   isSaving,
 }) => {
   const [visualAssistance, setVisualAssistance] = useState<
@@ -70,7 +73,7 @@ export const LearningPreferencesStep: React.FC<Props> = ({
       {/* Step Header */}
       <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-xs">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-blue text-mq-primary mb-2">
-          <span>පියවර 1 (Step 1 of 5)</span>
+          <span>පියවර 3 (Step 3 of 6)</span>
         </div>
         <h2 className="text-xl sm:text-2xl font-extrabold text-mq-text-strong font-sinhala">
           දරුවාගේ ඉගෙනුම් මනාපයන් (Learning Preferences)
@@ -402,17 +405,29 @@ export const LearningPreferencesStep: React.FC<Props> = ({
 
       {/* Action Buttons: Next & Save & Exit */}
       <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
-
-        <motion.button
-          type="button"
-          whileTap={{ scale: 0.98 }}
-          disabled={isSaving}
-          onClick={() => onSaveAndExit(getPayload())}
-          className="btn btn-secondary w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center justify-center gap-2"
-        >
-          <Save size={15} />
-          <span>සුරැක පසුව සම්පූර්ණ කරන්න (Save & Resume Later)</span>
-        </motion.button>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          {onBack && (
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.98 }}
+              onClick={onBack}
+              className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
+            >
+              <ArrowLeft size={15} />
+              <span>ආපසු (Back)</span>
+            </motion.button>
+          )}
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.98 }}
+            disabled={isSaving}
+            onClick={() => onSaveAndExit(getPayload())}
+            className="btn btn-secondary w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center justify-center gap-2"
+          >
+            <Save size={15} />
+            <span>සුරැක පසුව සම්පූර්ණ කරන්න (Save & Resume Later)</span>
+          </motion.button>
+        </div>
 
         <motion.button
           type="submit"
@@ -425,7 +440,7 @@ export const LearningPreferencesStep: React.FC<Props> = ({
             <Loader2 size={16} className="animate-spin" />
           ) : (
             <>
-              <span>මීළඟ පියවර: SNAP-IV ප්‍රශ්නාවලිය</span>
+              <span>මීළඟ පියවර: සමාජීය පසුබිම (Next)</span>
               <ArrowRight size={16} strokeWidth={2.5} />
             </>
           )}

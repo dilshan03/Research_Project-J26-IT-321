@@ -7,6 +7,7 @@ import {
   Save,
   Loader2,
   AlertCircle,
+  SkipForward,
 } from 'lucide-react';
 import {
   SNAP_IV_ITEMS,
@@ -20,6 +21,8 @@ interface Props {
   onSave: (responses: SnapIvItemAnswer[]) => Promise<void>;
   onSaveAndExit: (responses: SnapIvItemAnswer[]) => Promise<void>;
   onBack: () => void;
+  /** SNAP-IV is optional: skipping keeps any previously saved responses. */
+  onSkip: () => Promise<void>;
   isSaving: boolean;
 }
 
@@ -28,6 +31,7 @@ export const SnapIvStep: React.FC<Props> = ({
   onSave,
   onSaveAndExit,
   onBack,
+  onSkip,
   isSaving,
 }) => {
   // Store responses as a map of itemId -> score
@@ -73,14 +77,22 @@ export const SnapIvStep: React.FC<Props> = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-xs space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-green text-mq-success">
-          <span>පියවර 2: දෙමාපිය ඇගයීම (Step 2 of 5 - Parent Only)</span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-green text-mq-success">
+            පියවර 2: දෙමාපිය ප්‍රශ්නාවලිය (Step 2 of 6 - Parent Only)
+          </span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-soft text-mq-text-muted border border-mq-border">
+            විකල්පයි (Optional)
+          </span>
         </div>
         <h2 className="text-xl sm:text-2xl font-extrabold text-mq-text-strong font-sinhala">
           SNAP-IV 18-අයිතම ප්‍රශ්නාවලිය (Parent Rating Scale)
         </h2>
         <p className="text-xs sm:text-sm text-mq-text-muted leading-relaxed font-sinhala">
           පසුගිය මාස 6ක කාලය තුළ දරුවාගේ හැසිරීම් සහ අවධානය යොමුකිරීමේ රටාවන් නිරීක්ෂණය කර පහත අයිතම 18 සඳහා වඩාත්ම ගැළපෙන පිළිතුර තෝරන්න.
+        </p>
+        <p className="text-xs text-mq-text-muted leading-relaxed">
+          This questionnaire is optional. You can skip it now and complete it later from your child's profile summary. Skipping does not affect the learning activities.
         </p>
 
         {/* Clinical Non-Diagnosis Disclaimer Alert */}
@@ -91,6 +103,9 @@ export const SnapIvStep: React.FC<Props> = ({
           </div>
           <p className="text-mq-text-muted text-[11px] leading-relaxed">
             මෙම ප්‍රශ්නාවලිය මගින් ADHD හෝ වෙනත් කිසිදු සායනික රෝග විනිශ්චයක් (diagnosis) සිදු නොකෙරේ. මෙම ලකුණු භාවිතා කරනු ලබන්නේ දරුවාට වඩාත් ගැළපෙන ඉගෙනුම් ක්‍රමවේද සහ සහාය හඳුනාගැනීමට පමණි.
+          </p>
+          <p className="text-mq-text-muted text-[11px] leading-relaxed">
+            This is not a diagnostic test. Answers describe what you have observed and are kept separate from any diagnosis you reported.
           </p>
           <p className="text-[10px] text-mq-text-muted italic">
             * Standard Swanson, Nolan, and Pelham (SNAP-IV) 18-item scale with provisional research translation template.
@@ -247,7 +262,7 @@ export const SnapIvStep: React.FC<Props> = ({
 
       {/* Action Buttons */}
       <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
           <motion.button
             type="button"
             whileTap={{ scale: 0.98 }}
@@ -255,7 +270,7 @@ export const SnapIvStep: React.FC<Props> = ({
             className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
           >
             <ArrowLeft size={15} />
-            <span>ආපසු</span>
+            <span>ආපසු (Back)</span>
           </motion.button>
           <motion.button
             type="button"
@@ -269,22 +284,34 @@ export const SnapIvStep: React.FC<Props> = ({
           </motion.button>
         </div>
 
-        <motion.button
-          type="submit"
-          whileTap={{ scale: 0.98 }}
-          whileHover={{ scale: isSaving ? 1 : 1.01 }}
-          disabled={isSaving}
-          className="btn btn-primary w-full sm:w-auto px-7 py-2.5 rounded-full text-sm font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-sm"
-        >
-          {isSaving ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <>
-              <span>මීළඟ පියවර: සමාජීය පසුබිම</span>
-              <ArrowRight size={16} strokeWidth={2.5} />
-            </>
-          )}
-        </motion.button>
+        <div className="flex flex-col-reverse sm:flex-row items-center gap-2 w-full sm:w-auto">
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.98 }}
+            disabled={isSaving}
+            onClick={() => onSkip()}
+            className="btn btn-secondary w-full sm:w-auto px-5 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center justify-center gap-1.5"
+          >
+            <SkipForward size={15} />
+            <span>දැනට මඟ හරින්න (Skip for now)</span>
+          </motion.button>
+          <motion.button
+            type="submit"
+            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: isSaving ? 1 : 1.01 }}
+            disabled={isSaving}
+            className="btn btn-primary w-full sm:w-auto px-7 py-2.5 rounded-full text-sm font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-sm"
+          >
+            {isSaving ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <>
+                <span>සුරකින්න සහ ඉදිරියට (Save & Continue)</span>
+                <ArrowRight size={16} strokeWidth={2.5} />
+              </>
+            )}
+          </motion.button>
+        </div>
       </div>
     </form>
   );

@@ -3,6 +3,7 @@
  */
 
 export type OnboardingStepKey =
+  | 'adhd_information'
   | 'preferences'
   | 'snap_iv'
   | 'social_context'
@@ -19,6 +20,74 @@ export interface LearningPreferencesData {
   celebrationStyle: 'gentle_star' | 'badge_sound' | 'minimal';
   additionalNotes?: string;
 }
+
+/**
+ * Parent-reported ADHD information.
+ * A parent's report of a professional diagnosis: never verified by MathQuest, never inferred
+ * from SNAP-IV or gameplay, and kept separate from screening and mathematics evidence.
+ */
+export type AdhdDiagnosisStatus = 'yes' | 'no' | 'not_sure' | 'prefer_not_to_say';
+
+export type AdhdReportedPresentation =
+  | 'predominantly_inattentive'
+  | 'predominantly_hyperactive_impulsive'
+  | 'combined'
+  | 'not_specified';
+
+export interface AdhdInformationData {
+  version: string;
+  diagnosisStatus: AdhdDiagnosisStatus;
+  reportedPresentation?: AdhdReportedPresentation;
+  diagnosisReportedMonth?: string; // YYYY-MM
+}
+
+export interface AdhdInformationRecord {
+  version: string;
+  diagnosisStatus: AdhdDiagnosisStatus;
+  reportedPresentation: AdhdReportedPresentation | null;
+  diagnosisReportedMonth: string | null;
+  informationType: 'PARENT_REPORTED_PROFESSIONAL_DIAGNOSIS' | 'PARENT_REPORTED_DIAGNOSIS_STATUS';
+  source: 'parent';
+  verificationStatus: 'NOT_VERIFIED';
+  disclaimer: string;
+  savedAt: string;
+}
+
+export type SnapIvStatus = 'COMPLETED' | 'SKIPPED' | 'NOT_STARTED';
+
+export const ADHD_DIAGNOSIS_STATUS_OPTIONS: Array<{
+  value: AdhdDiagnosisStatus;
+  labelEn: string;
+  labelSi: string;
+}> = [
+  { value: 'yes', labelEn: 'Yes', labelSi: 'ඔව්' },
+  { value: 'no', labelEn: 'No', labelSi: 'නැත' },
+  { value: 'not_sure', labelEn: 'Not sure', labelSi: 'විශ්වාස නැත' },
+  { value: 'prefer_not_to_say', labelEn: 'Prefer not to say', labelSi: 'පැවසීමට අකමැතියි' },
+];
+
+export const ADHD_PRESENTATION_OPTIONS: Array<{
+  value: AdhdReportedPresentation;
+  labelEn: string;
+  labelSi: string;
+}> = [
+  {
+    value: 'predominantly_inattentive',
+    labelEn: 'Predominantly inattentive',
+    labelSi: 'ප්‍රධාන වශයෙන් අවධාන දුර්වලතා',
+  },
+  {
+    value: 'predominantly_hyperactive_impulsive',
+    labelEn: 'Predominantly hyperactive-impulsive',
+    labelSi: 'ප්‍රධාන වශයෙන් අධික ක්‍රියාශීලී-ආවේගශීලී',
+  },
+  { value: 'combined', labelEn: 'Combined', labelSi: 'ඒකාබද්ධ' },
+  {
+    value: 'not_specified',
+    labelEn: 'Not sure / Not specified',
+    labelSi: 'විශ්වාස නැත / සඳහන් කර නැත',
+  },
+];
 
 export interface SnapIvItemAnswer {
   itemId: number;
@@ -284,6 +353,10 @@ export interface OnboardingProgress {
   childPreferences?: ChildPreferenceChoices;
   impsaSummary?: ImpsaSummary;
   imlrSummary?: ImlrSummary;
+  // Parent-reported ADHD information and optional SNAP-IV status (Optional)
+  adhdInformationCompleted?: boolean;
+  adhdInformation?: AdhdInformationRecord | null;
+  snapIvStatus?: SnapIvStatus;
   updatedAt: string;
 }
 
@@ -292,6 +365,8 @@ export interface OnboardingFullSummary {
   progress: OnboardingProgress;
   learningPreferences?: LearningPreferencesData;
   snapIvSummary?: SnapIvScoreSummary;
+  snapIvStatus?: SnapIvStatus;
+  adhdInformation?: AdhdInformationRecord | null;
   socialContext?: SocialContextData;
   mathSummary?: MathAssessmentSummary;
 }

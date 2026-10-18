@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import {
+  Stethoscope,
   Compass,
   ClipboardList,
   HeartHandshake,
@@ -28,17 +29,24 @@ interface StepItem {
 
 const STEPS: StepItem[] = [
   {
-    key: 'preferences',
-    labelEn: 'Preferences',
-    labelSi: 'ඉගෙනුම් මනාප',
-    icon: Compass,
+    key: 'adhd_information',
+    labelEn: 'ADHD Info',
+    labelSi: 'ADHD තොරතුරු',
+    icon: Stethoscope,
     isParentStage: true,
   },
   {
     key: 'snap_iv',
     labelEn: 'SNAP-IV',
-    labelSi: 'දෙමාපිය ඇගයීම',
+    labelSi: 'විකල්ප ප්‍රශ්නාවලිය',
     icon: ClipboardList,
+    isParentStage: true,
+  },
+  {
+    key: 'preferences',
+    labelEn: 'Preferences',
+    labelSi: 'ඉගෙනුම් මනාප',
+    icon: Compass,
     isParentStage: true,
   },
   {

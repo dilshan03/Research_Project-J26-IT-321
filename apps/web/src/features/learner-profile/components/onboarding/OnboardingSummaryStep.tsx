@@ -11,16 +11,25 @@ import {
   Brain,
   Info,
   ShieldCheck,
+  Stethoscope,
+  Pencil,
 } from 'lucide-react';
 
 import type { OnboardingFullSummary } from '../../types/onboarding';
+import { ADHD_DIAGNOSIS_STATUS_OPTIONS, ADHD_PRESENTATION_OPTIONS } from '../../types/onboarding';
 import { AnimatedCompanion } from './AnimatedCompanion';
 
 interface Props {
   summary: OnboardingFullSummary;
+  onEditAdhdInformation?: () => void;
+  onCompleteSnapIv?: () => void;
 }
 
-export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
+export const OnboardingSummaryStep: React.FC<Props> = ({
+  summary,
+  onEditAdhdInformation,
+  onCompleteSnapIv,
+}) => {
   const [showFormulaExplanation, setShowFormulaExplanation] = useState<boolean>(false);
   const learner = summary.learner;
 
@@ -28,6 +37,9 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
   const snap = summary.snapIvSummary;
   const pref = summary.learningPreferences;
   const elpx = math?.elpxProfile;
+  const adhd = summary.adhdInformation;
+  const adhdStatus = ADHD_DIAGNOSIS_STATUS_OPTIONS.find((o) => o.value === adhd?.diagnosisStatus);
+  const adhdPresentation = ADHD_PRESENTATION_OPTIONS.find((o) => o.value === adhd?.reportedPresentation);
 
   return (
     <div className="space-y-6">
@@ -99,6 +111,65 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
               Congratulations, {learner.firstName}! Your personalized learning profile is ready!
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Parent-Reported ADHD Information (kept separate from questionnaire and learning evidence) */}
+      <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div className="flex items-start gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-mq-surface-blue text-mq-primary flex items-center justify-center shrink-0">
+              <Stethoscope size={18} />
+            </div>
+            <div className="min-w-0 space-y-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-sm font-bold text-mq-text-strong font-sinhala">
+                  දෙමාපිය වාර්තා කළ ADHD තොරතුරු
+                </h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-mq-surface-soft text-mq-text-muted border border-mq-border">
+                  Parent-reported • Not verified
+                </span>
+              </div>
+              {adhd && adhdStatus ? (
+                <div className="text-xs font-sinhala space-y-0.5">
+                  <p className="text-mq-text">
+                    <span className="text-mq-text-muted">වෘත්තිකයෙකු විසින් රෝග විනිශ්චය කර ඇත (Professionally diagnosed): </span>
+                    <span className="font-bold text-mq-text-strong">
+                      {adhdStatus.labelSi} ({adhdStatus.labelEn})
+                    </span>
+                  </p>
+                  {adhdPresentation && (
+                    <p className="text-mq-text">
+                      <span className="text-mq-text-muted">වාර්තා කළ ස්වරූපය (Reported presentation): </span>
+                      <span className="font-bold text-mq-text-strong">
+                        {adhdPresentation.labelSi} ({adhdPresentation.labelEn})
+                      </span>
+                      {adhd.diagnosisReportedMonth && (
+                        <span className="text-mq-text-muted"> • {adhd.diagnosisReportedMonth}</span>
+                      )}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-mq-text-muted font-sinhala">
+                  තොරතුරු ලබා දී නොමැත (Not provided). This is optional.
+                </p>
+              )}
+              <p className="text-[10px] text-mq-text-muted leading-relaxed">
+                Recorded as you reported it. MathQuest does not diagnose ADHD or change this information from questionnaires or gameplay.
+              </p>
+            </div>
+          </div>
+          {onEditAdhdInformation && (
+            <button
+              type="button"
+              onClick={onEditAdhdInformation}
+              className="btn btn-secondary text-xs py-2 px-4 rounded-full font-bold font-sinhala inline-flex items-center justify-center gap-1.5 shrink-0 self-start"
+            >
+              <Pencil size={13} />
+              <span>{adhd ? 'යාවත්කාලීන කරන්න (Update)' : 'එකතු කරන්න (Add)'}</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -198,7 +269,23 @@ export const OnboardingSummaryStep: React.FC<Props> = ({ summary }) => {
               </div>
             </div>
           ) : (
-            <p className="text-xs text-mq-text-muted font-sinhala">තොරතුරු ලබාගෙන නොමැත.</p>
+            <div className="space-y-3">
+              <p className="text-xs text-mq-text-muted font-sinhala">
+                {summary.snapIvStatus === 'SKIPPED'
+                  ? 'මඟ හැර ඇත (Skipped). This questionnaire is optional.'
+                  : 'තොරතුරු ලබාගෙන නොමැත (Not completed). This questionnaire is optional.'}
+              </p>
+              {onCompleteSnapIv && (
+                <button
+                  type="button"
+                  onClick={onCompleteSnapIv}
+                  className="btn btn-secondary text-xs py-2 px-4 rounded-full font-bold font-sinhala inline-flex items-center gap-1.5"
+                >
+                  <ClipboardList size={13} />
+                  <span>දැන් සම්පූර්ණ කරන්න (Complete now)</span>
+                </button>
+              )}
+            </div>
           )}
         </div>
 

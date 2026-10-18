@@ -9,10 +9,10 @@
     "page_count": 5,
     "file_size": 56071,
     "status": "extracted",
-    "extracted_problem_count": 3,
-    "gridfs_id": "fs_b3869145bb08",
+    "extracted_problem_count": 5,
+    "gridfs_id": "fs_1f848d97aa45",
     "local_path": "C:\\Users\\dilshan\\Desktop\\Research_Project-J26-IT-321\\services\\content-adaptation-service\\data\\syllabi\\Grade_01.pdf",
-    "created_at": "2026-10-16T04:50:01.328466+00:00",
+    "created_at": "2026-10-17T13:27:58.551960+00:00",
     "_id": "0f764dafa5e845d6b1c4861980115a19"
   },
   {
@@ -25,10 +25,10 @@
     "page_count": 5,
     "file_size": 55817,
     "status": "extracted",
-    "extracted_problem_count": 3,
-    "gridfs_id": "fs_7c655ae8ca67",
+    "extracted_problem_count": 6,
+    "gridfs_id": "fs_862871a68652",
     "local_path": "C:\\Users\\dilshan\\Desktop\\Research_Project-J26-IT-321\\services\\content-adaptation-service\\data\\syllabi\\Grade_02.pdf",
-    "created_at": "2026-10-16T04:50:09.422535+00:00",
+    "created_at": "2026-10-17T13:28:05.675119+00:00",
     "_id": "989af6e513f2459e8a26103ba09516f9"
   },
   {
@@ -41,10 +41,10 @@
     "page_count": 5,
     "file_size": 86055,
     "status": "extracted",
-    "extracted_problem_count": 3,
-    "gridfs_id": "fs_4de5a3b227c0",
+    "extracted_problem_count": 5,
+    "gridfs_id": "fs_7b1f68a3d066",
     "local_path": "C:\\Users\\dilshan\\Desktop\\Research_Project-J26-IT-321\\services\\content-adaptation-service\\data\\syllabi\\Grade_03.pdf",
-    "created_at": "2026-10-16T04:50:14.142395+00:00",
+    "created_at": "2026-10-17T13:28:13.220788+00:00",
     "_id": "1b434af365764531ae3fff23533cf729"
   },
   {
@@ -57,10 +57,10 @@
     "page_count": 6,
     "file_size": 98708,
     "status": "extracted",
-    "extracted_problem_count": 3,
-    "gridfs_id": "fs_2d1514736cab",
+    "extracted_problem_count": 6,
+    "gridfs_id": "fs_ae4d26077a53",
     "local_path": "C:\\Users\\dilshan\\Desktop\\Research_Project-J26-IT-321\\services\\content-adaptation-service\\data\\syllabi\\Grade_04.pdf",
-    "created_at": "2026-10-16T04:50:18.425149+00:00",
+    "created_at": "2026-10-17T13:28:17.784666+00:00",
     "_id": "b072b8620e21437ba23cfc08967d145f"
   },
   {
@@ -73,10 +73,10 @@
     "page_count": 6,
     "file_size": 98793,
     "status": "extracted",
-    "extracted_problem_count": 3,
-    "gridfs_id": "fs_5e7707ed1571",
+    "extracted_problem_count": 5,
+    "gridfs_id": "fs_fadc06164665",
     "local_path": "C:\\Users\\dilshan\\Desktop\\Research_Project-J26-IT-321\\services\\content-adaptation-service\\data\\syllabi\\Grade_05.pdf",
-    "created_at": "2026-10-16T04:50:22.855523+00:00",
+    "created_at": "2026-10-17T13:28:24.941550+00:00",
     "_id": "e38358c75048463f996bd1b3ccf21c1b"
   },
   {

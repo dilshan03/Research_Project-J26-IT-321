@@ -67,7 +67,8 @@ async def get_current_user(request: Request) -> Dict[str, Any]:
         "id": str(user_doc["_id"]),
         "email": user_doc.get("email"),
         "fullName": user_doc.get("fullName"),
-        "role": user_doc.get("role", "parent"),
+        # No default: a missing or unknown role must never be treated as 'parent'.
+        "role": user_doc.get("role"),
         "username": user_doc.get("username"),
     }
 
@@ -75,7 +76,8 @@ async def get_current_user(request: Request) -> Dict[str, Any]:
 async def require_parent(current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
     """
     Enforces that the authenticated user has the 'parent' role.
-    Teachers or other roles attempting parent-only operations receive HTTP 403 Forbidden.
+    Teachers, missing roles and any other role receive HTTP 403 Forbidden (deny by default).
+    Teachers remain excluded from learner data until teacher-learner assignment exists.
     """
     if current_user.get("role") != "parent":
         raise HTTPException(

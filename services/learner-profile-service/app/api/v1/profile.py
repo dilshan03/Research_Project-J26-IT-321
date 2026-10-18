@@ -6,7 +6,7 @@ Component: services/learner-profile-service/app/api/v1/profile.py
 from typing import Dict, Any, List, Optional, Union
 from fastapi import APIRouter, Depends, Query, status
 
-from app.core.auth import get_current_user
+from app.core.auth import require_parent
 from app.schemas.evidence import (
     GameplayActivityEvidence,
     BatchGameplayEvidenceRequest,
@@ -40,12 +40,12 @@ async def get_learner_profile_endpoint(
         default=False,
         description="Whether to return a sanitized cross-component payload (stripping private parent notes and raw clinical scales)"
     ),
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_parent: Dict[str, Any] = Depends(require_parent),
 ):
     profile = await get_learner_elpx_profile(
         learner_id=learnerId,
-        caller_parent_id=current_user["id"],
-        caller_role=current_user.get("role", "parent"),
+        caller_parent_id=current_parent["id"],
+        caller_role="parent",
         sanitized=sanitized,
     )
     return profile
@@ -64,7 +64,7 @@ async def get_learner_profile_endpoint(
 async def ingest_evidence_endpoint(
     learnerId: str,
     payload: Union[GameplayActivityEvidence, BatchGameplayEvidenceRequest],
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_parent: Dict[str, Any] = Depends(require_parent),
 ):
     if isinstance(payload, BatchGameplayEvidenceRequest):
         events_list = payload.events
@@ -74,7 +74,7 @@ async def ingest_evidence_endpoint(
     result = await ingest_gameplay_activity_evidence(
         learner_id=learnerId,
         events=events_list,
-        caller_role=current_user.get("role", "parent"),
-        caller_parent_id=current_user["id"],
+        caller_role="parent",
+        caller_parent_id=current_parent["id"],
     )
     return result

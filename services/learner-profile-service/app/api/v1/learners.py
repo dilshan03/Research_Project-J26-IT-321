@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, Depends, Query, status
-from app.core.auth import require_parent, get_current_user
+from app.core.auth import require_parent
 from app.schemas.learner import (
     CreateLearnerRequest,
     UpdateLearnerRequest,
@@ -103,12 +103,12 @@ async def list_deletion_requests_endpoint(
 )
 async def get_learner_endpoint(
     learnerId: str,
-    current_user: Dict[str, Any] = Depends(get_current_user),
+    current_parent: Dict[str, Any] = Depends(require_parent),
 ):
     learner = await get_learner_by_id(
         learner_id=learnerId,
-        parent_id=current_user["id"],
-        user_role=current_user.get("role"),
+        parent_id=current_parent["id"],
+        user_role="parent",
     )
     return SingleLearnerResponse(
         success=True,

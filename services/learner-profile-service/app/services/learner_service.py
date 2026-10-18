@@ -143,9 +143,17 @@ async def get_learner_by_id(
 ) -> Dict[str, Any]:
     """
     Retrieves a single learner by unique learnerId.
-    Enforces authorization: parents can ONLY access their own children.
+    Enforces authorization (deny by default): only the owning parent may access a learner.
+    Teachers, missing roles and other roles are refused until teacher-learner assignment exists.
     Optionally blocks archived learners from active gameplay / onboarding.
     """
+    # Refuse non-parent callers before lookup so learner existence is not disclosed.
+    if user_role != "parent" or not parent_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to view this learner profile.",
+        )
+
     learners_col = get_learners_collection()
     doc = await learners_col.find_one({"learnerId": learner_id})
 
@@ -155,14 +163,13 @@ async def get_learner_by_id(
             detail=f"Learner with ID '{learner_id}' was not found.",
         )
 
-    # Authorization verification
+    # Ownership verification
     doc_parent_id = str(doc.get("parentId", ""))
-    if user_role == "parent" and parent_id:
-        if doc_parent_id != str(parent_id):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Access denied: You do not have permission to view this learner profile.",
-            )
+    if doc_parent_id != str(parent_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You do not have permission to view this learner profile.",
+        )
 
     if not allow_archived and doc.get("isArchived"):
         raise HTTPException(

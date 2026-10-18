@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import type { ActionContext } from '../types/agent.types';
 import { setBoneTarget } from './helpers';
-import { idle } from './idle';
 
 export const correctCelebrate = (
   time: number, 

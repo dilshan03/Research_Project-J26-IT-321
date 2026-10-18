@@ -58,6 +58,34 @@ export const LINES = {
   breakTime: { si: 'අපි ටිකක් හුස්ම ගමු.', en: "Let's take a little breathing break." },
 } satisfies Record<string, Line>;
 
+export const QUESTION_FALLBACKS: Record<string, string> = {
+  'මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට ඇපල් 3 ක් දුන්නේය. දැන් මාලාට ඇපල් කීයක් තිබේද?':
+    'Mala has 5 apples. Nimal gave her 3 apples. How many apples does Mala have now?',
+  'මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?':
+    'Mala has 5 apples. Nimal gave her 3 more apples. How many apples does Mala have now?',
+  '10 න් 4 ක් අඩු කළ විට කීයද?': '10 minus 4 is how much?',
+  'ගසේ කුරුල්ලන් 12 ක් සිටියා. 5 ක් පියාඹා ගියා. ඉතිරි කුරුල්ලන් කීයද?':
+    'There were 12 birds on a tree. 5 flew away. How many birds are left?',
+  'කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?':
+    'Kamal bought a book for Rs. 50 and a pen for Rs. 20. He gave Rs. 100 to the shopkeeper. What is the balance?',
+  'රුපියල් 20 ක ටොෆි පැකට්ටුවක් සහ රුපියල් 15 ක බිස්කට් පැකට්ටුවක් ගැනීමට අවශ්‍ය මුළු මුදල කීයද?':
+    'How much total money is needed to buy a Rs. 20 toffee packet and a Rs. 15 biscuit packet?',
+  '1 සිට 9 තෙක් එකිනෙකට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණයට අදාළ සංඛ්‍යාව හඳුනා ගැනීම, කියවීම.':
+    'Recognize and count numbers from 1 to 9 matching object and image quantities.',
+  'රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම.':
+    'Recognize coins of one rupee, two rupees, and five rupees.',
+};
+
+export function getEnglishQuestionFallback(sinhalaQuestion?: string | null): string | null {
+  if (!sinhalaQuestion) return null;
+  const trimmed = sinhalaQuestion.trim();
+  if (QUESTION_FALLBACKS[trimmed]) return QUESTION_FALLBACKS[trimmed];
+  for (const [si, en] of Object.entries(QUESTION_FALLBACKS)) {
+    if (trimmed.startsWith(si.slice(0, 15))) return en;
+  }
+  return null;
+}
+
 /** Returns the pointer position in viewport coordinates and tests it against an element. */
 export function isOver(el: HTMLElement | null, point: { x: number; y: number }): boolean {
   if (!el) return false;

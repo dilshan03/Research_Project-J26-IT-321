@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAgentStore } from '../../store/useAgentStore';
 import type { AgentActionName, AgentId, GameEvent } from '../../types/agent.types';
 import { GAME_EVENT_MAP } from '../../mapping/gameEventMapping';

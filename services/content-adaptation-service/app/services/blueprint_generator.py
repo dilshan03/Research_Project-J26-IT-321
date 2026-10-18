@@ -4,7 +4,7 @@ GameActivityBlueprint using the CLI score, derived game settings,
 deterministic MathVerificationService, and Gaja mascot narrative enrichment.
 """
 import uuid
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from app.schemas.game_blueprint import (
     ADHDGameSettings,
@@ -13,8 +13,18 @@ from app.schemas.game_blueprint import (
     GameMicroStep,
     VisualAssetTag,
 )
-from app.schemas.syllabus import CurriculumProblem, StoryNarrative
-from app.services.cognitive_load import compute_cli, derive_adhd_game_settings
+from app.schemas.syllabus import (
+    CurriculumProblem,
+    CustomADHDGameSettings,
+    StoryNarrative,
+    StudentBehaviorProfile,
+)
+from app.services.cognitive_load import (
+    build_custom_adhd_game_settings,
+    calculate_custom_cli,
+    compute_cli,
+    derive_adhd_game_settings,
+)
 from app.services.llm_extractor import MathVerificationService, enrich_gameplay_narrative
 from app.services.problem_parser import OPERATION_SYMBOLS, ParsedProblem, _apply, parse_problem
 
@@ -27,6 +37,34 @@ OPERATION_LABELS = {
     "COMPARE": ("ප්‍රමාණ සැසඳීම", "Comparison"),
     "IDENTIFY": ("හඳුනා ගැනීම", "Identification"),
 }
+
+FALLBACK_QUESTION_TRANSLATIONS: Dict[str, str] = {
+    "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට ඇපල් 3 ක් දුන්නේය. දැන් මාලාට ඇපල් කීයක් තිබේද?": "Mala has 5 apples. Nimal gave her 3 apples. How many apples does Mala have now?",
+    "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?": "Mala has 5 apples. Nimal gave her 3 more apples. How many apples does Mala have now?",
+    "10 න් 4 ක් අඩු කළ විට කීයද?": "10 minus 4 is how much?",
+    "ගසේ කුරුල්ලන් 12 ක් සිටියා. 5 ක් පියාඹා ගියා. ඉතිරි කුරුල්ලන් කීයද?": "There were 12 birds on a tree. 5 flew away. How many birds are left?",
+    "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?": "Kamal bought a book for Rs. 50 and a pen for Rs. 20. He gave Rs. 100 to the shopkeeper. What is the balance?",
+    "රුපියල් 20 ක ටොෆි පැකට්ටුවක් සහ රුපියල් 15 ක බිස්කට් පැකට්ටුවක් ගැනීමට අවශ්‍ය මුළු මුදල කීයද?": "How much total money is needed to buy a Rs. 20 toffee packet and a Rs. 15 biscuit packet?",
+    "1 සිට 9 තෙක් එකිනෙකට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණයට අදාළ සංඛ්‍යාව හඳුනා ගැනීම, කියවීම.": "Recognize and count numbers from 1 to 9 matching object and image quantities.",
+    "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම.": "Recognize coins of one rupee, two rupees, and five rupees.",
+}
+
+
+def resolve_english_question(question_id: Optional[str] = None, raw_text: Optional[str] = None) -> Optional[str]:
+    if raw_text:
+        cleaned = raw_text.strip()
+        if cleaned in FALLBACK_QUESTION_TRANSLATIONS:
+            return FALLBACK_QUESTION_TRANSLATIONS[cleaned]
+        for k, v in FALLBACK_QUESTION_TRANSLATIONS.items():
+            if cleaned.startswith(k[:20]):
+                return v
+    from app.data.sample_questions import SAMPLE_QUESTIONS
+    for sq in SAMPLE_QUESTIONS:
+        if question_id and sq.get("source_question_id") == question_id:
+            return sq.get("translation_en")
+        if raw_text and sq.get("raw_sinhala_question") == raw_text:
+            return sq.get("translation_en")
+    return None
 
 # Which wrong operator an impulsive learner most often picks.
 OPERATOR_CONFUSIONS = {
@@ -176,10 +214,69 @@ def build_micro_steps(
 ) -> List[GameMicroStep]:
     op = operations[0] if operations else ("COUNT" if grade == 1 else "ADD")
 
+    if op == "SHAPE":
+        shape_opts = [
+            GameChoiceOption(text_si="රවුම (Circle)", text_en="Circle", numeric_value=1, is_correct=True, distractor_type="NONE", icon_or_shape="CIRCLE"),
+            GameChoiceOption(text_si="ත්‍රිකෝණය (Triangle)", text_en="Triangle", numeric_value=2, is_correct=False, distractor_type="IMPULSIVITY", icon_or_shape="TRIANGLE"),
+            GameChoiceOption(text_si="කොටුව (Square)", text_en="Square", numeric_value=3, is_correct=False, distractor_type="MAGNITUDE_SLIP", icon_or_shape="SQUARE"),
+        ]
+        return [
+            GameMicroStep(
+                step_order=1,
+                action_type="MATCH_SHAPE",
+                instruction_si="ගජා සොයන රවුම් හැඩය හඳුනාගන්න 🟡",
+                instruction_en="Identify the circle shape Gaja is looking for 🟡",
+                target_visual_asset=VisualAssetTag.SHAPE_CARD,
+                correct_target_value="1",
+                game_options=shape_opts,
+                operands=[1],
+                operation="SHAPE",
+            )
+        ]
+
+    if op == "PATTERN":
+        pattern_opts = [
+            GameChoiceOption(text_si="නිල් පාට (Blue)", text_en="Blue", numeric_value=2, is_correct=True, distractor_type="NONE", icon_or_shape="BLUE"),
+            GameChoiceOption(text_si="රතු පාට (Red)", text_en="Red", numeric_value=1, is_correct=False, distractor_type="IMPULSIVITY", icon_or_shape="RED"),
+            GameChoiceOption(text_si="කහ පාට (Yellow)", text_en="Yellow", numeric_value=3, is_correct=False, distractor_type="MAGNITUDE_SLIP", icon_or_shape="YELLOW"),
+        ]
+        return [
+            GameMicroStep(
+                step_order=1,
+                action_type="COMPLETE_PATTERN",
+                instruction_si="රටාවේ හිස් තැනට එන නිවැරදි වර්ණය හෝ හැඩය තෝරන්න 🚂",
+                instruction_en="Choose what comes next in the pattern 🚂",
+                target_visual_asset=VisualAssetTag.PATTERN_TRAIN,
+                correct_target_value="2",
+                game_options=pattern_opts,
+                operands=[2],
+                operation="PATTERN",
+            )
+        ]
+
+    if op == "COMPARE":
+        comp_opts = [
+            GameChoiceOption(text_si="විශාල ප්‍රමාණය (Bigger)", text_en="Bigger", numeric_value=final_answer, is_correct=True, distractor_type="NONE"),
+            GameChoiceOption(text_si="කුඩා ප්‍රමාණය (Smaller)", text_en="Smaller", numeric_value=min(operands) if len(operands) > 1 else 1, is_correct=False, distractor_type="IMPULSIVITY"),
+        ]
+        return [
+            GameMicroStep(
+                step_order=1,
+                action_type="COMPARE_QUANTITY",
+                instruction_si="වඩා විශාල හෝ වැඩි ප්‍රමාණය තෝරන්න 🐘",
+                instruction_en="Select the bigger or greater amount 🐘",
+                target_visual_asset=VisualAssetTag.COMPARISON_SCALE,
+                correct_target_value=str(final_answer),
+                game_options=comp_opts,
+                operands=operands,
+                operation="COMPARE",
+            )
+        ]
+
     # SPECIALIZED GRADE 1 WORKFLOW:
     # In Sri Lanka, Grade 1 does not use formal addition/subtraction signs (+, -).
     # Instead, learners identify items (NumberHunt/BasketCount) and pick the count/item directly.
-    if grade == 1 or op in ("COUNT", "COMPARE", "IDENTIFY"):
+    if grade == 1 or op in ("COUNT", "IDENTIFY"):
         steps: List[GameMicroStep] = [
             GameMicroStep(
                 step_order=1,
@@ -279,6 +376,7 @@ def generate_blueprint(
         story_narrative=story_narrative.model_dump() if story_narrative else None,
         cli_score=round(cli, 2),
         raw_sinhala_question=raw_sinhala_question,
+        raw_english_question=resolve_english_question(source_question_id, raw_sinhala_question) or (story_narrative.quest_goal_en if story_narrative else None),
     )
     return blueprint, cli, parsed
 
@@ -288,27 +386,37 @@ async def generate_blueprint_from_curriculum_problem(
     adhd_risk_level: str = "MEDIUM",
     game_theme: Optional[str] = None,
     custom_gaja_notes: Optional[str] = None,
+    learner_id: Optional[str] = None,
+    student_name: Optional[str] = None,
+    behavior_profile: Optional[StudentBehaviorProfile] = None,
+    custom_settings: Optional[CustomADHDGameSettings] = None,
 ) -> Tuple[GameActivityBlueprint, float]:
     """
     Asynchronous, end-to-end generator from a structured CurriculumProblem:
     1. Verifies math deterministically.
-    2. Computes CLI score and derives ADHD settings.
+    2. Computes CLI score and applies teacher customization & student behavioral profile.
     3. Enriches cultural narrative and Gaja dialogue.
-    4. Deconstructs into ADHD micro-steps with cognitive distractors.
+    4. Deconstructs into tailored ADHD micro-steps with cognitive distractors.
     """
     op = problem.operation or ("COUNT" if problem.grade == 1 else "ADD")
     operands = problem.operands if problem.operands else [problem.expected_answer]
 
     # Deterministic verification
     MathVerificationService.verify_grade_invariants(problem.grade, operands, op)
-    if op in ("COUNT", "COMPARE", "IDENTIFY"):
+    if op in ("COUNT", "COMPARE", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME"):
         verified_answer = problem.expected_answer
     else:
         verified_answer = MathVerificationService.execute_calculation(operands, op)
 
-    # CLI Score computation
+    # CLI Score computation & custom settings build
     cli = compute_cli(problem.raw_problem_text, operation_count=1)
-    settings = derive_adhd_game_settings(cli, adhd_risk_level)
+    settings, is_customized = build_custom_adhd_game_settings(
+        cli_score=cli,
+        adhd_risk_level=adhd_risk_level,
+        custom_settings=custom_settings,
+        behavior_profile=behavior_profile,
+    )
+    effective_cli = calculate_custom_cli(cli, settings, behavior_profile)
 
     # Theme selection
     chosen_theme = game_theme or _default_theme(problem.is_money, problem.topic, op)
@@ -337,6 +445,71 @@ async def generate_blueprint_from_curriculum_problem(
         status="draft",
         story_narrative=narrative.model_dump(),
         cli_score=round(cli, 2),
-        raw_sinhala_question=problem.raw_problem_text,
+        effective_cli_score=effective_cli,
+        raw_sinhala_question=problem.child_prompt_si or problem.raw_problem_text,
+        raw_english_question=problem.child_prompt_en or problem.english_translation or resolve_english_question(problem.problem_id, problem.raw_problem_text) or (narrative.quest_goal_en if narrative else None),
+        target_learner_id=learner_id,
+        student_name=student_name,
+        customized_by_teacher=is_customized,
+        behavior_profile=behavior_profile.model_dump() if behavior_profile else None,
     )
-    return blueprint, cli
+    return blueprint, effective_cli
+
+
+def tune_existing_blueprint(
+    existing: GameActivityBlueprint,
+    problem: CurriculumProblem,
+    custom_settings: CustomADHDGameSettings,
+    behavior_profile: Optional[StudentBehaviorProfile] = None,
+    game_theme: Optional[str] = None,
+) -> GameActivityBlueprint:
+    """
+    Synchronously re-tunes an existing GameActivityBlueprint with updated
+    cognitive load settings, micro-steps, and distractor profiles,
+    preserving the existing story narrative and mascot dialogue.
+    """
+    op = problem.operation or ("COUNT" if problem.grade == 1 else "ADD")
+    operands = problem.operands if problem.operands else [problem.expected_answer]
+
+    if op in ("COUNT", "COMPARE", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME"):
+        verified_answer = problem.expected_answer
+    else:
+        verified_answer = MathVerificationService.execute_calculation(operands, op)
+
+    base_cli = existing.cli_score or compute_cli(problem.raw_problem_text, operation_count=1)
+
+    settings, _ = build_custom_adhd_game_settings(
+        cli_score=base_cli,
+        adhd_risk_level="MEDIUM",
+        custom_settings=custom_settings,
+        behavior_profile=behavior_profile,
+    )
+    effective_cli = calculate_custom_cli(base_cli, settings, behavior_profile)
+
+    chosen_theme = game_theme or existing.game_theme
+
+    # Re-build micro-steps with new scaffolding/distractors
+    micro_steps = build_micro_steps(
+        operands=operands,
+        operations=[op],
+        final_answer=verified_answer,
+        settings=settings,
+        is_money=problem.is_money,
+        grade=problem.grade,
+    )
+
+    updated_blueprint = existing.model_copy(
+        update={
+            "game_theme": chosen_theme,
+            "adhd_game_settings": settings,
+            "micro_steps": micro_steps,
+            "effective_cli_score": effective_cli,
+            "raw_english_question": existing.raw_english_question or problem.child_prompt_en or problem.english_translation or resolve_english_question(problem.problem_id, problem.raw_problem_text),
+            "customized_by_teacher": True,
+            "behavior_profile": behavior_profile.model_dump() if behavior_profile else existing.behavior_profile,
+            "target_learner_id": behavior_profile.learner_id if behavior_profile and behavior_profile.learner_id else existing.target_learner_id,
+            "student_name": behavior_profile.student_name if behavior_profile and behavior_profile.student_name else existing.student_name,
+        }
+    )
+    return updated_blueprint
+

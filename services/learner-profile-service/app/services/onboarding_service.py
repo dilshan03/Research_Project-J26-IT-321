@@ -40,6 +40,12 @@ from app.schemas.onboarding import (
     OnboardingProgressResponse,
 )
 from app.core.elpx_engine import compute_elpx_profile_from_evaluated_items
+from app.services.assessment_evidence import (
+    EVIDENCE_RULESET_VERSION,
+    evaluate_submission,
+    normalize_answer,
+    select_proficiency_items,
+)
 
 logger = logging.getLogger("learner_profile.onboarding_service")
 
@@ -111,7 +117,7 @@ async def get_or_create_onboarding_progress(
         elpx_prof = assessment_doc.get("elpxProfile")
         if not elpx_prof and assessment_doc.get("evaluatedItems"):
             elpx_prof = compute_elpx_profile_from_evaluated_items(
-                evaluated_items=assessment_doc.get("evaluatedItems", []),
+                evaluated_items=select_proficiency_items(assessment_doc.get("evaluatedItems", [])),
                 grade=assessment_doc.get("grade", learner["grade"]),
                 learner_id=learner_id,
                 learning_preferences=quest_doc.get("learningPreferences") if quest_doc else None,
@@ -135,6 +141,8 @@ async def get_or_create_onboarding_progress(
                 "Baseline derived via transparent pedagogical rules."
             ),
             "elpxProfile": elpx_prof,
+            "evidenceRulesetVersion": assessment_doc.get("evidenceRulesetVersion"),
+            "evidenceSummary": assessment_doc.get("evidenceSummary"),
         }
 
     # Determine overall status
@@ -390,18 +398,6 @@ async def get_math_questions_for_learner(
     return questions
 
 
-def normalize_answer(val: Any) -> str:
-    """Normalizes string or numeric user answers for reliable comparison."""
-    if val is None:
-        return ""
-    if isinstance(val, (int, float)):
-        # Normalize float integers (e.g., 5.0 -> 5)
-        if isinstance(val, float) and val.is_integer():
-            return str(int(val)).strip().lower()
-        return str(val).strip().lower()
-    return str(val).strip().lower()
-
-
 async def submit_math_assessment(
     learner_id: str,
     parent_id: str,
@@ -441,7 +437,8 @@ async def submit_math_assessment(
         sort=[("completedAt", -1)]
     )
     if existing_assessment:
-        existing_items = existing_assessment.get("evaluatedItems", [])
+        # Excluded (unanswered/invalid) items are part of what was originally submitted.
+        existing_items = existing_assessment.get("evaluatedItems", []) + existing_assessment.get("excludedItems", [])
         existing_map = {item["questionId"]: item.get("userAnswer") for item in existing_items}
         incoming_map = {ans.questionId: ans.userAnswer for ans in data.answers}
 
@@ -482,6 +479,8 @@ async def submit_math_assessment(
                     "childPreferences": existing_assessment.get("childPreferences"),
                     "impsa": existing_assessment.get("impsaSummary"),
                     "imlr": existing_assessment.get("imlrSummary"),
+                    "evidenceRulesetVersion": existing_assessment.get("evidenceRulesetVersion"),
+                    "evidenceSummary": existing_assessment.get("evidenceSummary"),
                 },
             }
         else:
@@ -494,83 +493,44 @@ async def submit_math_assessment(
                 detail="A mathematics baseline assessment has already been completed for this learner. Conflicting submissions cannot overwrite historical baseline results.",
             )
 
-    evaluated_items = []
+    protocol_version = getattr(data, "assessmentProtocolVersion", None) or "onboarding-v1"
+
+    # Server-side evidence classification (ASSESS-EVIDENCE-v1.0): only answered mathematical items
+    # approved for the learner's grade are scored; all other submitted items are kept as excluded evidence.
+    approved_question_ids = {q["questionId"] for q in get_questions_for_grade(grade=grade, include_answers=True)}
+    evidence = evaluate_submission(
+        answers=data.answers,
+        learner_grade=grade,
+        approved_question_ids=approved_question_ids,
+        question_lookup=get_question_by_id,
+        request_grade=data.grade,
+        protocol_version=protocol_version,
+    )
+    if evidence["approvedItemsSubmitted"] == 0:
+        raise HTTPException(
+            status_code=422,
+            detail=f"No submitted items belong to the approved Grade {grade} mathematics item bank. Nothing was saved.",
+        )
+
+    evaluated_items = evidence["evaluatedItems"]
+    excluded_items = evidence["excludedItems"]
+    evidence_summary = evidence["evidenceSummary"]
+
+    # Final-answer accuracy (v1 semantics) over answered items only; empty answers are never correct.
     skill_stats: Dict[str, Dict[str, Any]] = {}
     correct_count = 0
-
-    for ans in data.answers:
-        q_item = get_question_by_id(ans.questionId)
-        if not q_item:
-            continue
-
-        skill_id = q_item["skillId"]
-        skill_name = q_item["skillName"]
-        skill_name_si = q_item["skillNameSi"]
-
-        if skill_id not in skill_stats:
-            skill_stats[skill_id] = {
-                "skillId": skill_id,
-                "skillName": skill_name,
-                "skillNameSi": skill_name_si,
-                "total": 0,
-                "correct": 0,
-            }
-
-        skill_stats[skill_id]["total"] += 1
-
-        # Check correctness
-        expected = q_item.get("correctAnswer")
-        is_correct = normalize_answer(ans.userAnswer) == normalize_answer(expected)
-        
-        # Valid assessment evidence: First confirmed response correctness is preserved separately
-        if ans.isFirstResponseCorrect is not None:
-            first_correct = bool(ans.isFirstResponseCorrect)
-        else:
-            first_correct = is_correct
-
-        first_confirmed = ans.firstConfirmedResponse if ans.firstConfirmedResponse is not None else ans.userAnswer
-
-        if is_correct:
+    for item in evaluated_items:
+        st = skill_stats.setdefault(item["skillId"], {
+            "skillId": item["skillId"],
+            "skillName": item["skillName"],
+            "skillNameSi": item["skillNameSi"],
+            "total": 0,
+            "correct": 0,
+        })
+        st["total"] += 1
+        if item["isCorrect"]:
             correct_count += 1
-            skill_stats[skill_id]["correct"] += 1
-
-        item_record = {
-            "questionId": ans.questionId,
-            "skillId": skill_id,
-            "skillName": skill_name,
-            "skillNameSi": skill_name_si,
-            "isCorrect": is_correct,
-            "correctFirstResponse": first_correct,
-            "firstConfirmedResponse": first_confirmed,
-            "userAnswer": ans.userAnswer,
-            "correctAnswer": expected,
-            "attempts": ans.attempts,
-            "responseTimeSeconds": ans.responseTimeSeconds,
-            "hintUsed": ans.hintUsed,
-            "demonstrationUsed": bool(getattr(ans, "demonstrationUsed", False)),
-            "selfCorrectionsCount": int(getattr(ans, "selfCorrectionsCount", 0)),
-        }
-        # Additive protocol-v2 fields (optional, safely preserved if provided)
-        if getattr(ans, "probeRole", None) is not None:
-            item_record["probeRole"] = ans.probeRole.value if hasattr(ans.probeRole, "value") else str(ans.probeRole)
-        if getattr(ans, "itemFamilyId", None) is not None:
-            item_record["itemFamilyId"] = ans.itemFamilyId
-        if getattr(ans, "representation", None) is not None:
-            item_record["representation"] = ans.representation.value if hasattr(ans.representation, "value") else str(ans.representation)
-        if getattr(ans, "supportBeforeFirstResponse", None) is not None:
-            item_record["supportBeforeFirstResponse"] = bool(ans.supportBeforeFirstResponse)
-        if getattr(ans, "supportEvents", None):
-            item_record["supportEvents"] = [e.model_dump() if hasattr(e, "model_dump") else e for e in ans.supportEvents]
-        if getattr(ans, "instructionEvents", None):
-            item_record["instructionEvents"] = [e.model_dump() if hasattr(e, "model_dump") else e for e in ans.instructionEvents]
-        if getattr(ans, "revisionEvents", None):
-            item_record["revisionEvents"] = [e.model_dump() if hasattr(e, "model_dump") else e for e in ans.revisionEvents]
-        if getattr(ans, "interactionMode", None) is not None:
-            item_record["interactionMode"] = ans.interactionMode.value if hasattr(ans.interactionMode, "value") else str(ans.interactionMode)
-        if getattr(ans, "dimensionTags", None):
-            item_record["dimensionTags"] = ans.dimensionTags
-
-        evaluated_items.append(item_record)
+            st["correct"] += 1
 
     total_questions = len(evaluated_items)
     accuracy_pct = round((correct_count / total_questions * 100.0), 1) if total_questions > 0 else 0.0
@@ -613,16 +573,15 @@ async def submit_math_assessment(
 
     evidence_level = "INSUFFICIENT" if total_questions < MINIMUM_EVIDENCE_QUESTIONS_OVERALL else "SUFFICIENT"
 
-    # Generate ELP-X v1.0 versioned profile for this assessment
+    # Generate ELP-X v1.0 versioned profile from independent (known, unassisted) first responses only
     elpx_profile = compute_elpx_profile_from_evaluated_items(
-        evaluated_items=evaluated_items,
+        evaluated_items=select_proficiency_items(evaluated_items),
         grade=grade,
         learner_id=learner_id,
         learning_preferences=quest_doc.get("learningPreferences"),
         social_context=quest_doc.get("socialContext"),
     )
 
-    protocol_version = getattr(data, "assessmentProtocolVersion", None) or "onboarding-v1"
     child_prefs = data.childPreferences.model_dump() if getattr(data, "childPreferences", None) else None
 
     assessment_doc = {
@@ -643,6 +602,9 @@ async def submit_math_assessment(
         "areasForGrowth": areas_for_growth,
         "recommendations": recommendations,
         "evaluatedItems": evaluated_items,
+        "excludedItems": excluded_items,
+        "evidenceRulesetVersion": EVIDENCE_RULESET_VERSION,
+        "evidenceSummary": evidence_summary,
         "elpxProfile": elpx_profile,
         "childPreferences": child_prefs,
         "mlPredictionNotice": (
@@ -698,6 +660,8 @@ async def submit_math_assessment(
         "childPreferences": child_prefs,
         "impsa": None,
         "imlr": None,
+        "evidenceRulesetVersion": EVIDENCE_RULESET_VERSION,
+        "evidenceSummary": evidence_summary,
     }
 
     return {

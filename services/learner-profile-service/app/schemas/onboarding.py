@@ -50,6 +50,13 @@ class InteractionMode(str, Enum):
     KEYBOARD = "keyboard"
 
 
+class ClientResponseStatus(str, Enum):
+    """Optional client declaration of whether an item was actually answered."""
+    ANSWERED = "answered"
+    SKIPPED = "skipped"
+    NOT_PRESENTED = "not_presented"
+
+
 # --- 1. Learning Preferences ---
 
 class LearningPreferencesRequest(BaseModel):
@@ -277,6 +284,13 @@ class MathItemAnswerSubmission(BaseModel):
         default_factory=list,
         description="Observable dimension tags addressed: MP, IC, SR, RU, SC, IA, CP"
     )
+    responseStatus: Optional[ClientResponseStatus] = Field(
+        default=None,
+        description=(
+            "Optional declaration for items without an answer: 'skipped' (shown, not answered) "
+            "or 'not_presented' (never shown). Omitted answers are recorded as unanswered."
+        )
+    )
 
 
 class MathAssessmentSubmissionRequest(BaseModel):
@@ -404,6 +418,15 @@ class MathAssessmentSummary(BaseModel):
     childPreferences: Optional[ChildPreferenceChoices] = Field(
         default=None,
         description="Child-expressed preferences recorded with source='child'"
+    )
+    # Evidence-integrity additive fields (Optional)
+    evidenceRulesetVersion: Optional[str] = Field(
+        default=None,
+        description="Version of the server-side assessment evidence rules applied"
+    )
+    evidenceSummary: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Counts of answered, unanswered, skipped, invalid and excluded items, and evidence-quality flags"
     )
 
 

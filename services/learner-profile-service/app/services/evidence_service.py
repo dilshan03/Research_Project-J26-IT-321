@@ -184,13 +184,21 @@ async def get_learner_elpx_profile(
 
     if baseline_doc and "evaluatedItems" in baseline_doc:
         for it in baseline_doc["evaluatedItems"]:
+            if "includedInProficiencyEstimate" in it:
+                # ASSESS-EVIDENCE-v1.0 records: independent first responses only, server-derived correctness
+                if not it["includedInProficiencyEstimate"]:
+                    continue
+                first_correct = bool(it.get("correctFirstResponse"))
+            else:
+                # Legacy records: unchanged historical behaviour
+                first_correct = it.get("isCorrect", False)
             evaluated_items.append({
                 "questionId": it.get("questionId"),
                 "skillId": it.get("skillId", "general"),
                 "skillName": it.get("skillName", "General"),
                 "skillNameSi": it.get("skillNameSi", "සාමාන්‍ය"),
                 "isCorrect": it.get("isCorrect", False),
-                "correctFirstResponse": it.get("isCorrect", False),
+                "correctFirstResponse": first_correct,
                 "attempts": it.get("attempts", 1),
                 "hintsUsed": 1 if it.get("hintUsed") else 0,
                 "responseTime": it.get("responseTimeSeconds", 0.0),

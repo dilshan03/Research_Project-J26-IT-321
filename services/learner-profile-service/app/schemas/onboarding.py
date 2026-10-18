@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union
 from pydantic import BaseModel, Field, field_validator
@@ -19,6 +19,35 @@ class StepStatus(str, Enum):
     NOT_STARTED = "NOT_STARTED"
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETED = "COMPLETED"
+
+
+# --- Protocol Versioning & Multi-Phase Assessment Enums ---
+
+class AssessmentProtocolVersion(str, Enum):
+    V1 = "onboarding-v1"
+    V2 = "onboarding-v2"
+
+
+class ProbeRole(str, Enum):
+    CALIBRATION = "calibration"
+    PRE = "pre"
+    SUPPORT = "support"
+    TRANSFER = "transfer"
+    REPRESENTATION = "representation"
+
+
+class RepresentationType(str, Enum):
+    CONCRETE = "concrete"
+    PICTORIAL = "pictorial"
+    VISUAL = "visual"
+    SYMBOLIC = "symbolic"
+    VERBAL = "verbal"
+
+
+class InteractionMode(str, Enum):
+    TOUCH = "touch"
+    MOUSE = "mouse"
+    KEYBOARD = "keyboard"
 
 
 # --- 1. Learning Preferences ---
@@ -48,7 +77,31 @@ class LearningPreferencesRequest(BaseModel):
     additionalNotes: Optional[str] = Field(None, max_length=500)
 
 
-# --- 2. SNAP-IV 18-Item Questionnaire ---
+# --- 2. Child-Expressed Preferences (Source Attribution: Child) ---
+
+class ChildPreferenceChoices(BaseModel):
+    """
+    Child-expressed preferences captured directly from the child.
+    Requirement: Explicitly record that the source is strictly 'child'.
+    """
+    source: str = Field(default="child", description="Explicit source attribution, strictly 'child'")
+    avatarId: Optional[str] = Field(None, description="Child-chosen companion avatar identifier")
+    soundMode: Optional[str] = Field(None, description="Child-chosen sound mode: gentle, quiet, off")
+    theme: Optional[str] = Field(None, description="Child-chosen visual theme (e.g., 'watercolor_island')")
+    chosenAt: Optional[datetime] = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        description="Timestamp when child made the preference choices"
+    )
+
+    @field_validator("source")
+    @classmethod
+    def validate_source_is_child(cls, v: str) -> str:
+        if not v or v.strip().lower() != "child":
+            raise ValueError("ChildPreferenceChoices source must strictly be 'child'")
+        return "child"
+
+
+# --- 3. SNAP-IV 18-Item Questionnaire ---
 
 class SnapIvItemResponse(BaseModel):
     itemId: int = Field(..., ge=1, le=18, description="SNAP-IV item index 1-18")
@@ -99,7 +152,7 @@ class SnapIvScoreSummary(BaseModel):
     )
 
 
-# --- 3. Social Learning Context ---
+# --- 4. Social Learning Context ---
 
 class SocialContextRequest(BaseModel):
     version: str = Field(default="SOCIAL-CONTEXT-v1.0")
@@ -122,7 +175,29 @@ class SocialContextRequest(BaseModel):
     optionalNotes: Optional[str] = Field(None, max_length=500)
 
 
-# --- 4. Mathematics Question & Assessment ---
+# --- 5. Event Evidence Schemas (Support, Instruction, Revision) ---
+
+class SupportEvent(BaseModel):
+    level: int = Field(..., ge=1, le=3, description="Support scaffold level (1=clarify, 2=visual cue, 3=worked demonstration)")
+    type: str = Field(..., description="Description or code of scaffold delivered (e.g., 'clarification', 'visual_cue', 'worked_demonstration')")
+    timestampSeconds: Optional[float] = Field(None, ge=0.0, description="Offset in seconds from item start")
+    deliveredAt: Optional[datetime] = None
+
+
+class InstructionEvent(BaseModel):
+    action: str = Field(..., description="Action type: delivered, replayed, clarified, audio_toggled")
+    timestampSeconds: Optional[float] = Field(None, ge=0.0, description="Offset in seconds from item start")
+    occurredAt: Optional[datetime] = None
+
+
+class RevisionEvent(BaseModel):
+    priorResponse: Optional[Union[str, int, float]] = None
+    newResponse: Optional[Union[str, int, float]] = None
+    timestampSeconds: Optional[float] = Field(None, ge=0.0, description="Offset in seconds from item start")
+    revisedAt: Optional[datetime] = None
+
+
+# --- 6. Mathematics Question & Assessment ---
 
 class QuestionType(str, Enum):
     MULTIPLE_CHOICE = "multiple_choice"
@@ -165,11 +240,57 @@ class MathItemAnswerSubmission(BaseModel):
     demonstrationUsed: Optional[bool] = False
     selfCorrectionsCount: Optional[int] = 0
 
+    # --- Protocol v2 Additive Fields (Optional, backward-compatible) ---
+    probeRole: Optional[ProbeRole] = Field(
+        default=None,
+        description="Role in multi-phase protocol: calibration, pre, support, transfer, representation"
+    )
+    itemFamilyId: Optional[str] = Field(
+        default=None,
+        description="Identifier linking isomorphic problem sets across representations or dynamic probes"
+    )
+    representation: Optional[RepresentationType] = Field(
+        default=None,
+        description="Item representation format: concrete, pictorial, visual, symbolic, verbal"
+    )
+    supportBeforeFirstResponse: Optional[bool] = Field(
+        default=False,
+        description="Whether hints, prompts, or demonstrations were accessed before the first confirmed response"
+    )
+    supportEvents: Optional[List[SupportEvent]] = Field(
+        default_factory=list,
+        description="Ordered sequence of scaffolding interventions delivered during item"
+    )
+    instructionEvents: Optional[List[InstructionEvent]] = Field(
+        default_factory=list,
+        description="Instruction delivery and audio replay events"
+    )
+    revisionEvents: Optional[List[RevisionEvent]] = Field(
+        default_factory=list,
+        description="Pre-confirmation adjustments and strategy changes"
+    )
+    interactionMode: Optional[InteractionMode] = Field(
+        default=None,
+        description="Input modality: touch, mouse, keyboard"
+    )
+    dimensionTags: Optional[List[str]] = Field(
+        default_factory=list,
+        description="Observable dimension tags addressed: MP, IC, SR, RU, SC, IA, CP"
+    )
+
 
 class MathAssessmentSubmissionRequest(BaseModel):
     version: str = Field(default="MATH-QB-v1.0")
+    assessmentProtocolVersion: Optional[str] = Field(
+        default=AssessmentProtocolVersion.V1.value,
+        description="Assessment protocol version: 'onboarding-v1' (default) or 'onboarding-v2'"
+    )
     grade: int = Field(..., ge=1, le=5)
     answers: List[MathItemAnswerSubmission] = Field(..., min_length=1)
+    childPreferences: Optional[ChildPreferenceChoices] = Field(
+        default=None,
+        description="Child-expressed preferences recorded with source='child'"
+    )
 
 
 class SkillScore(BaseModel):
@@ -184,8 +305,72 @@ class SkillScore(BaseModel):
     )
 
 
+# --- 7. Provisional IMPSA and IMLR Summary Schemas ---
+
+class ImpsaSummary(BaseModel):
+    """
+    Provisional Independent Mathematical Problem-Solving Ability summary.
+    Evaluated strictly on eligible, unassisted first attempts before hints/demonstrations.
+    """
+    status: str = Field(
+        default="INSUFFICIENT_EVIDENCE",
+        description="Status: 'PROVISIONAL', 'INSUFFICIENT_EVIDENCE'"
+    )
+    eligibleUnassistedItems: int = Field(
+        default=0,
+        ge=0,
+        description="Count of items completed without any assistance prior to first response"
+    )
+    skillEvidence: Optional[List[Dict[str, Any]]] = Field(
+        default_factory=list,
+        description="Item and concept level unassisted performance evidence"
+    )
+    estimatedProficiency: Optional[float] = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Provisional unassisted proficiency estimate (0.00 - 1.00)"
+    )
+    credibleInterval: Optional[Dict[str, float]] = Field(
+        default=None,
+        description="Bayesian credible interval bounds {'lower': float, 'upper': float}"
+    )
+    uncertaintyNote: Optional[str] = Field(
+        default="Provisional estimate based on brief intake. Revise after continuous gameplay observations.",
+        description="Epistemic uncertainty advisory"
+    )
+    evidenceSufficiency: str = Field(
+        default="INSUFFICIENT",
+        description="'SUFFICIENT' if eligible items >= 3, else 'INSUFFICIENT'"
+    )
+
+
+class ImlrSummary(BaseModel):
+    """
+    Provisional Independent Mathematical Learning Readiness summary.
+    Captures responsiveness to scaffolding and subsequent unassisted transfer.
+    """
+    status: str = Field(
+        default="INSUFFICIENT_EVIDENCE",
+        description="'TRANSFER_OBSERVED', 'TRANSFER_NOT_YET_OBSERVED', 'ALREADY_DEMONSTRATED', or 'INSUFFICIENT_EVIDENCE'"
+    )
+    conceptId: Optional[str] = Field(None, description="Target mathematical concept probed")
+    preProbeCorrect: Optional[bool] = Field(None, description="Outcome of unassisted pre-probe")
+    supportDelivered: Optional[List[str]] = Field(default_factory=list, description="List of scaffold steps provided")
+    unassistedTransferCorrect: Optional[bool] = Field(None, description="Outcome of unassisted transfer item")
+    evidenceLevel: str = Field(default="PROVISIONAL", description="'PROVISIONAL' or 'INSUFFICIENT'")
+    uncertaintyNote: Optional[str] = Field(
+        default="Initial transfer indicator from a single probe; does not certify durable learning gain.",
+        description="Dynamic assessment uncertainty guidance"
+    )
+
+
 class MathAssessmentSummary(BaseModel):
     grade: int
+    assessmentProtocolVersion: Optional[str] = Field(
+        default=AssessmentProtocolVersion.V1.value,
+        description="Assessment protocol version used for evaluation"
+    )
     totalQuestions: int
     correctAnswers: int
     accuracyPercentage: float
@@ -207,9 +392,22 @@ class MathAssessmentSummary(BaseModel):
         default=None,
         description="Versioned ELP-X evidence-aware proficiency estimates and explainable recommendations"
     )
+    # Protocol v2 Additive Summaries (Optional)
+    impsa: Optional[ImpsaSummary] = Field(
+        default=None,
+        description="Provisional Independent Mathematical Problem-Solving Ability summary"
+    )
+    imlr: Optional[ImlrSummary] = Field(
+        default=None,
+        description="Provisional Independent Mathematical Learning Readiness summary"
+    )
+    childPreferences: Optional[ChildPreferenceChoices] = Field(
+        default=None,
+        description="Child-expressed preferences recorded with source='child'"
+    )
 
 
-# --- Onboarding State & Aggregated Summary ---
+# --- 8. Onboarding State & Aggregated Summary ---
 
 class OnboardingProgressResponse(BaseModel):
     learnerId: str
@@ -226,6 +424,23 @@ class OnboardingProgressResponse(BaseModel):
     socialContext: Optional[Dict[str, Any]] = None
     snapIvSummary: Optional[SnapIvScoreSummary] = None
     mathSummary: Optional[MathAssessmentSummary] = None
+    # Protocol v2 Additive Fields (Optional)
+    assessmentProtocolVersion: Optional[str] = Field(
+        default=None,
+        description="Protocol version active for onboarding"
+    )
+    childPreferences: Optional[ChildPreferenceChoices] = Field(
+        default=None,
+        description="Child-expressed preferences if captured"
+    )
+    impsaSummary: Optional[ImpsaSummary] = Field(
+        default=None,
+        description="Provisional IMPSA output if protocol v2 was completed"
+    )
+    imlrSummary: Optional[ImlrSummary] = Field(
+        default=None,
+        description="Provisional IMLR output if protocol v2 was completed"
+    )
     updatedAt: str
 
 
@@ -233,3 +448,4 @@ class OnboardingApiResponse(BaseModel):
     success: bool = True
     message: str = "Operation completed successfully."
     data: Optional[Any] = None
+

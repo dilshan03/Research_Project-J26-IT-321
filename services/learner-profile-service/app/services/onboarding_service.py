@@ -162,6 +162,10 @@ async def get_or_create_onboarding_progress(
         "socialContext": quest_doc.get("socialContext") if quest_doc else None,
         "snapIvSummary": snap_iv_summary,
         "mathSummary": math_summary,
+        "assessmentProtocolVersion": assessment_doc.get("assessmentProtocolVersion") if assessment_doc else None,
+        "childPreferences": assessment_doc.get("childPreferences") if assessment_doc else None,
+        "impsaSummary": assessment_doc.get("impsaSummary") if assessment_doc else None,
+        "imlrSummary": assessment_doc.get("imlrSummary") if assessment_doc else None,
         "updatedAt": updated_at.isoformat() if isinstance(updated_at, datetime) else str(updated_at),
     }
 
@@ -459,6 +463,7 @@ async def submit_math_assessment(
                 "message": "Mathematics assessment was already submitted. Returning existing baseline result.",
                 "summary": {
                     "grade": existing_assessment.get("grade", grade),
+                    "assessmentProtocolVersion": existing_assessment.get("assessmentProtocolVersion", "onboarding-v1"),
                     "totalQuestions": existing_assessment.get("totalQuestions", 0),
                     "correctAnswers": existing_assessment.get("correctAnswers", 0),
                     "accuracyPercentage": existing_assessment.get("accuracyPercentage", 0.0),
@@ -474,6 +479,9 @@ async def submit_math_assessment(
                         "Baseline derived via transparent pedagogical rules."
                     ),
                     "elpxProfile": existing_assessment.get("elpxProfile"),
+                    "childPreferences": existing_assessment.get("childPreferences"),
+                    "impsa": existing_assessment.get("impsaSummary"),
+                    "imlr": existing_assessment.get("imlrSummary"),
                 },
             }
         else:
@@ -526,7 +534,7 @@ async def submit_math_assessment(
             correct_count += 1
             skill_stats[skill_id]["correct"] += 1
 
-        evaluated_items.append({
+        item_record = {
             "questionId": ans.questionId,
             "skillId": skill_id,
             "skillName": skill_name,
@@ -541,7 +549,28 @@ async def submit_math_assessment(
             "hintUsed": ans.hintUsed,
             "demonstrationUsed": bool(getattr(ans, "demonstrationUsed", False)),
             "selfCorrectionsCount": int(getattr(ans, "selfCorrectionsCount", 0)),
-        })
+        }
+        # Additive protocol-v2 fields (optional, safely preserved if provided)
+        if getattr(ans, "probeRole", None) is not None:
+            item_record["probeRole"] = ans.probeRole.value if hasattr(ans.probeRole, "value") else str(ans.probeRole)
+        if getattr(ans, "itemFamilyId", None) is not None:
+            item_record["itemFamilyId"] = ans.itemFamilyId
+        if getattr(ans, "representation", None) is not None:
+            item_record["representation"] = ans.representation.value if hasattr(ans.representation, "value") else str(ans.representation)
+        if getattr(ans, "supportBeforeFirstResponse", None) is not None:
+            item_record["supportBeforeFirstResponse"] = bool(ans.supportBeforeFirstResponse)
+        if getattr(ans, "supportEvents", None):
+            item_record["supportEvents"] = [e.model_dump() if hasattr(e, "model_dump") else e for e in ans.supportEvents]
+        if getattr(ans, "instructionEvents", None):
+            item_record["instructionEvents"] = [e.model_dump() if hasattr(e, "model_dump") else e for e in ans.instructionEvents]
+        if getattr(ans, "revisionEvents", None):
+            item_record["revisionEvents"] = [e.model_dump() if hasattr(e, "model_dump") else e for e in ans.revisionEvents]
+        if getattr(ans, "interactionMode", None) is not None:
+            item_record["interactionMode"] = ans.interactionMode.value if hasattr(ans.interactionMode, "value") else str(ans.interactionMode)
+        if getattr(ans, "dimensionTags", None):
+            item_record["dimensionTags"] = ans.dimensionTags
+
+        evaluated_items.append(item_record)
 
     total_questions = len(evaluated_items)
     accuracy_pct = round((correct_count / total_questions * 100.0), 1) if total_questions > 0 else 0.0
@@ -593,10 +622,14 @@ async def submit_math_assessment(
         social_context=quest_doc.get("socialContext"),
     )
 
+    protocol_version = getattr(data, "assessmentProtocolVersion", None) or "onboarding-v1"
+    child_prefs = data.childPreferences.model_dump() if getattr(data, "childPreferences", None) else None
+
     assessment_doc = {
         "learnerId": learner_id,
         "parentId": parent_id,
         "assessmentType": "BASELINE_MATH",
+        "assessmentProtocolVersion": protocol_version,
         "grade": grade,
         "questionBankVersion": QUESTION_BANK_VERSION,
         "thresholdVersion": THRESHOLD_CONFIG_VERSION,
@@ -611,6 +644,7 @@ async def submit_math_assessment(
         "recommendations": recommendations,
         "evaluatedItems": evaluated_items,
         "elpxProfile": elpx_profile,
+        "childPreferences": child_prefs,
         "mlPredictionNotice": (
             "Baseline derived via transparent pedagogical rules. "
             "Machine Learning / SHAP predictions will integrate when model service is attached."
@@ -648,6 +682,7 @@ async def submit_math_assessment(
 
     summary_response = {
         "grade": grade,
+        "assessmentProtocolVersion": protocol_version,
         "totalQuestions": total_questions,
         "correctAnswers": correct_count,
         "accuracyPercentage": accuracy_pct,
@@ -660,6 +695,9 @@ async def submit_math_assessment(
         "disclaimer": assessment_doc["disclaimer"],
         "mlPredictionNotice": assessment_doc["mlPredictionNotice"],
         "elpxProfile": elpx_profile,
+        "childPreferences": child_prefs,
+        "impsa": None,
+        "imlr": None,
     }
 
     return {

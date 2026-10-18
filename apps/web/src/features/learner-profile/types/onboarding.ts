@@ -70,6 +70,76 @@ export interface MathQuestion {
   hintSi: string;
 }
 
+export type AssessmentProtocolVersion = 'onboarding-v1' | 'onboarding-v2';
+
+export type ProbeRole =
+  | 'calibration'
+  | 'pre'
+  | 'support'
+  | 'transfer'
+  | 'representation';
+
+export type RepresentationType =
+  | 'concrete'
+  | 'pictorial'
+  | 'visual'
+  | 'symbolic'
+  | 'verbal';
+
+export type InteractionMode = 'touch' | 'mouse' | 'keyboard';
+
+export interface SupportEvent {
+  level: number; // 1, 2, 3
+  type: string;
+  timestampSeconds?: number;
+  deliveredAt?: string;
+}
+
+export interface InstructionEvent {
+  action: string;
+  timestampSeconds?: number;
+  occurredAt?: string;
+}
+
+export interface RevisionEvent {
+  priorResponse?: string | number;
+  newResponse?: string | number;
+  timestampSeconds?: number;
+  revisedAt?: string;
+}
+
+export interface ChildPreferenceChoices {
+  source: 'child';
+  avatarId?: string;
+  soundMode?: string;
+  theme?: string;
+  chosenAt?: string;
+}
+
+export interface ImpsaSummary {
+  status: 'PROVISIONAL' | 'INSUFFICIENT_EVIDENCE';
+  eligibleUnassistedItems: number;
+  skillEvidence?: Array<Record<string, any>>;
+  estimatedProficiency?: number;
+  credibleInterval?: { lower: number; upper: number };
+  uncertaintyNote?: string;
+  evidenceSufficiency: 'SUFFICIENT' | 'INSUFFICIENT';
+}
+
+export interface ImlrSummary {
+  status:
+    | 'TRANSFER_OBSERVED'
+    | 'TRANSFER_NOT_YET_OBSERVED'
+    | 'ALREADY_DEMONSTRATED'
+    | 'INSUFFICIENT_EVIDENCE';
+  conceptId?: string;
+  preProbeCorrect?: boolean;
+  supportDelivered?: string[];
+  unassistedTransferCorrect?: boolean;
+  evidenceLevel: string;
+  uncertaintyNote?: string;
+}
+
 export interface MathItemAnswer {
   questionId: string;
   userAnswer: string | number;
@@ -80,6 +150,25 @@ export interface MathItemAnswer {
   isFirstResponseCorrect?: boolean;
   demonstrationUsed?: boolean;
   selfCorrectionsCount?: number;
+
+  // Protocol v2 Additive Fields (Optional, backward-compatible)
+  probeRole?: ProbeRole;
+  itemFamilyId?: string;
+  representation?: RepresentationType;
+  supportBeforeFirstResponse?: boolean;
+  supportEvents?: SupportEvent[];
+  instructionEvents?: InstructionEvent[];
+  revisionEvents?: RevisionEvent[];
+  interactionMode?: InteractionMode;
+  dimensionTags?: string[];
+}
+
+export interface MathAssessmentSubmission {
+  version: string;
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
+  grade: number;
+  answers: MathItemAnswer[];
+  childPreferences?: ChildPreferenceChoices;
 }
 
 export interface SkillScore {
@@ -155,6 +244,7 @@ export interface ElpxProfile {
 
 export interface MathAssessmentSummary {
   grade: number;
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
   totalQuestions: number;
   correctAnswers: number;
   accuracyPercentage: number;
@@ -167,6 +257,10 @@ export interface MathAssessmentSummary {
   disclaimer?: string;
   mlPredictionNotice: string;
   elpxProfile?: ElpxProfile;
+  // Protocol v2 Additive Fields (Optional)
+  impsa?: ImpsaSummary;
+  imlr?: ImlrSummary;
+  childPreferences?: ChildPreferenceChoices;
 }
 
 
@@ -185,6 +279,11 @@ export interface OnboardingProgress {
   socialContext?: SocialContextData;
   snapIvSummary?: SnapIvScoreSummary;
   mathSummary?: MathAssessmentSummary;
+  // Protocol v2 Additive Fields (Optional)
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
+  childPreferences?: ChildPreferenceChoices;
+  impsaSummary?: ImpsaSummary;
+  imlrSummary?: ImlrSummary;
   updatedAt: string;
 }
 

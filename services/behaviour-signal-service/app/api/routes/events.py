@@ -56,3 +56,39 @@ async def get_behaviour(session_id:str,step_order:int):
     webcam=await db.webcam_signals.find_one({'sessionId':session_id,'stepOrder':step_order},sort=[('timestamp',-1)])
     result=fuse(snap,webcam)
     return {'success':True,'result':result}
+
+
+from pydantic import BaseModel, Field
+from app.processors.random_forest_predictor import predict_offtask
+
+
+class GameplayPredictionInput(BaseModel):
+    timetaken: float = Field(ge=0)
+    attemptcount: int = Field(ge=0)
+    correct: int = Field(ge=0, le=1)
+    hintcount: int = Field(ge=0)
+    consecutiveerrorsinrow: int = Field(ge=0)
+
+
+@router.post(
+    "/predict-offtask",
+    dependencies=[Depends(require_auth)]
+)
+async def predict_gameplay_offtask(
+    payload: GameplayPredictionInput
+):
+    try:
+        prediction = predict_offtask(
+            payload.model_dump()
+        )
+
+        return {
+            "success": True,
+            "result": prediction
+        }
+
+    except ValueError as error:
+        raise HTTPException(
+            status_code=400,
+            detail=str(error)
+        )

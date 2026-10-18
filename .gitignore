@@ -14,3 +14,6 @@ dist/
 
 # Logs
 *.log
+
+# MathQuest gameplay interaction training datasets
+services/behaviour-signal-service/model_training/data/student_log_*.csv

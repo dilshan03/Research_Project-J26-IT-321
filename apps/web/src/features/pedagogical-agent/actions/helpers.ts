@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import type { ActionContext } from '../types/agent.types';
 
 const euler = new THREE.Euler();
 

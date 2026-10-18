@@ -39,7 +39,7 @@ export function NumberHunt({ step, question, lang, calm, onWrong, onCorrect }: M
 
   return (
     <div className="flex flex-col items-center gap-8">
-      <div className="flex flex-wrap justify-center gap-2 md:gap-3 max-w-2xl" lang="si">
+      <div className="flex flex-wrap justify-center gap-2 md:gap-3 max-w-2xl" lang={lang}>
         {tokens.map((t, i) => {
           const isFound = found.includes(i);
           const isNum = /\d/.test(t);
@@ -54,7 +54,7 @@ export function NumberHunt({ step, question, lang, calm, onWrong, onCorrect }: M
               transition={shake === i ? { duration: 0.4 } : { duration: 1.2, repeat: Infinity }}
               whileHover={{ y: -3 }}
               whileTap={{ scale: 0.92 }}
-              className={`sinhala rounded-2xl px-4 py-2 text-xl md:text-2xl font-semibold border-2 transition-colors
+              className={`${lang === 'si' ? 'sinhala' : 'font-semibold'} rounded-2xl px-4 py-2 text-xl md:text-2xl border-2 transition-colors
                 ${isFound ? 'bg-mq-accent-yellow/30 border-mq-accent-yellow text-mq-text-muted line-through'
                   : hint && isNum ? 'bg-mq-accent-yellow/20 border-mq-accent-yellow text-mq-text-strong'
                   : 'bg-white border-mq-border text-mq-text-strong hover:border-mq-primary'}`}

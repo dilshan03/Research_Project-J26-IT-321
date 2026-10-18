@@ -2,12 +2,14 @@ import type {
   AdaptProblemRequest,
   BlueprintEnvelope,
   BlueprintStatus,
+  CognitiveLoadPreviewResponse,
   CurriculumProblem,
   DocumentUploadResponse,
   GenerateBlueprintRequest,
   SampleQuestion,
   SeedSyllabiResponse,
   SyllabusDocument,
+  TuneBlueprintRequest,
 } from './types';
 
 const BASE =
@@ -99,6 +101,22 @@ export const contentAdaptationApi = {
     request<BlueprintEnvelope>(`${SYLLABUS_API}/problems/${problemId}/adapt`, {
       method: 'POST',
       body: JSON.stringify(body),
+    }),
+
+  tuneBlueprint: (activityId: string, body: TuneBlueprintRequest) =>
+    request<BlueprintEnvelope>(`${SYLLABUS_API}/blueprints/${activityId}/tune`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    }),
+
+  previewCognitiveLoad: (rawSinhalaText: string, customSettings?: any, behaviorProfile?: any) =>
+    request<CognitiveLoadPreviewResponse>(`${SYLLABUS_API}/cognitive-load/preview`, {
+      method: 'POST',
+      body: JSON.stringify({
+        raw_sinhala_text: rawSinhalaText,
+        custom_settings: customSettings,
+        behavior_profile: behaviorProfile,
+      }),
     }),
 
   seedLocalSyllabi: () =>

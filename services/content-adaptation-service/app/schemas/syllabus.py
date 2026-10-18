@@ -41,14 +41,17 @@ class CurriculumProblem(BaseModel):
     problem_id: str = Field(..., description="Unique problem identifier, e.g. G1-ADD-001")
     doc_id: Optional[str] = Field(None, description="Associated syllabus document ID")
     grade: int = Field(..., ge=1, le=5, description="Curriculum grade level (1 to 5)")
-    topic: str = Field(..., description="Mathematics topic (Addition, Subtraction, Money, etc.)")
+    topic: str = Field(..., description="Mathematics topic (Shapes, Patterns, Counting, Addition, Subtraction, Money, etc.)")
     competency_code: Optional[str] = Field(None, description="NIE competency code (e.g. '1.1', '2.3')")
     competency_desc: Optional[str] = Field(None, description="Curriculum competency statement")
     raw_problem_text: str = Field(..., description="Authentic Sinhala/English problem statement")
+    child_prompt_si: Optional[str] = Field(None, description="Child-friendly spoken Sinhala prompt voiced by Gaja")
+    child_prompt_en: Optional[str] = Field(None, description="Child-friendly spoken English prompt voiced by Gaja")
     english_translation: Optional[str] = Field(None, description="English translation")
-    operation: Optional[Literal["ADD", "SUB", "MUL", "DIV", "COUNT", "COMPARE", "IDENTIFY"]] = Field(None, description="Inferred or declared operation")
+    operation: Optional[Literal["ADD", "SUB", "MUL", "DIV", "COUNT", "COMPARE", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME"]] = Field(None, description="Inferred or declared operation")
     operands: List[int] = Field(default_factory=list, description="Extracted numerical operands")
-    expected_answer: int = Field(..., description="Deterministically verified correct answer")
+    expected_answer: int = Field(..., description="Deterministically verified correct answer (or target choice index/numeric id)")
+    visual_props: Optional[dict] = Field(default_factory=dict, description="Metadata for shapes, colors, or visual patterns")
     difficulty: Literal["EASY", "MEDIUM", "HARD"] = Field("MEDIUM", description="Cognitive difficulty tier")
     page_number: Optional[int] = Field(None, description="PDF page reference")
     is_money: bool = Field(False, description="Whether problem involves currency/money")
@@ -61,12 +64,44 @@ class CurriculumProblemExtraction(BaseModel):
     problems: List[CurriculumProblem]
 
 
+class StudentBehaviorProfile(BaseModel):
+    learner_id: Optional[str] = None
+    student_name: Optional[str] = None
+    archetype_id: Optional[str] = None
+    inattention_level: Literal["LOW", "MODERATE", "HIGH"] = "MODERATE"
+    impulsivity_level: Literal["LOW", "MODERATE", "HIGH"] = "MODERATE"
+    working_memory_support: bool = True
+    activity_pace: Literal["CALM_STEP_BY_STEP", "REGULAR", "FLEXIBLE"] = "CALM_STEP_BY_STEP"
+    visual_assistance: Literal["ALWAYS", "SOMETIMES", "MINIMAL"] = "ALWAYS"
+    audio_assistance: Literal["READ_EVERYTHING", "READ_ON_CLICK", "OFF"] = "READ_ON_CLICK"
+
+
+class CustomADHDGameSettings(BaseModel):
+    step_granularity: Optional[Literal["TWO_TIER", "MAXIMAL_THREE_TIER"]] = None
+    distractor_count: Optional[int] = Field(None, ge=2, le=4)
+    stimulus_density: Optional[Literal["LOW", "MEDIUM"]] = None
+    visual_clutter_filter: Optional[bool] = None
+    timer_enabled: Optional[bool] = None
+    preferred_distractor_types: Optional[List[str]] = None
+
+
 class AdaptProblemRequest(BaseModel):
     adhd_risk_level: Literal["LOW", "MEDIUM", "HIGH"] = Field("MEDIUM", description="Assessed ADHD risk level")
     game_theme: Optional[Literal["VILLAGE_MARKET", "JUNGLE_ADVENTURE", "SPACE_QUEST"]] = Field(
         None, description="Visual theme setting for the activity"
     )
     custom_gaja_notes: Optional[str] = Field(None, description="Optional custom pedagogical notes for Gaja mascot")
+    learner_id: Optional[str] = Field(None, description="Assigned learner identifier if personalized")
+    student_name: Optional[str] = Field(None, description="Assigned learner name or archetype label")
+    behavior_profile: Optional[StudentBehaviorProfile] = Field(None, description="Student behavioral and cognitive traits")
+    custom_settings: Optional[CustomADHDGameSettings] = Field(None, description="Teacher overrides for cognitive load and game settings")
+
+
+class TuneBlueprintRequest(BaseModel):
+    custom_settings: CustomADHDGameSettings
+    behavior_profile: Optional[StudentBehaviorProfile] = None
+    custom_gaja_notes: Optional[str] = None
+    game_theme: Optional[Literal["VILLAGE_MARKET", "JUNGLE_ADVENTURE", "SPACE_QUEST"]] = None
 
 
 class DocumentUploadResponse(BaseModel):

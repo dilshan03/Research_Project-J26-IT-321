@@ -4,6 +4,7 @@ import { ShieldAlert, ArrowRight, Loader2 } from 'lucide-react';
 import { PortalHeader } from '../components/portal/PortalHeader';
 import { DashboardSidebar } from '../components/DashboardSidebar';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { parentText } from '../i18n/parentText';
 
 export interface DashboardLayoutProps {
   role: 'parent' | 'teacher';
@@ -14,6 +15,10 @@ export interface DashboardLayoutProps {
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const isParent = role === 'parent';
+  // Parent portal content is Sinhala; the class pairs Lexend (Latin) with Noto Sans Sinhala.
+  const rootLang = isParent ? 'si' : undefined;
+  const rootClass = isParent ? 'parent-portal' : '';
 
   const handleCloseMobileSidebar = useCallback(() => {
     setIsMobileSidebarOpen(false);
@@ -26,12 +31,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
   // 1. Loading State
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col bg-mq-bg">
+      <div lang={rootLang} className={`min-h-screen flex flex-col bg-mq-bg ${rootClass}`}>
         <PortalHeader role={role} onToggleMobileSidebar={handleToggleMobileSidebar} />
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="flex flex-col items-center gap-3 p-8 rounded-3xl bg-white border border-mq-border shadow-xs text-mq-primary font-semibold text-sm">
             <Loader2 size={36} className="animate-spin text-mq-primary" />
-            <span>Loading dashboard workspace...</span>
+            <span>{isParent ? parentText.shell.loading : 'Loading dashboard workspace...'}</span>
           </div>
         </div>
       </div>
@@ -41,7 +46,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
   // 2. Unauthenticated State (Strict Safety Fallback)
   if (!isAuthenticated || !user) {
     return (
-      <div className="min-h-screen flex flex-col bg-mq-bg">
+      <div lang={rootLang} className={`min-h-screen flex flex-col bg-mq-bg ${rootClass}`}>
         <PortalHeader role={role} onToggleMobileSidebar={handleToggleMobileSidebar} />
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="max-w-md w-full bg-white rounded-3xl border border-mq-border p-8 shadow-xs text-center animate-fade-in">
@@ -49,16 +54,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
               <ShieldAlert size={32} />
             </div>
             <h2 className="text-xl font-extrabold text-mq-text-strong mb-2">
-              Authentication Required
+              {isParent ? parentText.shell.signInRequiredTitle : 'Authentication Required'}
             </h2>
             <p className="text-sm text-mq-text-muted mb-6">
-              You must sign in with your verified {role} account to access this dashboard.
+              {isParent
+                ? parentText.shell.signInRequiredText
+                : `You must sign in with your verified ${role} account to access this dashboard.`}
             </p>
             <Link
               to="/sign-in"
               className="btn btn-primary w-full justify-center py-2.5 rounded-full text-sm font-bold"
             >
-              Sign In to Continue
+              {isParent ? parentText.shell.signIn : 'Sign In to Continue'}
             </Link>
           </div>
         </div>
@@ -104,7 +111,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
 
   // 4. Authorized Standard Dashboard Shell
   return (
-    <div className="min-h-screen flex flex-col bg-mq-bg text-mq-text">
+    <div lang={rootLang} className={`min-h-screen flex flex-col bg-mq-bg text-mq-text ${rootClass}`}>
       {/* Standard Portal Top Header */}
       <PortalHeader
         role={role}

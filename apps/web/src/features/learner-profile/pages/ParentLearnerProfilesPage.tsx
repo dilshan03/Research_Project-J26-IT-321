@@ -1,23 +1,29 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Brain,
-  CheckCircle2,
-  Loader2,
-  ArrowRight,
-  Info,
-  Palette,
-  Users2,
-} from 'lucide-react';
+import { CheckCircle2, Loader2, ArrowRight, Info, Palette, Home, ClipboardList } from 'lucide-react';
 import { learnerApi } from '../services/learnerApi';
 import { profileApi } from '../services/profileApi';
 import { onboardingApi } from '../services/onboardingApi';
 import type { Learner, DeletionRequest } from '../types';
 import { AVATAR_OPTIONS } from '../types';
-import type { ElpxProfile, ElpxSkillEstimate, OnboardingFullSummary } from '../types/onboarding';
+import type { ElpxProfile, OnboardingFullSummary } from '../types/onboarding';
 import { PageHeader } from '../../../shared/components/PageHeader';
-import { OnboardingStatusBadge } from '../components/OnboardingStatusBadge';
 import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
+import { ChildSwitcher } from '../components/parent/ChildSwitcher';
+import { SkillEvidenceList } from '../components/parent/SkillEvidenceList';
+import { deletionStatusLabel, optionTitle } from '../components/parent/labels';
+import { parentText } from '../../../shared/i18n/parentText';
+
+const t = parentText.profiles;
+const prefText = parentText.preferences;
+const socialText = parentText.social;
+
+const InfoRow: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <div className="flex items-start justify-between gap-4 py-2.5 border-b border-mq-border/60 last:border-b-0">
+    <dt className="text-sm text-mq-text-muted">{label}</dt>
+    <dd className="text-sm font-semibold text-mq-text-strong text-right break-words min-w-0">{value || '—'}</dd>
+  </div>
+);
 
 export const ParentLearnerProfilesPage: React.FC = () => {
   const [learners, setLearners] = useState<Learner[]>([]);
@@ -45,7 +51,7 @@ export const ParentLearnerProfilesPage: React.FC = () => {
           setSelectedLearnerId(res.data[0].learnerId);
         }
       } else {
-        setErrorMessage(res.message || 'Failed to retrieve learners.');
+        setErrorMessage(t.loadError);
       }
 
       if (delRes.success && delRes.data) {
@@ -56,12 +62,11 @@ export const ParentLearnerProfilesPage: React.FC = () => {
         setDeletionRequests(reqMap);
       }
     } catch {
-      setErrorMessage('Network error while connecting to learner profile service.');
+      setErrorMessage(parentText.common.networkError);
     } finally {
       setIsLoadingLearners(false);
     }
   }, [selectedLearnerId]);
-
 
   useEffect(() => {
     loadLearners();
@@ -92,17 +97,8 @@ export const ParentLearnerProfilesPage: React.FC = () => {
         ]);
 
         if (isMounted) {
-          if (profileRes.success && profileRes.data) {
-            setProfile(profileRes.data);
-          } else {
-            setProfile(null);
-          }
-
-          if (summaryRes.success && summaryRes.data) {
-            setSummary(summaryRes.data);
-          } else {
-            setSummary(null);
-          }
+          setProfile(profileRes.success && profileRes.data ? profileRes.data : null);
+          setSummary(summaryRes.success && summaryRes.data ? summaryRes.data : null);
         }
       } catch {
         if (isMounted) {
@@ -127,129 +123,77 @@ export const ParentLearnerProfilesPage: React.FC = () => {
     : AVATAR_OPTIONS[0];
 
   if (isLoadingLearners) {
-    return (
-      <LoadingState
-        message="Loading learner profiles..."
-        messageSi="ඉගෙනුම් පැතිකඩ පූරණය වෙමින් පවතී..."
-      />
-    );
+    return <LoadingState message={t.loading} />;
   }
 
   if (learners.length === 0) {
     return (
       <EmptyState
-        title="No Child Profiles Found"
-        titleSi="තවමත් දරුවන් ලියාපදිංචි කර නැත"
-        description="Add a child profile first to generate evidence-aware mathematics learner profiles."
-        descriptionSi="ඉගෙනුම් පැතිකඩ නිර්මාණය කිරීමට පෙර කරුණාකර පළමුව දරුවාගේ තොරතුරු ඇතුළත් කරන්න."
+        title={t.noChildrenTitle}
+        description={t.noChildrenText}
         action={
-          <Link to="/learners" className="btn btn-primary text-xs py-2 px-5 rounded-full inline-block font-bold">
-            Go to My Children (දරුවන් කළමනාකරණය)
+          <Link to="/learners" className="btn btn-primary min-h-[44px] px-6 rounded-full inline-flex items-center text-sm">
+            {t.goToChildren}
           </Link>
         }
       />
     );
   }
 
+  const prefs = summary?.learningPreferences;
+  const social = summary?.socialContext;
+  const deletionRequest = selectedChild ? deletionRequests[selectedChild.learnerId] : undefined;
+
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
-      {/* Standardized Page Header */}
       <PageHeader
         role="parent"
-        title="Learner Profiles & Evidence Levels"
-        titleSi="ඉගෙනුම් පැතිකඩ"
-        description="Evidence-aware mathematics proficiencies, Bayesian credible intervals, and skill levels."
-        descriptionSi="බේසියානු ඇස්තමේන්තු, 95% විශ්වාස්‍යතා පරාසයන් සහ ස්ථිර සාක්ෂි මත පදනම් වූ ගණිත නිපුණතා පැතිකඩ."
+        title={t.title}
+        description={t.description}
         actions={
-          <Link
-            to="/learners"
-            className="btn btn-secondary py-2 px-4 rounded-full text-xs sm:text-sm font-bold shadow-xs inline-flex items-center gap-1.5"
-          >
-            <span>Manage Children (මගේ දරුවන්)</span>
+          <Link to="/learners" className="btn btn-secondary min-h-[44px] px-5 rounded-full inline-flex items-center text-sm">
+            {parentText.nav.myChildren}
           </Link>
         }
       />
 
       {errorMessage && (
-        <ErrorAlert
-          message={errorMessage}
-          messageSi="පැතිකඩ තොරතුරු ලබාගැනීමේදී දෝෂයක් හටගැනිණි."
-          onRetry={loadLearners}
-        />
+        <ErrorAlert message={errorMessage} retryLabel={parentText.common.retry} onRetry={loadLearners} />
       )}
 
-      {/* Child Switcher Tabs */}
-      <div>
-        <h3 className="text-xs font-bold uppercase tracking-wider text-mq-text-muted mb-2.5">
-          Select Child Profile to Inspect
-        </h3>
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
-          {learners.map((child) => {
-            const isSelected = child.learnerId === selectedChild?.learnerId;
-            const childAvatar =
-              AVATAR_OPTIONS.find((a) => a.id === child.avatarId) || AVATAR_OPTIONS[0];
-
-            return (
-              <button
-                key={child.learnerId}
-                type="button"
-                onClick={() => setSelectedLearnerId(child.learnerId)}
-                className={`flex items-center gap-3 p-3 rounded-2xl border transition-all shrink-0 cursor-pointer text-left min-w-[200px] ${
-                  isSelected
-                    ? 'bg-mq-surface-blue border-mq-primary shadow-sm ring-2 ring-mq-primary/20'
-                    : 'bg-white border-mq-border hover:border-mq-primary/40 hover:bg-mq-surface-soft/60'
-                }`}
-              >
-                <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg shrink-0 ${childAvatar.bgColor} border ${childAvatar.borderColor}`}
-                >
-                  {childAvatar.icon}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold text-mq-text-strong truncate">
-                    {child.preferredName || child.firstName}
-                  </p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[11px] text-mq-text-muted">Grade {child.grade}</span>
-                    <span className="text-mq-border">•</span>
-                    <OnboardingStatusBadge status={child.onboardingStatus} size="sm" />
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <section className="space-y-3">
+        <h3 className="text-base font-bold text-mq-text-strong">{parentText.overview.selectChild}</h3>
+        <ChildSwitcher
+          learners={learners}
+          selectedId={selectedChild?.learnerId}
+          onSelect={setSelectedLearnerId}
+          showStatus
+        />
+      </section>
 
       {selectedChild && (
         <div className="space-y-6">
-          {/* Header Card */}
-          <div className="bg-white rounded-3xl border border-mq-border p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+          {/* Child header */}
+          <section className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4 min-w-0">
               <div
-                className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0 ${avatar.bgColor} border ${avatar.borderColor}`}
+                className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0 border ${avatar.bgColor} ${avatar.borderColor}`}
+                aria-hidden="true"
               >
                 {avatar.icon}
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-mq-text-strong">
-                    {selectedChild.firstName} {selectedChild.preferredName && `(${selectedChild.preferredName})`}
-                  </h2>
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary border border-mq-primary/20">
-                    Grade {selectedChild.grade}
-                  </span>
-                </div>
-                <p className="text-xs sm:text-sm text-mq-text-muted mt-0.5">
-                  Learner ID: <code className="font-mono text-xs">{selectedChild.learnerId}</code> · Age {selectedChild.age}
+              <div className="min-w-0 space-y-1">
+                <h2 className="text-xl sm:text-2xl font-bold text-mq-text-strong break-words">
+                  {selectedChild.firstName}
+                  {selectedChild.preferredName && ` (${selectedChild.preferredName})`}
+                </h2>
+                <p className="text-sm text-mq-text-muted">
+                  {parentText.common.gradeAndAge(selectedChild.grade, selectedChild.age)}
                 </p>
-                {deletionRequests[selectedChild.learnerId] && (
-                  <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-300">
-                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                    <span>
-                      Deletion Request: {deletionRequests[selectedChild.learnerId].status.replace('_', ' ')} (ස්ථිරව ඉවත්කිරීමේ ඉල්ලීම)
-                    </span>
-                  </div>
+                {deletionRequest && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-900 border border-amber-300">
+                    {deletionStatusLabel(deletionRequest.status)}
+                  </span>
                 )}
               </div>
             </div>
@@ -258,248 +202,92 @@ export const ParentLearnerProfilesPage: React.FC = () => {
               {selectedChild.onboardingStatus !== 'COMPLETED' ? (
                 <Link
                   to={`/learners/${selectedChild.learnerId}/onboarding`}
-                  className="btn btn-primary text-xs py-2.5 px-4 rounded-xl font-bold inline-flex items-center gap-1.5"
+                  className="btn btn-primary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center gap-2"
                 >
                   <span>
-                    {selectedChild.onboardingStatus === 'IN_PROGRESS'
-                      ? 'Resume Assessment'
-                      : 'Complete Onboarding'}
+                    {selectedChild.onboardingStatus === 'IN_PROGRESS' ? t.resumeAssessment : t.startAssessment}
                   </span>
-                  <ArrowRight size={14} />
+                  <ArrowRight size={16} />
                 </Link>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-success-bg text-mq-success border border-mq-success/30">
-                  <CheckCircle2 size={14} />
-                  <span>Verified ELP-X Profile</span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold bg-mq-success-bg text-mq-success border border-mq-success/30">
+                  <CheckCircle2 size={16} />
+                  <span>{t.completedBadge}</span>
                 </span>
               )}
             </div>
-          </div>
+          </section>
 
-          {/* If NOT_STARTED or IN_PROGRESS */}
           {selectedChild.onboardingStatus !== 'COMPLETED' && (
-            <div className="bg-white rounded-3xl border border-mq-border p-8 text-center space-y-4 max-w-xl mx-auto my-6">
-              <div className="w-14 h-14 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center mx-auto text-2xl">
-                📋
+            <section className="bg-white rounded-3xl border border-mq-border p-8 text-center space-y-3 max-w-xl mx-auto">
+              <div className="w-14 h-14 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center mx-auto">
+                <ClipboardList size={26} />
               </div>
-              <h3 className="text-lg font-bold text-mq-text-strong">
-                Profile Awaiting Diagnostic Assessment
-              </h3>
-              <p className="text-xs sm:text-sm text-mq-text-muted max-w-md mx-auto">
-                Evidence-aware mathematics proficiency levels and credible intervals are computed once the
-                diagnostic assessment is completed.
+              <h3 className="text-lg font-bold text-mq-text-strong">{t.notCompletedTitle}</h3>
+              <p className="text-sm text-mq-text-muted leading-relaxed">
+                {t.notCompletedText(selectedChild.preferredName || selectedChild.firstName)}
               </p>
-              <Link
-                to={`/learners/${selectedChild.learnerId}/onboarding`}
-                className="btn btn-primary text-xs py-2 px-5 rounded-full inline-flex items-center gap-1.5 font-bold"
-              >
-                <span>Launch Assessment Now</span>
-                <ArrowRight size={14} />
-              </Link>
-            </div>
+            </section>
           )}
 
-          {/* If COMPLETED: Display Evidence-Aware Mathematical Profile */}
           {selectedChild.onboardingStatus === 'COMPLETED' && (
             <>
               {isLoadingProfile && (
                 <div className="flex items-center justify-center p-12 text-mq-primary gap-2 text-sm font-semibold">
-                  <Loader2 size={24} className="animate-spin" />
-                  <span>Loading Bayesian profile models...</span>
+                  <Loader2 size={22} className="animate-spin" />
+                  <span>{t.loading}</span>
                 </div>
               )}
 
               {!isLoadingProfile && profile && (
                 <div className="space-y-6">
-                  {/* Bayesian Proficiency & Credible Interval Estimates */}
-                  <div className="bg-white rounded-3xl border border-mq-border p-6 shadow-sm space-y-5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-mq-border">
-                      <div>
-                        <h3 className="text-base font-extrabold text-mq-text-strong flex items-center gap-2">
-                          <Brain size={18} className="text-mq-primary" />
-                          <span>Bayesian Beta-Binomial Skill Estimates</span>
-                        </h3>
-                        <p className="text-xs text-mq-text-muted mt-0.5">
-                          Calculated via ELP-X Engine with prior smoothing and 95% Credible Intervals.
-                        </p>
-                      </div>
-                      <span className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-mq-surface-soft border border-mq-border self-start sm:self-auto">
-                        Schema: {profile.profileVersion}
-                      </span>
-                    </div>
+                  <section className="bg-white rounded-3xl border border-mq-border p-5 sm:p-7 shadow-xs">
+                    <SkillEvidenceList profile={profile} />
+                  </section>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {profile.skillEstimates?.map((skill: ElpxSkillEstimate) => (
-                        <div
-                          key={skill.skillId}
-                          className="p-5 rounded-2xl bg-mq-surface-soft/60 border border-mq-border hover:border-mq-primary/40 transition-all space-y-3"
-                        >
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <p className="text-sm font-bold text-mq-text-strong">
-                                {skill.skillName}
-                              </p>
-                              <p className="text-xs text-mq-text-muted font-medium">
-                                {skill.skillNameSi}
-                              </p>
-                            </div>
-                            <span
-                              className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
-                                skill.provisionalSkillLevel === 'PROFICIENT'
-                                  ? 'bg-mq-success-bg text-mq-success border border-mq-success/20'
-                                  : skill.provisionalSkillLevel === 'DEVELOPING'
-                                  ? 'bg-mq-surface-blue text-mq-primary border border-mq-primary/20'
-                                  : 'bg-amber-50 text-amber-800 border border-amber-200'
-                              }`}
-                            >
-                              {skill.provisionalSkillLevel.replace('_', ' ')}
-                            </span>
-                          </div>
-
-                          {/* Proficiency gauge */}
-                          <div>
-                            <div className="flex justify-between text-xs font-semibold mb-1">
-                              <span>Estimated Proficiency</span>
-                              <span className="text-mq-primary font-bold">
-                                {skill.estimatedProficiencyPercentage.toFixed(1)}%
-                              </span>
-                            </div>
-                            <div className="w-full bg-white h-2.5 rounded-full overflow-hidden border border-mq-border/80">
-                              <div
-                                className="h-full bg-mq-primary rounded-full transition-all duration-500"
-                                style={{ width: `${Math.min(100, Math.max(5, skill.estimatedProficiencyPercentage))}%` }}
-                              />
-                            </div>
-                          </div>
-
-                          {/* Statistical Indicators Table */}
-                          <div className="grid grid-cols-2 gap-2 pt-2 text-[11px] border-t border-mq-border/60">
-                            <div>
-                              <span className="text-mq-text-muted">Distinct Evaluated:</span>{' '}
-                              <strong className="text-mq-text">{skill.distinctQuestionsAssessed} items</strong>
-                            </div>
-                            <div>
-                              <span className="text-mq-text-muted">Raw Accuracy:</span>{' '}
-                              <strong className="text-mq-text">
-                                {skill.correctFirstResponses}/{skill.distinctQuestionsAssessed} ({skill.rawAccuracyPercentage.toFixed(0)}%)
-                              </strong>
-                            </div>
-                            <div>
-                              <span className="text-mq-text-muted">Posterior Beta (α, β):</span>{' '}
-                              <strong className="font-mono text-mq-text">
-                                ({skill.posteriorAlpha.toFixed(1)}, {skill.posteriorBeta.toFixed(1)})
-                              </strong>
-                            </div>
-                            <div>
-                              <span className="text-mq-text-muted">95% Credible Interval:</span>{' '}
-                              <strong className="font-mono text-mq-text">
-                                [{(skill.credibleInterval.lower * 100).toFixed(0)}% – {(skill.credibleInterval.upper * 100).toFixed(0)}%]
-                              </strong>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Adaptive Preferences & Social Learning Profile (From Onboarding) */}
                   {summary && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Learning Preferences */}
-                      <div className="bg-white rounded-3xl border border-mq-border p-6 shadow-sm space-y-4">
-                        <div className="flex items-center gap-2 pb-2 border-b border-mq-border">
-                          <Palette size={18} className="text-mq-primary" />
-                          <h3 className="text-sm font-extrabold text-mq-text-strong">
-                            ADHD Learning Preferences (ඉගෙනුම් මනාප)
-                          </h3>
-                        </div>
-
-                        {summary.learningPreferences ? (
-                          <div className="space-y-2.5 text-xs">
-                            <div className="flex justify-between py-1.5 border-b border-mq-border/50">
-                              <span className="text-mq-text-muted">Visual Assistance:</span>
-                              <span className="font-bold text-mq-text capitalize">
-                                {summary.learningPreferences.visualAssistance}
-                              </span>
-                            </div>
-                            <div className="flex justify-between py-1.5 border-b border-mq-border/50">
-                              <span className="text-mq-text-muted">Audio Assistance:</span>
-                              <span className="font-bold text-mq-text capitalize">
-                                {summary.learningPreferences.audioAssistance.replace('_', ' ')}
-                              </span>
-                            </div>
-                            <div className="flex justify-between py-1.5 border-b border-mq-border/50">
-                              <span className="text-mq-text-muted">Activity Pace:</span>
-                              <span className="font-bold text-mq-text capitalize">
-                                {summary.learningPreferences.activityPace.replace(/_/g, ' ')}
-                              </span>
-                            </div>
-                            <div className="flex justify-between py-1.5 border-b border-mq-border/50">
-                              <span className="text-mq-text-muted">Hint Style:</span>
-                              <span className="font-bold text-mq-text capitalize">
-                                {summary.learningPreferences.hintStyle.replace('_', ' ')}
-                              </span>
-                            </div>
-                            <div className="flex justify-between py-1.5">
-                              <span className="text-mq-text-muted">Celebration Style:</span>
-                              <span className="font-bold text-mq-text capitalize">
-                                {summary.learningPreferences.celebrationStyle.replace('_', ' ')}
-                              </span>
-                            </div>
-                          </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <section className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs space-y-3">
+                        <h3 className="text-base font-bold text-mq-text-strong flex items-center gap-2">
+                          <Palette size={18} className="text-mq-primary shrink-0" />
+                          <span>{t.preferencesTitle}</span>
+                        </h3>
+                        {prefs ? (
+                          <dl>
+                            <InfoRow label={prefText.visualAssistance.question} value={optionTitle(prefText.visualAssistance, prefs.visualAssistance)} />
+                            <InfoRow label={prefText.audioAssistance.question} value={optionTitle(prefText.audioAssistance, prefs.audioAssistance)} />
+                            <InfoRow label={prefText.activityPace.question} value={optionTitle(prefText.activityPace, prefs.activityPace)} />
+                            <InfoRow label={prefText.hintStyle.question} value={optionTitle(prefText.hintStyle, prefs.hintStyle)} />
+                            <InfoRow label={prefText.celebrationStyle.question} value={optionTitle(prefText.celebrationStyle, prefs.celebrationStyle)} />
+                          </dl>
                         ) : (
-                          <p className="text-xs text-mq-text-muted">No custom preferences registered.</p>
+                          <p className="text-sm text-mq-text-muted">{t.notRecorded}</p>
                         )}
-                      </div>
+                      </section>
 
-                      {/* Social Learning Context */}
-                      <div className="bg-white rounded-3xl border border-mq-border p-6 shadow-sm space-y-4">
-                        <div className="flex items-center gap-2 pb-2 border-b border-mq-border">
-                          <Users2 size={18} className="text-mq-secondary" />
-                          <h3 className="text-sm font-extrabold text-mq-text-strong">
-                            Social Learning Context (සමාජයීය සන්දර්භය)
-                          </h3>
-                        </div>
-
-                        {summary.socialContext ? (
-                          <div className="space-y-2.5 text-xs">
-                            <div className="flex justify-between py-1.5 border-b border-mq-border/50">
-                              <span className="text-mq-text-muted">Environment:</span>
-                              <span className="font-bold text-mq-text">
-                                {summary.socialContext.learningEnvironment}
-                              </span>
-                            </div>
-                            <div className="flex justify-between py-1.5 border-b border-mq-border/50">
-                              <span className="text-mq-text-muted">Peer Collaboration:</span>
-                              <span className="font-bold text-mq-text">
-                                {summary.socialContext.peerCollaboration}
-                              </span>
-                            </div>
-                            <div className="flex justify-between py-1.5 border-b border-mq-border/50">
-                              <span className="text-mq-text-muted">Parent Involvement:</span>
-                              <span className="font-bold text-mq-text">
-                                {summary.socialContext.parentInvolvement}
-                              </span>
-                            </div>
-                            <div className="flex justify-between py-1.5">
-                              <span className="text-mq-text-muted">Task Challenge Support:</span>
-                              <span className="font-bold text-mq-text">
-                                {summary.socialContext.challengingTaskSupport}
-                              </span>
-                            </div>
-                          </div>
+                      <section className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs space-y-3">
+                        <h3 className="text-base font-bold text-mq-text-strong flex items-center gap-2">
+                          <Home size={18} className="text-mq-secondary shrink-0" />
+                          <span>{t.socialTitle}</span>
+                        </h3>
+                        {social ? (
+                          <dl>
+                            <InfoRow label={socialText.learningEnvironment.question} value={optionTitle(socialText.learningEnvironment, social.learningEnvironment)} />
+                            <InfoRow label={socialText.peerCollaboration.question} value={optionTitle(socialText.peerCollaboration, social.peerCollaboration)} />
+                            <InfoRow label={socialText.parentInvolvement.question} value={optionTitle(socialText.parentInvolvement, social.parentInvolvement)} />
+                            <InfoRow label={socialText.challengingTaskSupport.question} value={optionTitle(socialText.challengingTaskSupport, social.challengingTaskSupport)} />
+                          </dl>
                         ) : (
-                          <p className="text-xs text-mq-text-muted">No social context responses saved.</p>
+                          <p className="text-sm text-mq-text-muted">{t.notRecorded}</p>
                         )}
-                      </div>
+                      </section>
                     </div>
                   )}
 
-                  {/* Research Disclaimer */}
-                  <div className="p-4 bg-mq-surface-soft rounded-2xl border border-mq-border text-xs text-mq-text-muted flex items-start gap-2.5">
+                  <p className="text-sm text-mq-text-muted flex items-start gap-2">
                     <Info size={16} className="text-mq-primary shrink-0 mt-0.5" />
-                    <span>{profile.disclaimer || 'MathQuest research profile generated for educational adaptation purposes.'}</span>
-                  </div>
+                    <span>{parentText.skills.subtitle}</span>
+                  </p>
                 </div>
               )}
             </>

@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import type { OnboardingStepKey } from '../../types/onboarding';
+import { parentText } from '../../../../shared/i18n/parentText';
 
 interface StepperProps {
   currentStep: OnboardingStepKey;
@@ -21,8 +22,6 @@ interface StepperProps {
 
 interface StepItem {
   key: OnboardingStepKey;
-  labelEn: string;
-  labelSi: string;
   icon: LucideIcon;
   isParentStage: boolean;
 }
@@ -30,50 +29,36 @@ interface StepItem {
 const STEPS: StepItem[] = [
   {
     key: 'adhd_information',
-    labelEn: 'ADHD Info',
-    labelSi: 'ADHD තොරතුරු',
     icon: Stethoscope,
     isParentStage: true,
   },
   {
     key: 'snap_iv',
-    labelEn: 'SNAP-IV',
-    labelSi: 'විකල්ප ප්‍රශ්නාවලිය',
     icon: ClipboardList,
     isParentStage: true,
   },
   {
     key: 'preferences',
-    labelEn: 'Preferences',
-    labelSi: 'ඉගෙනුම් මනාප',
     icon: Compass,
     isParentStage: true,
   },
   {
     key: 'social_context',
-    labelEn: 'Social Context',
-    labelSi: 'ඉගෙනුම් පසුබිම',
     icon: HeartHandshake,
     isParentStage: true,
   },
   {
     key: 'handover',
-    labelEn: 'Handover',
-    labelSi: 'දරුවාට භාරදීම',
     icon: UserCheck,
     isParentStage: false,
   },
   {
     key: 'math_assessment',
-    labelEn: 'Living Canvas',
-    labelSi: 'පුංචි ලෝකය',
     icon: Sparkles,
     isParentStage: false,
   },
   {
     key: 'summary',
-    labelEn: 'Profile Summary',
-    labelSi: 'පැතිකඩ සාරාංශය',
     icon: Award,
     isParentStage: false,
   },
@@ -125,14 +110,14 @@ export const OnboardingStepper: React.FC<StepperProps> = ({
                       ? 'bg-mq-primary text-white ring-4 ring-mq-primary/20'
                       : 'bg-mq-surface-soft text-mq-text-muted border border-mq-border'
                   }`}
-                  title={`${step.labelEn} (${step.labelSi})`}
+                  title={parentText.stepper[step.key]}
                 >
                   {isCompleted ? <Check size={16} strokeWidth={3} /> : <Icon size={16} />}
                 </motion.div>
 
                 {/* Step Labels */}
                 <span
-                  className={`text-[10px] sm:text-xs font-bold mt-1.5 line-clamp-1 transition-colors ${
+                  className={`text-xs font-semibold mt-1.5 leading-tight line-clamp-2 transition-colors ${
                     isCurrent
                       ? 'text-mq-primary'
                       : isCompleted
@@ -140,11 +125,11 @@ export const OnboardingStepper: React.FC<StepperProps> = ({
                       : 'text-mq-text-muted'
                   }`}
                 >
-                  {step.labelEn}
+                  {parentText.stepper[step.key]}
                 </span>
-                <span className="text-[9px] text-mq-text-muted hidden md:inline truncate max-w-[90px] font-sinhala">
-                  {step.labelSi}
-                </span>
+                {step.key === 'snap_iv' && (
+                  <span className="text-[11px] text-mq-text-muted leading-tight">{parentText.stepper.optional}</span>
+                )}
               </div>
 
               {/* Animated Connector Bar */}

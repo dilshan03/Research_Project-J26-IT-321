@@ -3,9 +3,6 @@ import { Link } from 'react-router-dom';
 import {
   Edit3,
   ArrowRight,
-  GraduationCap,
-  Calendar,
-  Languages,
   MoreVertical,
   Archive,
   RotateCcw,
@@ -17,6 +14,8 @@ import {
 import type { Learner, DeletionRequest } from '../types';
 import { AVATAR_OPTIONS } from '../types';
 import { OnboardingStatusBadge } from './OnboardingStatusBadge';
+import { parentText } from '../../../shared/i18n/parentText';
+import { comprehensionLabel, deletionStatusLabel, languageLabel } from './parent/labels';
 
 interface LearnerCardProps {
   learner: Learner;
@@ -27,13 +26,21 @@ interface LearnerCardProps {
   deletionRequest?: DeletionRequest | null;
 }
 
-const GRADE_LABELS: Record<number, { si: string; en: string }> = {
-  1: { si: '1 වන ශ්‍රේණිය', en: 'Grade 1' },
-  2: { si: '2 වන ශ්‍රේණිය', en: 'Grade 2' },
-  3: { si: '3 වන ශ්‍රේණිය', en: 'Grade 3' },
-  4: { si: '4 වන ශ්‍රේණිය', en: 'Grade 4' },
-  5: { si: '5 වන ශ්‍රේණිය', en: 'Grade 5' },
+const t = parentText.card;
+
+const DELETION_STYLES: Record<string, { className: string; Icon: typeof Clock }> = {
+  PENDING_REVIEW: { className: 'bg-amber-50 text-amber-900 border-amber-300', Icon: Clock },
+  APPROVED: { className: 'bg-blue-50 text-blue-800 border-blue-200', Icon: CheckCircle2 },
+  COMPLETED: { className: 'bg-green-50 text-green-800 border-green-200', Icon: CheckCircle2 },
+  REJECTED: { className: 'bg-zinc-100 text-zinc-700 border-zinc-200', Icon: XCircle },
 };
+
+const DetailRow: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+  <div className="flex items-start justify-between gap-3 py-2 border-b border-mq-border/60 last:border-b-0">
+    <dt className="text-sm text-mq-text-muted shrink-0">{label}</dt>
+    <dd className="text-sm font-semibold text-mq-text-strong text-right min-w-0 break-words">{children}</dd>
+  </div>
+);
 
 export const LearnerCard: React.FC<LearnerCardProps> = ({
   learner,
@@ -56,253 +63,196 @@ export const LearnerCard: React.FC<LearnerCardProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const avatar =
-    AVATAR_OPTIONS.find((a) => a.id === learner.avatarId) || AVATAR_OPTIONS[0];
+  const avatar = AVATAR_OPTIONS.find((a) => a.id === learner.avatarId) || AVATAR_OPTIONS[0];
 
-  const gradeInfo = GRADE_LABELS[learner.grade] || {
-    si: `${learner.grade} ශ්‍රේණිය`,
-    en: `Grade ${learner.grade}`,
-  };
+  const actionLabel =
+    learner.onboardingStatus === 'COMPLETED'
+      ? t.actionCompleted
+      : learner.onboardingStatus === 'IN_PROGRESS'
+      ? t.actionInProgress
+      : t.actionNotStarted;
 
-  const getActionLabel = () => {
-    switch (learner.onboardingStatus) {
-      case 'COMPLETED':
-        return 'ප්‍රතිඵල හා නිර්දේශ (View Profile)';
-      case 'IN_PROGRESS':
-        return 'ඇගයීම ඉදිරියට (Resume Profiling)';
-      case 'NOT_STARTED':
-      default:
-        return 'ආරම්භක ඇගයීම (Start Profiling)';
-    }
-  };
+  const isBilingual = learner.preferredLanguage === 'Bilingual';
+  const deletionStyle = deletionRequest ? DELETION_STYLES[deletionRequest.status] ?? DELETION_STYLES.REJECTED : null;
+
+  const menuItemClass =
+    'w-full text-left px-4 py-2.5 flex items-center gap-2.5 text-sm transition-colors cursor-pointer';
 
   return (
-    <div className={`bg-white rounded-3xl border transition-all flex flex-col justify-between group relative ${
-      learner.isArchived
-        ? 'border-amber-200/80 bg-stone-50/50 opacity-90'
-        : 'border-mq-border hover:border-mq-primary/40 shadow-xs hover:shadow-md'
-    } p-5 sm:p-6`}>
-      {/* Top Header: Avatar + Name + Context Menu */}
-      <div>
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex items-center gap-3.5 min-w-0">
+    <div
+      className={`rounded-3xl border flex flex-col p-5 sm:p-6 transition-colors ${
+        learner.isArchived
+          ? 'border-amber-200 bg-stone-50/70'
+          : 'bg-white border-mq-border hover:border-mq-primary/40 shadow-xs'
+      }`}
+    >
+      {/* Header: avatar, name, options menu */}
+      <div className="flex items-start gap-3.5">
+        <div
+          className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl border shrink-0 ${avatar.bgColor} ${avatar.borderColor}`}
+          aria-hidden="true"
+        >
+          {avatar.icon}
+        </div>
+        <div className="min-w-0 flex-1 pt-0.5">
+          <h3 className="text-lg font-bold text-mq-text-strong break-words leading-snug">{learner.firstName}</h3>
+          {learner.preferredName && (
+            <p className="text-sm text-mq-text-muted break-words">"{learner.preferredName}"</p>
+          )}
+        </div>
+
+        <div className="relative shrink-0" ref={menuRef}>
+          <button
+            type="button"
+            data-testid="child-actions-button"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft border border-mq-border/70 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary"
+            aria-label={t.actions(learner.firstName)}
+            aria-haspopup="menu"
+            aria-expanded={isMenuOpen}
+          >
+            <MoreVertical size={18} />
+          </button>
+
+          {isMenuOpen && (
             <div
-              className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-xs border shrink-0 ${avatar.bgColor} ${avatar.borderColor}`}
-              title={avatar.name}
+              role="menu"
+              className="absolute right-0 top-full mt-1.5 w-64 bg-white rounded-2xl border border-mq-border shadow-lg py-1.5 z-30"
             >
-              <span>{avatar.icon}</span>
-            </div>
-            <div className="min-w-0">
-              <h3 className="text-lg sm:text-xl font-bold text-mq-text-strong group-hover:text-mq-primary transition-colors flex items-center gap-2 truncate">
-                <span className="truncate">{learner.firstName}</span>
-                {learner.preferredName && (
-                  <span className="text-xs font-medium text-mq-text-muted bg-mq-surface-soft px-2 py-0.5 rounded-full border border-mq-border/50 shrink-0">
-                    "{learner.preferredName}"
-                  </span>
-                )}
-              </h3>
-              <p className="text-xs text-mq-text-muted font-sinhala font-medium mt-0.5 truncate">
-                {avatar.nameSi} ({avatar.name})
-              </p>
-            </div>
-          </div>
+              <button
+                type="button"
+                role="menuitem"
+                data-testid="edit-child-button"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onEdit(learner);
+                }}
+                className={`${menuItemClass} text-mq-text-strong hover:bg-mq-surface-soft hover:text-mq-primary`}
+              >
+                <Edit3 size={16} className="shrink-0" />
+                <span>{t.edit}</span>
+              </button>
 
-          {/* Three-dot context menu */}
-          <div className="relative shrink-0" ref={menuRef}>
-            <button
-              type="button"
-              onClick={() => setIsMenuOpen((prev) => !prev)}
-              className="p-2 rounded-xl text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft border border-mq-border/60 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary"
-              title="Learner Actions (විකල්ප)"
-              aria-label={`Options for ${learner.firstName}`}
-              aria-expanded={isMenuOpen}
-            >
-              <MoreVertical size={16} />
-            </button>
-
-            {isMenuOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-56 bg-white rounded-2xl border border-mq-border shadow-lg py-1.5 z-30 animate-fade-in text-xs font-medium">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    onEdit(learner);
-                  }}
-                  className="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-mq-text-strong hover:bg-mq-surface-soft hover:text-mq-primary transition-colors cursor-pointer"
-                >
-                  <Edit3 size={15} />
-                  <span>Edit Profile (පැතිකඩ සංස්කරණය)</span>
-                </button>
-
-                {!learner.isArchived ? (
-                  onArchive && (
+              {!learner.isArchived
+                ? onArchive && (
                     <button
                       type="button"
+                      role="menuitem"
                       onClick={() => {
                         setIsMenuOpen(false);
                         onArchive(learner);
                       }}
-                      className="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-amber-700 hover:bg-amber-50 transition-colors cursor-pointer"
+                      className={`${menuItemClass} text-amber-800 hover:bg-amber-50`}
                     >
-                      <Archive size={15} />
-                      <span>Archive Learner (සංරක්ෂණය කරන්න)</span>
+                      <Archive size={16} className="shrink-0" />
+                      <span>{t.archive}</span>
                     </button>
                   )
-                ) : (
-                  onRestore && (
+                : onRestore && (
                     <button
                       type="button"
+                      role="menuitem"
                       onClick={() => {
                         setIsMenuOpen(false);
                         onRestore(learner);
                       }}
-                      className="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer font-bold"
+                      className={`${menuItemClass} text-emerald-700 hover:bg-emerald-50`}
                     >
-                      <RotateCcw size={15} />
-                      <span>Restore Learner (නැවත සක්‍රීය කරන්න)</span>
+                      <RotateCcw size={16} className="shrink-0" />
+                      <span>{t.restore}</span>
                     </button>
-                  )
-                )}
+                  )}
 
-                <div className="my-1 border-t border-mq-border/60" />
-
-                {onRequestDeletion && (
+              {onRequestDeletion && (
+                <>
+                  <div className="my-1 border-t border-mq-border/60" />
                   <button
                     type="button"
+                    role="menuitem"
                     onClick={() => {
                       setIsMenuOpen(false);
                       onRequestDeletion(learner);
                     }}
-                    className="w-full text-left px-3.5 py-2.5 flex items-center gap-2.5 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                    className={`${menuItemClass} text-red-600 hover:bg-red-50`}
                   >
-                    <Trash2 size={15} />
-                    <span>Request Permanent Deletion (ස්ථිරව ඉවත් කිරීමට)</span>
+                    <Trash2 size={16} className="shrink-0" />
+                    <span>{t.requestDeletion}</span>
                   </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Status Badges Area */}
-        <div className="mb-4 flex flex-wrap items-center gap-2">
-          <OnboardingStatusBadge status={learner.onboardingStatus} />
-
-          {learner.isArchived && (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
-              <Archive size={12} />
-              <span>Archived • සංරක්ෂිතයි</span>
-            </span>
+                </>
+              )}
+            </div>
           )}
-
-          {deletionRequest && (
-            <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
-                deletionRequest.status === 'PENDING_REVIEW'
-                  ? 'bg-amber-50 text-amber-900 border-amber-300'
-                  : deletionRequest.status === 'APPROVED'
-                  ? 'bg-blue-50 text-blue-800 border-blue-200'
-                  : deletionRequest.status === 'COMPLETED'
-                  ? 'bg-green-50 text-green-800 border-green-200'
-                  : 'bg-zinc-100 text-zinc-700 border-zinc-200'
-              }`}
-            >
-              {deletionRequest.status === 'PENDING_REVIEW' && <Clock size={12} />}
-              {deletionRequest.status === 'APPROVED' && <CheckCircle2 size={12} />}
-              {deletionRequest.status === 'COMPLETED' && <CheckCircle2 size={12} />}
-              {deletionRequest.status === 'REJECTED' && <XCircle size={12} />}
-              <span>Deletion: {deletionRequest.status.replace('_', ' ')}</span>
-            </span>
-          )}
-        </div>
-
-        {/* Details Grid */}
-        <div className="grid grid-cols-2 gap-2.5 mb-5 text-xs">
-          <div className="bg-mq-surface-soft p-3 rounded-2xl border border-mq-border/50 flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-white text-mq-primary flex items-center justify-center shrink-0 border border-mq-border/60">
-              <GraduationCap size={15} />
-            </div>
-            <div className="overflow-hidden min-w-0">
-              <span className="text-[10px] uppercase font-bold text-mq-text-muted block">
-                Grade
-              </span>
-              <span className="font-bold text-mq-text-strong truncate block font-sinhala">
-                {gradeInfo.en} ({gradeInfo.si})
-              </span>
-            </div>
-          </div>
-
-          <div className="bg-mq-surface-soft p-3 rounded-2xl border border-mq-border/50 flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-white text-mq-secondary flex items-center justify-center shrink-0 border border-mq-border/60">
-              <Calendar size={15} />
-            </div>
-            <div className="overflow-hidden min-w-0">
-              <span className="text-[10px] uppercase font-bold text-mq-text-muted block">
-                Age
-              </span>
-              <span className="font-bold text-mq-text-strong block truncate">
-                {learner.age} Years ({learner.age} වසර)
-              </span>
-            </div>
-          </div>
-
-          <div className="bg-mq-surface-soft p-3 rounded-2xl border border-mq-border/50 col-span-2 flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-white text-mq-accent-yellow flex items-center justify-center shrink-0 border border-mq-border/60">
-              <Languages size={15} />
-            </div>
-            <div className="overflow-hidden min-w-0">
-              <span className="text-[10px] uppercase font-bold text-mq-text-muted block">
-                Language Preference (භාෂා මාධ්‍යය)
-              </span>
-              <span className="font-bold text-mq-text-strong block font-sinhala truncate">
-                {learner.preferredLanguage === 'Bilingual'
-                  ? `දෙබසම (Bilingual${
-                      learner.primaryInstructionLanguage
-                        ? ` • Primary: ${learner.primaryInstructionLanguage}`
-                        : ''
-                    })`
-                  : learner.preferredLanguage}
-              </span>
-              {learner.preferredLanguage === 'Bilingual' &&
-                (learner.sinhalaComprehension || learner.englishComprehension) && (
-                  <span className="text-[10px] text-mq-text-muted block truncate font-sinhala mt-0.5">
-                    {[
-                      learner.sinhalaComprehension ? `සිංහල: ${learner.sinhalaComprehension}` : null,
-                      learner.englishComprehension ? `EN: ${learner.englishComprehension}` : null,
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </span>
-                )}
-            </div>
-          </div>
         </div>
       </div>
 
-      {/* Action Footer */}
-      <div className="pt-3 border-t border-mq-border/60">
-        {learner.isArchived ? (
-          <button
-            type="button"
-            onClick={() => onRestore && onRestore(learner)}
-            className="w-full btn bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs sm:text-sm font-bold shadow-xs hover:shadow-sm transition-all cursor-pointer"
+      {/* Status badges */}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <OnboardingStatusBadge status={learner.onboardingStatus} />
+        {learner.isArchived && (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-200">
+            <Archive size={13} />
+            <span>{t.archivedBadge}</span>
+          </span>
+        )}
+        {deletionRequest && deletionStyle && (
+          <span
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${deletionStyle.className}`}
           >
-            <RotateCcw size={15} strokeWidth={2.5} className="shrink-0" />
-            <span className="truncate">Restore Profile (නැවත සක්‍රීය කරන්න)</span>
-          </button>
-        ) : (
-          <Link
-            to={`/learners/${learner.learnerId}/onboarding`}
-            className="w-full btn btn-primary py-2.5 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs sm:text-sm font-bold shadow-xs hover:shadow-sm transition-all"
-          >
-            <span className="truncate">{getActionLabel()}</span>
-            <ArrowRight size={15} strokeWidth={2.5} className="shrink-0" />
-          </Link>
+            <deletionStyle.Icon size={13} />
+            <span>{deletionStatusLabel(deletionRequest.status)}</span>
+          </span>
         )}
       </div>
+
+      {/* Details */}
+      <dl className="mt-4 mb-5 flex-1">
+        <DetailRow label={t.grade}>{parentText.common.grade(learner.grade)}</DetailRow>
+        <DetailRow label={t.age}>{t.years(learner.age)}</DetailRow>
+        <DetailRow label={t.language}>
+          <span className="block">{languageLabel(learner.preferredLanguage)}</span>
+          {isBilingual && learner.primaryInstructionLanguage && (
+            <span className="block text-xs font-normal text-mq-text-muted">
+              {parentText.languages.mainLanguage(languageLabel(learner.primaryInstructionLanguage))}
+            </span>
+          )}
+          {isBilingual && (learner.sinhalaComprehension || learner.englishComprehension) && (
+            <span className="block text-xs font-normal text-mq-text-muted">
+              {[
+                learner.sinhalaComprehension
+                  ? `${parentText.languages.Sinhala}: ${comprehensionLabel(learner.sinhalaComprehension)}`
+                  : null,
+                learner.englishComprehension
+                  ? `${parentText.languages.English}: ${comprehensionLabel(learner.englishComprehension)}`
+                  : null,
+              ]
+                .filter(Boolean)
+                .join(' • ')}
+            </span>
+          )}
+        </DetailRow>
+      </dl>
+
+      {/* Primary action */}
+      {learner.isArchived ? (
+        <button
+          type="button"
+          onClick={() => onRestore && onRestore(learner)}
+          className="w-full btn bg-emerald-600 hover:bg-emerald-700 text-white min-h-[46px] px-4 rounded-2xl inline-flex items-center justify-center gap-2 text-sm"
+        >
+          <RotateCcw size={16} strokeWidth={2.5} className="shrink-0" />
+          <span>{t.restore}</span>
+        </button>
+      ) : (
+        <Link
+          to={`/learners/${learner.learnerId}/onboarding`}
+          className="w-full btn btn-primary min-h-[46px] px-4 rounded-2xl inline-flex items-center justify-center gap-2 text-sm"
+        >
+          <span>{actionLabel}</span>
+          <ArrowRight size={16} strokeWidth={2.5} className="shrink-0" />
+        </Link>
+      )}
     </div>
   );
 };
 
 export default LearnerCard;
-

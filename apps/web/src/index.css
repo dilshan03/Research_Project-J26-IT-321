@@ -232,3 +232,12 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Parent portal (Sinhala-first): Lexend for Latin text, Noto Sans Sinhala for Sinhala glyphs.
+   Placed in the components layer so it wins over the base [lang='si'] rule. */
+@layer components {
+  .parent-portal {
+    font-family: 'Lexend', 'Noto Sans Sinhala', system-ui, sans-serif;
+    line-height: 1.7;
+  }
+}

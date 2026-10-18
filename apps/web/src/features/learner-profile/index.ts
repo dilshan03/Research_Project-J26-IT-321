@@ -5,6 +5,7 @@ export { ParentChildrenPage } from './pages/ParentChildrenPage';
 export { ParentLearnerProfilesPage } from './pages/ParentLearnerProfilesPage';
 export { ParentAssessmentsPage } from './pages/ParentAssessmentsPage';
 export { ParentRecommendationsPage } from './pages/ParentRecommendationsPage';
+export { ParentComingSoonPage } from './pages/ParentComingSoonPage';
 export { LearnerCard } from './components/LearnerCard';
 export { LearnerModal } from './components/LearnerModal';
 export { ArchiveLearnerModal } from './components/ArchiveLearnerModal';

@@ -4,25 +4,31 @@ import {
   Users,
   CheckCircle2,
   Clock,
-  Sparkles,
   Plus,
   ArrowRight,
   Brain,
   Loader2,
-  GraduationCap,
   ChevronRight,
   BookOpen,
+  ClipboardList,
 } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { learnerApi } from '../services/learnerApi';
 import { profileApi } from '../services/profileApi';
 import type { Learner, CreateLearnerData, UpdateLearnerData } from '../types';
 import { AVATAR_OPTIONS } from '../types';
-import type { ElpxProfile, ElpxSkillEstimate } from '../types/onboarding';
+import type { ElpxProfile } from '../types/onboarding';
 import { LearnerModal } from '../components/LearnerModal';
 import { OnboardingStatusBadge } from '../components/OnboardingStatusBadge';
+import { ChildSwitcher } from '../components/parent/ChildSwitcher';
+import { SkillEvidenceList } from '../components/parent/SkillEvidenceList';
+import { RecommendationList } from '../components/parent/RecommendationList';
+import { languageLabel } from '../components/parent/labels';
 import { PageHeader } from '../../../shared/components/PageHeader';
 import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
+import { parentText } from '../../../shared/i18n/parentText';
+
+const t = parentText.overview;
 
 export const ParentOverviewPage: React.FC = () => {
   const { user } = useAuth();
@@ -49,10 +55,10 @@ export const ParentOverviewPage: React.FC = () => {
           setSelectedLearnerId(res.data[0].learnerId);
         }
       } else {
-        setErrorMessage(res.message || 'Failed to load children profiles.');
+        setErrorMessage(t.loadError);
       }
     } catch {
-      setErrorMessage('Network connection error while loading children.');
+      setErrorMessage(parentText.common.networkError);
     } finally {
       setIsLoadingLearners(false);
     }
@@ -123,466 +129,211 @@ export const ParentOverviewPage: React.FC = () => {
     ? AVATAR_OPTIONS.find((a) => a.id === selectedChild.avatarId) || AVATAR_OPTIONS[0]
     : AVATAR_OPTIONS[0];
 
+  const stats = [
+    { label: t.statChildren, value: totalChildren, Icon: Users, tone: 'text-mq-primary' },
+    { label: t.statCompleted, value: completedOnboardingCount, Icon: CheckCircle2, tone: 'text-mq-success' },
+    { label: t.statPending, value: pendingOnboardingCount, Icon: Clock, tone: 'text-mq-warning' },
+  ];
+
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
-      {/* Standardized Page Header */}
       <PageHeader
         role="parent"
-        title="Dashboard Overview"
-        titleSi="දළ විශ්ලේෂණය"
-        description="Monitor your children’s math progress, assessment baselines, and personalized support."
-        descriptionSi="දරුවන්ගේ ගණිත ප්‍රගතිය, මූලික ඇගයීම් සහ පුද්ගලාරෝපිත අධ්‍යාපනික නිර්දේශ මෙතැනින් බලන්න."
+        title={t.title}
+        description={t.description}
         actions={
           <button
             type="button"
             onClick={() => setIsAddModalOpen(true)}
-            className="btn btn-primary inline-flex items-center gap-2 py-2 px-4 rounded-full text-xs sm:text-sm font-bold shadow-xs cursor-pointer"
+            className="btn btn-primary min-h-[44px] px-5 rounded-full inline-flex items-center gap-2 text-sm"
           >
-            <Plus size={16} />
-            <span>Add Child Profile</span>
+            <Plus size={18} />
+            <span>{t.addChild}</span>
           </button>
         }
       />
 
-      {/* ========================================================= */}
-      {/* 1. Personalized Parent Welcome & Quick Stat Highlights    */}
-      {/* ========================================================= */}
-      <div className="bg-gradient-to-r from-mq-primary/10 via-mq-surface-blue to-white p-6 sm:p-8 rounded-3xl border border-mq-primary/20 shadow-sm relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-1.5">
-            <span className="text-xs font-bold uppercase tracking-wider text-mq-primary flex items-center gap-1.5">
-              <Sparkles size={14} className="text-mq-accent-yellow" />
-              <span>ආයුබෝවන් · Welcome Back</span>
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong">
-              Hello, {user?.fullName || 'Parent'}!
-            </h2>
-            <p className="text-sm text-mq-text-muted max-w-xl">
-              Track your child’s ADHD-tailored math journey, review evidence-aware skill levels,
-              and explore explainable learning recommendations.
-            </p>
-          </div>
+      {/* Welcome and quick counts */}
+      <section className="bg-white p-5 sm:p-7 rounded-3xl border border-mq-border shadow-xs space-y-5">
+        <div className="space-y-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-mq-text-strong break-words">
+            {t.welcome(user?.fullName || parentText.shell.parentAccount)}
+          </h2>
+          <p className="text-sm text-mq-text-muted">{t.welcomeText}</p>
         </div>
-
-        {/* Quick Metrics Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mt-6 pt-6 border-t border-mq-border/70">
-          <div className="p-3.5 bg-white/80 backdrop-blur rounded-2xl border border-mq-border/80">
-            <div className="flex items-center gap-2 text-xs font-semibold text-mq-text-muted">
-              <Users size={15} className="text-mq-primary" />
-              <span>Registered Children</span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {stats.map(({ label, value, Icon, tone }) => (
+            <div key={label} className="p-4 bg-mq-surface-soft rounded-2xl border border-mq-border/70 flex items-center gap-3">
+              <Icon size={22} className={`${tone} shrink-0`} />
+              <div className="min-w-0">
+                <p className="text-2xl font-bold text-mq-text-strong leading-none">{value}</p>
+                <p className="text-sm text-mq-text-muted mt-1">{label}</p>
+              </div>
             </div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong mt-1">
-              {totalChildren}
-            </p>
-          </div>
-
-          <div className="p-3.5 bg-white/80 backdrop-blur rounded-2xl border border-mq-border/80">
-            <div className="flex items-center gap-2 text-xs font-semibold text-mq-success">
-              <CheckCircle2 size={15} />
-              <span>Onboarding Ready</span>
-            </div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong mt-1">
-              {completedOnboardingCount}
-            </p>
-          </div>
-
-          <div className="col-span-2 sm:col-span-1 p-3.5 bg-white/80 backdrop-blur rounded-2xl border border-mq-border/80">
-            <div className="flex items-center gap-2 text-xs font-semibold text-mq-warning">
-              <Clock size={15} />
-              <span>Pending Profiling</span>
-            </div>
-            <p className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong mt-1">
-              {pendingOnboardingCount}
-            </p>
-          </div>
+          ))}
         </div>
-      </div>
+      </section>
 
-      {/* ========================================================= */}
-      {/* 2. Loading & Error States                                 */}
-      {/* ========================================================= */}
-      {isLoadingLearners && (
-        <LoadingState
-          message="Loading children profiles..."
-          messageSi="දරුවන්ගේ පැතිකඩ පූරණය වෙමින් පවතී..."
-        />
-      )}
+      {isLoadingLearners && <LoadingState message={parentText.children.loading} />}
 
       {errorMessage && (
-        <ErrorAlert
-          message={errorMessage}
-          messageSi="දරුවන්ගේ තොරතුරු ලබාගැනීමට නොහැකි විය."
-          onRetry={loadLearners}
-        />
+        <ErrorAlert message={errorMessage} retryLabel={parentText.common.retry} onRetry={loadLearners} />
       )}
 
-      {/* ========================================================= */}
-      {/* 3. Empty State: No Registered Children                    */}
-      {/* ========================================================= */}
       {!isLoadingLearners && totalChildren === 0 && (
         <EmptyState
           icon={<Users size={36} />}
-          title="No Children Registered Yet"
-          titleSi="තවමත් දරුවෙකු ලියාපදිංචි කර නැත"
-          description="Get started by registering your child’s profile. Once added, you will complete the 5-step Sinhala onboarding assessment to discover their tailored mathematics level."
-          descriptionSi="ඔබේ දරුවාගේ අවධානය සහ ගණිත කුසලතා මට්ටමට ගැළපෙන අනුවර්තී අධ්‍යාපනික අත්දැකීම ලබා දීමට පළමුව දරුවාගේ තොරතුරු ඇතුළත් කරන්න."
+          title={t.noChildrenTitle}
+          description={t.noChildrenText}
           action={
             <button
               type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className="btn btn-primary inline-flex items-center gap-2 py-2.5 px-6 rounded-full text-sm font-bold shadow-xs cursor-pointer"
+              className="btn btn-primary min-h-[44px] px-6 rounded-full inline-flex items-center gap-2 text-sm"
             >
-              <Plus size={16} />
-              <span>Register Your First Child</span>
+              <Plus size={18} />
+              <span>{t.addFirstChild}</span>
             </button>
           }
         />
       )}
 
-      {/* ========================================================= */}
-      {/* 4. Active Child Selection & Deep Dive Overview            */}
-      {/* ========================================================= */}
       {!isLoadingLearners && totalChildren > 0 && selectedChild && (
         <div className="space-y-6">
-          {/* Child Selector Tabs */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-mq-text-muted">
-                Select Child (දරුවා තෝරන්න)
-              </h3>
+          {/* Child selector */}
+          <section className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-base font-bold text-mq-text-strong">{t.selectChild}</h3>
               <Link
                 to="/learners"
-                className="text-xs font-bold text-mq-primary hover:underline inline-flex items-center gap-1"
+                className="text-sm font-semibold text-mq-primary hover:underline inline-flex items-center gap-1"
               >
-                <span>Manage all ({totalChildren})</span>
-                <ChevronRight size={13} />
+                <span>{t.manageAll(totalChildren)}</span>
+                <ChevronRight size={15} />
               </Link>
             </div>
+            <ChildSwitcher learners={learners} selectedId={selectedChild.learnerId} onSelect={setSelectedLearnerId} />
+          </section>
 
-            <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-none">
-              {learners.map((child) => {
-                const isSelected = child.learnerId === selectedChild.learnerId;
-                const avatar =
-                  AVATAR_OPTIONS.find((a) => a.id === child.avatarId) || AVATAR_OPTIONS[0];
-
-                return (
-                  <button
-                    key={child.learnerId}
-                    type="button"
-                    onClick={() => setSelectedLearnerId(child.learnerId)}
-                    className={`flex items-center gap-3 p-3 rounded-2xl border transition-all shrink-0 cursor-pointer text-left min-w-[200px] ${
-                      isSelected
-                        ? 'bg-mq-surface-blue border-mq-primary shadow-sm ring-2 ring-mq-primary/20'
-                        : 'bg-white border-mq-border hover:border-mq-primary/40 hover:bg-mq-surface-soft/60'
-                    }`}
-                  >
-                    <div
-                      className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 ${avatar.bgColor} border ${avatar.borderColor}`}
-                    >
-                      {avatar.icon}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-bold text-mq-text-strong truncate">
-                        {child.preferredName || child.firstName}
-                      </p>
-                      <p className="text-xs text-mq-text-muted">
-                        Grade {child.grade} · {child.age} yrs
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Selected Child Status Banner & Actions */}
-          <div className="bg-white rounded-3xl border border-mq-border p-6 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-mq-border/80">
-              <div className="flex items-center gap-4">
+          {/* Selected child */}
+          <section className="bg-white rounded-3xl border border-mq-border p-5 sm:p-7 shadow-xs space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-mq-border">
+              <div className="flex items-center gap-4 min-w-0">
                 <div
-                  className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0 ${selectedAvatar.bgColor} border ${selectedAvatar.borderColor} shadow-xs`}
+                  className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0 border ${selectedAvatar.bgColor} ${selectedAvatar.borderColor}`}
+                  aria-hidden="true"
                 >
                   {selectedAvatar.icon}
                 </div>
-                <div>
+                <div className="min-w-0 space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-xl font-extrabold text-mq-text-strong">
-                      {selectedChild.firstName}{' '}
-                      {selectedChild.preferredName && `(${selectedChild.preferredName})`}
+                    <h3 className="text-xl font-bold text-mq-text-strong break-words">
+                      {selectedChild.firstName}
+                      {selectedChild.preferredName && ` (${selectedChild.preferredName})`}
                     </h3>
                     <OnboardingStatusBadge status={selectedChild.onboardingStatus} />
                   </div>
-                  <p className="text-xs sm:text-sm text-mq-text-muted mt-0.5">
-                    Grade {selectedChild.grade} · Age {selectedChild.age} · Preferred Language:{' '}
-                    {selectedChild.preferredLanguage || 'Sinhala'}
+                  <p className="text-sm text-mq-text-muted">
+                    {parentText.common.gradeAndAge(selectedChild.grade, selectedChild.age)} •{' '}
+                    {t.learningLanguage(languageLabel(selectedChild.preferredLanguage))}
                   </p>
                 </div>
               </div>
 
-              {/* Contextual Quick Links */}
               <div className="flex items-center gap-2.5 flex-wrap">
                 {selectedChild.onboardingStatus === 'COMPLETED' ? (
                   <>
                     <Link
                       to="/parent/dashboard/learner-profiles"
-                      className="btn btn-secondary text-xs py-2 px-3.5 rounded-xl font-bold inline-flex items-center gap-1.5"
+                      className="btn btn-secondary min-h-[44px] px-4 rounded-full text-sm inline-flex items-center gap-2"
                     >
-                      <Brain size={15} />
-                      <span>View Learner Profile</span>
+                      <Brain size={17} />
+                      <span>{t.viewProfile}</span>
                     </Link>
                     <a
                       href="#/play"
-                      className="btn btn-primary text-xs py-2 px-4 rounded-xl font-bold inline-flex items-center gap-1.5"
+                      className="btn btn-primary min-h-[44px] px-4 rounded-full text-sm inline-flex items-center gap-2"
                     >
-                      <BookOpen size={15} />
-                      <span>Play Math Games</span>
+                      <BookOpen size={17} />
+                      <span>{t.playGames}</span>
                     </a>
                   </>
                 ) : (
                   <Link
                     to={`/learners/${selectedChild.learnerId}/onboarding`}
-                    className="btn btn-primary text-xs py-2 px-4 rounded-xl font-bold inline-flex items-center gap-1.5 shadow-sm"
+                    className="btn btn-primary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center gap-2"
                   >
                     <span>
-                      {selectedChild.onboardingStatus === 'IN_PROGRESS'
-                        ? 'Resume Onboarding'
-                        : 'Start Initial Assessment'}
+                      {selectedChild.onboardingStatus === 'IN_PROGRESS' ? t.resumeAssessment : t.startAssessment}
                     </span>
-                    <ArrowRight size={14} />
+                    <ArrowRight size={16} />
                   </Link>
                 )}
               </div>
             </div>
 
-            {/* Assessment State Body */}
-            {selectedChild.onboardingStatus === 'NOT_STARTED' && (
-              <div className="p-6 bg-mq-surface-soft rounded-2xl border border-mq-border/80 text-center space-y-3">
-                <div className="w-12 h-12 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center mx-auto text-xl">
-                  📝
+            {selectedChild.onboardingStatus !== 'COMPLETED' && (
+              <div className="p-6 bg-mq-surface-soft rounded-2xl border border-mq-border text-center space-y-3">
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto ${
+                    selectedChild.onboardingStatus === 'IN_PROGRESS'
+                      ? 'bg-mq-primary text-white'
+                      : 'bg-amber-100 text-amber-700'
+                  }`}
+                >
+                  {selectedChild.onboardingStatus === 'IN_PROGRESS' ? <Clock size={22} /> : <ClipboardList size={22} />}
                 </div>
                 <h4 className="text-base font-bold text-mq-text-strong">
-                  Initial Mathematics Assessment Pending
+                  {selectedChild.onboardingStatus === 'IN_PROGRESS' ? t.inProgressTitle : t.notStartedTitle}
                 </h4>
-                <p className="text-xs sm:text-sm text-mq-text-muted max-w-lg mx-auto">
-                  To view evidence-aware skill estimates, Bayesian credible intervals, and recommendations,
-                  complete the initial Sinhala math onboarding assessment for {selectedChild.firstName}.
+                <p className="text-sm text-mq-text-muted max-w-lg mx-auto leading-relaxed">
+                  {selectedChild.onboardingStatus === 'IN_PROGRESS'
+                    ? t.inProgressText
+                    : t.notStartedText(selectedChild.preferredName || selectedChild.firstName)}
                 </p>
-                <Link
-                  to={`/learners/${selectedChild.learnerId}/onboarding`}
-                  className="btn btn-primary text-xs py-2 px-5 rounded-full font-bold inline-flex items-center gap-2 mt-2"
-                >
-                  <span>Start Assessment (ප්‍රශ්නාවලිය ආරම්භ කරන්න)</span>
-                  <ArrowRight size={14} />
-                </Link>
               </div>
             )}
 
-            {/* In-Progress Notice */}
-            {selectedChild.onboardingStatus === 'IN_PROGRESS' && (
-              <div className="p-6 bg-mq-surface-blue/50 rounded-2xl border border-mq-primary/20 text-center space-y-3">
-                <div className="w-12 h-12 bg-mq-primary text-white rounded-xl flex items-center justify-center mx-auto">
-                  <Clock size={22} />
-                </div>
-                <h4 className="text-base font-bold text-mq-text-strong">
-                  Onboarding Is Currently In Progress
-                </h4>
-                <p className="text-xs sm:text-sm text-mq-text-muted max-w-lg mx-auto">
-                  Some steps have been saved. Complete all 5 steps (Preferences, SNAP-IV, Social Context,
-                  Handover, and Grade {selectedChild.grade} Math Assessment) to unlock full ELP-X mathematics analytics.
-                </p>
-                <Link
-                  to={`/learners/${selectedChild.learnerId}/onboarding`}
-                  className="btn btn-primary text-xs py-2 px-5 rounded-full font-bold inline-flex items-center gap-2"
-                >
-                  <span>Continue Where You Left Off</span>
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
-            )}
-
-            {/* Completed Onboarding: Real ELP-X Data Display */}
             {selectedChild.onboardingStatus === 'COMPLETED' && (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {isLoadingProfile && (
-                  <div className="flex items-center justify-center p-8 text-mq-primary gap-2 text-xs font-semibold">
+                  <div className="flex items-center justify-center p-8 text-mq-primary gap-2 text-sm font-semibold">
                     <Loader2 size={18} className="animate-spin" />
-                    <span>Loading mathematical profile analytics...</span>
+                    <span>{t.loadingProfile}</span>
                   </div>
                 )}
 
                 {!isLoadingProfile && learnerProfile && (
                   <>
-                    {/* Overall Evidence & Distinct Questions Summary */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div className="p-4 bg-mq-surface-soft rounded-2xl border border-mq-border/70">
-                        <span className="text-xs text-mq-text-muted font-medium">Evidence Status</span>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span
-                            className={`inline-block w-2.5 h-2.5 rounded-full ${
-                              learnerProfile.isOverallEvidenceSufficient
-                                ? 'bg-mq-success'
-                                : 'bg-mq-warning'
-                            }`}
-                          />
-                          <p className="text-base font-extrabold text-mq-text-strong">
-                            {learnerProfile.evidenceStatus === 'SUFFICIENT'
-                              ? 'Sufficient Evidence'
-                              : 'Provisional (Gathering)'}
-                          </p>
+                    <SkillEvidenceList profile={learnerProfile} />
+
+                    {learnerProfile.structuredRecommendations?.length > 0 && (
+                      <section className="space-y-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <h3 className="text-base font-bold text-mq-text-strong">{parentText.recommendations.title}</h3>
+                          <Link
+                            to="/parent/dashboard/recommendations"
+                            className="text-sm font-semibold text-mq-primary hover:underline inline-flex items-center gap-1"
+                          >
+                            <span>{parentText.recommendations.viewAll}</span>
+                            <ChevronRight size={15} />
+                          </Link>
                         </div>
-                        <p className="text-[11px] text-mq-text-muted mt-1">
-                          {learnerProfile.totalDistinctQuestionsEvaluated} distinct items evaluated
-                        </p>
-                      </div>
-
-                      <div className="p-4 bg-mq-surface-soft rounded-2xl border border-mq-border/70">
-                        <span className="text-xs text-mq-text-muted font-medium">Overall Accuracy</span>
-                        <p className="text-2xl font-extrabold text-mq-text-strong mt-1">
-                          {(learnerProfile.rawOverallAccuracy * 100).toFixed(1)}%
-                        </p>
-                        <p className="text-[11px] text-mq-text-muted mt-0.5">
-                          {learnerProfile.totalCorrectFirstResponses} /{' '}
-                          {learnerProfile.totalDistinctQuestionsEvaluated} correct first try
-                        </p>
-                      </div>
-
-                      <div className="p-4 bg-mq-surface-soft rounded-2xl border border-mq-border/70">
-                        <span className="text-xs text-mq-text-muted font-medium">Algorithm Engine</span>
-                        <p className="text-base font-extrabold text-mq-primary mt-1">
-                          {learnerProfile.algorithmVersion || 'ELP-X-v1.0'}
-                        </p>
-                        <p className="text-[11px] text-mq-text-muted mt-1">
-                          Beta-Binomial Bayesian Estimator
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Skill Estimates Grid */}
-                    {learnerProfile.skillEstimates && learnerProfile.skillEstimates.length > 0 && (
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-bold text-mq-text-strong flex items-center gap-2">
-                            <GraduationCap size={16} className="text-mq-primary" />
-                            <span>Mathematics Skill Mastery (ගණිත නිපුණතා මට්ටම්)</span>
-                          </h4>
-                          <span className="text-xs text-mq-text-muted">
-                            Bayesian Estimated Proficiency
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {learnerProfile.skillEstimates.map((skill: ElpxSkillEstimate) => (
-                            <div
-                              key={skill.skillId}
-                              className="p-4 bg-white rounded-2xl border border-mq-border shadow-xs hover:border-mq-primary/40 transition-all space-y-2.5"
-                            >
-                              <div className="flex items-start justify-between gap-2">
-                                <div>
-                                  <p className="text-sm font-bold text-mq-text-strong">
-                                    {skill.skillName}
-                                  </p>
-                                  <p className="text-xs text-mq-text-muted font-medium">
-                                    {skill.skillNameSi}
-                                  </p>
-                                </div>
-                                <span
-                                  className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
-                                    skill.provisionalSkillLevel === 'PROFICIENT'
-                                      ? 'bg-mq-success-bg text-mq-success border border-mq-success/20'
-                                      : skill.provisionalSkillLevel === 'DEVELOPING'
-                                      ? 'bg-mq-surface-blue text-mq-primary border border-mq-primary/20'
-                                      : 'bg-amber-50 text-amber-800 border border-amber-200'
-                                  }`}
-                                >
-                                  {skill.provisionalSkillLevel.replace('_', ' ')}
-                                </span>
-                              </div>
-
-                              {/* Progress Bar with Credible Interval indicator */}
-                              <div>
-                                <div className="flex justify-between text-xs font-semibold text-mq-text mb-1">
-                                  <span>Estimated Proficiency</span>
-                                  <span>{skill.estimatedProficiencyPercentage.toFixed(0)}%</span>
-                                </div>
-                                <div className="w-full bg-mq-surface-soft h-2.5 rounded-full overflow-hidden relative">
-                                  <div
-                                    className="h-full bg-mq-primary rounded-full transition-all duration-500"
-                                    style={{
-                                      width: `${Math.min(
-                                        100,
-                                        Math.max(5, skill.estimatedProficiencyPercentage)
-                                      )}%`,
-                                    }}
-                                  />
-                                </div>
-                              </div>
-
-                              <div className="flex items-center justify-between text-[11px] text-mq-text-muted pt-1">
-                                <span>
-                                  Raw: {skill.correctFirstResponses}/{skill.distinctQuestionsAssessed}{' '}
-                                  ({skill.rawAccuracyPercentage.toFixed(0)}%)
-                                </span>
-                                <span>
-                                  95% CI: [{(skill.credibleInterval.lower * 100).toFixed(0)}% –{' '}
-                                  {(skill.credibleInterval.upper * 100).toFixed(0)}%]
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+                        <RecommendationList
+                          recommendations={learnerProfile.structuredRecommendations}
+                          limit={2}
+                          rulesetVersion={learnerProfile.recommendationRulesetVersion}
+                        />
+                      </section>
                     )}
-
-                    {/* Explainable Pedagogical Recommendations Preview */}
-                    {learnerProfile.structuredRecommendations &&
-                      learnerProfile.structuredRecommendations.length > 0 && (
-                        <div className="space-y-3 pt-2">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-sm font-bold text-mq-text-strong flex items-center gap-2">
-                              <Sparkles size={16} className="text-mq-accent-yellow" />
-                              <span>Personalized Recommendations (පුද්ගලාරෝපිත උපදෙස්)</span>
-                            </h4>
-                            <Link
-                              to="/parent/dashboard/recommendations"
-                              className="text-xs font-bold text-mq-primary hover:underline"
-                            >
-                              View all
-                            </Link>
-                          </div>
-
-                          <div className="space-y-2">
-                            {learnerProfile.structuredRecommendations
-                              .slice(0, 2)
-                              .map((rec) => (
-                                <div
-                                  key={rec.recommendationId}
-                                  className="p-3.5 bg-mq-surface-blue/40 border border-mq-primary/20 rounded-2xl"
-                                >
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-xs font-bold text-mq-primary">
-                                      {rec.titleEn}
-                                    </span>
-                                    <span className="text-[10px] font-semibold text-mq-text-muted">
-                                      ({rec.strategyCode})
-                                    </span>
-                                  </div>
-                                  <p className="text-xs text-mq-text-strong leading-relaxed">
-                                    {rec.descriptionSi || rec.descriptionEn}
-                                  </p>
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      )}
                   </>
                 )}
               </div>
             )}
-          </div>
+          </section>
         </div>
       )}
 
-      {/* Modal for Quick Adding Child Profile */}
       <LearnerModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}

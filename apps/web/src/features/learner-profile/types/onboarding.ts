@@ -74,14 +74,14 @@ export const ADHD_PRESENTATION_OPTIONS: Array<{
   {
     value: 'predominantly_inattentive',
     labelEn: 'Predominantly inattentive',
-    labelSi: 'ප්‍රධාන වශයෙන් අවධාන දුර්වලතා',
+    labelSi: 'ප්‍රධාන වශයෙන් අවධානය අඩු වීම',
   },
   {
     value: 'predominantly_hyperactive_impulsive',
     labelEn: 'Predominantly hyperactive-impulsive',
-    labelSi: 'ප්‍රධාන වශයෙන් අධික ක්‍රියාශීලී-ආවේගශීලී',
+    labelSi: 'ප්‍රධාන වශයෙන් අධික ක්‍රියාශීලී බව සහ ආවේගශීලී බව',
   },
-  { value: 'combined', labelEn: 'Combined', labelSi: 'ඒකාබද්ධ' },
+  { value: 'combined', labelEn: 'Combined', labelSi: 'දෙකම (ඒකාබද්ධ)' },
   {
     value: 'not_specified',
     labelEn: 'Not sure / Not specified',

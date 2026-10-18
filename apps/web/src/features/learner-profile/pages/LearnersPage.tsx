@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Users, Archive, UserCheck, RotateCcw } from 'lucide-react';
+import { Plus, Users, Archive, UserCheck } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { learnerApi } from '../services/learnerApi';
 import type {
@@ -19,6 +19,9 @@ import {
   ErrorAlert,
   SuccessAlert,
 } from '../../../shared/components/ui/StateViews';
+import { parentText } from '../../../shared/i18n/parentText';
+
+const t = parentText.children;
 
 export const LearnersPage: React.FC = () => {
   const { user } = useAuth();
@@ -60,7 +63,7 @@ export const LearnersPage: React.FC = () => {
       if (activeRes.success && activeRes.data) {
         setActiveLearners(activeRes.data);
       } else {
-        setErrorMessage(activeRes.message || 'Failed to load active learner profiles.');
+        setErrorMessage(t.loadError);
       }
 
       if (archivedRes.success && archivedRes.data) {
@@ -75,7 +78,7 @@ export const LearnersPage: React.FC = () => {
         setDeletionRequests(reqMap);
       }
     } catch {
-      setErrorMessage('Network connection error while communicating with server.');
+      setErrorMessage(parentText.common.networkError);
     } finally {
       setIsLoading(false);
     }
@@ -88,6 +91,11 @@ export const LearnersPage: React.FC = () => {
       setIsLoading(false);
     }
   }, [user, fetchAllData]);
+
+  const showToast = (message: string, durationMs = 4000) => {
+    setSuccessToast(message);
+    setTimeout(() => setSuccessToast(null), durationMs);
+  };
 
   const handleOpenAddModal = () => {
     setEditingLearner(null);
@@ -108,8 +116,7 @@ export const LearnersPage: React.FC = () => {
         data as UpdateLearnerData
       );
       if (res.success && res.data) {
-        setSuccessToast(`"${res.data.firstName}" profile was updated successfully.`);
-        setTimeout(() => setSuccessToast(null), 4000);
+        showToast(t.updated(res.data.firstName));
         await fetchAllData();
         return true;
       }
@@ -117,8 +124,7 @@ export const LearnersPage: React.FC = () => {
     } else {
       const res = await learnerApi.createLearner(data as CreateLearnerData);
       if (res.success && res.data) {
-        setSuccessToast(`"${res.data.firstName}" was registered successfully!`);
-        setTimeout(() => setSuccessToast(null), 4000);
+        showToast(t.created(res.data.firstName));
         await fetchAllData();
         return true;
       }
@@ -137,8 +143,7 @@ export const LearnersPage: React.FC = () => {
     if (!res.success) {
       throw new Error(res.message || 'Failed to archive learner profile.');
     }
-    setSuccessToast(`"${learner.firstName}" profile was archived successfully.`);
-    setTimeout(() => setSuccessToast(null), 4000);
+    showToast(t.archived(learner.firstName));
     await fetchAllData();
   };
 
@@ -148,14 +153,13 @@ export const LearnersPage: React.FC = () => {
     try {
       const res = await learnerApi.restoreLearner(learner.learnerId);
       if (res.success) {
-        setSuccessToast(`"${learner.firstName}" was restored to active learners.`);
-        setTimeout(() => setSuccessToast(null), 4000);
+        showToast(t.restored(learner.firstName));
         await fetchAllData();
       } else {
-        setErrorMessage(res.message || 'Failed to restore learner profile.');
+        setErrorMessage(t.restoreError);
       }
     } catch {
-      setErrorMessage('Network error while restoring profile.');
+      setErrorMessage(parentText.common.networkError);
     } finally {
       setRestoringLearnerId(null);
     }
@@ -172,165 +176,127 @@ export const LearnersPage: React.FC = () => {
     if (!res.success) {
       throw new Error(res.message || 'Failed to submit permanent deletion request.');
     }
-    setSuccessToast(
-      `Permanent deletion request for "${learner.firstName}" was submitted for review.`
-    );
-    setTimeout(() => setSuccessToast(null), 5000);
+    showToast(t.deletionRequested(learner.firstName), 5000);
     await fetchAllData();
   };
 
   const displayedLearners = activeTab === 'active' ? activeLearners : archivedLearners;
 
+  const tabClass = (isActive: boolean, tone: 'primary' | 'amber') =>
+    `inline-flex items-center gap-2 min-h-[44px] px-4 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+      isActive
+        ? tone === 'primary'
+          ? 'bg-mq-surface-blue text-mq-primary ring-1 ring-mq-primary/30'
+          : 'bg-amber-50 text-amber-900 ring-1 ring-amber-300'
+        : 'text-mq-text-muted hover:text-mq-text-strong hover:bg-mq-surface-soft'
+    }`;
+
+  const countClass = (isActive: boolean, tone: 'primary' | 'amber') =>
+    `text-xs min-w-[24px] text-center px-2 py-0.5 rounded-full font-bold ${
+      isActive
+        ? tone === 'primary'
+          ? 'bg-mq-primary text-white'
+          : 'bg-amber-600 text-white'
+        : 'bg-mq-surface-soft text-mq-text-muted border border-mq-border'
+    }`;
+
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Standardized Page Header */}
       <PageHeader
         role="parent"
-        title="My Children"
-        titleSi="මගේ දරුවන්"
-        description="Register, archive, and manage child accounts for adaptive mathematics learning support."
-        descriptionSi="MathQuest අනුවර්තී ගණිත ඉගෙනුම් සහාය සඳහා දරුවන්ගේ පැතිකඩ මෙතැනින් කළමනාකරණය කරන්න."
+        title={t.title}
+        description={t.description}
         actions={
           <button
             type="button"
+            data-testid="add-child-button"
             onClick={handleOpenAddModal}
-            className="btn btn-primary py-2.5 px-5 rounded-full flex items-center justify-center gap-2 text-xs sm:text-sm font-bold shadow-xs shrink-0 cursor-pointer"
+            className="btn btn-primary min-h-[44px] px-5 rounded-full inline-flex items-center justify-center gap-2 text-sm"
           >
-            <Plus size={16} strokeWidth={2.5} />
-            <span>Add Child (නව දරුවෙකු එක් කරන්න)</span>
+            <Plus size={18} strokeWidth={2.5} />
+            <span>{t.addChild}</span>
           </button>
         }
       />
 
-      {/* Feedback Toasts / Banners */}
       {successToast && (
         <SuccessAlert
           message={successToast}
+          dismissLabel={parentText.common.dismiss}
           onDismiss={() => setSuccessToast(null)}
         />
       )}
 
       {errorMessage && (
-        <ErrorAlert
-          message={errorMessage}
-          messageSi="දරුවන්ගේ තොරතුරු ලබාගැනීමේදී දෝෂයක් හටගැනිණි."
-          onRetry={fetchAllData}
-        />
+        <ErrorAlert message={errorMessage} retryLabel={parentText.common.retry} onRetry={fetchAllData} />
       )}
 
-      {/* Active vs Archived Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-mq-border/80 pb-3">
+      {/* Active vs archived */}
+      <div role="tablist" className="flex flex-wrap items-center gap-2 border-b border-mq-border pb-3">
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'active'}
           onClick={() => setActiveTab('active')}
-          className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-            activeTab === 'active'
-              ? 'bg-mq-surface-blue text-mq-primary shadow-xs ring-1 ring-mq-primary/30'
-              : 'text-mq-text-muted hover:text-mq-text-strong hover:bg-mq-surface-soft'
-          }`}
+          className={tabClass(activeTab === 'active', 'primary')}
         >
-          <UserCheck size={16} />
-          <span>Active Children (සක්‍රීය දරුවන්)</span>
-          <span
-            className={`text-xs px-2 py-0.5 rounded-full font-extrabold ${
-              activeTab === 'active'
-                ? 'bg-mq-primary text-white'
-                : 'bg-mq-surface-soft text-mq-text-muted border border-mq-border'
-            }`}
-          >
-            {activeLearners.length}
-          </span>
+          <UserCheck size={17} />
+          <span>{t.tabActive}</span>
+          <span className={countClass(activeTab === 'active', 'primary')}>{activeLearners.length}</span>
         </button>
-
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === 'archived'}
           onClick={() => setActiveTab('archived')}
-          className={`flex items-center gap-2 py-2 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-            activeTab === 'archived'
-              ? 'bg-amber-50 text-amber-900 shadow-xs ring-1 ring-amber-300'
-              : 'text-mq-text-muted hover:text-mq-text-strong hover:bg-mq-surface-soft'
-          }`}
+          className={tabClass(activeTab === 'archived', 'amber')}
         >
-          <Archive size={16} />
-          <span>Archived Children (සංරක්ෂිත දරුවන්)</span>
-          <span
-            className={`text-xs px-2 py-0.5 rounded-full font-extrabold ${
-              activeTab === 'archived'
-                ? 'bg-amber-600 text-white'
-                : 'bg-mq-surface-soft text-mq-text-muted border border-mq-border'
-            }`}
-          >
-            {archivedLearners.length}
-          </span>
+          <Archive size={17} />
+          <span>{t.tabArchived}</span>
+          <span className={countClass(activeTab === 'archived', 'amber')}>{archivedLearners.length}</span>
         </button>
       </div>
 
-      {/* Content Area */}
       {isLoading ? (
-        <LoadingState
-          message="Loading child learner profiles..."
-          messageSi="දරුවන්ගේ පැතිකඩ පූරණය වෙමින් පවතී..."
-        />
+        <LoadingState message={t.loading} />
       ) : displayedLearners.length === 0 ? (
         activeTab === 'active' ? (
-          /* Empty Active State */
           <EmptyState
             icon={<Users size={36} />}
-            title="No Active Children Found"
-            titleSi="ක්‍රියාකාරී දරුවන් නොමැත"
+            title={t.emptyActiveTitle}
             description={
-              archivedLearners.length > 0
-                ? `You have ${archivedLearners.length} archived child profile(s). Check the Archived Children tab to restore them.`
-                : 'Register your child aged 6–10 (Grades 1–5) to start personalized ADHD mathematics learning support.'
+              archivedLearners.length > 0 ? t.emptyActiveWithArchived(archivedLearners.length) : t.emptyActiveText
             }
-            descriptionSi="ඔබේ දරුවාගේ අවධානය සහ ගණිත කුසලතා මට්ටමට ගැළපෙන අනුවර්තී අධ්‍යාපනික අත්දැකීම ලබා දීමට පළමුව දරුවාගේ තොරතුරු ඇතුළත් කරන්න."
             action={
               <button
                 type="button"
                 onClick={handleOpenAddModal}
-                className="btn btn-primary py-2.5 px-6 rounded-full inline-flex items-center gap-2 text-xs sm:text-sm font-bold shadow-xs cursor-pointer"
+                className="btn btn-primary min-h-[44px] px-6 rounded-full inline-flex items-center gap-2 text-sm"
               >
-                <Plus size={16} strokeWidth={2.5} />
-                <span>Register First Child (පළමු දරුවා ලියාපදිංචි කරන්න)</span>
+                <Plus size={18} strokeWidth={2.5} />
+                <span>{t.addFirstChild}</span>
               </button>
             }
           />
         ) : (
-          /* Empty Archived State */
-          <EmptyState
-            icon={<Archive size={36} />}
-            title="No Archived Children"
-            titleSi="සංරක්ෂිත දරුවන් කිසිවෙකු නැත"
-            description="When you archive a child profile, they will appear here safely preserved with their learning history."
-            descriptionSi="ඔබ දරුවෙකු සංරක්ෂණය කළ විට ඔවුන්ගේ පැතිකඩ සහ ඉගෙනුම් දත්ත මෙහි ආරක්ෂිතව පවතිනු ඇත."
-          />
+          <EmptyState icon={<Archive size={36} />} title={t.emptyArchivedTitle} description={t.emptyArchivedText} />
         )
       ) : (
-        /* Learner Cards Grid */
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-mq-text-muted">
-              {activeTab === 'active' ? 'Active' : 'Archived'} Children ({displayedLearners.length}) • {activeTab === 'active' ? 'සක්‍රීය' : 'සංරක්ෂිත'} දරුවන්
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {displayedLearners.map((learner) => (
-              <LearnerCard
-                key={learner.learnerId}
-                learner={learner}
-                onEdit={handleOpenEditModal}
-                onArchive={handleOpenArchiveModal}
-                onRestore={handleConfirmRestore}
-                onRequestDeletion={handleOpenDeletionModal}
-                deletionRequest={deletionRequests[learner.learnerId] || null}
-              />
-            ))}
-          </div>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-5">
+          {displayedLearners.map((learner) => (
+            <LearnerCard
+              key={learner.learnerId}
+              learner={learner}
+              onEdit={handleOpenEditModal}
+              onArchive={handleOpenArchiveModal}
+              onRestore={handleConfirmRestore}
+              onRequestDeletion={handleOpenDeletionModal}
+              deletionRequest={deletionRequests[learner.learnerId] || null}
+            />
+          ))}
         </div>
       )}
 
-      {/* Add / Edit Modal */}
       <LearnerModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -338,7 +304,6 @@ export const LearnersPage: React.FC = () => {
         editingLearner={editingLearner}
       />
 
-      {/* Archive Modal */}
       <ArchiveLearnerModal
         isOpen={isArchiveModalOpen}
         learner={learnerToArchive}
@@ -349,7 +314,6 @@ export const LearnersPage: React.FC = () => {
         onConfirmArchive={handleConfirmArchive}
       />
 
-      {/* Request Permanent Deletion Modal */}
       <RequestDeletionModal
         isOpen={isDeleteModalOpen}
         learner={learnerToDelete}
@@ -364,4 +328,3 @@ export const LearnersPage: React.FC = () => {
 };
 
 export default LearnersPage;
-

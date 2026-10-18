@@ -16,6 +16,7 @@ import {
   ParentLearnerProfilesPage,
   ParentAssessmentsPage,
   ParentRecommendationsPage,
+  ParentComingSoonPage,
 } from './features/learner-profile';
 import { DashboardLayout } from './shared/layouts/DashboardLayout';
 import { FeaturePlaceholder } from './shared/components/FeaturePlaceholder';
@@ -163,51 +164,16 @@ function App() {
             <Route path="assessments" element={<ParentAssessmentsPage />} />
 
             {/* 5. Learning Progress (Pedagogical Engine) */}
-            <Route
-              path="progress"
-              element={
-                <FeaturePlaceholder
-                  featureName="Mathematics Learning Progress & Skill Mastery"
-                  responsibleComponent="Pedagogical Engine"
-                  description="Real-time curriculum tracking, skill progression trees, and mastery milestone visualizations are managed by the Pedagogical Engine."
-                  integrationStatus="In Active Research & Development"
-                />
-              }
-            />
+            <Route path="progress" element={<ParentComingSoonPage feature="progress" />} />
 
             {/* 6. Personalized Recommendations */}
             <Route path="recommendations" element={<ParentRecommendationsPage />} />
 
             {/* 7. Learning Activities (Content Adaptation) */}
-            <Route
-              path="activities"
-              element={
-                <FeaturePlaceholder
-                  featureName="Adaptive Learning Activities & Games"
-                  responsibleComponent="Content Adaptation"
-                  description="Interactive Sinhala mathematical games and personalized story themes adapted to each child's working memory and pacing profile."
-                  integrationStatus="In Active Research & Development"
-                  actionLink={{
-                    label: 'Launch Available Learner Games',
-                    href: '#/play',
-                    isExternalHash: true,
-                  }}
-                />
-              }
-            />
+            <Route path="activities" element={<ParentComingSoonPage feature="activities" />} />
 
             {/* 8. Behaviour Insights (Behaviour Monitoring) */}
-            <Route
-              path="behaviour"
-              element={
-                <FeaturePlaceholder
-                  featureName="Behaviour Insights & ADHD Engagement Monitoring"
-                  responsibleComponent="Behaviour Monitoring"
-                  description="Real-time attention span, interaction latency, and engagement heatmaps captured during learning sessions are synthesized by the Behaviour Monitoring component."
-                  integrationStatus="In Active Research & Development"
-                />
-              }
-            />
+            <Route path="behaviour" element={<ParentComingSoonPage feature="behaviour" />} />
 
             {/* 9. Settings (Reuses User Profile) */}
             <Route path="settings" element={<UserProfilePage hideNavbar={true} />} />

@@ -1,0 +1,59 @@
+{
+  "references": [
+    {
+      "sourceId": "REF-REVIEW-PACK",
+      "title": "MathQuest | Expert Review Pack (Learner Profile & Prediction Engine - Draft for Review)",
+      "author": "MathQuest Research Team (SLIIT Project J26-IT-321)",
+      "organization": "Sri Lanka Institute of Information Technology (SLIIT)",
+      "publicationYear": 2026,
+      "documentFilename": "MathQuest_Expert_Rules_Review_Pack.pdf",
+      "relevantPagesOrSections": "Sections A-E (pp. 1-3): Section A (Introduction, p. 1), Section B (Draft Decision Rules R1-R8, pp. 1-2), Section C (Learner Scenarios, p. 2), Section D (Reviewer Questions, p. 2), Section E (Validation Record, p. 3)",
+      "researchRelevance": "Contains the initial set of eight proposed pedagogical and clinical safeguard rules (R1-R8) submitted for external clinical psychologist evaluation. Defines preliminary criteria for mastery determination, multi-step scaffolding, separation of assisted vs. independent performance, non-diagnostic response-time safeguards, and uncertainty reporting.",
+      "limitations": "Draft review pack prepared for consultation, not a completed validation record or empirically calibrated psychometric instrument. Rules represent initial hypotheses requiring iterative clinical and pedagogical refinement."
+    },
+    {
+      "sourceId": "REF-BCH-2020",
+      "title": "Guided Self-Management Tools for ADHD: Children 6-12 (Version 1.1)",
+      "author": "Erica Lee, PhD and Keneisha Sinclair-McBride, PhD (Equal Authors); with Heather J. Walter, MD, MPH; David R. DeMaso, MD; Eugene D'Angelo, PhD; Louis Vernacchio, MD; Jonas Bromberg, PsyD; Betsy Brooks, MD, MPH; Bhavana Arora, MD, MBA",
+      "organization": "Boston Children's Hospital / Harvard Medical School",
+      "publicationYear": 2020,
+      "documentFilename": "Guided Self-Management Tools for ADHD - Children 6-12.pdf",
+      "relevantPagesOrSections": "Introduction & Skills 1-9 (pp. 1-44): Skill 1 (Household Rules and Structure, pp. 3-6), Skill 2 (Homework Help, pp. 7-10), Skill 3 (Daily School Check-In, pp. 11-15), Skill 4 (Problem Solving for ADHD, pp. 16-21), Skill 5 (Remembering Things I Need To Do, pp. 22-25), Skill 6 (How to Get Things Done - Task Roadmap & Mini-tasks, pp. 26-30), Skill 7 (How to Organize My Stuff, pp. 31-33), Skill 8 (How to Manage My Time - Check Your Time Game & Short Breaks, pp. 34-37), Skill 9 (How to Feel Good About Myself - Self-Esteem & Strength Identification, pp. 38-40)",
+      "researchRelevance": "Provides evidence-based executive functioning and self-management strategies for children aged 6-12 with ADHD. Directly supports MathQuest educational adaptations: breaking tasks into mini-tasks (Skill 6), scheduling short 5-minute movement/stretch breaks (Skills 2, 6, 8), non-punitive problem solving (Skill 4), time awareness without timer anxiety (Skill 8), clear visual checklists (Skill 5), and focusing on effort praise to protect academic self-esteem (Skills 1, 9).",
+      "limitations": "Designed primarily as clinician-guided parent/child home and school worksheets rather than an automated algorithm. Cultural adaptation is required for Sri Lankan family contexts, bilingual Sinhala-English instruction, and digital gaming delivery."
+    },
+    {
+      "sourceId": "REF-AAP-2019",
+      "title": "Clinical Practice Guideline for the Diagnosis, Evaluation, and Treatment of Attention-Deficit/Hyperactivity Disorder in Children and Adolescents",
+      "author": "Mark L. Wolraich, MD; Joseph F. Hagan Jr, MD; Carla Allan, PhD; Eugenia Chan, MD, MPH; Dale Davison, MSpEd; Marian Earls, MD; Steven W. Evans, PhD; Susan K. Flinn, MA; Tanya Froehlich, MD; Jennifer Frost, MD; Joseph R. Holbrook, PhD; Christoph Ulrich Lehmann, MD; Herschel Robert Lessin, MD; Karen L. Pierce, MD; Jonathan D. Winner, MD; William Zurhellen, MD; AAP Subcommittee on Children and Adolescents with Attention-Deficit/Hyperactive Disorder",
+      "organization": "American Academy of Pediatrics (AAP)",
+      "publicationYear": 2019,
+      "documentFilename": "peds_20192528.pdf",
+      "relevantPagesOrSections": "Key Action Statements 1-7 (pp. 5-18): KAS 1 (Evaluation initiation age 4-18, p. 5), KAS 2 (DSM-5 criteria across multiple settings with parent/teacher reports, ruling out alternatives, pp. 5-7), DSM-5 Presentation Subtypes (ADHD/I, ADHD/HI, ADHD/C, p. 6), Neuropsychological Testing Boundaries (clarifies learning strengths/weaknesses but does not diagnose, p. 6), KAS 3 (Comorbidity screening: learning/language disabilities, anxiety, depression, ASD, motor coordination, pp. 6, 9), KAS 4 (Chronic care model, pp. 9-10), KAS 5b (Elementary school 6-12 treatment: behavioral classroom interventions, IEP/504 individualized instructional supports, accommodations vs. skill remediation, pp. 11-12, 16), KAS 6 (Medication titration & monitoring, pp. 16-17), Future Research Priorities (objective impairment measures, monitoring schedules, pp. 18-19)",
+      "researchRelevance": "Establishes definitive clinical boundaries and diagnostic definitions for ADHD presentations (inattentive, hyperactive-impulsive, combined). Explicitly notes that neuropsychological testing clarifies learning profiles but does not diagnose ADHD. Differentiates academic accommodations (reducing task barriers) from instructional remediation (improving skills). Mandates multi-informant assessment and screening for common developmental comorbidities (learning/language disorders, motor coordination).",
+      "limitations": "US-focused clinical and legal framework (Section 504 / IDEA regulations). Diagnostic criteria require specialist clinician evaluation across real-world home and classroom environments, precluding digital in-game diagnosis."
+    },
+    {
+      "sourceId": "REF-NICE-NG87",
+      "title": "Attention Deficit Hyperactivity Disorder: Diagnosis and Management (NICE Guideline NG87)",
+      "author": "National Institute for Health and Care Excellence (NICE) Guideline Committee",
+      "organization": "National Institute for Health and Care Excellence (UK)",
+      "publicationYear": 2018,
+      "documentFilename": "attention-deficit-hyperactivity-disorder-diagnosis-and-management-pdf-1837699732933.pdf",
+      "relevantPagesOrSections": "Sections 1.1-1.10 (pp. 6-39): Section 1.2 (Recognition & Referral, no universal school screening, pp. 8-11), Section 1.3 (Diagnosis: specialist clinician only, full developmental history, multi-setting impairment, rating scales not solely diagnostic, pp. 12-13), Section 1.4 (Tailoring information to developmental level, language delays, sensory needs, pp. 13-16), Section 1.5 (Managing ADHD: environmental modifications prior to/alongside medication, pp. 17-22), Section 1.8 (Maintenance & symptom monitoring, pp. 32-35), Terms Used (Environmental Modifications: shorter periods of focus, movement breaks, 'I need a break' cards, reducing distractions, written/visual instructions, pp. 38-39)",
+      "researchRelevance": "Provides authoritative international standards for clinical safeguards, environmental modifications, and longitudinal monitoring. Strictly mandates that ADHD diagnosis must never be made solely on rating scales or observational data (Section 1.3.2) and forbids universal automated school screening (Section 1.2.3). Explicitly defines evidence-based environmental modifications: micro-chunked focus periods, structured movement breaks ('I need a break'), and reinforcing verbal instructions with visual/written prompts.",
+      "limitations": "National Health Service (UK) clinical pathway context. Clinical diagnostic thresholds and medication titration protocols cannot be executed by an autonomous educational gaming system."
+    },
+    {
+      "sourceId": "REF-IES-2021",
+      "title": "Assisting Students Struggling with Mathematics: Intervention in the Elementary Grades (WWC 2021006)",
+      "author": "Lynn S. Fuchs, PhD (Chair); Rebecca Newman-Gonchar, PhD; Robin Schumacher, PhD; Barbara Dougherty, PhD; Nicole Bucka, MA; Karen S. Karp, EdD; John Woodward, PhD; Ben Clarke, PhD; Nancy C. Jordan, PhD; Russell Gersten, PhD; Madhavi Jayanthi, EdD; Betsy Keating, MPP; Seth Morgan, MA",
+      "organization": "What Works Clearinghouse (WWC) / Institute of Education Sciences (IES), U.S. Department of Education",
+      "publicationYear": 2021,
+      "documentFilename": "WWC2021006-Math-PG.pdf",
+      "relevantPagesOrSections": "Recommendations 1-6 (pp. 5-55) & Appendices (pp. 58-158): Recommendation 1 (Systematic Instruction: review, accessible numbers, incremental sequence, visual/verbal supports, immediate feedback, pp. 5-10; evidence rationale, pp. 69-85), Recommendation 2 (Mathematical Language: student-friendly definitions, precise terminology, word walls, pp. 11-20; evidence rationale, pp. 86-92), Recommendation 3 (Representations: concrete-semiconcrete-abstract progression, proportional base-10 blocks, connecting representations, thinking tools, pp. 21-28; evidence rationale, pp. 93-103), Recommendation 4 (Number Lines: whole numbers, fractions, decimals, benchmark numbers, equidistant units, operations on number line, pp. 29-39; evidence rationale, pp. 104-110), Recommendation 5 (Word Problems: schema-based instruction [Change, Combine, Compare, Equal Groups], avoiding key-word strategies, visual prompt cards, varying unknowns, filtering irrelevant information, pp. 40-50; evidence rationale, pp. 111-119), Recommendation 6 (Timed Activities: brief 1-5 min fluency, automaticity of previously learned facts, charting progress, immediate feedback with self-correction opportunity, pp. 51-55; evidence rationale, pp. 120-130)",
+      "researchRelevance": "Serves as the foundational pedagogical evidence base for all MathQuest mathematics adaptations. Supported by 44 WWC-vetted experimental studies with strong evidence ratings across all recommendations. Guides the Concrete-Representational-Abstract (CRA) scaffolding ladder, mathematical vocabulary framing, visual number lines, schema-based word problem categorization, and brief untimed vs. timed fluency activities.",
+      "limitations": "Grounded in small-group and 1:1 human teacher-led Tier 2 interventions in US elementary schools (Grades K-6). Digital gamified adaptations must preserve teacher-led principles (fading, think-alouds, immediate error correction) within an automated software architecture."
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   PedagogicalCompanion, 
   AgentDevPanel, 
@@ -8,7 +8,7 @@ import {
   useLearnerState,
   useAgentStore 
 } from '../../features/pedagogical-agent';
-import type { InteractionEvent, HintLevel } from '../../features/pedagogical-agent';
+import type { InteractionEvent } from '../../features/pedagogical-agent';
 
 export function AgentTestPage() {
   const { playAction, onGameEvent, resetHints } = usePedagogicalAgent();

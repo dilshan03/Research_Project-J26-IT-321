@@ -1,6 +1,6 @@
 import type { PedagogicalIntent } from '../types/agent.types';
 
-export const intentToAnimation = (intent: PedagogicalIntent, wrongAttempts = 0): { actionName: string, duration?: number } => {
+export const intentToAnimation = (intent: PedagogicalIntent, _wrongAttempts = 0): { actionName: string, duration?: number } => {
   switch (intent) {
     case 'GREET': return { actionName: 'wave', duration: 3 };
     case 'CELEBRATE': return { actionName: 'correctCelebrate', duration: 4 };

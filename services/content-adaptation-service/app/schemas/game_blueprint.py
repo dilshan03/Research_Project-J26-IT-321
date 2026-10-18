@@ -16,6 +16,9 @@ class VisualAssetTag(str, Enum):
     OPERATOR_CHEST = "OPERATOR_CHEST"
     NUMBER_BLOCK = "NUMBER_BLOCK"
     CHARACTER_AVATAR = "CHARACTER_AVATAR"
+    SHAPE_CARD = "SHAPE_CARD"
+    PATTERN_TRAIN = "PATTERN_TRAIN"
+    COMPARISON_SCALE = "COMPARISON_SCALE"
 
 
 class GameChoiceOption(BaseModel):
@@ -29,13 +32,19 @@ class GameChoiceOption(BaseModel):
     distractor_rationale: Optional[str] = Field(
         None, description="Explanation for why a learner with ADHD might pick this distractor"
     )
+    icon_or_shape: Optional[str] = Field(None, description="Visual shape/color/emoji code if applicable")
 
 
 class GameMicroStep(BaseModel):
     step_order: int = Field(..., ge=1, le=3, description="Order of the micro-step (1, 2, or 3)")
-    action_type: Literal['IDENTIFY_ENTITY', 'SELECT_OPERATOR', 'CALCULATE_MICROSTEP'] = Field(
-        ..., description="The type of cognitive action required"
-    )
+    action_type: Literal[
+        'IDENTIFY_ENTITY',
+        'SELECT_OPERATOR',
+        'CALCULATE_MICROSTEP',
+        'MATCH_SHAPE',
+        'COMPLETE_PATTERN',
+        'COMPARE_QUANTITY',
+    ] = Field(..., description="The type of cognitive action required")
     instruction_si: str = Field(..., description="Short, encouraging Sinhala audio-visual instruction")
     instruction_en: str = Field(..., description="Short, equivalent English instruction")
     target_visual_asset: VisualAssetTag = Field(..., description="The main visual asset type used in this step")
@@ -44,9 +53,10 @@ class GameMicroStep(BaseModel):
     operands: Optional[List[int]] = Field(
         None, description="Quantities this step works on (used by the game layer for manipulatives)"
     )
-    operation: Optional[Literal['ADD', 'SUB', 'MUL', 'DIV', 'COUNT', 'COMPARE', 'IDENTIFY']] = Field(
-        None, description="Arithmetic or cognitive action this step applies"
-    )
+    operation: Optional[Literal[
+        'ADD', 'SUB', 'MUL', 'DIV', 'COUNT', 'COMPARE', 'IDENTIFY', 'SHAPE', 'PATTERN', 'COLOR', 'FRACTION', 'TIME'
+    ]] = Field(None, description="Arithmetic or cognitive action this step applies")
+    visual_props: Optional[dict] = Field(default_factory=dict, description="Metadata for shapes, colors, or visual patterns")
 
 
 class ADHDGameSettings(BaseModel):
@@ -72,7 +82,13 @@ class GameActivityBlueprint(BaseModel):
     status: Literal['draft', 'approved', 'rejected'] = Field(..., description="Approval status of the blueprint")
     story_narrative: Optional[dict] = Field(None, description="Culturally resonant story backdrop and Gaja mascot dialogue")
     cli_score: Optional[float] = Field(None, description="Calculated Cognitive Load Index")
+    effective_cli_score: Optional[float] = Field(None, description="Tuned Cognitive Load Index after teacher customization")
     raw_sinhala_question: Optional[str] = Field(None, description="Original question text")
+    raw_english_question: Optional[str] = Field(None, description="English translation or prompt of the question")
+    target_learner_id: Optional[str] = Field(None, description="Assigned learner identifier if personalized")
+    student_name: Optional[str] = Field(None, description="Assigned learner name or archetype label")
+    customized_by_teacher: bool = Field(False, description="Flag indicating if teacher adjusted cognitive load settings")
+    behavior_profile: Optional[dict] = Field(None, description="Student behavioral profile summary snapshot")
 
 
 class CurriculumAdaptationRequest(BaseModel):
@@ -80,4 +96,5 @@ class CurriculumAdaptationRequest(BaseModel):
     grade: int = Field(..., ge=1, le=5, description="Grade level (1 to 5)")
     topic: str = Field(..., description="Math topic for the question")
     raw_sinhala_question: str = Field(..., description="The raw textual Sinhala question from the curriculum")
+    raw_english_question: Optional[str] = Field(None, description="Optional English translation of the question")
     adhd_risk_level: Literal['LOW', 'MEDIUM', 'HIGH'] = Field(..., description="Assessed ADHD risk level for adaptation")

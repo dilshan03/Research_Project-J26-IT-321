@@ -73,6 +73,13 @@ class TestGrade1Journey:
         assert elpx["totalDistinctQuestionsEvaluated"] == 5  # count, 2 representation, pre, transfer
         assert elpx["totalCorrectFirstResponses"] == 4
 
+        # Provisional IMPSA and IMLR summaries
+        impsa = res.json()["data"]["impsa"]
+        assert impsa is not None and impsa["eligibleUnassistedItems"] == 5
+        imlr = res.json()["data"]["imlr"]
+        assert imlr is not None and imlr["status"] == "TRANSFER_OBSERVED"
+        assert imlr["preProbeCorrect"] is False and imlr["unassistedTransferCorrect"] is True
+
     async def test_support_item_cannot_be_relabelled_as_independent(self, db):
         answers = _journey()
         support = next(a for a in answers if a["questionId"] == "g1v2_compare_support")
@@ -119,6 +126,21 @@ class TestGrade1Journey:
                                           "hintUsed": False, "responseTimeSeconds": 8.0}], grade=1)
         assert res.status_code == 200
         assert res.json()["data"]["totalQuestions"] == 1
+
+    async def test_get_onboarding_summary_returns_v2_details(self, db):
+        await _submit(G1_LEARNER, _journey(), grade=1, assessmentProtocolVersion="onboarding-v2",
+                      childPreferences=CHILD_PREFS, sessionStartedAt="2026-10-19T08:00:00Z",
+                      sessionEndedAt="2026-10-19T08:05:10Z")
+        from app.services.onboarding_service import get_onboarding_summary
+        from tests.test_math_assessment_submission import PARENT_ID
+        summary = await get_onboarding_summary(learner_id=G1_LEARNER, parent_id=str(PARENT_ID))
+        assert summary["progress"]["assessmentProtocolVersion"] == "onboarding-v2"
+        math_sum = summary["mathSummary"]
+        assert math_sum["assessmentProtocolVersion"] == "onboarding-v2"
+        assert math_sum["childPreferences"]["theme"] == "animal_friends"
+        assert math_sum["impsa"]["eligibleUnassistedItems"] == 5
+        assert math_sum["imlr"]["status"] == "TRANSFER_OBSERVED"
+        assert len(math_sum["evaluatedItems"]) > 0
 
 
 def test_item_bank_answer_keys_present_and_roles_valid():

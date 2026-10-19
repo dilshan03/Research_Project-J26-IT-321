@@ -154,7 +154,9 @@ class TestSavingAdhdInformation:
                           {"diagnosisStatus": "yes", "reportedPresentation": presentation,
                            "diagnosisReportedMonth": "2023-06"})
         assert res.status_code == 200
-        assert res.json()["data"]["nextStep"] == "snap_iv"
+        # A specific reported type skips SNAP-IV in onboarding; "not specified" still offers it.
+        expected_next = "snap_iv" if presentation == "not_specified" else "preferences"
+        assert res.json()["data"]["nextStep"] == expected_next
         stored = _stored_adhd(db)
         assert stored["diagnosisStatus"] == "yes"
         assert stored["reportedPresentation"] == presentation
@@ -262,6 +264,32 @@ class TestOptionalSnapIv:
         assert data["adhdInformation"]["reportedPresentation"] == "combined"
         assert _learner_status(db) == "COMPLETED"
 
+    @pytest.mark.parametrize("presentation", PRESENTATIONS[:3])
+    async def test_reported_type_skips_snap_iv_without_recording_a_skip(self, db, presentation):
+        await _call("POST", "/onboarding/adhd-information",
+                    {"diagnosisStatus": "yes", "reportedPresentation": presentation})
+        progress = (await _call("GET", "/onboarding")).json()["data"]
+        assert progress["currentStep"] == "preferences"
+        assert progress["snapIvStatus"] == "NOT_STARTED"
+        await _call("POST", "/onboarding/preferences", PREFERENCES)
+        assert (await _call("GET", "/onboarding")).json()["data"]["currentStep"] == "social_context"
+
+    async def test_snap_iv_stays_available_later_when_type_was_reported(self, db):
+        await _call("POST", "/onboarding/adhd-information", {"diagnosisStatus": "yes", "reportedPresentation": "combined"})
+        await _call("POST", "/onboarding/preferences", PREFERENCES)
+        await _call("POST", "/onboarding/math-assessment", {"grade": 1, "answers": MATH_ANSWERS})
+        res = await _call("POST", "/onboarding/snap-iv", {"responses": SNAP_RESPONSES})
+        assert res.status_code == 200
+        progress = (await _call("GET", "/onboarding")).json()["data"]
+        assert progress["snapIvStatus"] == "COMPLETED"
+        assert progress["status"] == "COMPLETED"
+        assert progress["adhdInformation"]["reportedPresentation"] == "combined"  # never changed by SNAP-IV
+
+    @pytest.mark.parametrize("status", ["no", "not_sure", "prefer_not_to_say"])
+    async def test_snap_iv_still_offered_without_a_reported_type(self, db, status):
+        res = await _call("POST", "/onboarding/adhd-information", {"diagnosisStatus": status})
+        assert res.json()["data"]["nextStep"] == "snap_iv"
+
     async def test_mathematics_is_accessible_without_adhd_information(self, db):
         """Legacy API clients that never call the new endpoint keep working."""
         await _call("POST", "/onboarding/preferences", PREFERENCES)
@@ -279,10 +307,10 @@ class TestSaveAndResume:
 
     async def test_progress_restores_answers_and_next_step_after_each_save(self, db):
         await _call("POST", "/onboarding/adhd-information",
-                    {"diagnosisStatus": "yes", "reportedPresentation": "predominantly_hyperactive_impulsive"})
+                    {"diagnosisStatus": "yes", "reportedPresentation": "not_specified"})
         p1 = (await _call("GET", "/onboarding")).json()["data"]
         assert p1["currentStep"] == "snap_iv"
-        assert p1["adhdInformation"]["reportedPresentation"] == "predominantly_hyperactive_impulsive"
+        assert p1["adhdInformation"]["reportedPresentation"] == "not_specified"
 
         await _call("POST", "/onboarding/snap-iv/skip")
         assert (await _call("GET", "/onboarding")).json()["data"]["currentStep"] == "preferences"

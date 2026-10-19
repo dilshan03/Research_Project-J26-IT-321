@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, ArrowRight, Loader2, Lightbulb, AlertCircle, History, Users } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Plus, ArrowRight, Loader2, Lightbulb, AlertCircle, History, Users, ClipboardList, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { learnerApi } from '../services/learnerApi';
 import { profileApi } from '../services/profileApi';
+import { onboardingApi } from '../services/onboardingApi';
 import type { Learner, CreateLearnerData, UpdateLearnerData } from '../types';
 import { AVATAR_OPTIONS } from '../types';
-import type { ElpxProfile } from '../types/onboarding';
+import type { ElpxProfile, SnapIvStatus } from '../types/onboarding';
 import { LearnerModal } from '../components/LearnerModal';
 import { OnboardingStatusBadge } from '../components/OnboardingStatusBadge';
 import { SkillEvidenceList } from '../components/parent/SkillEvidenceList';
@@ -39,7 +40,10 @@ const card = 'bg-white rounded-3xl border border-mq-border shadow-xs';
 
 export const ParentOverviewPage: React.FC = () => {
   const { user } = useAuth();
+  const location = useLocation();
+  const savedToast = (location.state as { toast?: string } | null)?.toast;
   const [learners, setLearners] = useState<Learner[]>([]);
+  const [snapIvStatus, setSnapIvStatus] = useState<SnapIvStatus | null>(null);
   const [selectedLearnerId, setSelectedLearnerId] = useState<string | null>(null);
   const [learnerProfile, setLearnerProfile] = useState<ElpxProfile | null>(null);
 
@@ -111,6 +115,28 @@ export const ParentOverviewPage: React.FC = () => {
     };
 
     fetchProfile();
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedLearnerId, learners]);
+
+  // Optional SNAP-IV status, read only for children whose onboarding has started
+  // (reading progress for a NOT_STARTED child would create an onboarding record).
+  useEffect(() => {
+    const currentChild = learners.find((l) => l.learnerId === selectedLearnerId);
+    if (!selectedLearnerId || !currentChild || currentChild.onboardingStatus === 'NOT_STARTED') {
+      setSnapIvStatus(null);
+      return;
+    }
+    let isMounted = true;
+    onboardingApi
+      .getProgress(selectedLearnerId)
+      .then((res) => {
+        if (isMounted) setSnapIvStatus(res.success && res.data ? res.data.snapIvStatus ?? null : null);
+      })
+      .catch(() => {
+        if (isMounted) setSnapIvStatus(null);
+      });
     return () => {
       isMounted = false;
     };
@@ -199,6 +225,13 @@ export const ParentOverviewPage: React.FC = () => {
             );
           })}
         </div>
+      )}
+
+      {savedToast && (
+        <p role="status" className="flex items-center gap-2 rounded-2xl border border-mq-success/30 bg-mq-success-bg px-4 py-3 text-base text-mq-text-strong">
+          <CheckCircle2 size={20} className="shrink-0 text-mq-success" />
+          <span>{savedToast}</span>
+        </p>
       )}
 
       {isLoadingLearners && <LoadingState message={parentText.children.loading} minHeightClass="min-h-[200px]" />}
@@ -339,6 +372,26 @@ export const ParentOverviewPage: React.FC = () => {
               <p className="text-base text-mq-text-muted">{isLoadingProfile ? t.loadingProfile : t.skillsEmpty}</p>
             )}
           </section>
+
+          {/* Optional SNAP-IV (kept out of onboarding when the parent reported the ADHD type) */}
+          {snapIvStatus && (
+            <section className={`${card} p-5 space-y-3`}>
+              <h2 className="text-lg font-bold text-mq-text-strong flex items-center gap-2">
+                <ClipboardList size={20} className="text-mq-primary shrink-0" />
+                <span>{parentText.snap.cardTitle}</span>
+              </h2>
+              <p className="text-base text-mq-text leading-relaxed">
+                {snapIvStatus === 'COMPLETED' ? parentText.snap.cardDone : parentText.snap.cardText}
+              </p>
+              <Link
+                to={`/learners/${selectedChild.learnerId}/snap-iv`}
+                className="btn btn-secondary min-h-[44px] px-5 rounded-full inline-flex items-center gap-2 text-base"
+              >
+                <span>{snapIvStatus === 'COMPLETED' ? parentText.snap.cardUpdate : parentText.snap.cardStart}</span>
+                <ArrowRight size={18} />
+              </Link>
+            </section>
+          )}
 
           {/* 6. Recent activity: no parent-facing activity history API exists yet */}
           <section className={`${card} p-5 space-y-2`}>

@@ -6,6 +6,7 @@ import type { OnboardingFullSummary } from '../../types/onboarding';
 import { ADHD_DIAGNOSIS_STATUS_OPTIONS, ADHD_PRESENTATION_OPTIONS } from '../../types/onboarding';
 import { AnimatedCompanion } from './AnimatedCompanion';
 import { SkillEvidenceList } from '../parent/SkillEvidenceList';
+import { Grade1V2EvidenceView } from '../parent/Grade1V2EvidenceView';
 import { RecommendationList, RecommendationResearchRows } from '../parent/RecommendationList';
 import { ResearchDetails } from '../parent/ResearchDetails';
 import { languageLabel, optionTitle } from '../parent/labels';
@@ -106,6 +107,11 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
             </span>
             <span className="basis-full text-xs text-mq-text-muted">{t.mathNote}</span>
           </div>
+
+          <Grade1V2EvidenceView
+            mathSummary={math}
+            childPreferences={summary.progress?.childPreferences || math.childPreferences}
+          />
 
           <SkillEvidenceList profile={elpx ?? null} legacySkills={math.skills} showOverall={false}>
             <p className="font-mono break-words">

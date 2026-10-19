@@ -25,6 +25,7 @@ import type {
   SocialContextData,
   MathQuestion,
   MathItemAnswer,
+  MathSubmissionExtras,
   OnboardingFullSummary,
 } from '../types/onboarding';
 
@@ -407,14 +408,15 @@ export const OnboardingPlaceholderPage: React.FC = () => {
   };
 
   // Handle Step 5: Math Assessment Submit
-  const handleMathSubmit = async (answers: MathItemAnswer[]) => {
+  const handleMathSubmit = async (answers: MathItemAnswer[], extras?: MathSubmissionExtras) => {
     if (!learnerId || !learner || isActionLoading) return;
     setIsActionLoading(true);
     try {
       const res = await onboardingApi.submitMathAssessment(
         learnerId,
         learner.grade,
-        answers
+        answers,
+        extras
       );
       if (res.success && res.data) {
         setCompletedSteps((prev) =>

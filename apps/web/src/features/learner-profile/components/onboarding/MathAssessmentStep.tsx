@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import type { MathQuestion, MathItemAnswer, LearningPreferencesData } from '../../types/onboarding';
+import type { MathQuestion, MathItemAnswer, LearningPreferencesData, MathSubmissionExtras } from '../../types/onboarding';
 import { LivingCanvasOnboarding } from './LivingCanvasOnboarding';
+import { Grade1Journey } from './journey/ChildJourney';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
   ArrowRight,
@@ -24,14 +25,25 @@ interface Props {
   englishComprehension?: string;
   learningPreferences?: LearningPreferencesData | null;
   questions: MathQuestion[];
-  onSubmit: (answers: MathItemAnswer[]) => Promise<void>;
+  onSubmit: (answers: MathItemAnswer[], extras?: MathSubmissionExtras) => Promise<void>;
   onSaveAndExit: (answers: MathItemAnswer[]) => Promise<void>;
   onBack: () => void;
   isSubmitting: boolean;
   avatarId?: string;
 }
 
+/** Grade 1 uses the interactive onboarding-v2 journey; set to false to fall back to the previous flow. */
+const GRADE1_JOURNEY_ENABLED = true;
+
 export const MathAssessmentStep: React.FC<Props> = (props) => {
+  if (GRADE1_JOURNEY_ENABLED && props.grade === 1) {
+    return <Grade1Journey onSubmit={props.onSubmit} isSubmitting={props.isSubmitting} />;
+  }
+  return <LegacyMathAssessmentStep {...props} />;
+};
+
+/** Previous child assessment flow, unchanged; still used by Grades 2–5. */
+const LegacyMathAssessmentStep: React.FC<Props> = (props) => {
   // Default to the new 2D watercolor Living Canvas discovery experience
   const [viewMode, setViewMode] = useState<'canvas' | 'standard'>('canvas');
 

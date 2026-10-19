@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.services.blueprint_generator import generate_blueprint
 from app.services.problem_parser import parse_problem
-from app.services.repository import repository
+from app.services.db import FallbackCollection, db_service
 
 client = TestClient(app)
 
@@ -60,7 +60,6 @@ def test_money_blueprint_multi_step():
 
 
 def test_api_generate_review_flow():
-    repository.clear()
     res = client.post("/api/v1/adaptations/blueprints", json={
         "source_question_id": "Q1", "grade": 1, "topic": "Addition",
         "raw_sinhala_question": ADD_Q, "adhd_risk_level": "LOW",
@@ -72,7 +71,31 @@ def test_api_generate_review_flow():
     res = client.patch(f"/api/v1/adaptations/blueprints/{activity_id}/status", json={"status": "approved"})
     assert res.json()["blueprint"]["status"] == "approved"
     approved = client.get("/api/v1/adaptations/blueprints?status=approved").json()
-    assert len(approved) == 1
+    assert activity_id in [b["blueprint"]["activity_id"] for b in approved]
+    drafts = client.get("/api/v1/adaptations/blueprints?status=draft").json()
+    assert activity_id not in [b["blueprint"]["activity_id"] for b in drafts]
+
+
+def test_approved_games_survive_a_server_restart():
+    # Regression: blueprints used to live in an in-memory dict, so a restart emptied the
+    # learner page and approving an older game returned 404.
+    res = client.post("/api/v1/adaptations/blueprints", json={
+        "source_question_id": "Q-restart", "grade": 2, "topic": "Subtraction",
+        "raw_sinhala_question": SUB_Q, "adhd_risk_level": "LOW",
+    })
+    activity_id = res.json()["blueprint"]["activity_id"]
+
+    old = db_service._fallback_blueprints
+    db_service._fallback_blueprints = FallbackCollection(old.name, old.filepath)  # fresh process, same disk
+    try:
+        res = client.patch(f"/api/v1/adaptations/blueprints/{activity_id}/status", json={"status": "approved"})
+        assert res.status_code == 200
+        db_service._fallback_blueprints = FallbackCollection(old.name, old.filepath)
+        approved = client.get("/api/v1/adaptations/blueprints?status=approved").json()
+        assert activity_id in [b["blueprint"]["activity_id"] for b in approved]
+        assert client.get(f"/api/v1/adaptations/blueprints/{activity_id}").status_code == 200
+    finally:
+        db_service._fallback_blueprints = old
 
 
 def test_api_rejects_question_without_numbers():

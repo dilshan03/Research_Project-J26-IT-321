@@ -81,6 +81,16 @@ class FallbackCollection:
         except Exception:
             pass
 
+    @staticmethod
+    def _get(doc: Dict[str, Any], key: str) -> Any:
+        """Mongo-style dotted lookup, e.g. "blueprint.status"."""
+        value: Any = doc
+        for part in key.split("."):
+            if not isinstance(value, dict):
+                return None
+            value = value.get(part)
+        return value
+
     def _matches(self, doc: Dict[str, Any], query: Dict[str, Any]) -> bool:
         for k, v in query.items():
             if k == "_id" and str(doc.get("_id", "")) != str(v) and str(doc.get("id", "")) != str(v):
@@ -88,9 +98,9 @@ class FallbackCollection:
             elif isinstance(v, dict):
                 # Simple handling for $in operator
                 if "$in" in v:
-                    if doc.get(k) not in v["$in"]:
+                    if self._get(doc, k) not in v["$in"]:
                         return False
-            elif doc.get(k) != v:
+            elif k != "_id" and self._get(doc, k) != v:
                 return False
         return True
 

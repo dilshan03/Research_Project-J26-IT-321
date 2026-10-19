@@ -22,6 +22,7 @@ from app.services.blueprint_generator import (
 )
 from app.services.cognitive_load import compute_cli
 from app.services.db import DATA_DIR, db_service
+from app.services.repository import repository
 from app.services.syllabus_pipeline import page_count_bytes
 
 router = APIRouter(prefix="/api/v1/syllabus", tags=["syllabus-curriculum"])
@@ -189,30 +190,14 @@ async def adapt_problem_to_game(problem_id: str, req: AdaptProblemRequest):
         blueprint=blueprint,
     )
 
-    blueprints_col = db_service.get_game_blueprints()
-    await blueprints_col.update_one(
-        {"activity_id": blueprint.activity_id},
-        {"$set": envelope.model_dump()},
-        upsert=True,
-    )
-
-    from app.services.repository import repository
-    repository.save(envelope)
-
-    return envelope
+    return await repository.save(envelope)
 
 
 @router.put("/blueprints/{activity_id}/tune", response_model=BlueprintEnvelope)
 async def tune_game_blueprint(activity_id: str, req: TuneBlueprintRequest):
-    blueprints_col = db_service.get_game_blueprints()
-    bp_dict = await blueprints_col.find_one({"activity_id": activity_id})
-    if not bp_dict:
-        from app.services.repository import repository
-        env = repository.get(activity_id)
-        if not env:
-            raise HTTPException(status_code=404, detail=f"Blueprint {activity_id} not found")
-    else:
-        env = BlueprintEnvelope(**bp_dict)
+    env = await repository.get(activity_id)
+    if not env:
+        raise HTTPException(status_code=404, detail=f"Blueprint {activity_id} not found")
 
     probs_col = db_service.get_curriculum_problems()
     prob_dict = await probs_col.find_one({"problem_id": env.blueprint.source_question_id})
@@ -242,15 +227,7 @@ async def tune_game_blueprint(activity_id: str, req: TuneBlueprintRequest):
         blueprint=tuned_blueprint,
     )
 
-    await blueprints_col.update_one(
-        {"activity_id": activity_id},
-        {"$set": new_envelope.model_dump()},
-        upsert=True,
-    )
-    from app.services.repository import repository
-    repository.save(new_envelope)
-
-    return new_envelope
+    return await repository.save(new_envelope)
 
 
 @router.post("/cognitive-load/preview")

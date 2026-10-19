@@ -5,12 +5,14 @@ import { useAgentStore } from '../store/useAgentStore';
 
 export interface UseLearnerStateProps {
   studentId?: string;
+  parentId?: string;
   sessionId?: string;
   autoIntervene?: boolean; // Automatically triggers 3D agent reaction & speech bubble
 }
 
 export function useLearnerState({
   studentId = 'student_trial_01',
+  parentId = 'parent_demo',
   sessionId = 'sess_adhd_study_01',
   autoIntervene = true
 }: UseLearnerStateProps = {}) {
@@ -242,7 +244,12 @@ export function useLearnerState({
   const fetchLearnerState = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/telemetry/learner-state?studentId=${studentId}&sessionId=${sessionId}`);
+      const params = new URLSearchParams({
+        studentId,
+        parentId,
+        sessionId
+      });
+      const res = await fetch(`/api/telemetry/learner-state?${params.toString()}`);
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       const data = await res.json();
       if (data.success && data.learnerState) {
@@ -255,7 +262,7 @@ export function useLearnerState({
       setIsLoading(false);
     }
     return null;
-  }, [studentId, sessionId]);
+  }, [studentId, parentId, sessionId]);
 
   useEffect(() => {
     fetchLearnerState();

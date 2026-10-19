@@ -446,13 +446,25 @@ const OPTION_CARD_STYLES = [
 
 export interface PedagogicalPracticeArenaProps {
   studentId?: string;
+  parentId?: string;
   studentName?: string;
+  studentGrade?: number;
+  studentAvatar?: string;
   showResearchHUD?: boolean;
   isGameActive?: boolean;
   onStartGame?: () => void;
   onExitGame?: () => void;
   onRewardEarned?: (starsDelta: number, coinsDelta: number) => void;
   onProgressUpdate?: (progressPercent: number) => void;
+  onSessionDataSync?: (summary: {
+    completedSteps: number[];
+    hintAwareKnowledge: number;
+    standardKnowledge: number;
+    totalHintsUsed: number;
+    cognitiveState?: string;
+    fsmState?: string;
+    sessionComplete?: boolean;
+  }) => void;
 }
 
 /**
@@ -462,13 +474,17 @@ export interface PedagogicalPracticeArenaProps {
  */
 export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> = ({
   studentId = 'student_nethmi_g3',
+  parentId = 'parent_demo',
   studentName = 'Nethmi',
+  studentGrade = 3,
+  studentAvatar = '🦉',
   showResearchHUD = false,
   isGameActive,
   onStartGame,
   onExitGame,
   onRewardEarned,
   onProgressUpdate,
+  onSessionDataSync,
 }) => {
   const { playAction, onGameEvent, resetHints } = usePedagogicalAgent();
   const currentHintLevel = useAgentStore((state) => state.currentHintLevel);
@@ -496,10 +512,26 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
     };
   }, []);
 
+  // Reset practice session state when switching to a different child profile
+  useEffect(() => {
+    setCurrentQuestionIdx(0);
+    setCompletedSteps([]);
+    setIsSessionComplete(false);
+    setSelectedOption(null);
+    setAnswerFeedback(null);
+    setExplanationActive(false);
+    resetHints();
+  }, [studentId, parentId, resetHints]);
+
+  const sessionId = `sess_${parentId}_${studentId}`;
+
   // Telemetry & Real-time Pedagogical Engine (BKT + 10-Rule FSM) across all 10 questions
   const { logs, metrics, logAnswer, logHint, clearLogs } = useInteractionLogger({
-    sessionId: 'sess_student_practice_01',
+    sessionId,
     studentId,
+    parentId,
+    studentName,
+    grade: studentGrade,
     questionId: activeQuestion.id,
     concept: 'single_digit_addition',
   });
@@ -513,7 +545,8 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
     triggerFSMContext,
   } = useLearnerState({
     studentId,
-    sessionId: 'sess_student_practice_01',
+    parentId,
+    sessionId,
     autoIntervene: true,
   });
 
@@ -529,6 +562,30 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
       onProgressUpdate(pct);
     }
   }, [completedSteps, onProgressUpdate]);
+
+  useEffect(() => {
+    if (onSessionDataSync && logs.length > 0) {
+      onSessionDataSync({
+        completedSteps,
+        hintAwareKnowledge: bktComparison.hintAwareKnowledge,
+        standardKnowledge: bktComparison.standardKnowledge,
+        totalHintsUsed: metrics.totalHintsCount,
+        cognitiveState: learnerState?.cognitiveState,
+        fsmState: fsmDecision.fsmState,
+        sessionComplete: isSessionComplete,
+      });
+    }
+  }, [
+    completedSteps,
+    bktComparison.hintAwareKnowledge,
+    bktComparison.standardKnowledge,
+    metrics.totalHintsCount,
+    learnerState?.cognitiveState,
+    fsmDecision.fsmState,
+    isSessionComplete,
+    logs.length,
+    onSessionDataSync,
+  ]);
 
   const handleGoToStep = (idx: number) => {
     if (autoAdvanceTimerRef.current) {
@@ -557,7 +614,7 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
     setExplanationActive(false);
     resetHints();
     playAction('wave', {
-      message: 'අපි ප්‍රශ්න 10 මුලසිට නැවත පටන් ගමු!',
+      message: `${studentName}, අපි ප්‍රශ්න 10 මුලසිට නැවත පටන් ගමු!`,
       duration: 3,
     });
   };
@@ -683,22 +740,31 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
           <div className="h-2 w-full bg-gradient-to-r from-mq-primary-dark via-mq-primary to-mq-secondary" />
 
           <div className="p-6 sm:p-10 text-center space-y-6">
-            {/* Top Icon & Category Pill */}
+            {/* Top Icon, Active Child Badge & Category Pill */}
             <div className="space-y-3">
               <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-mq-surface-blue to-mq-surface-green border border-mq-primary/25 flex items-center justify-center mx-auto shadow-xs text-3xl">
-                🤖
+                {studentAvatar}
               </div>
 
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-mq-surface-blue border border-mq-primary/20 text-xs font-extrabold uppercase tracking-wider text-mq-primary-dark">
-                <Dumbbell size={13} className="text-mq-primary" />
-                <span>එකතු කිරීමේ ප්‍රගුණතාව · ADDITION MASTERY</span>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-mq-surface-green border border-mq-secondary/35 text-xs font-extrabold text-mq-success">
+                  <span>{studentAvatar}</span>
+                  <span>
+                    {studentName} · Grade {studentGrade}
+                  </span>
+                </span>
+
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-mq-surface-blue border border-mq-primary/20 text-xs font-extrabold uppercase tracking-wider text-mq-primary-dark">
+                  <Dumbbell size={13} className="text-mq-primary" />
+                  <span>එකතු කිරීමේ ප්‍රගුණතාව · ADDITION MASTERY</span>
+                </span>
               </div>
 
               <h1 className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong sinhala">
-                ගණිත පුහුණුව ආරම්භ කරමුද?
+                ආයුබෝවන් {studentName}! ගණිත පුහුණුව ආරම්භ කරමුද?
               </h1>
               <p className="text-sm sm:text-base font-bold text-mq-primary-dark">
-                Ready to Start Maths Practice? (Level 01: Number Adventure)
+                Ready to Start Maths Practice, {studentName}? (Level 01: Number Adventure)
               </p>
               <p className="text-xs sm:text-sm text-mq-text-muted max-w-lg mx-auto leading-relaxed sinhala">
                 ප්‍රශ්න 10 කින් යුත් මෙම පුහුණු වටයේදී ඔයාට පියවරෙන් පියවර උදව් කරන්න{' '}

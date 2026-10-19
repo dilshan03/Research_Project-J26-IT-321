@@ -89,6 +89,7 @@ function App() {
           {/* 2. Preserved Existing & Student Dashboard Routes          */}
           {/* ========================================================= */}
           <Route path="/student/dashboard" element={<StudentDashboardPage />} />
+          <Route path="/student/dashboard/:learnerId" element={<StudentDashboardPage />} />
           <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
 
           <Route

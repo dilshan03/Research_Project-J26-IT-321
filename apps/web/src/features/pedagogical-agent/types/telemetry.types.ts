@@ -7,6 +7,10 @@ export interface InteractionEvent {
   id: string;
   sessionId: string;
   studentId: string;
+  learnerId?: string;
+  parentId?: string;
+  studentName?: string;
+  grade?: number;
   questionId: string;
   concept: string; // e.g. 'single_digit_addition'
   

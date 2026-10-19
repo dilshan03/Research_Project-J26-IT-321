@@ -1,15 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Edit3,
   ArrowRight,
   GraduationCap,
   Calendar,
   Languages,
+  Gamepad2,
 } from 'lucide-react';
 import type { Learner } from '../types';
 import { AVATAR_OPTIONS } from '../types';
 import { OnboardingStatusBadge } from './OnboardingStatusBadge';
+import { setActiveStudentProfile } from '../utils/activeStudentStorage';
 
 interface LearnerCardProps {
   learner: Learner;
@@ -25,6 +27,8 @@ const GRADE_LABELS: Record<number, { si: string; en: string }> = {
 };
 
 export const LearnerCard: React.FC<LearnerCardProps> = ({ learner, onEdit }) => {
+  const navigate = useNavigate();
+
   const avatar =
     AVATAR_OPTIONS.find((a) => a.id === learner.avatarId) || AVATAR_OPTIONS[0];
 
@@ -43,6 +47,15 @@ export const LearnerCard: React.FC<LearnerCardProps> = ({ learner, onEdit }) => 
       default:
         return 'ආරම්භක ඇගයීම (Start Profiling)';
     }
+  };
+
+  const handleOpenStudentGameProfile = () => {
+    setActiveStudentProfile(learner);
+    const params = new URLSearchParams({
+      learnerId: learner.learnerId,
+      parentId: learner.parentId,
+    });
+    navigate(`/student/dashboard?${params.toString()}`);
   };
 
   return (
@@ -134,8 +147,8 @@ export const LearnerCard: React.FC<LearnerCardProps> = ({ learner, onEdit }) => 
         </div>
       </div>
 
-      {/* Action Footer: Start / Resume / View Profile */}
-      <div className="pt-3 border-t border-mq-border/60">
+      {/* Action Footer: Start / Resume / View Profile + Launch Child Game Profile */}
+      <div className="pt-3 border-t border-mq-border/60 space-y-2.5">
         <Link
           to={`/learners/${learner.learnerId}/onboarding`}
           className="w-full btn btn-primary py-2.5 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs sm:text-sm font-bold shadow-xs hover:shadow-sm transition-all"
@@ -143,6 +156,17 @@ export const LearnerCard: React.FC<LearnerCardProps> = ({ learner, onEdit }) => 
           <span className="truncate">{getActionLabel()}</span>
           <ArrowRight size={15} strokeWidth={2.5} className="shrink-0" />
         </Link>
+
+        <button
+          type="button"
+          onClick={handleOpenStudentGameProfile}
+          className="w-full py-2.5 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs sm:text-sm font-extrabold bg-mq-surface-green hover:bg-mq-secondary text-mq-success hover:text-white border border-mq-secondary/50 hover:border-mq-secondary shadow-xs hover:shadow-sm transition-all cursor-pointer font-sinhala"
+          title={`Open ${learner.firstName}'s Student Game Dashboard`}
+        >
+          <Gamepad2 size={16} className="shrink-0" />
+          <span className="truncate">ක්‍රීඩා පැතිකඩ (Game Profile)</span>
+          <ArrowRight size={15} strokeWidth={2.5} className="shrink-0" />
+        </button>
       </div>
     </div>
   );

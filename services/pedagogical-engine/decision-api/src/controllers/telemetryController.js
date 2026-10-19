@@ -1,16 +1,22 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { saveInteractionLog, getInteractionLogs } from '../models/interactionModel.js';
+import {
+  saveInteractionLog,
+  getInteractionLogs,
+  saveStudentProgressRecord,
+  getStudentProgressRecord
+} from '../models/interactionModel.js';
 import { buildLearnerState } from '../engine/learnerStateBuilder.js';
 import { defaultBKT } from '../engine/bktEngine.js';
 import { defaultFSM, FSM_RULES, FSM_STATES } from '../engine/fsmDecisionEngine.js';
 
-// Local file-system telemetry persistence fallback path
+// Local file-system telemetry persistence fallback paths
 const LOCAL_STORAGE_PATH = fileURLToPath(new URL('../../data/pedagogical_interactions.json', import.meta.url));
+const LOCAL_PROGRESS_PATH = fileURLToPath(new URL('../../data/pedagogical_student_progress.json', import.meta.url));
 
 /**
- * Ensures the fallback data directory and JSON file exist.
+ * Ensures the fallback data directory and JSON files exist.
  */
 export function ensureLocalStorage() {
   const dir = path.dirname(LOCAL_STORAGE_PATH);
@@ -19,6 +25,9 @@ export function ensureLocalStorage() {
   }
   if (!fs.existsSync(LOCAL_STORAGE_PATH)) {
     fs.writeFileSync(LOCAL_STORAGE_PATH, JSON.stringify([], null, 2));
+  }
+  if (!fs.existsSync(LOCAL_PROGRESS_PATH)) {
+    fs.writeFileSync(LOCAL_PROGRESS_PATH, JSON.stringify([], null, 2));
   }
 }
 
@@ -29,8 +38,13 @@ function saveToLocalStorage(logData, recordId) {
   ensureLocalStorage();
   const raw = fs.readFileSync(LOCAL_STORAGE_PATH, 'utf-8');
   const list = JSON.parse(raw || '[]');
+  const normalizedStudentId = logData.studentId || logData.learnerId || 'student_unknown';
+  const normalizedParentId = logData.parentId || 'parent_unknown';
   const doc = {
     ...logData,
+    studentId: normalizedStudentId,
+    learnerId: logData.learnerId || normalizedStudentId,
+    parentId: normalizedParentId,
     _id: recordId,
     receivedAt: new Date().toISOString()
   };
@@ -42,15 +56,67 @@ function saveToLocalStorage(logData, recordId) {
 /**
  * Read logs from local fallback storage
  */
-function readFromLocalStorage({ studentId, sessionId, limit = 100 }) {
+function readFromLocalStorage({ parentId, studentId, learnerId, sessionId, limit = 100 }) {
   ensureLocalStorage();
   const raw = fs.readFileSync(LOCAL_STORAGE_PATH, 'utf-8');
   let logs = JSON.parse(raw || '[]');
 
-  if (studentId) logs = logs.filter((l) => l.studentId === studentId);
+  const targetStudentId = studentId || learnerId;
+  if (parentId) logs = logs.filter((l) => l.parentId === parentId);
+  if (targetStudentId) {
+    logs = logs.filter((l) => l.studentId === targetStudentId || l.learnerId === targetStudentId);
+  }
   if (sessionId) logs = logs.filter((l) => l.sessionId === sessionId);
 
   return logs.slice(-parseInt(limit, 10)).reverse();
+}
+
+/**
+ * Save or update student progress in local fallback JSON
+ */
+function saveProgressToLocalStorage(progressData) {
+  ensureLocalStorage();
+  const raw = fs.readFileSync(LOCAL_PROGRESS_PATH, 'utf-8');
+  const list = JSON.parse(raw || '[]');
+  const parentId = progressData.parentId || 'parent_unknown';
+  const studentId = progressData.learnerId || progressData.studentId || 'student_unknown';
+
+  const idx = list.findIndex((item) => item.parentId === parentId && item.studentId === studentId);
+  const updatedDoc = {
+    ...(idx >= 0 ? list[idx] : {}),
+    ...progressData,
+    parentId,
+    studentId,
+    learnerId: studentId,
+    updatedAt: new Date().toISOString()
+  };
+
+  if (idx >= 0) {
+    list[idx] = updatedDoc;
+  } else {
+    list.push(updatedDoc);
+  }
+
+  fs.writeFileSync(LOCAL_PROGRESS_PATH, JSON.stringify(list, null, 2));
+  return updatedDoc;
+}
+
+/**
+ * Read student progress from local fallback JSON
+ */
+function readProgressFromLocalStorage({ parentId, studentId, learnerId }) {
+  ensureLocalStorage();
+  const raw = fs.readFileSync(LOCAL_PROGRESS_PATH, 'utf-8');
+  const list = JSON.parse(raw || '[]');
+  const targetStudentId = studentId || learnerId;
+
+  return (
+    list.find(
+      (item) =>
+        (!parentId || item.parentId === parentId) &&
+        (!targetStudentId || item.studentId === targetStudentId || item.learnerId === targetStudentId)
+    ) || null
+  );
 }
 
 /**
@@ -80,7 +146,9 @@ export async function recordInteraction(req, res) {
       storageTarget = 'Local Storage Fallback';
     }
 
-    console.log(`[Telemetry Saved] Event: ${logData.eventType} | Student: ${logData.studentId} | Storage: ${storageTarget} | Correct: ${logData.isCorrect ?? '-'}`);
+    console.log(
+      `[Telemetry Saved] Event: ${logData.eventType} | Parent: ${logData.parentId || '-'} | Student: ${logData.studentId || logData.learnerId} | Storage: ${storageTarget} | Correct: ${logData.isCorrect ?? '-'}`
+    );
 
     return res.status(201).json({
       success: true,
@@ -103,11 +171,13 @@ export async function recordInteraction(req, res) {
  */
 export async function getInteractions(req, res) {
   try {
-    const { studentId, sessionId, limit = 100 } = req.query;
+    const { parentId, studentId, learnerId, sessionId, limit = 100 } = req.query;
 
     try {
       const logs = await getInteractionLogs({
+        parentId,
         studentId,
+        learnerId,
         sessionId,
         limit: limit ? parseInt(limit, 10) : 100
       });
@@ -123,7 +193,7 @@ export async function getInteractions(req, res) {
     }
 
     // Fallback to local JSON storage
-    const logs = readFromLocalStorage({ studentId, sessionId, limit });
+    const logs = readFromLocalStorage({ parentId, studentId, learnerId, sessionId, limit });
 
     return res.json({
       success: true,
@@ -147,29 +217,32 @@ export async function getInteractions(req, res) {
  */
 export async function getLearnerState(req, res) {
   try {
-    const { studentId, sessionId, limit = 20 } = req.query;
+    const { parentId, studentId, learnerId, sessionId, limit = 20 } = req.query;
 
     let logs = [];
     try {
       logs = await getInteractionLogs({
+        parentId,
         studentId,
+        learnerId,
         sessionId,
         limit: parseInt(limit, 10) || 20
       });
     } catch (dbErr) {
-      logs = readFromLocalStorage({ studentId, sessionId, limit });
+      logs = readFromLocalStorage({ parentId, studentId, learnerId, sessionId, limit });
     }
 
     // If MongoDB returned no records (e.g. offline fallback used earlier), check fallback
     if (!logs || logs.length === 0) {
-      logs = readFromLocalStorage({ studentId, sessionId, limit });
+      logs = readFromLocalStorage({ parentId, studentId, learnerId, sessionId, limit });
     }
 
     const learnerState = buildLearnerState(logs);
 
     return res.json({
       success: true,
-      studentId: studentId || learnerState.studentId,
+      parentId: parentId || null,
+      studentId: studentId || learnerId || learnerState.studentId,
       interactionsAnalyzed: logs.length,
       learnerState
     });
@@ -239,21 +312,23 @@ export function calculateBKTStep(req, res) {
  */
 export async function getBKTMasteryTrajectory(req, res) {
   try {
-    const { studentId, sessionId, limit = 100 } = req.query;
+    const { parentId, studentId, learnerId, sessionId, limit = 100 } = req.query;
 
     let logs = [];
     try {
       logs = await getInteractionLogs({
+        parentId,
         studentId,
+        learnerId,
         sessionId,
         limit: parseInt(limit, 10) || 100
       });
     } catch (dbErr) {
-      logs = readFromLocalStorage({ studentId, sessionId, limit });
+      logs = readFromLocalStorage({ parentId, studentId, learnerId, sessionId, limit });
     }
 
     if (!logs || logs.length === 0) {
-      logs = readFromLocalStorage({ studentId, sessionId, limit });
+      logs = readFromLocalStorage({ parentId, studentId, learnerId, sessionId, limit });
     }
 
     // Ensure chronological order
@@ -262,11 +337,85 @@ export async function getBKTMasteryTrajectory(req, res) {
 
     return res.json({
       success: true,
-      studentId,
+      parentId: parentId || null,
+      studentId: studentId || learnerId,
       ...trajectoryData
     });
   } catch (error) {
     return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+/**
+ * POST /api/telemetry/student-progress
+ * Persists cumulative student progress (stars, coins, BKT mastery, session stats) keyed by (parentId, studentId/learnerId)
+ */
+export async function upsertStudentProgress(req, res) {
+  try {
+    const progressData = req.body || {};
+    const parentId = progressData.parentId || 'parent_unknown';
+    const studentId = progressData.learnerId || progressData.studentId;
+
+    if (!studentId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required field: learnerId or studentId'
+      });
+    }
+
+    let storageTarget = 'MongoDB Atlas';
+    let savedProgress = null;
+
+    try {
+      savedProgress = await saveStudentProgressRecord(progressData);
+      saveProgressToLocalStorage(progressData);
+    } catch (dbErr) {
+      console.warn('MongoDB progress save failed, using local storage fallback:', dbErr.message);
+      savedProgress = saveProgressToLocalStorage(progressData);
+      storageTarget = 'Local Storage Fallback';
+    }
+
+    return res.json({
+      success: true,
+      storage: storageTarget,
+      progress: savedProgress
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * GET /api/telemetry/student-progress
+ * Retrieves saved student progress for a specific (parentId, studentId/learnerId) pair
+ */
+export async function getStudentProgress(req, res) {
+  try {
+    const { parentId, studentId, learnerId } = req.query;
+    let progress = null;
+
+    try {
+      progress = await getStudentProgressRecord({ parentId, studentId, learnerId });
+    } catch (dbErr) {
+      progress = readProgressFromLocalStorage({ parentId, studentId, learnerId });
+    }
+
+    if (!progress) {
+      progress = readProgressFromLocalStorage({ parentId, studentId, learnerId });
+    }
+
+    return res.json({
+      success: true,
+      progress
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 }
 
@@ -320,3 +469,4 @@ export function getFSMRules(req, res) {
     });
   }
 }
+

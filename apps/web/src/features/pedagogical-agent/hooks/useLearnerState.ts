@@ -5,12 +5,14 @@ import { useAgentStore } from '../store/useAgentStore';
 
 export interface UseLearnerStateProps {
   studentId?: string;
+  parentId?: string;
   sessionId?: string;
   autoIntervene?: boolean; // Automatically triggers 3D agent reaction & speech bubble
 }
 
 export function useLearnerState({
   studentId = 'student_trial_01',
+  parentId = 'parent_demo',
   sessionId = 'sess_adhd_study_01',
   autoIntervene = true
 }: UseLearnerStateProps = {}) {
@@ -164,7 +166,18 @@ export function useLearnerState({
     async (interactions: InteractionEvent[]) => {
       if (!interactions || interactions.length === 0) return null;
 
-      // 1. Update BKT comparative model
+      const newestEvent = interactions[interactions.length - 1];
+      const isPassiveQuestionLoad =
+        newestEvent?.eventType === 'QUESTION_VIEW' &&
+        !newestEvent.idleTimeBeforeFirstActionMs &&
+        !newestEvent.responseTimeMs;
+
+      // Do not overwrite active BKT/FSM state when auto-advancing to the next question
+      if (isPassiveQuestionLoad && interactions.length > 1) {
+        return null;
+      }
+
+      // 1. Update BKT comparative model across all answered questions
       const bktResult = computeBKTComparison(interactions);
       setBktComparison(bktResult);
 
@@ -185,8 +198,18 @@ export function useLearnerState({
           setLearnerState(state);
 
           // 3. Evaluate FSM Decision Engine with full learner and BKT metrics
-          const lastEvent = interactions[interactions.length - 1];
-          const lastIsCorrect = lastEvent?.eventType === 'ANSWER_SUBMIT' ? lastEvent.isCorrect : null;
+          const actionable = interactions.filter(
+            (ev) =>
+              ev.eventType !== 'QUESTION_VIEW' ||
+              (ev.idleTimeBeforeFirstActionMs && ev.idleTimeBeforeFirstActionMs > 0) ||
+              (ev.responseTimeMs && ev.responseTimeMs > 0)
+          );
+          const lastEvent =
+            actionable.length > 0
+              ? actionable[actionable.length - 1]
+              : interactions[interactions.length - 1];
+          const lastIsCorrect =
+            lastEvent?.eventType === 'ANSWER_SUBMIT' ? lastEvent.isCorrect : null;
 
           const fsmContext = {
             consecutiveErrors: state.metrics.consecutiveErrors,
@@ -221,7 +244,12 @@ export function useLearnerState({
   const fetchLearnerState = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`/api/telemetry/learner-state?studentId=${studentId}&sessionId=${sessionId}`);
+      const params = new URLSearchParams({
+        studentId,
+        parentId,
+        sessionId
+      });
+      const res = await fetch(`/api/telemetry/learner-state?${params.toString()}`);
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       const data = await res.json();
       if (data.success && data.learnerState) {
@@ -234,7 +262,7 @@ export function useLearnerState({
       setIsLoading(false);
     }
     return null;
-  }, [studentId, sessionId]);
+  }, [studentId, parentId, sessionId]);
 
   useEffect(() => {
     fetchLearnerState();

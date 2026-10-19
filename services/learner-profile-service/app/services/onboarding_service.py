@@ -81,6 +81,13 @@ def snap_iv_status(quest_doc: Optional[Dict[str, Any]], progress_doc: Optional[D
     return SNAP_IV_NOT_STARTED
 
 
+def adhd_type_reported(adhd_information: Optional[Dict[str, Any]]) -> bool:
+    """True when the parent reported a professional diagnosis with a specific ADHD presentation."""
+    if not adhd_information or adhd_information.get("diagnosisStatus") != "yes":
+        return False
+    return adhd_information.get("reportedPresentation") not in (None, "not_specified")
+
+
 def resolve_next_step(
     quest_doc: Optional[Dict[str, Any]],
     progress_doc: Optional[Dict[str, Any]],
@@ -90,7 +97,12 @@ def resolve_next_step(
     quest_doc = quest_doc or {}
     if not quest_doc.get("adhdInformation"):
         return "adhd_information"
-    if snap_iv_status(quest_doc, progress_doc) == SNAP_IV_NOT_STARTED:
+    # SNAP-IV is not asked during onboarding when the parent already reported the ADHD type;
+    # it stays NOT_STARTED (not skipped) and remains available from the parent dashboard.
+    if (
+        snap_iv_status(quest_doc, progress_doc) == SNAP_IV_NOT_STARTED
+        and not adhd_type_reported(quest_doc.get("adhdInformation"))
+    ):
         return "snap_iv"
     if not quest_doc.get("learningPreferences"):
         return "preferences"
@@ -209,6 +221,7 @@ async def get_or_create_onboarding_progress(
 
         math_summary = {
             "grade": assessment_doc.get("grade", learner["grade"]),
+            "assessmentProtocolVersion": assessment_doc.get("assessmentProtocolVersion", "onboarding-v1"),
             "totalQuestions": assessment_doc.get("totalQuestions", 0),
             "correctAnswers": assessment_doc.get("correctAnswers", 0),
             "accuracyPercentage": assessment_doc.get("accuracyPercentage", 0.0),
@@ -224,6 +237,13 @@ async def get_or_create_onboarding_progress(
                 "Baseline derived via transparent pedagogical rules."
             ),
             "elpxProfile": elpx_prof,
+            "childPreferences": assessment_doc.get("childPreferences"),
+            "impsa": assessment_doc.get("impsaSummary"),
+            "imlr": assessment_doc.get("imlrSummary"),
+            "evaluatedItems": assessment_doc.get("evaluatedItems", []),
+            "excludedItems": assessment_doc.get("excludedItems", []),
+            "sessionStartedAt": assessment_doc.get("sessionStartedAt"),
+            "sessionEndedAt": assessment_doc.get("sessionEndedAt"),
             "evidenceRulesetVersion": assessment_doc.get("evidenceRulesetVersion"),
             "evidenceSummary": assessment_doc.get("evidenceSummary"),
         }
@@ -713,6 +733,57 @@ async def submit_math_assessment(
 
     child_prefs = data.childPreferences.model_dump() if getattr(data, "childPreferences", None) else None
 
+    impsa_summary = None
+    imlr_summary = None
+    if protocol_version == "onboarding-v2":
+        prof_items = select_proficiency_items(evaluated_items)
+        unassisted_count = len(prof_items)
+        impsa_status = "PROVISIONAL" if unassisted_count >= 3 else "INSUFFICIENT_EVIDENCE"
+        impsa_summary = {
+            "status": impsa_status,
+            "eligibleUnassistedItems": unassisted_count,
+            "skillEvidence": [
+                {
+                    "questionId": it.get("questionId"),
+                    "conceptId": it.get("conceptId"),
+                    "skillId": it.get("skillId"),
+                    "correctFirstResponse": bool(it.get("correctFirstResponse")),
+                }
+                for it in prof_items
+            ],
+            "evidenceSufficiency": "SUFFICIENT" if unassisted_count >= 3 else "INSUFFICIENT",
+            "uncertaintyNote": (
+                "Provisional estimate based on brief intake. Revise after continuous gameplay observations."
+            ),
+        }
+
+        pre_item = next((it for it in evaluated_items if it.get("probeRole") == "pre"), None)
+        support_item = next((it for it in evaluated_items if it.get("probeRole") == "support"), None)
+        transfer_item = next((it for it in evaluated_items if it.get("probeRole") == "transfer"), None)
+
+        if pre_item and transfer_item:
+            pre_correct = bool(pre_item.get("correctFirstResponse") and not pre_item.get("supportBeforeFirstResponse"))
+            support_delivered = [e.get("type", "support") for e in (support_item.get("supportEvents", []) if support_item else [])]
+            transfer_correct = bool(transfer_item.get("correctFirstResponse") and not transfer_item.get("supportBeforeFirstResponse"))
+            if pre_correct:
+                imlr_status = "ALREADY_DEMONSTRATED"
+            elif transfer_correct:
+                imlr_status = "TRANSFER_OBSERVED"
+            else:
+                imlr_status = "TRANSFER_NOT_YET_OBSERVED"
+
+            imlr_summary = {
+                "status": imlr_status,
+                "conceptId": pre_item.get("conceptId") or "compare_more",
+                "preProbeCorrect": pre_correct,
+                "supportDelivered": support_delivered,
+                "unassistedTransferCorrect": transfer_correct,
+                "evidenceLevel": "PROVISIONAL",
+                "uncertaintyNote": (
+                    "Initial transfer indicator from a single probe; does not certify durable learning gain."
+                ),
+            }
+
     assessment_doc = {
         "learnerId": learner_id,
         "parentId": parent_id,
@@ -737,6 +808,8 @@ async def submit_math_assessment(
         "evidenceSummary": evidence_summary,
         "elpxProfile": elpx_profile,
         "childPreferences": child_prefs,
+        "impsaSummary": impsa_summary,
+        "imlrSummary": imlr_summary,
         "sessionStartedAt": data.sessionStartedAt,
         "sessionEndedAt": data.sessionEndedAt,
         "mlPredictionNotice": (
@@ -790,8 +863,12 @@ async def submit_math_assessment(
         "mlPredictionNotice": assessment_doc["mlPredictionNotice"],
         "elpxProfile": elpx_profile,
         "childPreferences": child_prefs,
-        "impsa": None,
-        "imlr": None,
+        "impsa": impsa_summary,
+        "imlr": imlr_summary,
+        "evaluatedItems": evaluated_items,
+        "excludedItems": excluded_items,
+        "sessionStartedAt": data.sessionStartedAt,
+        "sessionEndedAt": data.sessionEndedAt,
         "evidenceRulesetVersion": EVIDENCE_RULESET_VERSION,
         "evidenceSummary": evidence_summary,
     }

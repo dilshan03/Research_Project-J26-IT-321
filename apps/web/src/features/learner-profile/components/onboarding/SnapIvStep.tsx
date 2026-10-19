@@ -23,8 +23,10 @@ interface Props {
   onSaveAndExit: (responses: SnapIvItemAnswer[]) => Promise<void>;
   onBack: () => void;
   /** SNAP-IV is optional: skipping keeps any previously saved responses. */
-  onSkip: () => Promise<void>;
+  onSkip?: () => Promise<void>;
   isSaving: boolean;
+  /** Opened from the parent dashboard rather than the onboarding sequence (no step badge or skip). */
+  standalone?: boolean;
 }
 
 const t = parentText.snap;
@@ -36,6 +38,7 @@ export const SnapIvStep: React.FC<Props> = ({
   onBack,
   onSkip,
   isSaving,
+  standalone = false,
 }) => {
   const [answers, setAnswers] = useState<Record<number, number>>(() => {
     const map: Record<number, number> = {};
@@ -125,9 +128,11 @@ export const SnapIvStep: React.FC<Props> = ({
       {/* Header */}
       <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-xs space-y-4">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-mq-surface-green text-mq-success">
-            {parentText.onboarding.stepOf(2)}
-          </span>
+          {!standalone && (
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-mq-surface-green text-mq-success">
+              {parentText.onboarding.stepOf(2)}
+            </span>
+          )}
           <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-mq-surface-soft text-mq-text-muted border border-mq-border">
             {parentText.common.optional}
           </span>
@@ -136,7 +141,7 @@ export const SnapIvStep: React.FC<Props> = ({
         <p className="text-base text-mq-text-muted leading-relaxed">{t.intro}</p>
         <p className="text-sm text-mq-text-muted leading-relaxed flex items-start gap-2">
           <Info size={16} className="shrink-0 mt-0.5 text-mq-primary" />
-          <span>{t.optionalText}</span>
+          <span>{standalone ? t.optionalTextStandalone : t.optionalText}</span>
         </p>
 
         {/* Not a diagnosis */}
@@ -193,16 +198,18 @@ export const SnapIvStep: React.FC<Props> = ({
         </div>
 
         <div className="flex flex-col-reverse sm:flex-row gap-3">
-          <motion.button
-            type="button"
-            whileTap={{ scale: 0.98 }}
-            disabled={isSaving}
-            onClick={() => onSkip()}
-            className="btn btn-secondary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center justify-center gap-2"
-          >
-            <SkipForward size={16} />
-            <span>{parentText.common.skipForNow}</span>
-          </motion.button>
+          {onSkip && !standalone && (
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.98 }}
+              disabled={isSaving}
+              onClick={() => onSkip()}
+              className="btn btn-secondary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center justify-center gap-2"
+            >
+              <SkipForward size={16} />
+              <span>{parentText.common.skipForNow}</span>
+            </motion.button>
+          )}
           <motion.button
             type="submit"
             whileTap={{ scale: 0.98 }}
@@ -213,7 +220,7 @@ export const SnapIvStep: React.FC<Props> = ({
               <Loader2 size={18} className="animate-spin" />
             ) : (
               <>
-                <span>{parentText.common.saveAndContinue}</span>
+                <span>{standalone ? t.saveStandalone : parentText.common.saveAndContinue}</span>
                 <ArrowRight size={18} strokeWidth={2.5} />
               </>
             )}

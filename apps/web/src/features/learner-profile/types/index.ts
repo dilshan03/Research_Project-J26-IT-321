@@ -1,6 +1,11 @@
 export type OnboardingStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED';
 
-export type PreferredLanguage = 'Sinhala' | 'English' | 'Bilingual';
+export type LanguageComprehensionLevel =
+  | 'Understands a little'
+  | 'Understands basic instructions'
+  | 'Understands well';
+
+export type PrimaryInstructionLanguage = 'Sinhala' | 'English';
 
 export interface Learner {
   id: string;
@@ -11,8 +16,34 @@ export interface Learner {
   age: number;
   grade: number;
   preferredLanguage: string;
+  sinhalaComprehension?: LanguageComprehensionLevel | string;
+  englishComprehension?: LanguageComprehensionLevel | string;
+  primaryInstructionLanguage?: PrimaryInstructionLanguage | string;
   avatarId: string;
   onboardingStatus: OnboardingStatus;
+  isArchived?: boolean;
+  archivedAt?: string | null;
+  archivedBy?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type DeletionRequestStatus =
+  | 'PENDING_REVIEW'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'COMPLETED';
+
+export interface DeletionRequest {
+  requestId: string;
+  learnerId: string;
+  parentId: string;
+  learnerName?: string;
+  status: DeletionRequestStatus;
+  requestedAt: string;
+  reviewOutcome?: string | null;
+  completedAt?: string | null;
+  reason?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,6 +54,9 @@ export interface CreateLearnerData {
   age: number;
   grade: number;
   preferredLanguage?: string;
+  sinhalaComprehension?: LanguageComprehensionLevel | string;
+  englishComprehension?: LanguageComprehensionLevel | string;
+  primaryInstructionLanguage?: PrimaryInstructionLanguage | string;
   avatarId?: string;
 }
 
@@ -32,6 +66,9 @@ export interface UpdateLearnerData {
   age?: number;
   grade?: number;
   preferredLanguage?: string;
+  sinhalaComprehension?: LanguageComprehensionLevel | string;
+  englishComprehension?: LanguageComprehensionLevel | string;
+  primaryInstructionLanguage?: PrimaryInstructionLanguage | string;
   avatarId?: string;
   onboardingStatus?: OnboardingStatus;
 }

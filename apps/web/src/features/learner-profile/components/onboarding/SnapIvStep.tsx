@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import {
   ShieldAlert,
   ArrowRight,
@@ -6,30 +7,36 @@ import {
   Save,
   Loader2,
   AlertCircle,
+  SkipForward,
+  Info,
 } from 'lucide-react';
 import {
   SNAP_IV_ITEMS,
   SNAP_IV_SCALE_OPTIONS,
   type SnapIvItemAnswer,
 } from '../../types/onboarding';
-
+import { parentText } from '../../../../shared/i18n/parentText';
 
 interface Props {
   initialResponses?: SnapIvItemAnswer[];
   onSave: (responses: SnapIvItemAnswer[]) => Promise<void>;
   onSaveAndExit: (responses: SnapIvItemAnswer[]) => Promise<void>;
   onBack: () => void;
+  /** SNAP-IV is optional: skipping keeps any previously saved responses. */
+  onSkip: () => Promise<void>;
   isSaving: boolean;
 }
+
+const t = parentText.snap;
 
 export const SnapIvStep: React.FC<Props> = ({
   initialResponses,
   onSave,
   onSaveAndExit,
   onBack,
+  onSkip,
   isSaving,
 }) => {
-  // Store responses as a map of itemId -> score
   const [answers, setAnswers] = useState<Record<number, number>>(() => {
     const map: Record<number, number> = {};
     if (initialResponses) {
@@ -60,226 +67,158 @@ export const SnapIvStep: React.FC<Props> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isComplete) {
-      setValidationError(
-        `කරුණාකර සියලු ප්‍රශ්න 18 සඳහා පිළිතුරු සපයන්න (Please answer all 18 items. Currently answered: ${answeredCount}/18).`
-      );
+      setValidationError(t.errorIncomplete(answeredCount));
       return;
     }
     onSave(getResponsesArray());
   };
 
+  const renderSection = (subscale: 'inattention' | 'hyperactivity', title: string, from: number, to: number) => (
+    <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-8 shadow-xs space-y-5">
+      <div className="border-b border-mq-border/70 pb-3">
+        <h3 className="text-lg font-bold text-mq-text-strong">{title}</h3>
+        <p className="text-sm text-mq-text-muted">{t.itemsRange(from, to)}</p>
+      </div>
+
+      <div className="space-y-4">
+        {SNAP_IV_ITEMS.filter((item) => item.subscale === subscale).map((item) => (
+          <fieldset
+            key={item.id}
+            className={`p-4 rounded-2xl border transition-colors ${
+              answers[item.id] !== undefined ? 'border-mq-border bg-white' : 'border-mq-border/60 bg-mq-surface-soft/50'
+            }`}
+          >
+            <legend className="sr-only">{`${item.id}. ${item.textSi}`}</legend>
+            <p className="mb-3 text-base text-mq-text-strong leading-relaxed" aria-hidden="true">
+              <span className="font-bold text-mq-primary mr-2">{item.id}.</span>
+              {item.textSi}
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {SNAP_IV_SCALE_OPTIONS.map((scale) => {
+                const isSelected = answers[item.id] === scale.value;
+                return (
+                  <button
+                    type="button"
+                    key={scale.value}
+                    aria-pressed={isSelected}
+                    onClick={() => handleSelectScore(item.id, scale.value)}
+                    className={`min-h-[48px] px-3 py-2 rounded-xl border text-center text-sm transition-colors cursor-pointer ${
+                      isSelected
+                        ? 'border-mq-primary bg-mq-surface-blue text-mq-primary font-semibold ring-2 ring-mq-primary/20'
+                        : 'border-mq-border bg-white hover:border-mq-primary/40 text-mq-text'
+                    }`}
+                  >
+                    {scale.labelSi}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-xs space-y-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-mq-surface-green text-mq-success">
-          <span>පියවර 2: දෙමාපිය ඇගයීම (Step 2 of 5 - Parent Only)</span>
+      <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-xs space-y-4">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-mq-surface-green text-mq-success">
+            {parentText.onboarding.stepOf(2)}
+          </span>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-mq-surface-soft text-mq-text-muted border border-mq-border">
+            {parentText.common.optional}
+          </span>
         </div>
-        <h2 className="text-xl sm:text-2xl font-extrabold text-mq-text-strong font-sinhala">
-          SNAP-IV 18-අයිතම ප්‍රශ්නාවලිය (Parent Rating Scale)
-        </h2>
-        <p className="text-xs sm:text-sm text-mq-text-muted leading-relaxed font-sinhala">
-          පසුගිය මාස 6ක කාලය තුළ දරුවාගේ හැසිරීම් සහ අවධානය යොමුකිරීමේ රටාවන් නිරීක්ෂණය කර පහත අයිතම 18 සඳහා වඩාත්ම ගැළපෙන පිළිතුර තෝරන්න.
+        <h2 className="text-xl sm:text-2xl font-bold text-mq-text-strong">{t.title}</h2>
+        <p className="text-base text-mq-text-muted leading-relaxed">{t.intro}</p>
+        <p className="text-sm text-mq-text-muted leading-relaxed flex items-start gap-2">
+          <Info size={16} className="shrink-0 mt-0.5 text-mq-primary" />
+          <span>{t.optionalText}</span>
         </p>
 
-        {/* Clinical Non-Diagnosis Disclaimer Alert */}
-        <div className="p-4 rounded-2xl bg-mq-warning-bg/60 border border-mq-warning/40 text-xs text-mq-text-strong space-y-1 font-sinhala">
-          <div className="flex items-center gap-2 font-bold text-mq-warning">
-            <ShieldAlert size={16} />
-            <span>පර්යේෂණ හා අනුවර්තී අධ්‍යාපනික භාවිතය සඳහා පමණි (Non-Diagnostic Research Notice)</span>
-          </div>
-          <p className="text-mq-text-muted text-[11px] leading-relaxed">
-            මෙම ප්‍රශ්නාවලිය මගින් ADHD හෝ වෙනත් කිසිදු සායනික රෝග විනිශ්චයක් (diagnosis) සිදු නොකෙරේ. මෙම ලකුණු භාවිතා කරනු ලබන්නේ දරුවාට වඩාත් ගැළපෙන ඉගෙනුම් ක්‍රමවේද සහ සහාය හඳුනාගැනීමට පමණි.
+        {/* Not a diagnosis */}
+        <div className="p-4 rounded-2xl bg-mq-warning-bg/60 border border-mq-warning/40 space-y-1.5">
+          <p className="flex items-center gap-2 text-sm font-semibold text-mq-warning">
+            <ShieldAlert size={18} className="shrink-0" />
+            <span>{t.notDiagnosisTitle}</span>
           </p>
-          <p className="text-[10px] text-mq-text-muted italic">
-            * Standard Swanson, Nolan, and Pelham (SNAP-IV) 18-item scale with provisional research translation template.
-          </p>
+          <p className="text-sm text-mq-text-muted leading-relaxed">{t.notDiagnosisText}</p>
+          <p className="text-xs text-mq-text-muted">{t.sourceNote}</p>
         </div>
 
-        {/* Progress Tracker */}
-        <div className="flex items-center justify-between text-xs pt-2 border-t border-mq-border/60">
-          <span className="font-bold text-mq-text-strong font-sinhala">
-            සම්පූර්ණ කරන ලද ප්‍රශ්න: {answeredCount} / 18
-          </span>
-          <span
-            className={`font-bold ${
-              isComplete ? 'text-mq-success' : 'text-mq-warning'
-            }`}
-          >
-            {isComplete ? 'සියල්ල සම්පූර්ණයි' : `${18 - answeredCount} ක් ඉතිරිව ඇත`}
+        {/* Progress */}
+        <div className="flex items-center justify-between gap-3 text-sm pt-3 border-t border-mq-border/60">
+          <span className="font-semibold text-mq-text-strong">{t.answered(answeredCount)}</span>
+          <span className={`font-semibold ${isComplete ? 'text-mq-success' : 'text-mq-warning'}`}>
+            {isComplete ? t.allAnswered : t.remaining(18 - answeredCount)}
           </span>
         </div>
       </div>
 
       {validationError && (
-        <div className="p-4 rounded-2xl bg-mq-danger-bg border border-mq-danger/40 text-xs text-mq-danger font-bold flex items-center gap-2">
-          <AlertCircle size={16} />
+        <div role="alert" className="p-4 rounded-2xl bg-mq-danger-bg border border-mq-danger/40 text-sm text-mq-danger font-semibold flex items-center gap-2">
+          <AlertCircle size={18} className="shrink-0" />
           <span>{validationError}</span>
         </div>
       )}
 
-      {/* Subscale 1: Inattention (Items 1-9) */}
-      <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-xs space-y-5">
-        <div className="border-b border-mq-border/70 pb-3">
-          <span className="text-xs font-bold text-mq-primary uppercase tracking-wider block">
-            Subscale A (අයිතම 1 සිට 9 දක්වා)
-          </span>
-          <h3 className="text-base sm:text-lg font-extrabold text-mq-text-strong font-sinhala">
-            අවධානය සහ සාන්ද්‍රණය (Inattention Characteristics)
-          </h3>
-        </div>
-
-        <div className="space-y-4">
-          {SNAP_IV_ITEMS.filter((item) => item.subscale === 'inattention').map((item) => (
-            <div
-              key={item.id}
-              className={`p-4 rounded-2xl border transition-all ${
-                answers[item.id] !== undefined
-                  ? 'border-mq-border bg-white shadow-2xs'
-                  : 'border-mq-border/60 bg-mq-surface-soft/40'
-              }`}
-            >
-              <div className="mb-3">
-                <span className="text-xs font-bold text-mq-primary mr-2">
-                  {item.id}.
-                </span>
-                <span className="text-sm font-bold text-mq-text-strong font-sinhala">
-                  {item.textSi}
-                </span>
-                <p className="text-xs text-mq-text-muted mt-0.5 italic">
-                  {item.textEn}
-                </p>
-              </div>
-
-              {/* 4-Point Radio Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {SNAP_IV_SCALE_OPTIONS.map((scale) => {
-                  const isSelected = answers[item.id] === scale.value;
-                  return (
-                    <button
-                      type="button"
-                      key={scale.value}
-                      onClick={() => handleSelectScore(item.id, scale.value)}
-                      className={`px-3 py-2 rounded-xl border text-center transition-all cursor-pointer ${
-                        isSelected
-                          ? 'border-mq-primary bg-mq-surface-blue text-mq-primary font-bold ring-2 ring-mq-primary/20'
-                          : 'border-mq-border bg-white hover:border-mq-primary/40 text-mq-text text-xs'
-                      }`}
-                    >
-                      <span className="block text-xs font-bold font-sinhala">
-                        {scale.labelSi}
-                      </span>
-                      <span className="block text-[10px] text-mq-text-muted mt-0.5">
-                        {scale.labelEn} ({scale.value})
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Subscale 2: Hyperactivity / Impulsivity (Items 10-18) */}
-      <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-xs space-y-5">
-        <div className="border-b border-mq-border/70 pb-3">
-          <span className="text-xs font-bold text-mq-primary uppercase tracking-wider block">
-            Subscale B (අයිතම 10 සිට 18 දක්වා)
-          </span>
-          <h3 className="text-base sm:text-lg font-extrabold text-mq-text-strong font-sinhala">
-            ක්‍රියාශීලීත්වය සහ ආවේගශීලීත්වය (Hyperactivity & Impulsivity Characteristics)
-          </h3>
-        </div>
-
-        <div className="space-y-4">
-          {SNAP_IV_ITEMS.filter((item) => item.subscale === 'hyperactivity').map((item) => (
-            <div
-              key={item.id}
-              className={`p-4 rounded-2xl border transition-all ${
-                answers[item.id] !== undefined
-                  ? 'border-mq-border bg-white shadow-2xs'
-                  : 'border-mq-border/60 bg-mq-surface-soft/40'
-              }`}
-            >
-              <div className="mb-3">
-                <span className="text-xs font-bold text-mq-primary mr-2">
-                  {item.id}.
-                </span>
-                <span className="text-sm font-bold text-mq-text-strong font-sinhala">
-                  {item.textSi}
-                </span>
-                <p className="text-xs text-mq-text-muted mt-0.5 italic">
-                  {item.textEn}
-                </p>
-              </div>
-
-              {/* 4-Point Radio Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {SNAP_IV_SCALE_OPTIONS.map((scale) => {
-                  const isSelected = answers[item.id] === scale.value;
-                  return (
-                    <button
-                      type="button"
-                      key={scale.value}
-                      onClick={() => handleSelectScore(item.id, scale.value)}
-                      className={`px-3 py-2 rounded-xl border text-center transition-all cursor-pointer ${
-                        isSelected
-                          ? 'border-mq-primary bg-mq-surface-blue text-mq-primary font-bold ring-2 ring-mq-primary/20'
-                          : 'border-mq-border bg-white hover:border-mq-primary/40 text-mq-text text-xs'
-                      }`}
-                    >
-                      <span className="block text-xs font-bold font-sinhala">
-                        {scale.labelSi}
-                      </span>
-                      <span className="block text-[10px] text-mq-text-muted mt-0.5">
-                        {scale.labelEn} ({scale.value})
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {renderSection('inattention', t.sectionA, 1, 9)}
+      {renderSection('hyperactivity', t.sectionB, 10, 18)}
 
       {/* Action Buttons */}
-      <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <button
+      <div className="flex flex-col-reverse lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.98 }}
             onClick={onBack}
-            className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
+            className="btn btn-secondary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center justify-center gap-2"
           >
-            <ArrowLeft size={15} />
-            <span>ආපසු</span>
-          </button>
-          <button
+            <ArrowLeft size={16} />
+            <span>{parentText.common.back}</span>
+          </motion.button>
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.98 }}
             disabled={isSaving}
             onClick={() => onSaveAndExit(getResponsesArray())}
-            className="btn btn-secondary px-4 py-2.5 rounded-full text-xs font-bold font-sinhala inline-flex items-center gap-1.5"
+            className="btn btn-secondary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center justify-center gap-2"
           >
-            <Save size={15} />
-            <span>සුරැක පසුව සම්පූර්ණ කරන්න</span>
-          </button>
+            <Save size={16} />
+            <span>{parentText.common.saveAndExit}</span>
+          </motion.button>
         </div>
 
-        <button
-          type="submit"
-          disabled={isSaving}
-          className="btn btn-primary w-full sm:w-auto px-7 py-2.5 rounded-full text-sm font-bold font-sinhala inline-flex items-center justify-center gap-2 shadow-sm"
-        >
-          {isSaving ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <>
-              <span>මීළඟ පියවර: සමාජීය පසුබිම</span>
-              <ArrowRight size={16} strokeWidth={2.5} />
-            </>
-          )}
-        </button>
+        <div className="flex flex-col-reverse sm:flex-row gap-3">
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.98 }}
+            disabled={isSaving}
+            onClick={() => onSkip()}
+            className="btn btn-secondary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center justify-center gap-2"
+          >
+            <SkipForward size={16} />
+            <span>{parentText.common.skipForNow}</span>
+          </motion.button>
+          <motion.button
+            type="submit"
+            whileTap={{ scale: 0.98 }}
+            disabled={isSaving}
+            className="btn btn-primary min-h-[48px] px-7 rounded-full text-base inline-flex items-center justify-center gap-2 shadow-sm"
+          >
+            {isSaving ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <>
+                <span>{parentText.common.saveAndContinue}</span>
+                <ArrowRight size={18} strokeWidth={2.5} />
+              </>
+            )}
+          </motion.button>
+        </div>
       </div>
     </form>
   );

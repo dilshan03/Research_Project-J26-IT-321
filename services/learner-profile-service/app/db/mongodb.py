@@ -62,6 +62,12 @@ async def init_indexes() -> None:
         await events_col.create_index([("skillId", ASCENDING)])
         await events_col.create_index([("activityTimestamp", ASCENDING)])
 
+        deletion_requests_col = _database["learner_deletion_requests"]
+        await deletion_requests_col.create_index([("requestId", ASCENDING)], unique=True)
+        await deletion_requests_col.create_index([("learnerId", ASCENDING)])
+        await deletion_requests_col.create_index([("parentId", ASCENDING)])
+        await deletion_requests_col.create_index([("status", ASCENDING)])
+
         logger.info("MongoDB collections and indexes initialized successfully.")
     except Exception as exc:
         logger.warning("Index initialization notice: %s", exc)
@@ -110,5 +116,10 @@ def get_assessments_collection() -> AsyncCollection:
 
 def get_gameplay_events_collection() -> AsyncCollection:
     return get_database()["learner_gameplay_events"]
+
+
+def get_deletion_requests_collection() -> AsyncCollection:
+    return get_database()["learner_deletion_requests"]
+
 
 

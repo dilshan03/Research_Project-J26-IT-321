@@ -2,6 +2,8 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
 import { getRouteMeta } from './sidebar/sidebarConfig';
+import { parentText } from '../i18n/parentText';
+import { PARENT_ROUTE_LABELS } from '../i18n/parentNav';
 
 export interface BreadcrumbItem {
   label: string;
@@ -18,13 +20,14 @@ export const DashboardBreadcrumb: React.FC<DashboardBreadcrumbProps> = ({ role, 
 
   const getAutoItems = (): BreadcrumbItem[] => {
     const rootPath = `/${role}/dashboard`;
-    const rootLabel = role === 'parent' ? 'Parent Dashboard' : 'Teacher Dashboard';
+    const isParent = role === 'parent';
+    const rootLabel = isParent ? parentText.nav.portal : 'Teacher Dashboard';
 
     // Special handling for canonical /learners
     if (role === 'parent' && (location.pathname === '/learners' || location.pathname.startsWith('/parent/dashboard/children'))) {
       return [
         { label: rootLabel, path: rootPath },
-        { label: 'My Children' },
+        { label: parentText.nav.myChildren },
       ];
     }
 
@@ -32,8 +35,8 @@ export const DashboardBreadcrumb: React.FC<DashboardBreadcrumbProps> = ({ role, 
     if (role === 'parent' && location.pathname.includes('/onboarding')) {
       return [
         { label: rootLabel, path: rootPath },
-        { label: 'My Children', path: '/learners' },
-        { label: 'Onboarding Assessment' },
+        { label: parentText.nav.myChildren, path: '/learners' },
+        { label: parentText.nav.onboarding },
       ];
     }
 
@@ -54,7 +57,11 @@ export const DashboardBreadcrumb: React.FC<DashboardBreadcrumbProps> = ({ role, 
       accumulatedPath += `/${seg}`;
       const isLast = idx === segments.length - 1;
       const meta = getRouteMeta(role, accumulatedPath);
-      const title = meta.breadcrumbLabel || meta.title || seg.charAt(0).toUpperCase() + seg.slice(1);
+      const title =
+        (isParent && PARENT_ROUTE_LABELS[accumulatedPath]) ||
+        meta.breadcrumbLabel ||
+        meta.title ||
+        seg.charAt(0).toUpperCase() + seg.slice(1);
 
       autoItems.push({
         label: title,
@@ -68,16 +75,19 @@ export const DashboardBreadcrumb: React.FC<DashboardBreadcrumbProps> = ({ role, 
   const breadcrumbs = items || getAutoItems();
 
   return (
-    <nav aria-label="Dashboard Breadcrumb" className="py-1 px-0.5 text-xs text-mq-text-muted">
+    <nav
+      aria-label={role === 'parent' ? parentText.shell.breadcrumb : 'Dashboard Breadcrumb'}
+      className={`py-1 px-0.5 text-mq-text-muted ${role === 'parent' ? 'text-sm' : 'text-xs'}`}
+    >
       <ol className="flex items-center flex-wrap gap-1.5 sm:gap-2">
         <li className="inline-flex items-center">
           <Link
             to={role === 'parent' ? '/parent/dashboard' : '/teacher/dashboard'}
             className="inline-flex items-center gap-1 text-mq-text-muted hover:text-mq-primary transition-colors"
-            title="Dashboard Home"
+            title={role === 'parent' ? parentText.shell.home : 'Dashboard Home'}
           >
-            <Home size={13} />
-            <span className="sr-only">Home</span>
+            <Home size={14} />
+            <span className="sr-only">{role === 'parent' ? parentText.shell.home : 'Home'}</span>
           </Link>
         </li>
 

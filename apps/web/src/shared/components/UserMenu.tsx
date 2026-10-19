@@ -10,6 +10,7 @@ import {
   Globe,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { parentText } from '../i18n/parentText';
 
 export interface UserMenuProps {
   className?: string;
@@ -74,7 +75,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-controls="user-profile-menu"
-        aria-label="User account menu"
+        aria-label={isParent ? parentText.nav.settings : 'User account menu'}
       >
         {/* User Initial Avatar */}
         <div className="w-7 h-7 bg-mq-primary group-hover:bg-mq-primary-hover text-white rounded-full flex items-center justify-center font-bold text-xs shrink-0 transition-colors shadow-xs">
@@ -87,7 +88,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
             {displayName}
           </span>
           <span className="text-[10px] font-semibold text-mq-primary capitalize leading-none mt-0.5">
-            {user.role}
+            {isParent ? parentText.userMenu.roleParent : user.role}
           </span>
         </div>
 
@@ -110,14 +111,18 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
         >
           {/* User Summary Header */}
           <div className="px-4 py-2.5 border-b border-mq-border/70 mb-1">
-            <p className="text-[11px] text-mq-text-muted font-medium">Signed in as</p>
+            <p className="text-[11px] text-mq-text-muted font-medium">{isParent ? parentText.userMenu.signedInAs : 'Signed in as'}</p>
             <p className="text-sm font-bold text-mq-text-strong truncate mt-0.5">
               {displayName}
             </p>
             <p className="text-xs text-mq-text-muted truncate">{user.email}</p>
             <div className="mt-1.5">
-              <span className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary border border-mq-primary/20">
-                {user.role} Portal Active
+              <span
+                className={`inline-flex items-center font-bold px-2 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary border border-mq-primary/20 ${
+                  isParent ? 'text-xs' : 'text-[10px] uppercase tracking-wider'
+                }`}
+              >
+                {isParent ? parentText.shell.signedIn : `${user.role} Portal Active`}
               </span>
             </div>
           </div>
@@ -133,7 +138,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
                   className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
                 >
                   <LayoutDashboard size={15} className="text-mq-primary shrink-0" />
-                  <span>Parent Dashboard</span>
+                  <span>{parentText.nav.portal}</span>
                 </Link>
                 <Link
                   to="/learners"
@@ -142,7 +147,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
                   className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
                 >
                   <Users size={15} className="text-mq-primary shrink-0" />
-                  <span>My Children</span>
+                  <span>{parentText.nav.myChildren}</span>
                 </Link>
                 <Link
                   to="/parent/dashboard/settings"
@@ -151,7 +156,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
                   className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
                 >
                   <Settings size={15} className="text-mq-primary shrink-0" />
-                  <span>Account Settings</span>
+                  <span>{parentText.nav.settings}</span>
                 </Link>
               </>
             )}
@@ -196,7 +201,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
               className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text-muted hover:bg-mq-surface-soft hover:text-mq-primary transition-colors border-t border-mq-border/50 mt-1 pt-1.5"
             >
               <Globe size={15} className="text-mq-text-muted shrink-0" />
-              <span>Public Website</span>
+              <span>{isParent ? parentText.shell.publicWebsite : 'Public Website'}</span>
             </Link>
           </div>
 
@@ -209,7 +214,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-danger hover:bg-mq-danger-bg transition-colors cursor-pointer"
             >
               <LogOut size={15} className="shrink-0" />
-              <span>Sign Out</span>
+              <span>{isParent ? parentText.userMenu.signOut : 'Sign Out'}</span>
             </button>
           </div>
         </div>

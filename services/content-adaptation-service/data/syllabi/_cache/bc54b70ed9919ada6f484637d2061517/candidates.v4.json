@@ -1,0 +1,2833 @@
+{
+ "grade": 4,
+ "windows": {
+  "1-9": [],
+  "28-35": [
+   {
+    "kind": "aligned",
+    "page_number": 35,
+    "source_quote": "3m = 300cm",
+    "number_limit": 500,
+    "operation": "MUL",
+    "operands": [
+     3,
+     100
+    ],
+    "expected_answer": 300,
+    "raw_problem_text": "මීටර 3ක් සෙන්ටිමීටරවලින් කොපමණද?",
+    "child_prompt_si": "මීටර 3 කට සෙන්ටිමීටර කීයද?",
+    "child_prompt_en": "How many centimeters in 3 meters?",
+    "english_translation": "How much is 3 meters in centimeters?",
+    "topic": "Multiplication",
+    "competency_code": "3.1",
+    "competency_desc": "මීටරයට සෙන්ටිමීටර 100ක් ඇති බව හඳුනා ගෙන දිග මැනීමේ ක්‍රියාකාරකමෙහි නිරත වෙයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 35,
+    "source_quote": "400cm = 4m",
+    "number_limit": 500,
+    "operation": "DIV",
+    "operands": [
+     400,
+     100
+    ],
+    "expected_answer": 4,
+    "raw_problem_text": "සෙන්ටිමීටර 400ක් යනු මීටර කීයද?",
+    "child_prompt_si": "සෙන්ටිමීටර 400 කට මීටර කීයද?",
+    "child_prompt_en": "How many meters in 400 centimeters?",
+    "english_translation": "How much is 400 centimeters in meters?",
+    "topic": "Division",
+    "competency_code": "3.1",
+    "competency_desc": "මීටරයට සෙන්ටිමීටර 100ක් ඇති බව හඳුනා ගෙන දිග මැනීමේ ක්‍රියාකාරකමෙහි නිරත වෙයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 35,
+    "source_quote": "7m = 700cm",
+    "number_limit": 900,
+    "operation": "MUL",
+    "operands": [
+     7,
+     100
+    ],
+    "expected_answer": 700,
+    "raw_problem_text": "මීටර 7ක් සෙන්ටිමීටරවලින් කීයද?",
+    "child_prompt_si": "මීටර 7 කට සෙන්ටිමීටර කීයද?",
+    "child_prompt_en": "How many centimeters in 7 meters?",
+    "english_translation": "How much is 7 meters in centimeters?",
+    "topic": "Multiplication",
+    "competency_code": "3.1",
+    "competency_desc": "මීටරයට සෙන්ටිමීටර 100ක් ඇති බව හඳුනා ගෙන දිග මැනීමේ ක්‍රියාකාරකමෙහි නිරත වෙයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   }
+  ],
+  "20-27": [
+   {
+    "kind": "aligned",
+    "page_number": 20,
+    "source_quote": "50ට පෙර සංඛ්‍යාව කුමක් ද ?",
+    "number_limit": 50,
+    "operation": "SUB",
+    "operands": [
+     50,
+     1
+    ],
+    "expected_answer": 49,
+    "raw_problem_text": "50ට පෙර සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "50ට පෙර සංඛ්‍යාව කීය ද?",
+    "child_prompt_en": "What is the number before 50?",
+    "english_translation": "What is the number before 50?",
+    "topic": "Subtraction",
+    "competency_code": "2.1",
+    "competency_desc": "සංඛ්‍යා හඳුනා ගනී",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 20,
+    "source_quote": "99ට පසු සංඛ්‍යාව කුමක් ද ?",
+    "number_limit": 100,
+    "operation": "ADD",
+    "operands": [
+     99,
+     1
+    ],
+    "expected_answer": 100,
+    "raw_problem_text": "99ට පසු සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "99ට පසු සංඛ්‍යාව කීය ද?",
+    "child_prompt_en": "What is the number after 99?",
+    "english_translation": "What is the number after 99?",
+    "topic": "Addition",
+    "competency_code": "2.1",
+    "competency_desc": "සංඛ්‍යා හඳුනා ගනී",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 20,
+    "source_quote": "එම සංඛ්‍යා දෙකෙන් විශාල සංඛ්‍යාව/කුඩා සංඛ්‍යාව කුමක් ද ?",
+    "number_limit": 99,
+    "operation": "COMPARE",
+    "operands": [
+     45,
+     82
+    ],
+    "expected_answer": 82,
+    "raw_problem_text": "45 සහ 82 සංඛ්‍යා දෙකෙන් විශාල සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "45 සහ 82 අතරින් විශාල සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_en": "Which number is bigger: 45 or 82?",
+    "english_translation": "Which number is bigger: 45 or 82?",
+    "topic": "Comparison",
+    "competency_code": "2.2",
+    "competency_desc": "සංඛ්‍යා සසඳයි",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "BIGGER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 23,
+    "source_quote": "15, 9, 6 සංඛ්‍යා තුනෙන් කුඩා ම සංඛ්‍යාව කුමක් ද ? විශාල ම සංඛ්‍යාව කුමක් ද ?",
+    "number_limit": 20,
+    "operation": "COMPARE",
+    "operands": [
+     15,
+     9
+    ],
+    "expected_answer": 9,
+    "raw_problem_text": "15, 9 සහ 6 සංඛ්‍යා තුනෙන් කුඩාම සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "15, 9, 6 වලින් කුඩාම අංකය කුමක් ද?",
+    "child_prompt_en": "Which is the smallest: 15, 9, or 6?",
+    "english_translation": "Which is the smallest among 15, 9, and 6?",
+    "topic": "Comparison",
+    "competency_code": "2.3",
+    "competency_desc": "සංඛ්‍යා පිළිවෙළට සකස් කරයි",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "target": "SMALLER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 23,
+    "source_quote": "25, 42 සංඛ්‍යා දෙකෙන් කුඩා/විශාල සංඛ්‍යාව කුමක් ද ?",
+    "number_limit": 50,
+    "operation": "COMPARE",
+    "operands": [
+     25,
+     42
+    ],
+    "expected_answer": 25,
+    "raw_problem_text": "25 සහ 42 සංඛ්‍යා දෙකෙන් කුඩා සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "25 සහ 42 වලින් කුඩා සංඛ්‍යාව කීය ද?",
+    "child_prompt_en": "Which is smaller: 25 or 42?",
+    "english_translation": "Which is smaller between 25 and 42?",
+    "topic": "Comparison",
+    "competency_code": "2.3",
+    "competency_desc": "සංඛ්‍යා සසඳයි",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "SMALLER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 25,
+    "source_quote": "50ට 25ක් එකතු කළ විට පිළිතුර කීය ද ?",
+    "number_limit": 100,
+    "operation": "ADD",
+    "operands": [
+     50,
+     25
+    ],
+    "expected_answer": 75,
+    "raw_problem_text": "ළඟ තිබූ අඹ 50කට තව අඹ 25ක් එකතු කළ විට මුළු අඹ ගණන කීය ද?",
+    "child_prompt_si": "අඹ 50කට අඹ 25ක් එකතු කළ විට කීය ද?",
+    "child_prompt_en": "Add 25 mangoes to 50 mangoes. How many?",
+    "english_translation": "If you add 25 mangoes to 50 mangoes, what is the total?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 25,
+    "source_quote": "25ට 12ක් එකතු කළ විට පිළිතුර කීය ද ?",
+    "number_limit": 50,
+    "operation": "ADD",
+    "operands": [
+     25,
+     12
+    ],
+    "expected_answer": 37,
+    "raw_problem_text": "පෑන් 25ක් තිබූ පෙට්ටියකට තවත් පෑන් 12ක් දැමුවා. දැන් පෙට්ටියේ මුළු පෑන් ගණන කීය ද?",
+    "child_prompt_si": "පෑන් 25කට පෑන් 12ක් දැමුවොත් කීය ද?",
+    "child_prompt_en": "Add 12 pens to 25 pens. How many?",
+    "english_translation": "If you put 12 more pens into a box of 25 pens, what is the total number of pens?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 25,
+    "source_quote": "15ට 20ක් එකතු කළ විට පිළිතුර කීය ද ?",
+    "number_limit": 50,
+    "operation": "ADD",
+    "operands": [
+     15,
+     20
+    ],
+    "expected_answer": 35,
+    "raw_problem_text": "පාපැදි 15ක් තිබූ තැනකට තවත් පාපැදි 20ක් ආවා. දැන් මුළු පාපැදි ගණන කීය ද?",
+    "child_prompt_si": "පාපැදි 15කට පාපැදි 20ක් එකතු කළ විට කීය ද?",
+    "child_prompt_en": "Add 20 bicycles to 15 bicycles. How many?",
+    "english_translation": "If 20 more bicycles arrive where there were 15 bicycles, what is the total?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 26,
+    "source_quote": "යළුවෝ දෙදෙනකු ළඟ තිබූ මුද්දර ප්‍රමාණය පිළිවෙළින් 116ක් හා 125ක් වේ. දෙදෙනා ළඟ ඇති මුළු මුද්දර ගණන සොයා ගන්නේ කෙසේ ද ?",
+    "number_limit": 300,
+    "operation": "ADD",
+    "operands": [
+     116,
+     125
+    ],
+    "expected_answer": 241,
+    "raw_problem_text": "යාලුවෝ දෙදෙනකු ළඟ මුද්දර 116ක් හා 125ක් තිබුණා. දෙදෙනා ළඟ ඇති මුළු මුද්දර ගණන කීය ද?",
+    "child_prompt_si": "මුද්දර 116යි මුද්දර 125යි එකතු කළ විට කීය ද?",
+    "child_prompt_en": "Add 116 stamps and 125 stamps. Total?",
+    "english_translation": "Two friends have 116 and 125 stamps respectively. What is the total number of stamps they have?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි",
+    "difficulty": "HARD",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 27,
+    "source_quote": "17ට 6ක් එකතු කළ විට පිළිතුර කීය ද ?",
+    "number_limit": 30,
+    "operation": "ADD",
+    "operands": [
+     17,
+     6
+    ],
+    "expected_answer": 23,
+    "raw_problem_text": "පොත් 17ක් තිබූ මේසයක තවත් පොත් 6ක් තැබුවා. දැන් මේසයේ ඇති මුළු පොත් ගණන කීය ද?",
+    "child_prompt_si": "පොත් 17කට පොත් 6ක් දැමුවොත් කීය ද?",
+    "child_prompt_en": "Add 6 books to 17 books. How many?",
+    "english_translation": "If you put 6 more books on a table with 17 books, what is the total?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි",
+    "difficulty": "EASY",
+    "visual_props": {}
+   }
+  ],
+  "10-19": [
+   {
+    "kind": "aligned",
+    "page_number": 13,
+    "source_quote": "2.1 පොදු අන්තරය 2, 3, 4, 5 සහ 10 වූ සංඛ්‍යා රටා ගොඩනගයි.",
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": 8,
+    "raw_problem_text": "2, 4, 6 ඊළඟට එන සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "2, 4, 6 ඊළඟ සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "What is the next number after 2, 4, 6?",
+    "english_translation": "What is the next number after 2, 4, 6?",
+    "topic": "Number Patterns",
+    "competency_code": "2.1",
+    "competency_desc": "පොදු අන්තරය 2, 3, 4, 5 සහ 10 වූ සංඛ්‍යා රටා ගොඩනගයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      2,
+      4,
+      6
+     ],
+     "target": 8
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 13,
+    "source_quote": "5.1 ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා දෙකක් ගෙන යාම එක් අවස්ථාවක් පමණක් සහිත එකතු කිරීමේ ගැටලු විසඳයි.",
+    "number_limit": 999,
+    "operation": "ADD",
+    "operands": [
+     124,
+     235
+    ],
+    "expected_answer": 359,
+    "raw_problem_text": "පොත් 124ක් සහ අභ්‍යාස පොත් 235ක් තිබුණි. එකතු කළ විට පොත් කීයද?",
+    "child_prompt_si": "පොත් 124යි, පොත් 235යි එකතු කළ විට කීයද?",
+    "child_prompt_en": "Add 124 books and 235 books. How many?",
+    "english_translation": "There were 124 books and 235 exercise books. How many books in total?",
+    "topic": "Addition",
+    "competency_code": "5.1",
+    "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා දෙකක් ගෙන යාම එක් අවස්ථාවක් පමණක් සහිත එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 13,
+    "source_quote": "5.1 ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා දෙකක් ගෙන යාම එක් අවස්ථාවක් පමණක් සහිත එකතු කිරීමේ ගැටලු විසඳයි.",
+    "number_limit": 999,
+    "operation": "ADD",
+    "operands": [
+     342,
+     153
+    ],
+    "expected_answer": 495,
+    "raw_problem_text": "මල් 342ක් සහ තවත් මල් 153ක් නෙළා ගත්තේය. මුළු මල් ගණන කීයද?",
+    "child_prompt_si": "මල් 342යි තවත් මල් 153යි එකතු කළ විට කීයද?",
+    "child_prompt_en": "Add 342 flowers and 153 flowers. How many?",
+    "english_translation": "342 flowers and another 153 flowers were plucked. What is the total number of flowers?",
+    "topic": "Addition",
+    "competency_code": "5.1",
+    "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා දෙකක් ගෙන යාම එක් අවස්ථාවක් පමණක් සහිත එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 13,
+    "source_quote": "5.1 ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා දෙකක් ගෙන යාම එක් අවස්ථාවක් පමණක් සහිත එකතු කිරීමේ ගැටලු විසඳයි.",
+    "number_limit": 999,
+    "operation": "ADD",
+    "operands": [
+     410,
+     265
+    ],
+    "expected_answer": 675,
+    "raw_problem_text": "ගස්වල අඹ 410ක් සහ බිම අඹ 265ක් තිබුණි. මුළු අඹ ගණන කීයද?",
+    "child_prompt_si": "අඹ 410යි අඹ 265යි එකතු කළ විට කීයද?",
+    "child_prompt_en": "Add 410 mangoes and 265 mangoes. How many?",
+    "english_translation": "There were 410 mangoes on trees and 265 on the ground. What is the total number of mangoes?",
+    "topic": "Addition",
+    "competency_code": "5.1",
+    "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා දෙකක් ගෙන යාම එක් අවස්ථාවක් පමණක් සහිත එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "6.1 99ට නොවැඩි සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් ගෙන එම රහිතව අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     48,
+     23
+    ],
+    "expected_answer": 25,
+    "raw_problem_text": "පෑන් 48කින් පෑන් 23ක් දුන්නේය. ඉතුරු පෑන් කීයද?",
+    "child_prompt_si": "පෑන් 48න් 23ක් දුන්නා. ඉතුරු පෑන් කීයද?",
+    "child_prompt_en": "Give 23 pens from 48 pens. How many left?",
+    "english_translation": "23 pens were given away from 48 pens. How many pens are left?",
+    "topic": "Subtraction",
+    "competency_code": "6.1",
+    "competency_desc": "99ට නොවැඩි සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් ගෙන එම රහිතව අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "6.1 99ට නොවැඩි සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් ගෙන එම රහිතව අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     75,
+     41
+    ],
+    "expected_answer": 34,
+    "raw_problem_text": "බෝල 75කින් බෝල 41ක් නැති විය. ඉතුරු බෝල කීයද?",
+    "child_prompt_si": "බෝල 75න් 41ක් නැතිවුණා. ඉතුරු කීයද?",
+    "child_prompt_en": "Lost 41 balls from 75 balls. How many left?",
+    "english_translation": "41 balls were lost out of 75 balls. How many balls are left?",
+    "topic": "Subtraction",
+    "competency_code": "6.1",
+    "competency_desc": "99ට නොවැඩි සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් ගෙන එම රහිතව අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "6.1 99ට නොවැඩි සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් ගෙන එම රහිතව අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     89,
+     53
+    ],
+    "expected_answer": 36,
+    "raw_problem_text": "මුද්දර 89කින් මුද්දර 53ක් ඇස්තමේන්තු කර ඇලෙව්වේය. ඉතුරු මුද්දර කීයද?",
+    "child_prompt_si": "මුද්දර 89න් 53ක් ඇලෙව්වා. ඉතුරු කීයද?",
+    "child_prompt_en": "Paste 53 stamps from 89 stamps. How many left?",
+    "english_translation": "53 stamps were pasted out of 89 stamps. How many stamps are left?",
+    "topic": "Subtraction",
+    "competency_code": "6.1",
+    "competency_desc": "99ට නොවැඩි සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් ගෙන එම රහිතව අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "7.1 ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා 2න්, 5න් සහ 10න් ගුණ කරයි.",
+    "number_limit": 99,
+    "operation": "MUL",
+    "operands": [
+     12,
+     2
+    ],
+    "expected_answer": 24,
+    "raw_problem_text": "පෙට්ටි 2ක බැගින් දමන ලද පැන්සල් 12ක් ඇත. මුළු පැන්සල් ගණන කීයද?",
+    "child_prompt_si": "පැන්සල් 12 බැගින් පෙට්ටි 2ක ඇති පැන්සල් කීයද?",
+    "child_prompt_en": "12 pencils in each of 2 boxes. How many pencils?",
+    "english_translation": "There are 12 pencils put into each of 2 boxes. What is the total number of pencils?",
+    "topic": "Multiplication",
+    "competency_code": "7.1",
+    "competency_desc": "ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා 2න්, 5න් සහ 10න් ගුණ කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "7.1 ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා 2න්, 5න් සහ 10න් ගුණ කරයි.",
+    "number_limit": 99,
+    "operation": "MUL",
+    "operands": [
+     14,
+     5
+    ],
+    "expected_answer": 70,
+    "raw_problem_text": "ළමයෙකුට අඹ 14ක් බැගින් ළමයි 5 දෙනෙකුට දුන්නේය. දුන් මුළු අඹ ගණන කීයද?",
+    "child_prompt_si": "අඹ 14 බැගින් ළමයි 5 දෙනෙකුට දුන්නා. අඹ කීයද?",
+    "child_prompt_en": "Give 14 mangoes each to 5 children. How many mangoes?",
+    "english_translation": "14 mangoes were given to each of 5 children. What is the total number of mangoes given?",
+    "topic": "Multiplication",
+    "competency_code": "7.1",
+    "competency_desc": "ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා 2න්, 5න් සහ 10න් ගුණ කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "7.1 ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා 2න්, 5න් සහ 10න් ගුණ කරයි.",
+    "number_limit": 99,
+    "operation": "MUL",
+    "operands": [
+     23,
+     10
+    ],
+    "expected_answer": 230,
+    "raw_problem_text": "පොත් 23ක් බැගින් පැකට් 10ක ඇති මුළු පොත් ගණන කීයද?",
+    "child_prompt_si": "පොත් 23 බැගින් පැකට් 10ක ඇති පොත් කීයද?",
+    "child_prompt_en": "23 books in each of 10 packets. How many books?",
+    "english_translation": "What is the total number of books in 10 packets with 23 books each?",
+    "topic": "Multiplication",
+    "competency_code": "7.1",
+    "competency_desc": "ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා 2න්, 5න් සහ 10න් ගුණ කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "8.1 ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා 2න් බෙදීමේ ගැටලු විසඳයි.",
+    "number_limit": 999,
+    "operation": "DIV",
+    "operands": [
+     48,
+     2
+    ],
+    "expected_answer": 24,
+    "raw_problem_text": "දොඩම් 48ක් දරුවන් 2 දෙනාට සමසමව බෙදුවොත් එක්කෙනෙකුට කීයද?",
+    "child_prompt_si": "දොඩම් 48ක් දරුවන් 2 දෙනාට සමසමව බෙදුවොත් කීයද?",
+    "child_prompt_en": "Share 48 oranges equally among 2 children. How many each?",
+    "english_translation": "If 48 oranges are shared equally between 2 children, how many does each get?",
+    "topic": "Division",
+    "competency_code": "8.1",
+    "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා 2න් බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "8.1 ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා 2න් බෙදීමේ ගැටලු විසඳයි.",
+    "number_limit": 999,
+    "operation": "DIV",
+    "operands": [
+     84,
+     2
+    ],
+    "expected_answer": 42,
+    "raw_problem_text": "පෑන් 84ක් ළමයි 2 දෙනෙකුට සමසමව බෙදා දුන්නේය. එක් අයෙකුට ලැබුණු පෑන් ගණන කීයද?",
+    "child_prompt_si": "පෑන් 84ක් ළමයි 2 දෙනාට සමසමව බෙදුවොත් කීයද?",
+    "child_prompt_en": "Share 84 pens equally between 2 children. How many each?",
+    "english_translation": "84 pens were distributed equally to 2 children. What is the number of pens received by each?",
+    "topic": "Division",
+    "competency_code": "8.1",
+    "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා 2න් බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "8.1 ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා 2න් බෙදීමේ ගැටලු විසඳයි.",
+    "number_limit": 999,
+    "operation": "DIV",
+    "operands": [
+     126,
+     2
+    ],
+    "expected_answer": 63,
+    "raw_problem_text": "මල් 126ක් කූඩ 2කට සමසමව බෙදුවේය. එක් කූඩයක ඇති මල් ගණන කීයද?",
+    "child_prompt_si": "මල් 126ක් කූඩ 2කට සමසමව බෙදුවොත් කීයද?",
+    "child_prompt_en": "Share 126 flowers equally into 2 baskets. How many each?",
+    "english_translation": "126 flowers were shared equally into 2 baskets. What is the number of flowers in one basket?",
+    "topic": "Division",
+    "competency_code": "8.1",
+    "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යා 2න් බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "HARD",
+    "visual_props": {}
+   }
+  ],
+  "54-61": [
+   {
+    "kind": "exercise",
+    "page_number": 56,
+    "source_quote": "1. පැන්සල් 12කින් භාගය පැන්සල් කීය ද?",
+    "number_limit": 12,
+    "operation": "DIV",
+    "operands": [
+     12,
+     2
+    ],
+    "expected_answer": 6,
+    "raw_problem_text": "පැන්සල් 12කින් භාගය පැන්සල් කීය ද?",
+    "child_prompt_si": "පැන්සල් 12න් භාගයක් කීයද?",
+    "child_prompt_en": "What is half of 12 pencils?",
+    "english_translation": "How many pencils is half of 12 pencils?",
+    "topic": "Fractions / Division",
+    "competency_code": "4.1",
+    "competency_desc": "ද්‍රව්‍ය සමූහයකින් භාගය හඳුනා ගනී",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 56,
+    "source_quote": "2. දොඩම් ගෙඩි 8ක් යහළුවන් දෙදෙනෙකුට භාගය බැගින් බෙදූ විට එක් අයට ලැබෙන දොඩම් ප්‍රමාණය කොපමණ ද?",
+    "number_limit": 8,
+    "operation": "DIV",
+    "operands": [
+     8,
+     2
+    ],
+    "expected_answer": 4,
+    "raw_problem_text": "දොඩම් ගෙඩි 8ක් යහළුවන් දෙදෙනෙකුට භාගය බැගින් බෙදූ විට එක් අයට ලැබෙන දොඩම් ප්‍රමාණය කොපමණ ද?",
+    "child_prompt_si": "දොඩම් 8ක් දෙදෙනෙකුට බෙදුවොත් එක්කෙනෙකුට කීයද?",
+    "child_prompt_en": "If 8 oranges are shared by 2, how many each?",
+    "english_translation": "When 8 oranges are divided equally between two friends, how many does one person get?",
+    "topic": "Fractions / Division",
+    "competency_code": "4.1",
+    "competency_desc": "ද්‍රව්‍ය සමූහයකින් භාගය හඳුනා ගනී",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 56,
+    "source_quote": "3. අඹ ගෙඩි 20ක් භාගය බැගින් ගොඩවල් දෙකකට වෙන් කළ විට එක් ගොඩක ඇති අඹ ගෙඩි ගණන කීය ද?",
+    "number_limit": 20,
+    "operation": "DIV",
+    "operands": [
+     20,
+     2
+    ],
+    "expected_answer": 10,
+    "raw_problem_text": "අඹ ගෙඩි 20ක් භාගය බැගින් ගොඩවල් දෙකකට වෙන් කළ විට එක් ගොඩක ඇති අඹ ගෙඩි ගණන කීය ද?",
+    "child_prompt_si": "අඹ 20ක් ගොඩවල් 2කට බෙදුවොත් එක ගොඩක කීයද?",
+    "child_prompt_en": "If 20 mangoes are split into 2 piles, how many in one?",
+    "english_translation": "When 20 mangoes are divided into two piles as halves, what is the number of mangoes in one pile?",
+    "topic": "Fractions / Division",
+    "competency_code": "4.1",
+    "competency_desc": "ද්‍රව්‍ය සමූහයකින් භාගය හඳුනා ගනී",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   }
+  ],
+  "44-53": [
+   {
+    "kind": "exercise",
+    "page_number": 44,
+    "source_quote": "උදා : 2, 5, 8, 11, . . . , . . . ,",
+    "number_limit": 20,
+    "operation": null,
+    "operands": [],
+    "expected_answer": 14,
+    "raw_problem_text": "2, 5, 8, 11 යන රටාවේ ඊළඟට එන සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "2, 5, 8, 11, ඊළඟට එන සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "2, 5, 8, 11, what is the next number?",
+    "english_translation": "What is the next number in the pattern 2, 5, 8, 11?",
+    "topic": "Patterns",
+    "competency_code": "4",
+    "competency_desc": "රටා හඳුනා ගනී",
+    "difficulty": "EASY",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      2,
+      5,
+      8,
+      11
+     ],
+     "target": 14
+    }
+   },
+   {
+    "kind": "exercise",
+    "page_number": 46,
+    "source_quote": "1. 1, 5, 9, . . . , . . . , . . .",
+    "number_limit": 20,
+    "operation": null,
+    "operands": [],
+    "expected_answer": 13,
+    "raw_problem_text": "1, 5, 9 යන රටාවේ හිස්තැන්ට සුදුසු සංඛ්‍යාව ලියන්න.",
+    "child_prompt_si": "1, 5, 9, ඊළඟට එන සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "1, 5, 9, what is the next number?",
+    "english_translation": "Fill in the blank for the pattern 1, 5, 9.",
+    "topic": "Patterns",
+    "competency_code": "4",
+    "competency_desc": "රටා හඳුනා ගනී",
+    "difficulty": "EASY",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      1,
+      5,
+      9
+     ],
+     "target": 13
+    }
+   },
+   {
+    "kind": "exercise",
+    "page_number": 51,
+    "source_quote": "1. පන්තියේ සිටින සිසුන් 38 දෙනකුට එක් අයෙකුට දෙක බැගින් පැන්සල් දෙන ලදි. දෙන ලද මුළු පැන්සල් ගණන කීය ද ?",
+    "number_limit": 100,
+    "operation": "MUL",
+    "operands": [
+     38,
+     2
+    ],
+    "expected_answer": 76,
+    "raw_problem_text": "පන්තියේ සිටින සිසුන් 38 දෙනකුට එක් අයෙකුට දෙක බැගින් පැන්සල් දෙන ලදි. දෙන ලද මුළු පැන්සල් ගණන කීය ද?",
+    "child_prompt_si": "ළමයි 38 දෙනෙකුට පෑන් 2 බැගින් දුන්නා. මුළු පෑන් ගණන කීයද?",
+    "child_prompt_en": "38 children got 2 pens each. Total pens?",
+    "english_translation": "38 students in the class were given 2 pencils each. What is the total number of pencils given?",
+    "topic": "Multiplication",
+    "competency_code": "6",
+    "competency_desc": "සංඛ්‍යා ගුණ කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 51,
+    "source_quote": "2. පෙට්ටියක් සබන් කැලි දෙක බැගින් පෙட்டி 15ක දැමීම සඳහා අවශ්‍ය සබන් කැලි ගණන කීය ද ?",
+    "number_limit": 50,
+    "operation": "MUL",
+    "operands": [
+     15,
+     2
+    ],
+    "expected_answer": 30,
+    "raw_problem_text": "පෙට්ටියකට සබන් කැලි දෙක බැගින් පෙට්ටි 15ක දැමීම සඳහා අවශ්‍ය සබන් කැලි ගණන කීය ද?",
+    "child_prompt_si": "පෙට්ටි 15ක සබන් කැලි 2 බැගින් දැමුවා. මුළු සබන් ගණන කීයද?",
+    "child_prompt_en": "15 boxes have 2 soaps each. Total soaps?",
+    "english_translation": "How many soap pieces are needed to put 2 soap pieces each in 15 boxes?",
+    "topic": "Multiplication",
+    "competency_code": "6",
+    "competency_desc": "සංඛ්‍යා ගුණ කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 47,
+    "source_quote": "ඉගෙනුම් පල : - 2හි ගුණන වගුව මතකයෙන් කියයි.",
+    "number_limit": 20,
+    "operation": "MUL",
+    "operands": [
+     4,
+     2
+    ],
+    "expected_answer": 8,
+    "raw_problem_text": "පෑනක් රුපියල් 2ක් වී නම් පෑන් 4ක මිල කීයද?",
+    "child_prompt_si": "පෑනක් රුපියල් 2යි. පෑන් 4ක මිල කීයද?",
+    "child_prompt_en": "A pen is 2 rupees. Price of 4 pens?",
+    "english_translation": "If a pen is 2 rupees, what is the price of 4 pens?",
+    "topic": "Multiplication",
+    "competency_code": "6.1",
+    "competency_desc": "2හි ගුණන වගුව මතකයෙන් කියයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 47,
+    "source_quote": "ඉගෙනුම් පල : - 2හි ගුණන වගුව මතකයෙන් කියයි.",
+    "number_limit": 20,
+    "operation": "MUL",
+    "operands": [
+     6,
+     2
+    ],
+    "expected_answer": 12,
+    "raw_problem_text": "බස් රථයක සීට් එකක මගීන් 2 දෙනෙක් වාඩි වෙති. එවැනි සීට් 6ක වාඩි විය හැකි මගීන් ගණන කීයද?",
+    "child_prompt_si": "සීට් එකක මගීන් 2 දෙනෙක් ඉන්නවා. සීට් 6ක මගීන් කීයද?",
+    "child_prompt_en": "2 passengers in 1 seat. Passengers in 6 seats?",
+    "english_translation": "2 passengers sit in one bus seat. How many passengers can sit in 6 such seats?",
+    "topic": "Multiplication",
+    "competency_code": "6.1",
+    "competency_desc": "2හි ගුණන වගුව මතකයෙන් කියයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 47,
+    "source_quote": "ඉගෙනුම් පල : - 2හි ගුණන වගුව මතකයෙන් කියයි.",
+    "number_limit": 20,
+    "operation": "MUL",
+    "operands": [
+     8,
+     2
+    ],
+    "expected_answer": 16,
+    "raw_problem_text": "ළමයි 8 දෙනෙකුට බෙදා දීමට එක් අයෙකුට කෙසෙල් ගෙඩි 2 බැගින් ගෙන ආවේය. අවශ්‍ය කෙසෙල් ගෙඩි ගණන කීයද?",
+    "child_prompt_si": "ළමයි 8 දෙනෙකුට කෙසෙල් 2 බැගින් දුන්නා. මුළු කෙසෙල් ගණන කීයද?",
+    "child_prompt_en": "8 kids get 2 bananas each. Total bananas?",
+    "english_translation": "2 bananas each were brought to distribute to 8 children. What is the total number of bananas needed?",
+    "topic": "Multiplication",
+    "competency_code": "6.1",
+    "competency_desc": "2හි ගුණන වගුව මතකයෙන් කියයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 47,
+    "source_quote": "ඉගෙනුම් පල : - ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යාවක් දෙකෙන් ගුණ කර පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 50,
+    "operation": "MUL",
+    "operands": [
+     12,
+     2
+    ],
+    "expected_answer": 24,
+    "raw_problem_text": "පෙට්ටියක පාට පෑන් 12ක් ඇත. එවැනි පෙට්ටි 2ක ඇති පාට පෑන් මුළු ගණන කීයද?",
+    "child_prompt_si": "පෙට්ටියක පෑන් 12ක් ඇත. පෙට්ටි 2ක පෑන් කීයද?",
+    "child_prompt_en": "12 pens in a box. Pens in 2 boxes?",
+    "english_translation": "There are 12 colored pens in a box. What is the total number of colored pens in 2 such boxes?",
+    "topic": "Multiplication",
+    "competency_code": "6.2",
+    "competency_desc": "ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යාවක් දෙකෙන් ගුණ කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 47,
+    "source_quote": "ඉගෙනුම් පල : - ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යාවක් දෙකෙන් ගුණ කර පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 50,
+    "operation": "MUL",
+    "operands": [
+     14,
+     2
+    ],
+    "expected_answer": 28,
+    "raw_problem_text": "ළමයෙක් දිනකට මුද්දර 14ක් එකතු කරයි. දින 2ක දී ඔහු එකතු කරන මුද්දර මුළු ගණන කීයද?",
+    "child_prompt_si": "ළමයෙක් දිනකට මුද්දර 14ක් එකතු කළා. දින 2ක මුද්දර කීයද?",
+    "child_prompt_en": "A boy collects 14 stamps a day. Stamps in 2 days?",
+    "english_translation": "A boy collects 14 stamps a day. What is the total number of stamps he collects in 2 days?",
+    "topic": "Multiplication",
+    "competency_code": "6.2",
+    "competency_desc": "ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යාවක් දෙකෙන් ගුණ කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 47,
+    "source_quote": "ඉගෙනුම් පල : - ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යාවක් දෙකෙන් ගුණ කර පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 50,
+    "operation": "MUL",
+    "operands": [
+     21,
+     2
+    ],
+    "expected_answer": 42,
+    "raw_problem_text": "පොතක පිටු 21ක් ඇත. එවැනි පොත් 2ක ඇති මුළු පිටු ගණන කීයද?",
+    "child_prompt_si": "පොතක පිටු 21යි. පොත් 2ක පිටු කීයද?",
+    "child_prompt_en": "A book has 21 pages. Pages in 2 books?",
+    "english_translation": "A book has 21 pages. What is the total number of pages in 2 such books?",
+    "topic": "Multiplication",
+    "competency_code": "6.2",
+    "competency_desc": "ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යාවක් දෙකෙන් ගුණ කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 47,
+    "source_quote": "ඉගෙනුම් පල : - 5හි ගුණන වගුව මතකයෙන් කියයි.",
+    "number_limit": 50,
+    "operation": "MUL",
+    "operands": [
+     3,
+     5
+    ],
+    "expected_answer": 15,
+    "raw_problem_text": "මල් පැළයක් හිටුවීමට මල් පෝච්චි 3ක් අවශ්‍ය විය. එක් පෝච්චියකට මල් 5 බැගින් දැමුවහොත් අවශ්‍ය මල් ගණන කීයද?",
+    "child_prompt_si": "පෝච්චි 3ක මල් 5 බැගින් දැමුවා. මල් කීයද?",
+    "child_prompt_en": "3 pots with 5 flowers each. Total flowers?",
+    "english_translation": "3 pots were needed to plant flowers. If 5 flowers are put in each pot, how many flowers are needed?",
+    "topic": "Multiplication",
+    "competency_code": "6.3",
+    "competency_desc": "5හි ගුණන වගුව මතකයෙන් කියයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 47,
+    "source_quote": "ඉගෙනුම් පල : - 5හි ගුණන වගුව මතකයෙන් කියයි.",
+    "number_limit": 50,
+    "operation": "MUL",
+    "operands": [
+     4,
+     5
+    ],
+    "expected_answer": 20,
+    "raw_problem_text": "ළමයි 4 දෙනෙකුට අඹ ගෙඩි 5 බැගින් දුන්නේය. ඔවුන්ට ලැබුණු මුළු අඹ ගෙඩි ගණන කීයද?",
+    "child_prompt_si": "ළමයි 4 දෙනෙකුට අඹ 5 බැගින් දුන්නා. අඹ කීයද?",
+    "child_prompt_en": "4 children got 5 mangoes each. Total mangoes?",
+    "english_translation": "5 mangoes each were given to 4 children. What is the total number of mangoes they received?",
+    "topic": "Multiplication",
+    "competency_code": "6.3",
+    "competency_desc": "5හි ගුණන වගුව මතකයෙන් කියයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 47,
+    "source_quote": "ඉගෙනුම් පල : - 5හි ගුණන වගුව මතකයෙන් කියයි.",
+    "number_limit": 50,
+    "operation": "MUL",
+    "operands": [
+     7,
+     5
+    ],
+    "expected_answer": 35,
+    "raw_problem_text": "පාට පෑන් පැකට් 7ක එක් පැකට් එකක පෑන් 5 බැගින් ඇත. පෑන් මුළු ගණන කීයද?",
+    "child_prompt_si": "පැකට් 7ක පෑන් 5 බැගින් ඇත. පෑන් කීයද?",
+    "child_prompt_en": "7 packets with 5 pens each. Total pens?",
+    "english_translation": "There are 5 pens in each of 7 colored pen packets. What is the total number of pens?",
+    "topic": "Multiplication",
+    "competency_code": "6.3",
+    "competency_desc": "5හි ගුණන වගුව මතකයෙන් කියයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   }
+  ],
+  "62-69": [
+   {
+    "kind": "aligned",
+    "page_number": 64,
+    "source_quote": "9999 තෙක් කවර හෝ සංඛ්‍යාංකයක් සහ සංඛ්‍යා නාමයක් කියවයි.",
+    "number_limit": 9999,
+    "operation": "COMPARE",
+    "operands": [
+     4250,
+     3890
+    ],
+    "expected_answer": 4250,
+    "raw_problem_text": "4250 සහ 3890 සංඛ්‍යා දෙකෙන් වැඩි සංඛ්‍යාව කුමක්ද?",
+    "child_prompt_si": "4250 සහ 3890 අතරින් ලොකු සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "Which number is bigger: 4250 or 3890?",
+    "english_translation": "Which number is bigger between 4250 and 3890?",
+    "topic": "Number Comparison",
+    "competency_code": "9",
+    "competency_desc": "9999 තෙක් කවර හෝ සංඛ්‍යාංකයක් සහ සංඛ්‍යා නාමයක් කියවයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "BIGGER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 64,
+    "source_quote": "9999 තෙක් කවර හෝ සංඛ්‍යාංකයක් සහ සංඛ්‍යා නාමයක් කියවයි.",
+    "number_limit": 9999,
+    "operation": "COMPARE",
+    "operands": [
+     1234,
+     2143
+    ],
+    "expected_answer": 1234,
+    "raw_problem_text": "1234 සහ 2143 සංඛ්‍යා දෙකෙන් කුඩා සංඛ්‍යාව කුමක්ද?",
+    "child_prompt_si": "1234 සහ 2143 අතරින් පොඩි සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "Which number is smaller: 1234 or 2143?",
+    "english_translation": "Which number is smaller between 1234 and 2143?",
+    "topic": "Number Comparison",
+    "competency_code": "9",
+    "competency_desc": "9999 තෙක් කවර හෝ සංඛ්‍යාංකයක් සහ සංඛ්‍යා නාමයක් කියවයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "SMALLER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 64,
+    "source_quote": "9999 තෙක් කවර හෝ සංඛ්‍යාංකයක් සහ සංඛ්‍යා නාමයක් කියවයි.",
+    "number_limit": 9999,
+    "operation": "COMPARE",
+    "operands": [
+     5012,
+     5021
+    ],
+    "expected_answer": 5021,
+    "raw_problem_text": "5012 සහ 5021 සංඛ්‍යා දෙකෙන් වැඩි සංඛ්‍යාව කුමක්ද?",
+    "child_prompt_si": "5012 සහ 5021 අතරින් ලොකු සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "Which number is bigger: 5012 or 5021?",
+    "english_translation": "Which number is bigger between 5012 and 5021?",
+    "topic": "Number Comparison",
+    "competency_code": "9",
+    "competency_desc": "9999 තෙක් කවර හෝ සංඛ්‍යාංකයක් සහ සංඛ්‍යා නාමයක් කියවයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "target": "BIGGER"
+    }
+   }
+  ],
+  "36-43": [
+   {
+    "kind": "exercise",
+    "page_number": 37,
+    "source_quote": "මා ළඟ පාට පෑන්සල් 12ක් තිබුණා. ඉන් 2ක් මා නංගිට දුන්නා. මා ළඟ ඉතුරු පාට පෑන්සල් ගණන කීය ද ?",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     12,
+     2
+    ],
+    "expected_answer": 10,
+    "raw_problem_text": "මා ළඟ පාට පෑන්සල් 12ක් තිබුණා. ඉන් 2ක් මා නංගිට දුන්නා. මා ළඟ ඉතුරු පාට පෑන්සල් ගණන කීය ද?",
+    "child_prompt_si": "පාට පෑන්සල් 12න් 2ක් දුන්නා. ඉතුරු කීයද?",
+    "child_prompt_en": "Had 12 color pencils, gave 2. How many left?",
+    "english_translation": "I had 12 color pencils. I gave 2 to my sister. How many color pencils do I have left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 37,
+    "source_quote": "අම්මා මට කාසි 26ක් දුන්නා. ඉන් මම කාසි 10ක් කෑටයකට දැම්මා. මා ළඟ ඉතුරු කාසි ගණන කීය ද ?",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     26,
+     10
+    ],
+    "expected_answer": 16,
+    "raw_problem_text": "අම්මා මට කාසි 26ක් දුන්නා. ඉන් මම කාසි 10ක් කෑටයකට දැම්මා. මා ළඟ ඉතුරු කාසි ගණන කීය ද?",
+    "child_prompt_si": "කාසි 26න් 10ක් දැම්මා. ඉතුරු කීයද?",
+    "child_prompt_en": "Had 26 coins, put 10 in piggy bank. How many left?",
+    "english_translation": "Mother gave me 26 coins. I put 10 coins into a piggy bank. How many coins do I have left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 37,
+    "source_quote": "පන්තියේ සිසුන් 36 දෙනකු සිටියා. එයින් සිසුන් 21 දෙනකු විවිධ ප්‍රසංගයේ නර්තනයට සහභාගී වුණා. ඉතුරු පිරිස ගායනයට සහභාගී වුණා. ගායනයට සහභාගී වූ සිසුන් ගණන කීය ද ?",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     36,
+     21
+    ],
+    "expected_answer": 15,
+    "raw_problem_text": "පන්තියේ සිසුන් 36 දෙනකු සිටියා. එයින් සිසුන් 21 දෙනකු නර්තනයට සහභාගී වුණා. ගායනයට සහභාගී වූ සිසුන් ගණන කීය ද?",
+    "child_prompt_si": "ළමයි 36න් 21ක් නටනවා. ගායනා කරන ළමයි කීයද?",
+    "child_prompt_en": "36 students, 21 dancing. How many singing?",
+    "english_translation": "There were 36 students in the class. 21 students participated in dancing. How many students participated in singing?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 39,
+    "source_quote": "පන්තියේ සිටින මුළු සිසුන් සංඛ්‍යාව 35කි. ඉන් 20ක් ගැහැණු ළමයි ය. පන්තියේ සිටින පිරිමි ළමයින් සංඛ්‍යාව කොපමණ ද ?",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     35,
+     20
+    ],
+    "expected_answer": 15,
+    "raw_problem_text": "පන්තියේ සිටින මුළු සිසුන් සංඛ්‍යාව 35කි. ඉන් 20ක් ගැහැණු ළමයි ය. පන්තියේ සිටින පිරිමි ළමයින් සංඛ්‍යාව කොපමණ ද?",
+    "child_prompt_si": "ළමයි 35න් 20ක් ගැහැණු ළමයි. පිරිමි ළමයි කීයද?",
+    "child_prompt_en": "35 students, 20 are girls. How many boys?",
+    "english_translation": "Total students in class is 35. 20 of them are girls. What is the number of boys in the class?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 39,
+    "source_quote": "සමන්ගේ මුද්දර එකතුවේ මුද්දර ගණන 35කි. ඔහුගේ අයියාගේ මුද්දර එකතුව 75කින් සමන්විත වේ. සමන්ට වඩා ඔහුගේ අයියා එකතු කර ඇති මුද්දර සංඛ්‍යාව කොපමණකින් වැඩි ද ?",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     75,
+     35
+    ],
+    "expected_answer": 40,
+    "raw_problem_text": "සමන්ගේ මුද්දර 35කි. අයියාගේ මුද්දර 75කි. අයියා ළඟ මුද්දර කීයකින් වැඩි ද?",
+    "child_prompt_si": "සමන්ට මුද්දර 35යි, අයියාට 75යි. අයියා ළඟ කීයක් වැඩිද?",
+    "child_prompt_en": "Saman has 35 stamps, brother has 75. How many more does brother have?",
+    "english_translation": "Saman's stamp collection has 35 stamps. Brother's collection has 75 stamps. How many more stamps does his brother have compared to Saman?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 40,
+    "source_quote": "කඩයකට මිල දී ගත් පොල් ගෙඩි ගණන 75කි. දවස අවසානයේ එයින් පොල් ගෙඩි 34ක් විකිනී තිබිණි. ඉතුරු පොල් ගෙඩි ගණන කීය ද ?",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     75,
+     34
+    ],
+    "expected_answer": 41,
+    "raw_problem_text": "කඩයකට ගත් පොල් 75කි. දවස අවසානයේ පොල් 34ක් විකුණුවා. ඉතුරු පොල් කීයද?",
+    "child_prompt_si": "පොල් 75න් 34ක් විකුණුවා. ඉතුරු පොල් කීයද?",
+    "child_prompt_en": "Bought 75 coconuts, sold 34. How many coconuts left?",
+    "english_translation": "Number of coconuts bought for the shop is 75. At the end of the day 34 coconuts were sold. What is the number of coconuts left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 41,
+    "source_quote": "පසුගිය වසරේ විනෝද චාරිකාවට සහභාගී වූ සිසුන් ගණන 53කි. මේ වසරේ සිසුහු 85 දෙනෙක් සහභාගී වූහ. පසුගිය වසරට වඩා මේ වසරේ විනෝද චාරිකාවට සභාගී වූ සිසුන් ගණන කීයකින් වැඩි වී තිබේ ද ?",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     85,
+     53
+    ],
+    "expected_answer": 32,
+    "raw_problem_text": "ගිය වසරේ ගියා 53කි. මේ වසරේ 85 දෙනෙක් ගියා. කීයකින් වැඩිද?",
+    "child_prompt_si": "ගිය වසරේ 53යි, මේ වසරේ 85යි. වැඩිපුර ළමයි කීයද?",
+    "child_prompt_en": "Last year 53 went, this year 85. How many more this year?",
+    "english_translation": "Students who went on the trip last year: 53. This year 85 students participated. By how much is this year's trip participation higher than last year?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 41,
+    "source_quote": "පෙට්ටියක බිස්කෝතු පැකැට්ටු 68ක් දැමිය හැකි ය. එහි ඇත්තේ 45කි. තව කීයක් එයට දැමිය හැකි ද ?",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     68,
+     45
+    ],
+    "expected_answer": 23,
+    "raw_problem_text": "පෙට්ටියකට බිස්කෝතු 68ක් දාන්න පුළුවන්. දැන් තියෙන්නේ 45කි. තව කීයක් දාන්න පුළුවන්ද?",
+    "child_prompt_si": "පෙට්ටියට 68ක් පුළුවන්. දැන් 45යි තියෙන්නේ. තව කීයද?",
+    "child_prompt_en": "Box fits 68 biscuits, has 45. How many more fit?",
+    "english_translation": "A box can hold 68 biscuit packets. There are 45. How many more can be put into it?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 42,
+    "source_quote": "පොදු අන්තරය 2, 5 සහ 10 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "number_limit": 100,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": 12,
+    "raw_problem_text": "පොදු අන්තරය 2ක් වන 2, 4, 6, 8, 10 සංඛ්‍යා රටාවේ ඊළඟ සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "2, 4, 6, 8, 10 රටාවේ ඊළඟ අංකය කීයද?",
+    "child_prompt_en": "What is next in 2, 4, 6, 8, 10?",
+    "english_translation": "What is the next number in the pattern 2, 4, 6, 8, 10 with a common difference of 2?",
+    "topic": "Patterns",
+    "competency_code": "5.1",
+    "competency_desc": "පොදු අන්තරය 2, 5 සහ 10 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      2,
+      4,
+      6,
+      8,
+      10
+     ],
+     "target": 12
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 42,
+    "source_quote": "පොදු අන්තරය 2, 5 සහ 10 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "number_limit": 100,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": 25,
+    "raw_problem_text": "පොදු අන්තරය 5ක් වන 5, 10, 15, 20 සංඛ්‍යා රටාවේ ඊළඟ සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "5, 10, 15, 20 රටාවේ ඊළඟ අංකය කීයද?",
+    "child_prompt_en": "What is next in 5, 10, 15, 20?",
+    "english_translation": "What is the next number in the pattern 5, 10, 15, 20 with a common difference of 5?",
+    "topic": "Patterns",
+    "competency_code": "5.1",
+    "competency_desc": "පොදු අන්තරය 2, 5 සහ 10 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      5,
+      10,
+      15,
+      20
+     ],
+     "target": 25
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 42,
+    "source_quote": "පොදු අන්තරය 2, 5 සහ 10 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "number_limit": 100,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": 40,
+    "raw_problem_text": "පොදු අන්තරය 10ක් වන 10, 20, 30 සංඛ්‍යා රටාවේ ඊළඟ සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "10, 20, 30 රටාවේ ඊළඟ අංකය කීයද?",
+    "child_prompt_en": "What is next in 10, 20, 30?",
+    "english_translation": "What is the next number in the pattern 10, 20, 30 with a common difference of 10?",
+    "topic": "Patterns",
+    "competency_code": "5.1",
+    "competency_desc": "පොදු අන්තරය 2, 5 සහ 10 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      10,
+      20,
+      30
+     ],
+     "target": 40
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 42,
+    "source_quote": "පොදු අන්තරය 3 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "number_limit": 100,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": 13,
+    "raw_problem_text": "පොදු අන්තරය 3ක් වන 1, 4, 7, 10 සංඛ්‍යා රටාවේ ඊළඟ සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "1, 4, 7, 10 රටාවේ ඊළඟ අංකය කීයද?",
+    "child_prompt_en": "What is next in 1, 4, 7, 10?",
+    "english_translation": "What is the next number in the pattern 1, 4, 7, 10 with a common difference of 3?",
+    "topic": "Patterns",
+    "competency_code": "5.1",
+    "competency_desc": "පොදු අන්තරය 3 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      1,
+      4,
+      7,
+      10
+     ],
+     "target": 13
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 42,
+    "source_quote": "පොදු අන්තරය 3 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "number_limit": 100,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": 16,
+    "raw_problem_text": "පොදු අන්තරය 3ක් වන 4, 7, 10, 13 සංඛ්‍යා රටාවේ ඊළඟ සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "4, 7, 10, 13 රටාවේ ඊළඟ අංකය කීයද?",
+    "child_prompt_en": "What is next in 4, 7, 10, 13?",
+    "english_translation": "What is the next number in the pattern 4, 7, 10, 13 with a common difference of 3?",
+    "topic": "Patterns",
+    "competency_code": "5.1",
+    "competency_desc": "පොදු අන්තරය 3 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      4,
+      7,
+      10,
+      13
+     ],
+     "target": 16
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 42,
+    "source_quote": "පොදු අන්තරය 3 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "number_limit": 100,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": 19,
+    "raw_problem_text": "පොදු අන්තරය 3ක් වන 7, 10, 13, 16 සංඛ්‍යා රටාවේ ඊළඟ සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "7, 10, 13, 16 රටාවේ ඊළඟ අංකය කීයද?",
+    "child_prompt_en": "What is next in 7, 10, 13, 16?",
+    "english_translation": "What is the next number in the pattern 7, 10, 13, 16 with a common difference of 3?",
+    "topic": "Patterns",
+    "competency_code": "5.1",
+    "competency_desc": "පොදු අන්තරය 3 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      7,
+      10,
+      13,
+      16
+     ],
+     "target": 19
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 42,
+    "source_quote": "පොදු අන්තරය 4 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "number_limit": 100,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": 16,
+    "raw_problem_text": "පොදු අන්තරය 4ක් වන 4, 8, 12 සංඛ්‍යා රටාවේ ඊළඟ සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "4, 8, 12 රටාවේ ඊළඟ අංකය කීයද?",
+    "child_prompt_en": "What is next in 4, 8, 12?",
+    "english_translation": "What is the next number in the pattern 4, 8, 12 with a common difference of 4?",
+    "topic": "Patterns",
+    "competency_code": "5.1",
+    "competency_desc": "පොදු අන්තරය 4 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      4,
+      8,
+      12
+     ],
+     "target": 16
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 42,
+    "source_quote": "පොදු අන්තරය 4 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "number_limit": 100,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": 17,
+    "raw_problem_text": "පොදු අන්තරය 4ක් වන 5, 9, 13 සංඛ්‍යා රටාවේ ඊළඟ සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "5, 9, 13 රටාවේ ඊළඟ අංකය කීයද?",
+    "child_prompt_en": "What is next in 5, 9, 13?",
+    "english_translation": "What is the next number in the pattern 5, 9, 13 with a common difference of 4?",
+    "topic": "Patterns",
+    "competency_code": "5.1",
+    "competency_desc": "පොදු අන්තරය 4 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      5,
+      9,
+      13
+     ],
+     "target": 17
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 42,
+    "source_quote": "පොදු අන්තරය 4 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "number_limit": 100,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": 20,
+    "raw_problem_text": "පොදු අන්තරය 4ක් වන 8, 12, 16 සංඛ්‍යා රටාවේ ඊළඟ සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "8, 12, 16 රටාවේ ඊළඟ අංකය කීයද?",
+    "child_prompt_en": "What is next in 8, 12, 16?",
+    "english_translation": "What is the next number in the pattern 8, 12, 16 with a common difference of 4?",
+    "topic": "Patterns",
+    "competency_code": "5.1",
+    "competency_desc": "පොදු අන්තරය 4 වූ සංඛ්‍යා රටා ගොඩනඟයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      8,
+      12,
+      16
+     ],
+     "target": 20
+    }
+   }
+  ],
+  "89-96": [],
+  "97-104": [
+   {
+    "kind": "aligned",
+    "page_number": 97,
+    "source_quote": "ඉගෙනුම් ඵල : • ඉලක්කම් හතරේ සංඛ්‍යා දෙකක් ගෙන යාම එකස්ථානයෙන් දහස්ථානයට පමණක් සහිත ව එකතු කරයි.",
+    "number_limit": 9999,
+    "operation": "ADD",
+    "operands": [
+     2546,
+     1235
+    ],
+    "expected_answer": 3781,
+    "raw_problem_text": "පන්ති කාමර දෙකක ළමයි 2546ක් සහ 1235ක් ඉන්නවා. මුළු ළමයි ගණන කීයද?",
+    "child_prompt_si": "පන්ති දෙකක ළමයි 2546ක් හා 1235ක් ඉන්නවා. මුළු ළමයි කීයද?",
+    "child_prompt_en": "There are 2546 and 1235 children in two classes. Total children?",
+    "english_translation": "There are 2546 and 1235 children in two classes. What is the total number of children?",
+    "topic": "Addition",
+    "competency_code": "16",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 98,
+    "source_quote": "ඉගෙනුම් ඵල : • ඉලක්කම් හතර තෙක් වූ සංඛ්‍යා දෙකක එකතුව (ගෙන යාම දහස්ථානයෙන් සියස්ථානයට සහිත) ප්‍රකාශ කරයි.",
+    "number_limit": 9999,
+    "operation": "ADD",
+    "operands": [
+     4286,
+     3141
+    ],
+    "expected_answer": 7427,
+    "raw_problem_text": "පොත් කඩයක සිංහල පොත් 4286කුත් ඉංග්‍රීසි පොත් 3141කුත් තියෙනවා. මුළු පොත් ගණන කීයද?",
+    "child_prompt_si": "පොත් 4286යි 3141යි තියෙනවා. මුළු පොත් කීයද?",
+    "child_prompt_en": "There are 4286 and 3141 books. Total books?",
+    "english_translation": "There are 4286 Sinhala books and 3141 English books in a bookshop. What is the total number of books?",
+    "topic": "Addition",
+    "competency_code": "16",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "HARD",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 100,
+    "source_quote": "මාර්තු මාසයේ විකුණු අඹ සහ අන්නාසිවල එකතුව කීය ද?",
+    "number_limit": 9999,
+    "operation": "ADD",
+    "operands": [
+     1532,
+     836
+    ],
+    "expected_answer": 2368,
+    "raw_problem_text": "මාර්තු මාසයේ අඹ ගෙඩි 1532කුත් අන්නාසි ගෙඩි 836කුත් විකුණුවා. විකුණු මුළු පළතුරු ගණන කීයද?",
+    "child_prompt_si": "අඹ 1532යි අන්නාසි 836යි විකුණුවා. මුළු පළතුරු කීයද?",
+    "child_prompt_en": "Sold 1532 mangoes and 836 pineapples. Total fruits?",
+    "english_translation": "Sold 1532 mangoes and 836 pineapples in March. What is the total number of fruits sold?",
+    "topic": "Addition",
+    "competency_code": "16",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   }
+  ],
+  "105-112": [
+   {
+    "kind": "exercise",
+    "page_number": 107,
+    "source_quote": "* 12න් 2ක් අඩු කළ විට පිළිතුරු කීය ද ?",
+    "number_limit": 12,
+    "operation": "SUB",
+    "operands": [
+     12,
+     2
+    ],
+    "expected_answer": 10,
+    "raw_problem_text": "පෑන් 12කින් පෑන් 2ක් දුන්නොත්, ඉතුරු පෑන් ගණන කීයද?",
+    "child_prompt_si": "පෑන් 12න් 2ක් දුන්නා. ඉතුරු පෑන් කීයද?",
+    "child_prompt_en": "You had 12 pens and gave away 2. How many pens are left?",
+    "english_translation": "If 2 pens are given away from 12 pens, how many pens are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 107,
+    "source_quote": "* 16න් 5ක් අඩු කළ විට පිළිතුරු කීය ද ?",
+    "number_limit": 16,
+    "operation": "SUB",
+    "operands": [
+     16,
+     5
+    ],
+    "expected_answer": 11,
+    "raw_problem_text": "අඹ 16කින් අඹ 5ක් කෑවා නම්, ඉතුරු අඹ ගණන කීයද?",
+    "child_prompt_si": "අඹ 16න් 5ක් කෑවා. ඉතුරු අඹ කීයද?",
+    "child_prompt_en": "You had 16 mangoes and ate 5. How many mangoes are left?",
+    "english_translation": "If 5 mangoes are eaten from 16 mangoes, how many mangoes are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 107,
+    "source_quote": "* 18න් 11ක් අඩු කළ විට පිළිතුරු කීය ද ?",
+    "number_limit": 18,
+    "operation": "SUB",
+    "operands": [
+     18,
+     11
+    ],
+    "expected_answer": 7,
+    "raw_problem_text": "මල් 18කින් මල් 11ක් තිළිණ කළා නම්, ඉතුරු මල් ගණන කීයද?",
+    "child_prompt_si": "මල් 18න් 11ක් දුන්නා. ඉතුරු මල් කීයද?",
+    "child_prompt_en": "You had 18 flowers and gave away 11. How many flowers are left?",
+    "english_translation": "If 11 flowers are given away from 18 flowers, how many flowers are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 107,
+    "source_quote": "ඉගෙනුම් ඵල | • 99ට නොවැඩි සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් (දහය ස්ථානයේ සිට එක ස්ථානයට ගෙන ඒම සහිත ව) අඩු කර පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     51,
+     29
+    ],
+    "expected_answer": 22,
+    "raw_problem_text": "පොත් 51කින් පොත් 29ක් දුන්නොත්, ඉතුරු පොත් ගණන කීයද?",
+    "child_prompt_si": "පොත් 51න් 29ක් දුන්නා. ඉතුරු පොත් කීයද?",
+    "child_prompt_en": "You had 51 books and gave away 29. How many books are left?",
+    "english_translation": "If 29 books are given away from 51 books, how many books are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 107,
+    "source_quote": "ඉගෙනුම් ඵල | • 99ට නොවැඩි සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් (දහය ස්ථානයේ සිට එක ස්ථානයට ගෙන ඒම සහිත ව) අඩු කර පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     74,
+     26
+    ],
+    "expected_answer": 48,
+    "raw_problem_text": "දොඩම් 74කින් දොඩම් 26ක් කෑවා නම්, ඉතුරු දොඩම් ගණන කීයද?",
+    "child_prompt_si": "දොඩම් 74න් 26ක් කෑවා. ඉතුරු දොඩම් කීයද?",
+    "child_prompt_en": "You had 74 oranges and ate 26. How many oranges are left?",
+    "english_translation": "If 26 oranges are eaten from 74 oranges, how many oranges are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 107,
+    "source_quote": "ඉගෙනුම් ඵල | • 99ට නොවැඩි සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් (දහය ස්ථානයේ සිට එක ස්ථානයට ගෙන ඒම සහිත ව) අඩු කර පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 99,
+    "operation": "SUB",
+    "operands": [
+     83,
+     58
+    ],
+    "expected_answer": 25,
+    "raw_problem_text": "පෑන් 83කින් පෑන් 58ක් විකුණුවා නම්, ඉතුරු පෑන් ගණන කීයද?",
+    "child_prompt_si": "පෑන් 83න් 58ක් විකුණුවා. ඉතුරු පෑන් කීයද?",
+    "child_prompt_en": "You had 83 pens and sold 58. How many pens are left?",
+    "english_translation": "If 58 pens are sold from 83 pens, how many pens are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   }
+  ],
+  "125-132": [],
+  "113-124": [
+   {
+    "kind": "aligned",
+    "page_number": 104,
+    "source_quote": "• 4න් ගුණ කිරීමක් සහිත ගැටළුවක් සිසුන්ට ඉදිරිපත් කරන්න. \"එක පොකුරක මල් 4 බැගින් ඇත. එවැනි පොකුරු 6ක ඇති මල් ගණන කීය ද ?\"",
+    "number_limit": 10,
+    "operation": "MUL",
+    "operands": [
+     4,
+     6
+    ],
+    "expected_answer": 24,
+    "raw_problem_text": "එක පොකුරක මල් 4 බැගින් ඇත. එවැනි පොකුරු 6ක ඇති මල් ගණන කීය ද?",
+    "child_prompt_si": "පොකුරක මල් 4 බැගින් පොකුරු 6ක ඇති මුළු මල් කීයද?",
+    "child_prompt_en": "There are 4 flowers in a bunch. How many flowers in 6 bunches?",
+    "english_translation": "There are 4 flowers in each bunch. What is the total number of flowers in 6 such bunches?",
+    "topic": "Multiplication",
+    "competency_code": "20",
+    "competency_desc": "සංඛ්‍යා ගුණ කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 104,
+    "source_quote": "• 4න් ගුණ කිරීමක් සහිත ගැටළුවක් සිසුන්ට ඉදිරිපත් කරන්න. \"එක පොකුරක මල් 4 බැගින් ඇත. එවැනි පොකුරු 6ක ඇති මල් ගණන කීය ද ?\"",
+    "number_limit": 10,
+    "operation": "MUL",
+    "operands": [
+     3,
+     5
+    ],
+    "expected_answer": 15,
+    "raw_problem_text": "එක පෙට්ටියක පාට පෑන් 3 බැගින් පෙට්ටි 5ක ඇති පාට පෑන් ගණන කීය ද?",
+    "child_prompt_si": "පෙට්ටියක පෑන් 3 බැගින් පෙට්ටි 5ක ඇති මුළු පෑන් කීයද?",
+    "child_prompt_en": "There are 3 pens in a box. How many pens in 5 boxes?",
+    "english_translation": "There are 3 color pens in each box. What is the total number of pens in 5 such boxes?",
+    "topic": "Multiplication",
+    "competency_code": "20",
+    "competency_desc": "සංඛ්‍යා ගුණ කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 104,
+    "source_quote": "• 4න් ගුණ කිරීමක් සහිත ගැටළුවක් සිසුන්ට ඉදිරිපත් කරන්න. \"එක පොකුරක මල් 4 බැගින් ඇත. එවැනි පොකුරු 6ක ඇති මල් ගණන කීය ද ?\"",
+    "number_limit": 10,
+    "operation": "MUL",
+    "operands": [
+     4,
+     7
+    ],
+    "expected_answer": 28,
+    "raw_problem_text": "එක් මේසයක පුටු 4 බැගින් මේස 7ක ඇති පුටු ගණන කීය ද?",
+    "child_prompt_si": "මේසයක පුටු 4 බැගින් මේස 7ක ඇති මුළු පුටු කීයද?",
+    "child_prompt_en": "There are 4 chairs at a table. How many chairs at 7 tables?",
+    "english_translation": "There are 4 chairs at each table. What is the total number of chairs at 7 such tables?",
+    "topic": "Multiplication",
+    "competency_code": "20",
+    "competency_desc": "සංඛ්‍යා ගුණ කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   }
+  ],
+  "144-151": [
+   {
+    "kind": "exercise",
+    "page_number": 144,
+    "source_quote": "උදා : * 300, 400, 500 මෙයින් කුඩා ම සංඛ්‍යාව කුමක් ද ? විශාල ම සංඛ්‍යාව කුමක් ද ?",
+    "operation": "COMPARE",
+    "operands": [
+     300,
+     500
+    ],
+    "expected_answer": 300,
+    "raw_problem_text": "300, 400, 500 මෙයින් කුඩා ම සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "300, 400, 500 වලින් කුඩාම සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "What is the smallest number among 300, 400, 500?",
+    "english_translation": "What is the smallest number among 300, 400, 500?",
+    "topic": "Number Comparison",
+    "competency_code": "4.4",
+    "competency_desc": "9999ට නොවැඩි සංඛ්‍යා හතරක් පිළිවෙළට සකස් කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "SMALLER"
+    }
+   },
+   {
+    "kind": "exercise",
+    "page_number": 144,
+    "source_quote": "උදා : * 1450 සහ 1623 සංඛ්‍යා දෙකෙන් කුඩා සංඛ්‍යාව කුමක් ද ?",
+    "operation": "COMPARE",
+    "operands": [
+     1450,
+     1623
+    ],
+    "expected_answer": 1450,
+    "raw_problem_text": "1450 සහ 1623 සංඛ්‍යා දෙකෙන් කුඩා සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "1450 සහ 1623 වලින් කුඩා සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "Which is smaller: 1450 or 1623?",
+    "english_translation": "Which is smaller: 1450 or 1623?",
+    "topic": "Number Comparison",
+    "competency_code": "4.4",
+    "competency_desc": "9999ට නොවැඩි සංඛ්‍යා හතරක් පිළිවෙළට සකස් කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "SMALLER"
+    }
+   },
+   {
+    "kind": "exercise",
+    "page_number": 146,
+    "source_quote": "උදා : පාසලක සිටින ගැහැණු ළමයින් ගණන 1029කි. පිරිමි ළමයින් ගණන 1152කි. පාසලේ සිටින මුළු ළමයින් ගණන කීය ද ?",
+    "operation": "ADD",
+    "operands": [
+     1029,
+     1152
+    ],
+    "expected_answer": 2181,
+    "raw_problem_text": "පාසලක සිටින ගැහැණු ළමයින් ගණන 1029කි. පිරිමි ළමයින් ගණන 1152කි. පාසලේ සිටින මුළු ළමයින් ගණන කීය ද?",
+    "child_prompt_si": "ගැහැණු ළමයින් 1029යි, පිරිමි ළමයින් 1152යි. මුළු ළමයින් කීයද?",
+    "child_prompt_en": "Girls are 1029, boys are 1152. Total children?",
+    "english_translation": "There are 1029 girls and 1152 boys in a school. What is the total number of children?",
+    "topic": "Addition",
+    "competency_code": "26.1",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 148,
+    "source_quote": "මාස තුනක දී තේ කර්මාන්ත ශාලාවකින් නිෂ්පාදනය ලද තේ පැකට් ප්‍රමාණය මෙසේ ය. 1227, 1302, 1244 මාස තුනෙහි නිෂ්පාදනය ලද මුළු තේ පැකට් ප්‍රමාණය සොයන්න.",
+    "operation": "ADD",
+    "operands": [
+     1227,
+     1302
+    ],
+    "expected_answer": 2529,
+    "raw_problem_text": "මාස තුනක දී තේ කර්මාන්ත ශාලාවකින් නිෂ්පාදනය ලද තේ පැකට් ප්‍රමාණය 1227කි, 1302කි සහ 1244කි. මුළු තේ පැකට් ප්‍රමාණය සොයන්න.",
+    "child_prompt_si": "තේ පැකට් 1227ක්, 1302ක් සහ 1244ක් ඇත. මුළු පැකට් කීයද?",
+    "child_prompt_en": "Tea packets are 1227, 1302 and 1244. Total packets?",
+    "english_translation": "Tea packets produced are 1227, 1302 and 1244. Find the total number of tea packets.",
+    "topic": "Addition",
+    "competency_code": "26.1",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "HARD",
+    "visual_props": {}
+   }
+  ],
+  "133-143": [
+   {
+    "kind": "exercise",
+    "page_number": 135,
+    "source_quote": "අඹ ගෙඩි 35ක් සමාන ව ගොඩවල් තුනකට වෙන් කළ විට එක් ගොඩක ඇති අඹ ගණන කීය ද ?",
+    "operation": "DIV",
+    "operands": [
+     [
+      35,
+      3
+     ]
+    ],
+    "expected_answer": 11,
+    "raw_problem_text": "අඹ ගෙඩි 35ක් සමාන ව ගොඩවල් තුනකට වෙන් කළ විට එක් ගොඩක ඇති අඹ ගණන කීය ද?",
+    "child_prompt_si": "අඹ 35ක් ගොඩවල් 3කට සමව බෙදුවොත් එක් ගොඩක ඇති අඹ කීයද?",
+    "child_prompt_en": "If 35 mangoes are divided into 3 equal piles, how many in one pile?",
+    "english_translation": "If 35 mangoes are divided equally into 3 piles, how many mangoes are in one pile?",
+    "topic": "Division",
+    "competency_code": "23",
+    "competency_desc": "සංඛ්‍යා බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 139,
+    "source_quote": "පේර ගෙඩි 75ක් සමාන ව ගොඩවල් තුනකට වෙන් කළ විට එක ගොඩක පේර ගෙඩි කීයක් තිබේ ද ?",
+    "operation": "DIV",
+    "operands": [
+     [
+      75,
+      3
+     ]
+    ],
+    "expected_answer": 25,
+    "raw_problem_text": "පේර ගෙඩි 75ක් සමාන ව ගොඩවල් තුනකට වෙන් කළ විට එක ගොඩක පේර ගෙඩි කීයක් තිබේ ද?",
+    "child_prompt_si": "පේර 75ක් ගොඩවල් 3කට සමව බෙදුවොත් එක ගොඩක පේර කීයද?",
+    "child_prompt_en": "If 75 guavas are divided into 3 equal piles, how many in one pile?",
+    "english_translation": "If 75 guavas are divided equally into 3 piles, how many guavas are in one pile?",
+    "topic": "Division",
+    "competency_code": "23",
+    "competency_desc": "සංඛ්‍යා බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 139,
+    "source_quote": "අභ්‍යාස පොත් 85ක්, එක් අයකුට තුන බැගින් කී දෙනෙකුට බෙදා දිය හැකි ද ? කීයක් ඉතුරු වේ ද ?",
+    "operation": "DIV",
+    "operands": [
+     [
+      85,
+      3
+     ]
+    ],
+    "expected_answer": 28,
+    "raw_problem_text": "අභ්‍යාස පොත් 85ක්, එක් අයකුට තුන බැගින් කී දෙනෙකුට බෙදා දිය හැකි ද? කීයක් ඉතුරු වේ ද?",
+    "child_prompt_si": "පොත් 85ක් එක් කෙනෙකුට 3 බැගින් දුන්නොත් කී දෙනෙකුට දෙන්න පුළුවන්ද?",
+    "child_prompt_en": "85 exercise books are given 3 each. How many people get them?",
+    "english_translation": "85 exercise books are distributed 3 to each person. How many people can receive them and how many are left?",
+    "topic": "Division",
+    "competency_code": "23",
+    "competency_desc": "සංඛ්‍යා බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "HARD",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 142,
+    "source_quote": "25, 39 සංඛ්‍යා දෙකෙන් විශාල සංඛ්‍යාව කුමක් ද ?",
+    "number_limit": 99,
+    "operation": "COMPARE",
+    "operands": [
+     25,
+     39
+    ],
+    "expected_answer": 39,
+    "raw_problem_text": "25, 39 සංඛ්‍යා දෙකෙන් විශාල සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "25 සහ 39 අතරින් විශාල සංඛ්‍යාව කුමක්ද?",
+    "child_prompt_en": "Which is the bigger number between 25 and 39?",
+    "english_translation": "Which is the larger number between 25 and 39?",
+    "topic": "Comparison",
+    "competency_code": "සංඛ්‍යා - 3",
+    "competency_desc": "සංඛ්‍යා හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "BIGGER"
+    }
+   },
+   {
+    "kind": "exercise",
+    "page_number": 142,
+    "source_quote": "258, 273 සංඛ්‍යා දෙකෙන් කුඩා සංඛ්‍යාව කුමක් ද ?",
+    "number_limit": 999,
+    "operation": "COMPARE",
+    "operands": [
+     258,
+     273
+    ],
+    "expected_answer": 258,
+    "raw_problem_text": "258, 273 සංඛ්‍යා දෙකෙන් කුඩා සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "258 සහ 273 අතරින් කුඩා සංඛ්‍යාව කුමක්ද?",
+    "child_prompt_en": "Which is the smaller number between 258 and 273?",
+    "english_translation": "Which is the smaller number between 258 and 273?",
+    "topic": "Comparison",
+    "competency_code": "සංඛ්‍යා - 3",
+    "competency_desc": "සංඛ්‍යා හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "SMALLER"
+    }
+   },
+   {
+    "kind": "exercise",
+    "page_number": 142,
+    "source_quote": "3450, 8271 සංඛ්‍යා දෙකෙන් විශාල සංඛ්‍යාව කුමක් ද ?",
+    "number_limit": 9999,
+    "operation": "COMPARE",
+    "operands": [
+     3450,
+     8271
+    ],
+    "expected_answer": 8271,
+    "raw_problem_text": "3450, 8271 සංඛ්‍යා දෙකෙන් විශාල සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "3450 සහ 8271 අතරින් විශාල සංඛ්‍යාව කුමක්ද?",
+    "child_prompt_en": "Which is the bigger number between 3450 and 8271?",
+    "english_translation": "Which is the larger number between 3450 and 8271?",
+    "topic": "Comparison",
+    "competency_code": "සංඛ්‍යා - 3",
+    "competency_desc": "සංඛ්‍යා හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "target": "BIGGER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 134,
+    "source_quote": "ඉලක්කම් දෙකේ සංඛ්‍යාවක් 3න් බෙදා පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 99,
+    "operation": "DIV",
+    "operands": [
+     [
+      48,
+      3
+     ]
+    ],
+    "expected_answer": 16,
+    "raw_problem_text": "පෑන් 48ක් ළමයි 3 දෙනෙකුට සමසමව බෙදුවොත් එක්කෙනෙකුට පෑන් කීයද?",
+    "child_prompt_si": "පෑන් 48ක් ළමයි 3 දෙනෙකුට සමව බෙදුවොත් කීයක් ලැබේද?",
+    "child_prompt_en": "If 48 pens are shared equally among 3 children, how many does each get?",
+    "english_translation": "If 48 pens are shared equally among 3 children, how many does each get?",
+    "topic": "Division",
+    "competency_code": "23",
+    "competency_desc": "සංඛ්‍යා බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 134,
+    "source_quote": "ඉලක්කම් දෙකේ සංඛ්‍යාවක් 3න් බෙදා පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 99,
+    "operation": "DIV",
+    "operands": [
+     [
+      66,
+      3
+     ]
+    ],
+    "expected_answer": 22,
+    "raw_problem_text": "චොක්ලට් 66ක් ළමයි 3 දෙනෙකුට සමසමව බෙදුවොත් එක්කෙනෙකුට කීයද?",
+    "child_prompt_si": "චොක්ලට් 66ක් ළමයි 3 දෙනෙකුට සමව බෙදුවොත් කීයක් ලැබේද?",
+    "child_prompt_en": "If 66 chocolates are shared equally among 3 children, how many does each get?",
+    "english_translation": "If 66 chocolates are shared equally among 3 children, how many does each get?",
+    "topic": "Division",
+    "competency_code": "23",
+    "competency_desc": "සංඛ්‍යා බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 134,
+    "source_quote": "ඉලක්කම් දෙකේ සංඛ්‍යාවක් 3න් බෙදා පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 99,
+    "operation": "DIV",
+    "operands": [
+     [
+      39,
+      3
+     ]
+    ],
+    "expected_answer": 13,
+    "raw_problem_text": "දොඩම් ගෙඩි 39ක් දරුවන් 3 දෙනෙකුට සමසමව බෙදුවොත් එක් අයෙකුට කීයද?",
+    "child_prompt_si": "දොඩම් 39ක් දරුවන් 3 දෙනෙකුට සමව බෙදුවොත් කීයක් ලැබේද?",
+    "child_prompt_en": "If 39 oranges are shared equally among 3 children, how many does each get?",
+    "english_translation": "If 39 oranges are shared equally among 3 children, how many does each get?",
+    "topic": "Division",
+    "competency_code": "23",
+    "competency_desc": "සංඛ්‍යා බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 134,
+    "source_quote": "ඉලක්කම් දෙකේ සංඛ්‍යාවක් 4න් බෙදා පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 99,
+    "operation": "DIV",
+    "operands": [
+     [
+      44,
+      4
+     ]
+    ],
+    "expected_answer": 11,
+    "raw_problem_text": "මල් 44ක් යාළුවන් 4 දෙනෙකුට සමසමව බෙදුවොත් එක් අයෙකුට කීයද?",
+    "child_prompt_si": "මල් 44ක් යාළුවන් 4 දෙනෙකුට සමව බෙදුවොත් කීයක් ලැබේද?",
+    "child_prompt_en": "If 44 flowers are shared equally among 4 friends, how many does each get?",
+    "english_translation": "If 44 flowers are shared equally among 4 friends, how many does each get?",
+    "topic": "Division",
+    "competency_code": "23",
+    "competency_desc": "සංඛ්‍යා බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 134,
+    "source_quote": "ඉලක්කම් දෙකේ සංඛ්‍යාවක් 4න් බෙදා පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 99,
+    "operation": "DIV",
+    "operands": [
+     [
+      84,
+      4
+     ]
+    ],
+    "expected_answer": 21,
+    "raw_problem_text": "බිස්කට් 84ක් ළමයින් 4 දෙනෙකුට සමසමව බෙදුවොත් එක් අයෙකුට කීයද?",
+    "child_prompt_si": "බිස්කට් 84ක් ළමයින් 4 දෙනෙකුට සමව බෙදුවොත් කීයක් ලැබේද?",
+    "child_prompt_en": "If 84 biscuits are shared equally among 4 children, how many does each get?",
+    "english_translation": "If 84 biscuits are shared equally among 4 children, how many does each get?",
+    "topic": "Division",
+    "competency_code": "23",
+    "competency_desc": "සංඛ්‍යා බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 134,
+    "source_quote": "ඉලක්කම් දෙකේ සංඛ්‍යාවක් 4න් බෙදා පිළිතුරු ප්‍රකාශ කරයි.",
+    "number_limit": 99,
+    "operation": "DIV",
+    "operands": [
+     [
+      68,
+      4
+     ]
+    ],
+    "expected_answer": 17,
+    "raw_problem_text": "පෑන් 68ක් සිසුන් 4 දෙනෙකුට සමසමව බෙදුවොත් එක් අයෙකුට කීයද?",
+    "child_prompt_si": "පෑන් 68ක් සිසුන් 4 දෙනෙකුට සමව බෙදුවොත් කීයක් ලැබේද?",
+    "child_prompt_en": "If 68 pens are shared equally among 4 students, how many does each get?",
+    "english_translation": "If 68 pens are shared equally among 4 students, how many does each get?",
+    "topic": "Division",
+    "competency_code": "23",
+    "competency_desc": "සංඛ්‍යා බෙදීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 140,
+    "source_quote": "9999ට නොවැඩි සංඛ්‍යා කිහිපයකින් විශාල ම සංඛ්‍යාව හා කුඩා ම සංඛ්‍යාව හඳුනාගෙන ප්‍රකාශ කරයි.",
+    "number_limit": 9999,
+    "operation": "COMPARE",
+    "operands": [
+     4120,
+     4890
+    ],
+    "expected_answer": 4890,
+    "raw_problem_text": "4120, 4890 සංඛ්‍යා දෙකෙන් විශාල සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "4120 සහ 4890 අතරින් විශාල සංඛ්‍යාව කුමක්ද?",
+    "child_prompt_en": "Which is the bigger number between 4120 and 4890?",
+    "english_translation": "Which is the larger number between 4120 and 4890?",
+    "topic": "Comparison",
+    "competency_code": "සංඛ්‍යා - 3",
+    "competency_desc": "සංඛ්‍යා හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "target": "BIGGER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 140,
+    "source_quote": "9999ට නොවැඩි සංඛ්‍යා කිහිපයකින් විශාල ම සංඛ්‍යාව හා කුඩා ම සංඛ්‍යාව හඳුනාගෙන ප්‍රකාශ කරයි.",
+    "number_limit": 9999,
+    "operation": "COMPARE",
+    "operands": [
+     7340,
+     7120
+    ],
+    "expected_answer": 7120,
+    "raw_problem_text": "7340, 7120 සංඛ්‍යා දෙකෙන් කුඩා සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "7340 සහ 7120 අතරින් කුඩා සංඛ්‍යාව කුමක්ද?",
+    "child_prompt_en": "Which is the smaller number between 7340 and 7120?",
+    "english_translation": "Which is the smaller number between 7340 and 7120?",
+    "topic": "Comparison",
+    "competency_code": "සංඛ්‍යා - 3",
+    "competency_desc": "සංඛ්‍යා හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "target": "SMALLER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 140,
+    "source_quote": "9999ට නොවැඩි සංඛ්‍යා කිහිපයකින් විශාල ම සංඛ්‍යාව හා කුඩා ම සංඛ්‍යාව හඳුනාගෙන ප්‍රකාශ කරයි.",
+    "number_limit": 9999,
+    "operation": "COMPARE",
+    "operands": [
+     2500,
+     5200
+    ],
+    "expected_answer": 5200,
+    "raw_problem_text": "2500, 5200 සංඛ්‍යා දෙකෙන් විශාල සංඛ්‍යාව කුමක් ද?",
+    "child_prompt_si": "2500 සහ 5200 අතරින් විශාල සංඛ්‍යාව කුමක්ද?",
+    "child_prompt_en": "Which is the bigger number between 2500 and 5200?",
+    "english_translation": "Which is the larger number between 2500 and 5200?",
+    "topic": "Comparison",
+    "competency_code": "සංඛ්‍යා - 3",
+    "competency_desc": "සංඛ්‍යා හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "target": "BIGGER"
+    }
+   }
+  ],
+  "152-159": [
+   {
+    "kind": "aligned",
+    "page_number": 152,
+    "source_quote": "- එක් එක් කණ්ඩායමට ආදේශ ද්‍රව්‍ය යොදාගෙන තරාදියෙන් මැන බලමින් විසදීම සඳහා බර ප්‍රමාණ එකතු කිරීමේ ගැටලු තුනක් පමණ ලබා දෙන්න.",
+    "number_limit": 5000,
+    "operation": "ADD",
+    "operands": [
+     2250,
+     2200
+    ],
+    "expected_answer": 4450,
+    "raw_problem_text": "මල්ක ළඟ හාල් ග්‍රෑම් 2250ක් තිබිණි. එයට තවත් හාල් ග්‍රෑම් 2200ක් දමන ලදි. දැන් මල්ලේ ඇති මුළු බර කොපමණ ද?",
+    "child_prompt_si": "හාල් ග්‍රෑම් 2250කට හාල් ග්‍රෑම් 2200ක් එකතු කළාම කීයද?",
+    "child_prompt_en": "What is 2250 grams plus 2200 grams?",
+    "english_translation": "Malka had 2250g of rice. Another 2200g of rice was added to it. What is the total weight in the bag now?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 153,
+    "source_quote": "පිටි 3kg 750g ඇති බෑගයකින් 2kg 500g ප්‍රමාණයක් ඉවත් කළ විට කොපමණ ප්‍රමාණයක් ඉතුරු වන්නේ ද යන්න සෙවිය යුතු බව සිසුන්ට පවසන්න.",
+    "number_limit": 5000,
+    "operation": "SUB",
+    "operands": [
+     3750,
+     2500
+    ],
+    "expected_answer": 1250,
+    "raw_problem_text": "පිටි ග්‍රෑම් 3750ක් ඇති බෑගයකින් ග්‍රෑම් 2500ක් ඉවත් කළ විට කොපමණ ප්‍රමාණයක් ඉතුරු වන්නේ ද?",
+    "child_prompt_si": "පිටි ග්‍රෑම් 3750කින් ග්‍රෑම් 2500ක් ගත්තම කීයද?",
+    "child_prompt_en": "What is 3750 grams minus 2500 grams?",
+    "english_translation": "When 2500g is removed from a bag containing 3750g of flour, how much is left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 154,
+    "source_quote": "1. හාල් 5kg 250gක් ඇති මල්ලකින් 2kg 500gක් ඉවත් කළ විට මල්ලේ ඉතුරු වන හාල් ප්‍රමාණය කොපමණ ද ?",
+    "number_limit": 6000,
+    "operation": "SUB",
+    "operands": [
+     5250,
+     2500
+    ],
+    "expected_answer": 2750,
+    "raw_problem_text": "හාල් ග්‍රෑම් 5250ක් ඇති මල්ලකින් ග්‍රෑම් 2500ක් ඉවත් කළ විට මල්ලේ ඉතුරු වන හාල් ප්‍රමාණය කොපමණ ද?",
+    "child_prompt_si": "හාල් ග්‍රෑම් 5250න් ග්‍රෑම් 2500ක් ගත්තාම ඉතුරු කීයද?",
+    "child_prompt_en": "What is 5250 grams minus 2500 grams?",
+    "english_translation": "When 2500g is removed from a bag of 5250g of rice, what is the remaining amount of rice?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "HARD",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 155,
+    "source_quote": "[පින්තූරය: 5 - 4 = ]   [පින්තූරය: 7 - 2 = ]   [පින්තූරය: 6 - 6 = ]",
+    "number_limit": 10,
+    "operation": "SUB",
+    "operands": [
+     5,
+     4
+    ],
+    "expected_answer": 1,
+    "raw_problem_text": "මැටි බෝල 5කින් බෝල 4ක් කැඩී ගියා. ඉතුරු මැටි බෝල කීයද?",
+    "child_prompt_si": "මැටි බෝල 5කින් බෝල 4ක් ගියාම කීයද?",
+    "child_prompt_en": "What is 5 minus 4?",
+    "english_translation": "4 clay balls broke out of 5 clay balls. How many clay balls are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 155,
+    "source_quote": "[පින්තූරය: 5 - 4 = ]   [පින්තූරය: 7 - 2 = ]   [පින්තූරය: 6 - 6 = ]",
+    "number_limit": 10,
+    "operation": "SUB",
+    "operands": [
+     7,
+     2
+    ],
+    "expected_answer": 5,
+    "raw_problem_text": "පෑන් 7කින් පෑන් 2ක් නැති වුණා. ඉතුරු පෑන් කීයද?",
+    "child_prompt_si": "පෑන් 7කින් පෑන් 2ක් ගියාම කීයද?",
+    "child_prompt_en": "What is 7 minus 2?",
+    "english_translation": "2 pens out of 7 pens were lost. How many pens are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 155,
+    "source_quote": "[පින්තූරය: 5 - 4 = ]   [පින්තූරය: 7 - 2 = ]   [පින්තූරය: 6 - 6 = ]",
+    "number_limit": 10,
+    "operation": "SUB",
+    "operands": [
+     6,
+     6
+    ],
+    "expected_answer": 0,
+    "raw_problem_text": "දොඩම් ගෙඩි 6ක් තිබුණා. 6ක්ම කෑවා. ඉතුරු දොඩම් කීයද?",
+    "child_prompt_si": "දොඩම් 6කින් 6ක්ම කෑවාම කීයද?",
+    "child_prompt_en": "What is 6 minus 6?",
+    "english_translation": "There were 6 oranges. All 6 were eaten. How many oranges are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 155,
+    "source_quote": "[පින්තූරය: 9 - 4 = ]   [පින්තූරය: 7 - 3 = ]   [පින්තූරය: 5 - 0 = ]",
+    "number_limit": 10,
+    "operation": "SUB",
+    "operands": [
+     9,
+     4
+    ],
+    "expected_answer": 5,
+    "raw_problem_text": "පොත් 9කින් පොත් 4ක් දුන්නා. ඉතුරු පොත් කීයද?",
+    "child_prompt_si": "පොත් 9කින් පොත් 4ක් දුන්නාම කීයද?",
+    "child_prompt_en": "What is 9 minus 4?",
+    "english_translation": "4 books were given away out of 9 books. How many books are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 155,
+    "source_quote": "[පින්තූරය: 9 - 4 = ]   [පින්තූරය: 7 - 3 = ]   [පින්තූරය: 5 - 0 = ]",
+    "number_limit": 10,
+    "operation": "SUB",
+    "operands": [
+     7,
+     3
+    ],
+    "expected_answer": 4,
+    "raw_problem_text": "මල් 7කින් මල් 3ක් වැටුණා. ඉතුරු මල් කීයද?",
+    "child_prompt_si": "මල් 7කින් මල් 3ක් වැටුණාම කීයද?",
+    "child_prompt_en": "What is 7 minus 3?",
+    "english_translation": "3 flowers fell out of 7 flowers. How many flowers are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 155,
+    "source_quote": "[පින්තූරය: 9 - 4 = ]   [පින්තූරය: 7 - 3 = ]   [පින්තූරය: 5 - 0 = ]",
+    "number_limit": 10,
+    "operation": "SUB",
+    "operands": [
+     5,
+     0
+    ],
+    "expected_answer": 5,
+    "raw_problem_text": "අඹ 5කින් කිසිවක් කෑවේ නැහැ. ඉතුරු අඹ කීයද?",
+    "child_prompt_si": "අඹ 5කින් 0ක් ගියාම කීයද?",
+    "child_prompt_en": "What is 5 minus 0?",
+    "english_translation": "Nothing was eaten out of 5 mangoes. How many mangoes are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 155,
+    "source_quote": "උදා : එක් දිනක දී අඹ වත්තකින් අඹ ගෙඩි 327ක් කඩන ලදි. එයින් 245ක් ඉදුණු අඹ වේ. එදින ම ඉදුණු අඹවලින් 152ක් ඔහු විසින් විකුණන ලදි.",
+    "number_limit": 400,
+    "operation": "SUB",
+    "operands": [
+     327,
+     245
+    ],
+    "expected_answer": 82,
+    "raw_problem_text": "අඹ ගෙඩි 327කින් ඉදුණු අඹ 245ක් විය. එම අඹ ගෙඩි 327න් 245ක් ඉවත් කළ විට ඉතුරු අඹ කීයද?",
+    "child_prompt_si": "අඹ 327න් 245ක් අඩු කළාම කීයද?",
+    "child_prompt_en": "What is 327 minus 245?",
+    "english_translation": "Out of 327 mangoes, 245 were ripe. When 245 are removed from 327 mangoes, how many mangoes are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 158,
+    "source_quote": "උදා : එක්තරා පාසලක මුළු සිසුන් 825කින් 442ක් ගැහැණු ළමයි ය. එම පාසලේ සිටින පිරිමි ළමයින් ගණන කීය ද ?",
+    "number_limit": 1000,
+    "operation": "SUB",
+    "operands": [
+     825,
+     442
+    ],
+    "expected_answer": 383,
+    "raw_problem_text": "පාසලක මුළු සිසුන් 825කින් 442ක් ගැහැණු ළමයි ය. එම පාසලේ සිටින පිරිමි ළමයින් ගණන කීය ද?",
+    "child_prompt_si": "මුළු ළමයි 825න් ගැහැණු ළමයි 442ක් ගියාම පිරිමි ළමයි කීයද?",
+    "child_prompt_en": "What is 825 minus 442?",
+    "english_translation": "Out of a total of 825 students in a school, 442 are girls. What is the number of boys in that school?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "HARD",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 159,
+    "source_quote": "උදා : * ලීටර 1 ට මිලිලීටර කීය ද ?",
+    "number_limit": 1000,
+    "operation": "SUB",
+    "operands": [
+     1000,
+     250
+    ],
+    "expected_answer": 750,
+    "raw_problem_text": "මිලිලීටර් 1000ක් ඇති බෝතලයෙන් මිලිලීටර් 250ක් බීවොත් ඉතුරු කීයද?",
+    "child_prompt_si": "මිලිලීටර් 1000කින් 250ක් ගත්තම කීයද?",
+    "child_prompt_en": "What is 1000 minus 250?",
+    "english_translation": "If 250 milliliters is drunk from a bottle with 1000 milliliters, how much is left?",
+    "topic": "Subtraction",
+    "competency_code": "4.1",
+    "competency_desc": "පරිමාව හා ධාරිතාව ඇතුළත් ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   }
+  ],
+  "160-173": [
+   {
+    "kind": "exercise",
+    "page_number": 160,
+    "source_quote": "1. බුලියක වතුර 3l 250ml තිබිණි. එයට තවත් වතුර 5l 200ml වත් කළහොත් එම බුලියේ ඇති වතුර ප්‍රමාණය කොපමණ ද ?",
+    "operation": "ADD",
+    "operands": [
+     3250,
+     5200
+    ],
+    "expected_answer": 8450,
+    "raw_problem_text": "බුලියක වතුර 3l 250ml තිබිණි. එයට තවත් වතුර 5l 200ml වත් කළහොත් එම බුලියේ ඇති වතුර ප්‍රමාණය කොපමණ ද?",
+    "child_prompt_si": "වතුර 3l 250ml බුලියකට තවත් වතුර 5l 200ml දැමුවා. මුළු වතුර කොපමණද?",
+    "child_prompt_en": "A jug has 3l 250ml water. Added 5l 200ml more. Total water?",
+    "english_translation": "A jug had 3l 250ml of water. If another 5l 200ml of water is poured into it, what is the amount of water in that jug?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "ධාරිතාව එකතු කරයි",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 160,
+    "source_quote": "2. ලීටරයේ දොඩම් යුෂ බෝතලයකට වතුර 3l 500ml මිශ්‍රකොට බීමක් සාදා ගන්නා ලදි. සාදන ලද බීම ප්‍රමාණය කොපමණ ද ?",
+    "operation": "ADD",
+    "operands": [
+     1000,
+     3500
+    ],
+    "expected_answer": 4500,
+    "raw_problem_text": "ලීටරයේ දොඩම් යුෂ බෝතලයකට වතුර 3l 500ml මිශ්‍රකොට බීමක් සාදා ගන්නා ලදි. සාදන ලද බීම ප්‍රමාණය කොපමණ ද?",
+    "child_prompt_si": "ලීටර් 1ක දොඩම් යුෂවලට වතුර 3l 500ml මිශ්‍ර කළා. මුළු බීම ප්‍රමාණය කොපමණද?",
+    "child_prompt_en": "Mixed 1l orange juice with 3l 500ml water. Total drink amount?",
+    "english_translation": "1l of orange juice was mixed with 3l 500ml of water to make a drink. What was the amount of drink made?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "ධාරිතාව එකතු කරයි",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 160,
+    "source_quote": "3. එකක 1l 200ml ඇති පැණිබීම බෝතල් දෙකක ඇති බීම ප්‍රමාණය කොපමණ ද ?",
+    "operation": "ADD",
+    "operands": [
+     1200,
+     1200
+    ],
+    "expected_answer": 2400,
+    "raw_problem_text": "එකක 1l 200ml ඇති පැණිබීම බෝතල් දෙකක ඇති බීම ප්‍රමාණය කොපමණ ද?",
+    "child_prompt_si": "එකක 1l 200ml බැගින් බෝතල් 2ක ඇති බීම කොපමණද?",
+    "child_prompt_en": "2 bottles each have 1l 200ml soft drink. Total drink?",
+    "english_translation": "What is the amount of drink in two soft drink bottles each containing 1l 200ml?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "ධාරිතාව එකතු කරයි",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 163,
+    "source_quote": "1. භාජනයක 5l 350ml පැණි තිබිණි. එයින් 1l 200mlක පැණි ප්‍රමාණයක් කැවිලි සෑදීමට ගන්නා ලදී. තව ඉතුරු කොපමණ ද ?",
+    "operation": "SUB",
+    "operands": [
+     5350,
+     1200
+    ],
+    "expected_answer": 4150,
+    "raw_problem_text": "භාජනයක 5l 350ml පැණි තිබිණි. එයින් 1l 200mlක පැණි ප්‍රමාණයක් කැවිලි සෑදීමට ගන්නා ලදී. තව ඉතුරු කොපමණ ද?",
+    "child_prompt_si": "පැණි 5l 350mlවලින් 1l 200ml ගත්තා. තව ඉතුරු කොපමණද?",
+    "child_prompt_en": "Took 1l 200ml from 5l 200ml treacle. How much is left?",
+    "english_translation": "A container had 5l 350ml of treacle. 1l 200ml was used for making sweets. How much is left?",
+    "topic": "Subtraction",
+    "competency_code": "4.3",
+    "competency_desc": "ධාරිතාව අඩු කරයි",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 163,
+    "source_quote": "2. පැණි බීම 3l 600ml තිබූ භාජනයකින් 1l 350ml භාවිතයට ගන්නා ලදී. ඉතුරු ප්‍රමාණය කොපමණ ද ?",
+    "operation": "SUB",
+    "operands": [
+     3600,
+     1350
+    ],
+    "expected_answer": 2250,
+    "raw_problem_text": "පැණි බීම 3l 600ml තිබූ භාජනයකින් 1l 350ml භාවිතයට ගන්නා ලදී. ඉතුරු ප්‍රමාණය කොපමණ ද?",
+    "child_prompt_si": "බීම 3l 600mlවලින් 1l 350ml බිව්වා. ඉතුරු කොපමණද?",
+    "child_prompt_en": "Drank 1l 350ml from 3l 600ml drink. Leftover amount?",
+    "english_translation": "1l 350ml was used from a container with 3l 600ml of soft drink. What is the remaining amount?",
+    "topic": "Subtraction",
+    "competency_code": "4.3",
+    "competency_desc": "ධාරිතාව අඩු කරයි",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 168,
+    "source_quote": "1. එක් වලක මිරිස් පැළ 2 බැගින් වලවල් 12ක සිටුවීමට අවශ්‍ය මිරිස් පැළ ගණන සොයන්න.",
+    "operation": "MUL",
+    "operands": [
+     12,
+     2
+    ],
+    "expected_answer": 24,
+    "raw_problem_text": "එක් වලක මිරිස් පැළ 2 බැගින් වලවල් 12ක සිටුවීමට අවශ්‍ය මිරිස් පැළ ගණන සොයන්න.",
+    "child_prompt_si": "වල 1ක මිරිස් පැළ 2 බැගින් වලවල් 12ක පැළ කීයද?",
+    "child_prompt_en": "2 chilli plants in 1 hole, 12 holes. Total plants?",
+    "english_translation": "Find the number of chilli plants needed to plant 2 plants in each hole in 12 holes.",
+    "topic": "Multiplication",
+    "competency_code": "3.1",
+    "competency_desc": "ගුණ කිරීමේ ගැටලු විසඳයි",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 168,
+    "source_quote": "2. පාපැදි 25ක ඇති රෝද ගණන කීය ද ?",
+    "operation": "MUL",
+    "operands": [
+     25,
+     2
+    ],
+    "expected_answer": 50,
+    "raw_problem_text": "පාපැදි 25ක ඇති රෝද ගණන කීය ද?",
+    "child_prompt_si": "පාපැදි 25ක ඇති රෝද මුළු ගණන කීයද?",
+    "child_prompt_en": "Total wheels on 25 bicycles?",
+    "english_translation": "What is the number of wheels in 25 bicycles?",
+    "topic": "Multiplication",
+    "competency_code": "3.1",
+    "competency_desc": "ගුණ කිරීමේ ගැටලු විසඳයි",
+    "difficulty": "EASY",
+    "visual_props": {}
+   }
+  ],
+  "174-182": [],
+  "183-191": [
+   {
+    "kind": "aligned",
+    "page_number": 184,
+    "source_quote": "1. අන්නාසි ගෙඩියක් මිල දී ගෙන රුපියල් 200ක් දුන් විට ලැබෙන ඉතුරු මුදල කීය ද ?",
+    "number_limit": 200,
+    "operation": "SUB",
+    "operands": [
+     200,
+     120
+    ],
+    "expected_answer": 80,
+    "raw_problem_text": "අන්නාසි ගෙඩියක් රුපියල් 120කට මිල දී ගෙන රුපියල් 200ක් දුන් විට ලැබෙන ඉතුරු මුදල කීය ද?",
+    "child_prompt_si": "රුපියල් 120ක අන්නාසි ගෙඩියකට රුපියල් 200ක් දුන්නා. ඉතුරු කීයද?",
+    "child_prompt_en": "Paid 200 rupees for a pineapple costing 120 rupees. What is the balance?",
+    "english_translation": "If you buy a pineapple for 120 rupees and give 200 rupees, what is the balance amount received?",
+    "topic": "Subtraction",
+    "competency_code": "හැඩ හා අවකාශය",
+    "competency_desc": "ද්‍රව්‍ය මිල දී ගැනීමේ දී ඉතුරු මුදල ගණනය කිරීම",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 184,
+    "source_quote": "2. අඹ ගෙඩියක් සහ කොමඩු ගෙඩියක් මිලට ගෙන රුපියල් 150ක් දුන්නේ නම් ලැබුණු ඉතුරු මුදල සොයන්න.",
+    "number_limit": 150,
+    "operation": "SUB",
+    "operands": [
+     150,
+     110
+    ],
+    "expected_answer": 40,
+    "raw_problem_text": "රුපියල් 35කට අඹ ගෙඩියක් සහ රුපියල් 75කට කොමඩු ගෙඩියක් මිලට ගෙන රුපියල් 150ක් දුන්නේ නම් ලැබුණු ඉතුරු මුදල කීය ද?",
+    "child_prompt_si": "අඹ 1ක් රුපියල් 35යි, කොමඩු 1ක් රුපියල් 75යි. රුපියල් 150ක් දුන්නා. ඉතුරු කීයද?",
+    "child_prompt_en": "Mango is 35 rupees, melon is 75 rupees. Paid 150 rupees. What is the balance?",
+    "english_translation": "If you buy a mango for 35 rupees and a melon for 75 rupees and give 150 rupees, find the balance received.",
+    "topic": "Subtraction",
+    "competency_code": "හැඩ හා අවකාශය",
+    "competency_desc": "ද්‍රව්‍ය මිල දී ගැනීමේ දී ඉතුරු මුදල ගණනය කිරීම",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 184,
+    "source_quote": "4. කොමඩු ගෙدی 2ක් සහ අන්නාසි ගෙඩියක් මිල දී ගැනීමට ගෙවිය යුතු මුදල කීය ද ?",
+    "number_limit": 500,
+    "operation": "ADD",
+    "operands": [
+     150,
+     120
+    ],
+    "expected_answer": 270,
+    "raw_problem_text": "කොමඩු ගෙඩියක් රුපියල් 75 බැගින් ගෙඩි 2ක මිල සහ අන්නාසි ගෙඩියක මිල රුපියල් 120 එකතු කළ විට ගෙවිය යුතු මුළු මුදල කීය ද?",
+    "child_prompt_si": "කොමඩු 2ක් රුපියල් 150යි. අන්නාසි 1ක් රුපියල් 120යි. මුළු මුදල කීයද?",
+    "child_prompt_en": "2 melons cost 150 rupees. 1 pineapple costs 120 rupees. What is the total?",
+    "english_translation": "What is the total amount to be paid for 2 melons and a pineapple?",
+    "topic": "Addition",
+    "competency_code": "හැඩ හා අවකාශය",
+    "competency_desc": "ද්‍රව්‍ය මිල දී ගැනීමේ දී එකතුව ගණනය කිරීම",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   }
+  ],
+  "192-193": [
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "4. දෙන ලද සංඛ්‍යා රාවාව හඳුනා ගෙන පිළිගට එන සංඛ්‍යාව ලියයි. (පොදු අන්තරය 3 සහ 4)",
+    "number_limit": 9999,
+    "operation": "PATTERN",
+    "operands": [
+     3,
+     6,
+     9
+    ],
+    "expected_answer": 12,
+    "raw_problem_text": "3, 6, 9 යන රටාව දිගටම කරගෙන ගිය විට ඊළඟට එන සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "3, 6, 9 ඊළඟට එන සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "3, 6, 9 what is the next number?",
+    "english_translation": "What is the next number in the pattern 3, 6, 9?",
+    "topic": "Patterns",
+    "competency_code": "4",
+    "competency_desc": "දෙන ලද සංඛ්‍යා රටාව හඳුනා ගෙන පිළිවෙළට එන සංඛ්‍යාව ලියයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      3,
+      6,
+      9
+     ],
+     "target": 12
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "4. දෙන ලද සංඛ්‍යා රාවාව හඳුනා ගෙන පිළිගට එන සංඛ්‍යාව ලියයි. (පොදු අන්තරය 3 සහ 4)",
+    "number_limit": 9999,
+    "operation": "PATTERN",
+    "operands": [
+     4,
+     8,
+     12
+    ],
+    "expected_answer": 16,
+    "raw_problem_text": "4, 8, 12 යන රටාව දිගටම කරගෙන ගිය විට ඊළඟට එන සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "4, 8, 12 ඊළඟට එන සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "4, 8, 12 what is the next number?",
+    "english_translation": "What is the next number in the pattern 4, 8, 12?",
+    "topic": "Patterns",
+    "competency_code": "4",
+    "competency_desc": "දෙන ලද සංඛ්‍යා රටාව හඳුනා ගෙන පිළිවෙළට එන සංඛ්‍යාව ලියයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      4,
+      8,
+      12
+     ],
+     "target": 16
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "4. දෙන ලද සංඛ්‍යා රාවාව හඳුනා ගෙන පිළිගට එන සංඛ්‍යාව ලියයි. (පොදු අන්තරය 3 සහ 4)",
+    "number_limit": 9999,
+    "operation": "PATTERN",
+    "operands": [
+     5,
+     8,
+     11
+    ],
+    "expected_answer": 14,
+    "raw_problem_text": "5, 8, 11 යන රටාව දිගටම කරගෙන ගිය විට ඊළඟට එන සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "5, 8, 11 ඊළඟට එන සංඛ්‍යාව කීයද?",
+    "child_prompt_en": "5, 8, 11 what is the next number?",
+    "english_translation": "What is the next number in the pattern 5, 8, 11?",
+    "topic": "Patterns",
+    "competency_code": "4",
+    "competency_desc": "දෙන ලද සංඛ්‍යා රටාව හඳුනා ගෙන පිළිවෙළට එන සංඛ්‍යාව ලියයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "kind": "NUMBER",
+     "sequence": [
+      5,
+      8,
+      11
+     ],
+     "target": 14
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "9. ඉලක්කම් හතර තෙක් වූ සංඛ්‍යා දෙකක් (ගෙනියාම එක් ස්ථානයකින් පමණක් සහිත ව) එකතු කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 9999,
+    "operation": "ADD",
+    "operands": [
+     1240,
+     3125
+    ],
+    "expected_answer": 4365,
+    "raw_problem_text": "පන්ති කාමරයක ළමයි 1240ක් සිටිති. අලුතින් ළමයි 3125ක් පැමිණියහ. දැන් මුළු ළමයි ගණන කීයද?",
+    "child_prompt_si": "ළමයි 1240යි, තව 3125යි. මුළු ළමයි කීයද?",
+    "child_prompt_en": "1240 kids and 3125 more. Total kids?",
+    "english_translation": "There were 1240 children in a classroom. 3125 new children arrived. What is the total number of children now?",
+    "topic": "Addition",
+    "competency_code": "9",
+    "competency_desc": "ඉලක්කම් හතර තෙක් වූ සංඛ්‍යා දෙකක් එකතු කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "9. ඉලක්කම් හතර තෙක් වූ සංඛ්‍යා දෙකක් (ගෙනියාම එක් ස්ථානයකින් පමණක් සහිත ව) එකතු කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 9999,
+    "operation": "ADD",
+    "operands": [
+     2340,
+     1425
+    ],
+    "expected_answer": 3765,
+    "raw_problem_text": "පොත් සාප්පුවක සිංහල පොත් 2340ක් සහ ඉංග්‍රීසි පොත් 1425ක් ඇත. පොත් මුළු සංඛ්‍යාව කීයද?",
+    "child_prompt_si": "පොත් 2340යි, 1425යි. මුළු පොත් කීයද?",
+    "child_prompt_en": "2340 books and 1425 books. Total books?",
+    "english_translation": "There are 2340 Sinhala books and 1425 English books in a bookstore. What is the total number of books?",
+    "topic": "Addition",
+    "competency_code": "9",
+    "competency_desc": "ඉලක්කම් හතර තෙක් වූ සංඛ්‍යා දෙකක් එකතු කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "9. ඉලක්කම් හතර තෙක් වූ සංඛ්‍යා දෙකක් (ගෙනියාම එක් ස්ථානයකින් පමණක් සහිත ව) එකතු කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 9999,
+    "operation": "ADD",
+    "operands": [
+     4110,
+     2534
+    ],
+    "expected_answer": 6644,
+    "raw_problem_text": "ගමේ පුස්තකාලයේ සඟරා 4110ක් සහ කතා පොත් 2534ක් තිබුණි. පොත් සහ සඟරා මුළු ගණන කීයද?",
+    "child_prompt_si": "සඟරා 4110යි, පොත් 2534යි. මුළු ගණන කීයද?",
+    "child_prompt_en": "4110 magazines and 2534 books. Total count?",
+    "english_translation": "There were 4110 magazines and 2534 storybooks in the village library. What is the total number of books and magazines?",
+    "topic": "Addition",
+    "competency_code": "9",
+    "competency_desc": "ඉලක්කම් හතර තෙක් වූ සංඛ්‍යා දෙකක් එකතු කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "11. ඉලක්කම් තුන තෙක් වූ සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් (ගෙන එම එක් අවස්ථාවක් පමණක් සහිත ව) අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 999,
+    "operation": "SUB",
+    "operands": [
+     542,
+     218
+    ],
+    "expected_answer": 324,
+    "raw_problem_text": "වත්තේ තිබූ අඹ 542කින් අඹ 218ක් කඩා ගත්තේය. දැන් ගසේ ඉතුරු අඹ ගණන කීයද?",
+    "child_prompt_si": "අඹ 542න් 218ක් ගත්තා. ඉතුරු අඹ කීයද?",
+    "child_prompt_en": "From 542 mangoes, took 218. Mangoes left?",
+    "english_translation": "218 mangoes were plucked out of 542 mangoes on the tree. How many mangoes are left on the tree now?",
+    "topic": "Subtraction",
+    "competency_code": "11",
+    "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යාවකින් අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "11. ඉලක්කම් තුන තෙක් වූ සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් (ගෙන එම එක් අවස්ථාවක් පමණක් සහිත ව) අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 999,
+    "operation": "SUB",
+    "operands": [
+     635,
+     312
+    ],
+    "expected_answer": 323,
+    "raw_problem_text": "බස් රථයක මගීන් 635ක් ගමන් කළහ. නගරයෙන් මගීන් 312ක් බැස්සහ. දැන් බස් රථයේ සිටින මගීන් ගණන කීයද?",
+    "child_prompt_si": "මගීන් 635න් 312ක් බැස්සා. ඉතුරු මගීන් කීයද?",
+    "child_prompt_en": "Out of 635 passengers, 312 got down. Passengers left?",
+    "english_translation": "635 passengers travelled in a bus. 312 passengers got down at the town. How many passengers are in the bus now?",
+    "topic": "Subtraction",
+    "competency_code": "11",
+    "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යාවකින් අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "11. ඉලක්කම් තුන තෙක් වූ සංඛ්‍යාවකින් එයට අඩු සංඛ්‍යාවක් (ගෙන එම එක් අවස්ථාවක් පමණක් සහිත ව) අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 999,
+    "operation": "SUB",
+    "operands": [
+     854,
+     421
+    ],
+    "expected_answer": 433,
+    "raw_problem_text": "පන්ති කාමරයක පුටු 854ක් තිබුණි. එයින් පුටු 421ක් අලුත්වැඩියා කිරීමට ගෙන ගියේය. දැන් පන්තියේ ඉතුරු පුටු ගණන කීයද?",
+    "child_prompt_si": "පුටු 854න් 421ක් ගෙන ගියා. ඉතුරු පුටු කීයද?",
+    "child_prompt_en": "From 854 chairs, 421 were taken. Chairs left?",
+    "english_translation": "There were 854 chairs in a classroom. 421 chairs were taken for repairs. How many chairs are left in the class now?",
+    "topic": "Subtraction",
+    "competency_code": "11",
+    "competency_desc": "ඉලක්කම් තුන තෙක් වූ සංඛ්‍යාවකින් අඩු කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "15. ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා 2, 3, 4, 5 සහ 10 යන සංඛ්‍යාවලින් ගුණ කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 99,
+    "operation": "MUL",
+    "operands": [
+     12,
+     3
+    ],
+    "expected_answer": 36,
+    "raw_problem_text": "එක් පැකට්ටුවක පාට පෑන් 12 බැගින් පැකට් 3ක ඇති මුළු පාට පෑන් ගණන කීයද?",
+    "child_prompt_si": "පැකට් 3ක පෑන් 12 බැගින් ඇත. මුළු පෑන් කීයද?",
+    "child_prompt_en": "3 packets with 12 pens each. Total pens?",
+    "english_translation": "What is the total number of colour pens in 3 packets with 12 pens in each packet?",
+    "topic": "Multiplication",
+    "competency_code": "15",
+    "competency_desc": "ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා ගුණ කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "15. ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා 2, 3, 4, 5 සහ 10 යන සංඛ්‍යාවලින් ගුණ කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 99,
+    "operation": "MUL",
+    "operands": [
+     14,
+     4
+    ],
+    "expected_answer": 56,
+    "raw_problem_text": "ළමයෙකු ළඟ ස්ටිකර් 14ක් ඇත. එවැනි ළමයි 4 දෙනෙකු ළඟ ඇති මුළු ස්ටිකර් ගණන කීයද?",
+    "child_prompt_si": "ළමයි 4 දෙනා ළඟ ස්ටිකර් 14 බැගින් ඇත. මුළු ස්ටිකර් කීයද?",
+    "child_prompt_en": "4 kids have 14 stickers each. Total stickers?",
+    "english_translation": "A child has 14 stickers. What is the total number of stickers with such 4 children?",
+    "topic": "Multiplication",
+    "competency_code": "15",
+    "competency_desc": "ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා ගුණ කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 192,
+    "source_quote": "15. ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා 2, 3, 4, 5 සහ 10 යන සංඛ්‍යාවලින් ගුණ කිරීමේ සරල ගැටලු විසඳයි.",
+    "number_limit": 99,
+    "operation": "MUL",
+    "operands": [
+     15,
+     5
+    ],
+    "expected_answer": 75,
+    "raw_problem_text": "පෙට්ටියක චොක්ලට් 15ක් ඇත. එවැනි පෙட்டி 5ක ඇති මුළු චොක්ලට් ගණන කීයද?",
+    "child_prompt_si": "පෙට්ටි 5ක චොක්ලට් 15 බැගින් ඇත. මුළු චොක්ලට් කීයද?",
+    "child_prompt_en": "5 boxes with 15 chocolates each. Total chocolates?",
+    "english_translation": "There are 15 chocolates in a box. What is the total number of chocolates in 5 such boxes?",
+    "topic": "Multiplication",
+    "competency_code": "15",
+    "competency_desc": "ඉලක්කම් දෙකකට නොවැඩි සංඛ්‍යා ගුණ කිරීමේ සරල ගැටලු විසඳයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   }
+  ]
+ }
+}

@@ -23,10 +23,13 @@ export function PatternTrain({ step, lang, calm, onWrong, onCorrect }: MechanicP
   const [seed] = useState(() => Math.floor(Math.random() * 1e6));
   const options = useMemo(() => seededShuffle(step.game_options, seed), [step.game_options, seed]);
 
-  const sequence: string[] = Array.isArray(step.visual_props?.sequence) && step.visual_props.sequence.length
+  // NIE guides teach both colour/shape patterns and number patterns ("පොදු අන්තරය 2" = goes up by 2).
+  const isNumber = step.visual_props?.kind === 'NUMBER';
+  const sequence: (string | number)[] = Array.isArray(step.visual_props?.sequence) && step.visual_props.sequence.length
     ? step.visual_props.sequence
     : DEFAULT_SEQUENCE;
   const answer = step.game_options.find(o => o.is_correct);
+  const numberCar = 'bg-sky-500/20 border-sky-400 text-white font-extrabold !text-2xl sm:!text-3xl';
 
   const pick = (opt: GameChoiceOption) => {
     if (done || wrong.includes(opt.text_en)) return;
@@ -68,9 +71,9 @@ export function PatternTrain({ step, lang, calm, onWrong, onCorrect }: MechanicP
                   initial={calm ? false : { opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.15 }}
-                  className={`${carClass} ${colorOf(c).car}`}
+                  className={`${carClass} ${isNumber ? numberCar : colorOf(String(c)).car}`}
                 >
-                  {colorOf(c).symbol}
+                  {isNumber ? c : colorOf(String(c)).symbol}
                 </motion.div>
                 <div className="w-3 h-1 bg-slate-600 rounded-full" />
               </div>
@@ -81,9 +84,9 @@ export function PatternTrain({ step, lang, calm, onWrong, onCorrect }: MechanicP
               animate={done ? { scale: calm ? 1 : [1, 1.2, 1] } : calm ? {} : { opacity: [0.6, 1, 0.6] }}
               transition={done ? { duration: 0.5 } : { duration: 1.6, repeat: Infinity }}
               className={`${carClass} border-dashed transition-colors
-                ${done ? `${colorOf(answer?.icon_or_shape).car} border-solid` : 'bg-amber-400/20 border-amber-400 text-amber-300 font-bold'}`}
+                ${done ? `${isNumber ? numberCar : colorOf(answer?.icon_or_shape).car} border-solid` : 'bg-amber-400/20 border-amber-400 text-amber-300 font-bold'}`}
             >
-              {done ? colorOf(answer?.icon_or_shape).symbol : '?'}
+              {done ? (isNumber ? answer?.text_en : colorOf(answer?.icon_or_shape).symbol) : '?'}
             </motion.div>
           </div>
         </motion.div>
@@ -116,13 +119,21 @@ export function PatternTrain({ step, lang, calm, onWrong, onCorrect }: MechanicP
                   ? 'bg-slate-100 border-slate-300 text-slate-400 cursor-not-allowed'
                   : done && opt.is_correct
                   ? 'bg-emerald-100 border-emerald-500 ring-4 ring-emerald-400/50 text-emerald-950'
+                  : isNumber
+                  ? 'bg-sky-50 hover:bg-sky-100 border-sky-400 cursor-pointer'
                   : `${colorMeta.bg} ${colorMeta.border} cursor-pointer`
                 }`}
             >
-              <span className="text-3xl sm:text-4xl select-none">{colorMeta.symbol}</span>
-              <span className="text-base sm:text-lg font-extrabold text-slate-800">
-                {lang === 'si' ? opt.text_si : opt.text_en}
-              </span>
+              {isNumber ? (
+                <span className="text-3xl sm:text-4xl font-extrabold text-slate-800">{opt.text_en}</span>
+              ) : (
+                <>
+                  <span className="text-3xl sm:text-4xl select-none">{colorMeta.symbol}</span>
+                  <span className="text-base sm:text-lg font-extrabold text-slate-800">
+                    {lang === 'si' ? opt.text_si : opt.text_en}
+                  </span>
+                </>
+              )}
             </motion.button>
           );
         })}

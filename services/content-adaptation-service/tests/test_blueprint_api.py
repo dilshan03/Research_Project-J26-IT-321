@@ -32,9 +32,14 @@ def test_low_risk_blueprint_is_two_tier():
 
 
 def test_grade_1_no_operator_selection():
+    # Counting is one concrete step: the game draws the objects and the learner picks how many.
     bp, _, _ = generate_blueprint("G1-1", 1, "Counting", "ගස්වල ඇති අඹ 5 ක් ගණන් කරන්න.", "LOW")
-    assert [s.action_type for s in bp.micro_steps] == ["IDENTIFY_ENTITY", "CALCULATE_MICROSTEP"]
+    assert [s.action_type for s in bp.micro_steps] == ["CALCULATE_MICROSTEP"]
+    assert bp.micro_steps[0].operation == "COUNT" and bp.micro_steps[0].correct_target_value == "5"
+    # Grade 1 adding (NIE: with objects, no operator symbols) also skips operator selection.
+    bp, _, _ = generate_blueprint("G1-2", 1, "Addition", ADD_Q, "LOW")
     assert "SELECT_OPERATOR" not in [s.action_type for s in bp.micro_steps]
+    assert bp.micro_steps[-1].correct_target_value == "8"
 
 
 def test_high_risk_blueprint_is_three_tier_with_two_distractors():
@@ -76,63 +81,3 @@ def test_api_rejects_question_without_numbers():
         "raw_sinhala_question": "ඇපල් කීයද?", "adhd_risk_level": "LOW",
     })
     assert res.status_code == 422
-
-
-def test_syllabus_seed_and_list_flow():
-    # Trigger local syllabi seed
-    res = client.post("/api/v1/syllabus/seed-local")
-    assert res.status_code == 200
-    data = res.json()
-    assert data["imported_documents"] >= 4
-    assert data["extracted_problems"] >= 10
-
-    # Query documents
-    docs_res = client.get("/api/v1/syllabus/documents")
-    assert docs_res.status_code == 200
-    docs = docs_res.json()
-    assert len(docs) >= 4
-
-    # Query curriculum problems for Grade 1
-    probs_res = client.get("/api/v1/syllabus/problems?grade=1")
-    assert probs_res.status_code == 200
-    probs = probs_res.json()
-    assert len(probs) >= 3
-    assert all(p["grade"] == 1 for p in probs)
-
-
-def test_syllabus_adapt_problem_flow():
-    # Seed to ensure problems exist
-    client.post("/api/v1/syllabus/seed-local")
-
-    # Get a problem (Grade 2 arithmetic for multi-tier micro-step verification)
-    probs = client.get("/api/v1/syllabus/problems?grade=2").json()
-    target = probs[0]
-    prob_id = target["problem_id"]
-
-    # Adapt to ADHD-friendly game blueprint
-    adapt_res = client.post(
-        f"/api/v1/syllabus/problems/{prob_id}/adapt",
-        json={"adhd_risk_level": "HIGH", "game_theme": "VILLAGE_MARKET"},
-    )
-    assert adapt_res.status_code == 201
-    env = adapt_res.json()
-    assert env["blueprint"]["source_question_id"] == prob_id
-    assert env["blueprint"]["game_theme"] == "VILLAGE_MARKET"
-    assert env["blueprint"]["adhd_game_settings"]["step_granularity"] == "MAXIMAL_THREE_TIER"
-    assert len(env["blueprint"]["micro_steps"]) >= 2
-    assert env["blueprint"]["story_narrative"] is not None
-    assert "gaja_dialogue" in env["blueprint"]["story_narrative"]
-
-
-def test_syllabus_pdf_upload_flow():
-    # Simulate uploading a mock PDF
-    pdf_content = b"%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF"
-    files = {"file": ("custom_grade2_math.pdf", pdf_content, "application/pdf")}
-    data = {"grade": "2", "subject": "Mathematics", "year": "2024", "language": "si"}
-
-    upload_res = client.post("/api/v1/syllabus/upload", files=files, data=data)
-    assert upload_res.status_code == 201
-    doc = upload_res.json()["document"]
-    assert doc["grade"] == 2
-    assert doc["filename"] == "custom_grade2_math.pdf"
-

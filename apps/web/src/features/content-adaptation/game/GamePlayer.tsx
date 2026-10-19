@@ -13,6 +13,7 @@ import { BalanceScale } from './mechanics/BalanceScale';
 import { ShapeMatcher } from './mechanics/ShapeMatcher';
 import { PatternTrain } from './mechanics/PatternTrain';
 import { ComparisonScale } from './mechanics/ComparisonScale';
+import { CountObjects } from './mechanics/CountObjects';
 import type { MechanicProps } from './mechanics/types';
 import { useCompanion } from './useCompanion';
 import { CompanionWardrobeModal } from './CompanionWardrobeModal';
@@ -39,7 +40,11 @@ function pickMechanic(step: GameMicroStep): { Comp: (p: MechanicProps) => React.
     return { Comp: PatternTrain, intro: { si: 'ලස්සන දුම්රිය රටාවේ ඊළඟට එන වර්ණය තෝරමු!', en: "Let's find what comes next in the train pattern!" } };
   }
   if (step.action_type === 'COMPARE_QUANTITY' || step.operation === 'COMPARE') {
-    return { Comp: ComparisonScale, intro: { si: 'වඩා විශාල හෝ වැඩි ප්‍රමාණය තෝරමු!', en: "Let's compare and find the bigger one!" } };
+    // The step says whether to pick the bigger or the smaller one.
+    return { Comp: ComparisonScale, intro: { si: step.instruction_si, en: step.instruction_en } };
+  }
+  if (step.operation === 'COUNT' && step.action_type === 'CALCULATE_MICROSTEP') {
+    return { Comp: CountObjects, intro: { si: 'එකින් එක තට්ටු කරලා ගණන් කරමු!', en: "Let's tap each one and count!" } };
   }
   if (step.action_type === 'IDENTIFY_ENTITY') return { Comp: NumberHunt, intro: LINES.identify };
   if (step.action_type === 'SELECT_OPERATOR') return { Comp: OperatorDrop, intro: LINES.operator };
@@ -146,6 +151,15 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
 
   const step = steps[stepIndex];
   const mechanic = useMemo(() => (step ? pickMechanic(step) : null), [step]);
+
+  // NumberHunt asks the learner to tap the step's numbers in the question. If the English
+  // wording lacks them (a translation can drop or spell out numbers), use the Sinhala text.
+  const stepQuestion = useMemo(() => {
+    if (step?.action_type !== 'IDENTIFY_ENTITY' || lang !== 'en') return activeQuestion;
+    const digits: string[] = activeQuestion.match(/\d+/g) ?? [];
+    const hasAll = (step.operands ?? []).every(n => digits.includes(String(n)));
+    return hasAll ? activeQuestion : blueprint.raw_sinhala_question || question;
+  }, [step, lang, activeQuestion, blueprint.raw_sinhala_question, question]);
 
   const say = useCallback((l: Line, m?: Mood) => {
     setLine(l);
@@ -369,7 +383,7 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
               </h2>
               <div className="w-full flex justify-center">
                 <mechanic.Comp
-                  step={step} question={activeQuestion} theme={blueprint.game_theme} isMoney={isMoney}
+                  step={step} question={stepQuestion} theme={blueprint.game_theme} isMoney={isMoney}
                   lang={lang} calm={calm} onWrong={onWrong} onCorrect={onCorrect} onSay={l => say(l, 'thinking')}
                 />
               </div>

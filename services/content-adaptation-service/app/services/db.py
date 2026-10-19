@@ -12,9 +12,11 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 load_dotenv()
 
-MONGODB_URI = os.getenv("MONGODB_URI", "")
+# CONTENT_FORCE_LOCAL_DB=1 keeps everything in the local JSON store (used by the test suite so
+# it never writes to the shared Atlas database); CONTENT_DATA_DIR relocates that store.
+MONGODB_URI = "" if os.getenv("CONTENT_FORCE_LOCAL_DB") == "1" else os.getenv("MONGODB_URI", "")
 MONGODB_DB_NAME = os.getenv("MONGODB_DB_NAME", "mathquest_db")
-DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "db_store"
+DATA_DIR = Path(os.getenv("CONTENT_DATA_DIR") or Path(__file__).resolve().parents[1] / "data" / "db_store")
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 GRIDFS_DIR = DATA_DIR / "gridfs"
 GRIDFS_DIR.mkdir(parents=True, exist_ok=True)
@@ -156,6 +158,15 @@ class FallbackCollection:
                     self._save()
                     return type("DeleteResult", (), {"deleted_count": 1})()
             return type("DeleteResult", (), {"deleted_count": 0})()
+
+    async def delete_many(self, query: Dict[str, Any]):
+        async with self._lock:
+            doomed = [doc_id for doc_id, doc in self._data.items() if self._matches(doc, query)]
+            for doc_id in doomed:
+                del self._data[doc_id]
+            if doomed:
+                self._save()
+            return type("DeleteResult", (), {"deleted_count": len(doomed)})()
 
     async def count_documents(self, query: Optional[Dict[str, Any]] = None) -> int:
         query = query or {}

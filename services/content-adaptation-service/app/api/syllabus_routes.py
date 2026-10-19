@@ -1,11 +1,8 @@
 import asyncio
-import io
-import os
 import uuid
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import List, Optional
 from fastapi import APIRouter, Body, File, Form, HTTPException, Query, UploadFile
-from pypdf import PdfReader
 
 from app.schemas.api import BlueprintEnvelope
 from app.schemas.syllabus import (
@@ -18,59 +15,60 @@ from app.schemas.syllabus import (
     SyllabusDocument,
     TuneBlueprintRequest,
 )
+from app.services import ingestion_jobs
 from app.services.blueprint_generator import (
     generate_blueprint_from_curriculum_problem,
     tune_existing_blueprint,
 )
 from app.services.cognitive_load import compute_cli
-from app.services.db import db_service
-from app.services.llm_extractor import upload_and_extract_problems
+from app.services.db import DATA_DIR, db_service
+from app.services.syllabus_pipeline import page_count_bytes
 
 router = APIRouter(prefix="/api/v1/syllabus", tags=["syllabus-curriculum"])
+
+UPLOAD_DIR = DATA_DIR / "uploads"
+MAX_UPLOAD_BYTES = 300 * 1024 * 1024
 
 
 @router.post("/upload", response_model=DocumentUploadResponse, status_code=201)
 async def upload_syllabus_document(
     file: UploadFile = File(...),
-    grade: int = Form(1),
+    grade: int = Form(..., ge=1, le=5),
     subject: str = Form("Mathematics"),
     year: int = Form(2024),
     language: str = Form("si"),
 ):
-    if not file.filename.lower().endswith(".pdf"):
+    if not (file.filename or "").lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
     content = await file.read()
     if not content:
         raise HTTPException(status_code=400, detail="Uploaded file is empty")
+    if len(content) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="PDF is larger than 300 MB")
 
-    # Read page count via pypdf
+    # Reject anything that is not a real, non-empty PDF now, not halfway through extraction.
+    # Checked in memory so nothing is written (or left locked on Windows) for a bad file.
     try:
-        reader = PdfReader(io.BytesIO(content))
-        page_count = len(reader.pages)
-    except Exception as e:
-        page_count = 1
+        pages = await asyncio.to_thread(page_count_bytes, content)
+    except Exception:  # noqa: BLE001
+        pages = 0
+    if pages < 1:
+        raise HTTPException(status_code=400, detail="This file is not a readable PDF with pages")
 
     doc_id = f"doc_{uuid.uuid4().hex[:8]}"
+    UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    local_file_path = UPLOAD_DIR / f"{doc_id}_{Path(file.filename).name}"
+    local_file_path.write_bytes(content)
 
-    # Save to local uploads dir as reliable backup
-    local_upload_dir = Path(__file__).resolve().parents[1] / "data" / "db_store" / "uploads"
-    local_upload_dir.mkdir(parents=True, exist_ok=True)
-    local_file_path = local_upload_dir / f"{doc_id}_{file.filename}"
-    saved_local_path: Optional[str] = None
-    try:
-        local_file_path.write_bytes(content)
-        saved_local_path = str(local_file_path)
-    except Exception as e:
-        print(f"[upload_syllabus_document] Local backup save note: {e}")
-
-    # Save to GridFS / disk fallback
-    gridfs = db_service.get_gridfs()
-    gridfs_id = await gridfs.upload_from_stream(
-        filename=file.filename,
-        source=content,
-        metadata={"grade": grade, "subject": subject, "year": year, "language": language},
-    )
+    # Shared copy for other machines when Atlas is available; the local copy is enough otherwise.
+    gridfs_id: Optional[str] = None
+    if db_service.is_connected:
+        gridfs_id = str(await db_service.get_gridfs().upload_from_stream(
+            filename=file.filename,
+            source=content,
+            metadata={"grade": grade, "subject": subject, "year": year, "language": language},
+        ))
 
     doc = SyllabusDocument(
         doc_id=doc_id,
@@ -78,115 +76,57 @@ async def upload_syllabus_document(
         grade=grade,
         subject=subject,
         year=year,
-        language=language,  # type: ignore
-        page_count=page_count,
+        language=language,  # type: ignore[arg-type]
+        page_count=pages,
         file_size=len(content),
         status="uploaded",
-        extracted_problem_count=0,
-        gridfs_id=str(gridfs_id),
-        local_path=saved_local_path,
+        gridfs_id=gridfs_id,
+        local_path=str(local_file_path),
+        pipeline_version=ingestion_jobs.PIPELINE_VERSION,
     )
-
-    docs_col = db_service.get_syllabus_documents()
-    await docs_col.insert_one(doc.model_dump())
+    await db_service.get_syllabus_documents().insert_one(doc.model_dump())
 
     return DocumentUploadResponse(
         document=doc,
-        message=f"Successfully ingested {file.filename} ({page_count} pages) for Grade {grade}",
+        message=f"Uploaded {file.filename} ({pages} pages) for Grade {grade}. Run extraction to build its problem bank.",
     )
 
 
 @router.get("/documents", response_model=List[SyllabusDocument])
-async def list_documents(grade: Optional[int] = Query(None, ge=1, le=5)):
-    docs_col = db_service.get_syllabus_documents()
-    query = {}
+async def list_documents(
+    grade: Optional[int] = Query(None, ge=1, le=5),
+    include_legacy: bool = Query(False, description="Also list records made by the old text-layer extractor"),
+):
+    query: dict = {} if include_legacy else {"pipeline_version": ingestion_jobs.PIPELINE_VERSION}
     if grade:
         query["grade"] = grade
-    cursor = docs_col.find(query)
-    docs = await cursor.to_list(length=100)
-    return [SyllabusDocument(**d) for d in docs]
+    docs = await db_service.get_syllabus_documents().find(query).to_list(length=200)
+    return sorted((SyllabusDocument(**d) for d in docs), key=lambda d: (d.grade, d.filename))
 
 
 @router.get("/documents/{doc_id}", response_model=SyllabusDocument)
 async def get_document(doc_id: str):
-    docs_col = db_service.get_syllabus_documents()
-    doc = await docs_col.find_one({"doc_id": doc_id})
+    doc = await db_service.get_syllabus_documents().find_one({"doc_id": doc_id})
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
     return SyllabusDocument(**doc)
 
 
-@router.post("/documents/{doc_id}/extract", response_model=List[CurriculumProblem])
-async def extract_problems_from_document(doc_id: str):
+@router.post("/documents/{doc_id}/extract", response_model=SyllabusDocument, status_code=202)
+async def extract_problems_from_document(
+    doc_id: str,
+    wait: bool = Query(False, description="Block until extraction finishes (scripts/tests)"),
+):
+    """Starts background extraction; poll GET /documents/{doc_id} for progress."""
     docs_col = db_service.get_syllabus_documents()
-    doc_dict = await docs_col.find_one({"doc_id": doc_id})
-    if not doc_dict:
+    if not await docs_col.find_one({"doc_id": doc_id}):
         raise HTTPException(status_code=404, detail="Document not found")
-
-    doc = SyllabusDocument(**doc_dict)
-    await docs_col.update_one({"doc_id": doc_id}, {"$set": {"status": "extracting"}})
-
-    # Fetch file content from local path or GridFS
-    pdf_bytes = b""
-    if doc.local_path and os.path.exists(doc.local_path):
-        try:
-            pdf_bytes = Path(doc.local_path).read_bytes()
-        except Exception as e:
-            print(f"[extract_problems_from_document] Local read error: {e}")
-
-    if not pdf_bytes and doc.gridfs_id:
-        try:
-            gridfs = db_service.get_gridfs()
-            # If MongoDB is connected, GridFS expects an ObjectId
-            file_id: Any = doc.gridfs_id
-            if db_service.is_connected:
-                from bson import ObjectId
-                try:
-                    file_id = ObjectId(doc.gridfs_id)
-                except Exception:
-                    file_id = doc.gridfs_id
-            stream = await gridfs.open_download_stream(file_id)
-            if hasattr(stream, "read"):
-                read_res = stream.read()
-                if asyncio.iscoroutine(read_res):
-                    pdf_bytes = await read_res
-                else:
-                    pdf_bytes = read_res
-        except Exception as e:
-            print(f"[extract_problems_from_document] GridFS read error: {e}")
-
-    # Fallback to local syllabus dataset if matches Grade
-    if not pdf_bytes:
-        default_local = Path(__file__).resolve().parents[2] / "data" / "syllabi" / f"Grade_0{doc.grade}.pdf"
-        if default_local.exists():
-            try:
-                pdf_bytes = default_local.read_bytes()
-            except Exception:
-                pass
-
-    try:
-        problems = await upload_and_extract_problems(
-            pdf_file_path_or_bytes=pdf_bytes,
-            grade=doc.grade,
-            doc_id=doc.doc_id,
-        )
-
-        probs_col = db_service.get_curriculum_problems()
-        for p in problems:
-            await probs_col.update_one(
-                {"problem_id": p.problem_id},
-                {"$set": p.model_dump()},
-                upsert=True,
-            )
-
-        await docs_col.update_one(
-            {"doc_id": doc_id},
-            {"$set": {"status": "extracted", "extracted_problem_count": len(problems)}},
-        )
-        return problems
-    except Exception as e:
-        await docs_col.update_one({"doc_id": doc_id}, {"$set": {"status": "error"}})
-        raise HTTPException(status_code=500, detail=f"Extraction failed: {str(e)}")
+    ingestion_jobs.start_extraction(doc_id)
+    if wait:
+        await ingestion_jobs.wait_for(doc_id)
+    else:
+        await asyncio.sleep(0)  # let the job record its "queued" state before we read it back
+    return SyllabusDocument(**(await docs_col.find_one({"doc_id": doc_id})))
 
 
 @router.get("/problems", response_model=List[CurriculumProblem])
@@ -194,22 +134,20 @@ async def list_curriculum_problems(
     grade: Optional[int] = Query(None, ge=1, le=5),
     topic: Optional[str] = Query(None),
     doc_id: Optional[str] = Query(None),
+    include_legacy: bool = Query(False, description="Also return problems not verified against a syllabus page"),
 ):
-    probs_col = db_service.get_curriculum_problems()
-    query = {}
+    query: dict = {} if include_legacy else {"source": "syllabus"}
     if grade:
         query["grade"] = grade
     if doc_id:
         query["doc_id"] = doc_id
-    cursor = probs_col.find(query)
-    items = await cursor.to_list(length=200)
+    items = await db_service.get_curriculum_problems().find(query).to_list(length=2000)
 
-    # In-memory filter for topic if provided
     problems = [CurriculumProblem(**p) for p in items]
     if topic:
         t = topic.lower()
         problems = [p for p in problems if t in p.topic.lower() or (t == "money" and p.is_money)]
-    return problems
+    return sorted(problems, key=lambda p: (p.grade, p.page_number or 0, p.problem_id))
 
 
 @router.get("/problems/{problem_id}", response_model=CurriculumProblem)
@@ -347,9 +285,9 @@ async def preview_cognitive_load(payload: dict = Body(...)):
 
 
 @router.post("/seed-local", response_model=SeedSyllabiResponse)
-async def seed_local_syllabi(directory: Optional[str] = Query(None)):
-    """Scans local data/syllabi folder, imports Grade 1-5 PDFs and extracts problems."""
+async def seed_local_syllabi(
+    wait: bool = Query(False, description="Block until every guide is extracted (scripts/tests)"),
+):
+    """Registers the bundled NIE guides in data/syllabi and queues them for background extraction."""
     from app.scripts.seed_syllabi import run_seed
-    syllabi_dir = Path(directory) if directory else Path(__file__).resolve().parents[2] / "data" / "syllabi"
-    result = await run_seed(syllabi_dir)
-    return result
+    return await run_seed(wait=wait)

@@ -12,7 +12,7 @@
     "standardKnowledge": 0.2,
     "totalHintsUsed": 0,
     "sessionsCompleted": 0,
-    "updatedAt": "2026-10-19T18:15:51.085Z",
+    "updatedAt": "2026-10-19T23:35:54.614Z",
     "lastFsmState": "OBSERVING",
     "studentId": "lrn_e4d0ac37b8",
     "lastCognitiveState": "NORMAL"
@@ -34,5 +34,22 @@
     "lastCognitiveState": "NORMAL",
     "lastFsmState": "OBSERVING",
     "studentId": "lrn_7574835f26"
+  },
+  {
+    "parentId": "6acb27e594049997a510aca0",
+    "learnerId": "student_default",
+    "studentName": "Esandi",
+    "grade": 1,
+    "stars": 100,
+    "coins": 50,
+    "learningProgressPct": 0,
+    "completedSteps": [],
+    "hintAwareKnowledge": 0.2,
+    "standardKnowledge": 0.2,
+    "totalHintsUsed": 0,
+    "sessionsCompleted": 0,
+    "updatedAt": "2026-10-19T23:35:52.968Z",
+    "lastFsmState": "OBSERVING",
+    "studentId": "student_default"
   }
 ]

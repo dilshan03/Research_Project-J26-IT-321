@@ -13,6 +13,7 @@ import {
   LearnersPage,
   OnboardingPlaceholderPage,
   ParentOverviewPage,
+  ParentSnapIvPage,
   ParentLearnerProfilesPage,
   ParentAssessmentsPage,
   ParentRecommendationsPage,
@@ -125,6 +126,8 @@ function App() {
             }
           >
             <Route index element={<LearnersPage />} />
+            {/* Optional SNAP-IV, opened from the parent dashboard */}
+            <Route path=":learnerId/snap-iv" element={<ParentSnapIvPage />} />
           </Route>
 
           <Route

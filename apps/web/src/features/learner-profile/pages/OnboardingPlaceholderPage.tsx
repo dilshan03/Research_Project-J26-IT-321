@@ -28,6 +28,7 @@ import type {
   MathSubmissionExtras,
   OnboardingFullSummary,
 } from '../types/onboarding';
+import { isAdhdTypeReported } from '../types/onboarding';
 
 import { OnboardingStepper } from '../components/onboarding/OnboardingStepper';
 import { languageLabel } from '../components/parent/labels';
@@ -43,6 +44,7 @@ import { OnboardingSummaryStep } from '../components/onboarding/OnboardingSummar
 interface StepFlags {
   adhdDone: boolean;
   snapDone: boolean; // completed or skipped (SNAP-IV is optional)
+  snapNotAsked: boolean; // parent reported the ADHD type, so SNAP-IV is offered from the dashboard instead
   prefsDone: boolean;
   socialDone: boolean;
   mathDone: boolean;
@@ -50,13 +52,14 @@ interface StepFlags {
 
 /**
  * First unfinished step in the parent sequence:
- * ADHD information -> SNAP-IV (optional) -> preferences -> social context (optional) -> handover.
+ * ADHD information -> SNAP-IV (optional; not asked when the ADHD type was reported) -> preferences
+ * -> social context (optional) -> handover.
  * Mirrors the backend resolver, so resumed learners never repeat finished steps.
  */
 const resolveNextStep = (flags: StepFlags, storedStep?: string): OnboardingStepKey => {
   if (flags.mathDone) return 'summary';
   if (!flags.adhdDone) return 'adhd_information';
-  if (!flags.snapDone) return 'snap_iv';
+  if (!flags.snapDone && !flags.snapNotAsked) return 'snap_iv';
   if (!flags.prefsDone) return 'preferences';
   // A parent who already moved past (or skipped) social context resumes at the handover.
   if (storedStep === 'handover' || storedStep === 'math_assessment') return 'handover';
@@ -101,6 +104,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
   const currentFlags = (): StepFlags => ({
     adhdDone: Boolean(savedAdhd),
     snapDone: snapIvStatus !== 'NOT_STARTED',
+    snapNotAsked: isAdhdTypeReported(savedAdhd),
     prefsDone: Boolean(savedPreferences),
     socialDone: Boolean(savedSocialContext),
     mathDone: progress?.status === 'COMPLETED',
@@ -176,6 +180,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
               {
                 adhdDone: Boolean(p.adhdInformation),
                 snapDone: resumedSnapStatus !== 'NOT_STARTED',
+                snapNotAsked: isAdhdTypeReported(p.adhdInformation),
                 prefsDone: Boolean(p.learningPreferences),
                 socialDone: Boolean(p.socialContext),
                 mathDone: false,
@@ -203,28 +208,31 @@ export const OnboardingPlaceholderPage: React.FC = () => {
   }, [loadData]);
 
   // Handle Step 1: Parent-Reported ADHD Information
-  const saveAdhd = async (data: AdhdInformationData): Promise<boolean> => {
-    if (!learnerId) return false;
+  const saveAdhd = async (data: AdhdInformationData): Promise<AdhdInformationRecord | null> => {
+    if (!learnerId) return null;
     const res = await onboardingApi.saveAdhdInformation(learnerId, data);
     if (res.success && res.data) {
       setSavedAdhd(res.data.adhdInformation);
       markCompleted('adhd_information');
-      return true;
+      return res.data.adhdInformation;
     }
     showToast(res.message || 'සුරැකීමට නොහැකි විය (Could not save).');
-    return false;
+    return null;
   };
 
   const handleSaveAdhd = async (data: AdhdInformationData) => {
     if (!learnerId || isActionLoading) return;
     setIsActionLoading(true);
     try {
-      if (await saveAdhd(data)) {
+      const saved = await saveAdhd(data);
+      if (saved) {
         showToast('තොරතුරු සුරකින ලදී (Information saved).');
         if (returnToSummary) {
           await goBackToSummary();
         } else {
-          setCurrentStep(resolveNextStep({ ...currentFlags(), adhdDone: true }));
+          setCurrentStep(
+            resolveNextStep({ ...currentFlags(), adhdDone: true, snapNotAsked: isAdhdTypeReported(saved) })
+          );
         }
       }
     } catch {
@@ -556,6 +564,11 @@ export const OnboardingPlaceholderPage: React.FC = () => {
                 <OnboardingStepper
                   currentStep={currentStep}
                   completedSteps={completedSteps}
+                  hiddenSteps={
+                    isAdhdTypeReported(savedAdhd) && snapIvStatus === 'NOT_STARTED' && currentStep !== 'snap_iv'
+                      ? ['snap_iv']
+                      : undefined
+                  }
                   onSelectStep={(step) => {
                     // Allow jumping to already completed steps
                     if (completedSteps.includes(step)) {
@@ -625,7 +638,9 @@ export const OnboardingPlaceholderPage: React.FC = () => {
                     initialData={savedPreferences}
                     onSave={handleSavePreferences}
                     onSaveAndExit={handlePreferencesSaveAndExit}
-                    onBack={() => setCurrentStep('snap_iv')}
+                    onBack={() =>
+                      setCurrentStep(isAdhdTypeReported(savedAdhd) && snapIvStatus === 'NOT_STARTED' ? 'adhd_information' : 'snap_iv')
+                    }
                     isSaving={isActionLoading}
                   />
                 )}

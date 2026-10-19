@@ -81,6 +81,13 @@ def snap_iv_status(quest_doc: Optional[Dict[str, Any]], progress_doc: Optional[D
     return SNAP_IV_NOT_STARTED
 
 
+def adhd_type_reported(adhd_information: Optional[Dict[str, Any]]) -> bool:
+    """True when the parent reported a professional diagnosis with a specific ADHD presentation."""
+    if not adhd_information or adhd_information.get("diagnosisStatus") != "yes":
+        return False
+    return adhd_information.get("reportedPresentation") not in (None, "not_specified")
+
+
 def resolve_next_step(
     quest_doc: Optional[Dict[str, Any]],
     progress_doc: Optional[Dict[str, Any]],
@@ -90,7 +97,12 @@ def resolve_next_step(
     quest_doc = quest_doc or {}
     if not quest_doc.get("adhdInformation"):
         return "adhd_information"
-    if snap_iv_status(quest_doc, progress_doc) == SNAP_IV_NOT_STARTED:
+    # SNAP-IV is not asked during onboarding when the parent already reported the ADHD type;
+    # it stays NOT_STARTED (not skipped) and remains available from the parent dashboard.
+    if (
+        snap_iv_status(quest_doc, progress_doc) == SNAP_IV_NOT_STARTED
+        and not adhd_type_reported(quest_doc.get("adhdInformation"))
+    ):
         return "snap_iv"
     if not quest_doc.get("learningPreferences"):
         return "preferences"

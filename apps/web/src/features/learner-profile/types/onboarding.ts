@@ -213,7 +213,8 @@ export interface MathItemAnswer {
   questionId: string;
   userAnswer: string | number;
   attempts: number;
-  responseTimeSeconds: number;
+  /** Measured time to the first confirmed response; omitted when not measured (never estimated). */
+  responseTimeSeconds?: number;
   hintUsed: boolean;
   firstConfirmedResponse?: string | number;
   isFirstResponseCorrect?: boolean;
@@ -230,6 +231,21 @@ export interface MathItemAnswer {
   revisionEvents?: RevisionEvent[];
   interactionMode?: InteractionMode;
   dimensionTags?: string[];
+  responseStatus?: 'answered' | 'skipped' | 'not_presented';
+
+  // Interactive onboarding activity metadata (Optional, additive)
+  activityId?: string;
+  conceptId?: string;
+  inputMethod?: 'drag' | 'tap' | 'select';
+  missedDropCount?: number;
+}
+
+/** Request-level fields sent alongside answers by the interactive onboarding journey. */
+export interface MathSubmissionExtras {
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
+  childPreferences?: ChildPreferenceChoices;
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
 }
 
 export interface MathAssessmentSubmission {
@@ -238,6 +254,8 @@ export interface MathAssessmentSubmission {
   grade: number;
   answers: MathItemAnswer[];
   childPreferences?: ChildPreferenceChoices;
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
 }
 
 export interface SkillScore {

@@ -54,6 +54,8 @@ FLAG_ASSISTANCE_TIMING_UNKNOWN = "ASSISTANCE_TIMING_UNKNOWN"
 FLAG_ASSISTANCE_NOT_REPORTED = "ASSISTANCE_NOT_REPORTED"
 FLAG_SUPPORT_PROBE_ROLE = "SUPPORT_PROBE_ROLE"
 FLAG_RESPONSE_TIME_NOT_RECORDED = "RESPONSE_TIME_NOT_RECORDED"
+FLAG_PROBE_ROLE_MISMATCH = "PROBE_ROLE_MISMATCH"
+FLAG_TRANSFER_WITHOUT_PRE_PROBE = "TRANSFER_WITHOUT_PRE_PROBE"
 
 # Assessment-level flags
 FLAG_UNRECOGNIZED_PROTOCOL_VERSION = "UNRECOGNIZED_PROTOCOL_VERSION"
@@ -134,7 +136,52 @@ def _raw_item_record(ans: MathItemAnswerSubmission) -> Dict[str, Any]:
         record["dimensionTags"] = ans.dimensionTags
     if ans.responseStatus is not None:
         record["clientDeclaredResponseStatus"] = _enum_value(ans.responseStatus)
+    if ans.activityId is not None:
+        record["activityId"] = ans.activityId
+    if ans.conceptId is not None:
+        record["conceptId"] = ans.conceptId
+    if ans.inputMethod is not None:
+        record["inputMethod"] = _enum_value(ans.inputMethod)
+    if ans.missedDropCount is not None:
+        record["missedDropCount"] = ans.missedDropCount
     return record
+
+
+# Item metadata that the server item bank defines authoritatively (onboarding-v2 items)
+SERVER_DEFINED_ITEM_FIELDS = ("probeRole", "itemFamilyId", "representation", "activityId", "conceptId")
+
+
+def _apply_server_item_metadata(record: Dict[str, Any], question: Dict[str, Any], flags: List[str]) -> None:
+    """
+    For bank items that define probe metadata, the bank wins over the client so a guided
+    (support) item can never be relabelled as independent evidence. Client values that differ
+    are kept for audit.
+    """
+    if "probeRole" not in question:
+        return
+    for field in SERVER_DEFINED_ITEM_FIELDS:
+        server_value = question.get(field)
+        client_value = record.get(field)
+        if client_value is not None and client_value != server_value:
+            record[f"clientReported{field[0].upper()}{field[1:]}"] = client_value
+            if field == "probeRole":
+                flags.append(FLAG_PROBE_ROLE_MISMATCH)
+        if server_value is None:
+            record.pop(field, None)
+        else:
+            record[field] = server_value
+
+
+def _flag_transfer_integrity(evaluated: List[Dict[str, Any]], excluded: List[Dict[str, Any]]) -> None:
+    """A transfer item only supports learning-transfer evidence after a presented pre-probe of the same family."""
+    pre_families = {
+        it.get("itemFamilyId")
+        for it in evaluated + excluded
+        if it.get("probeRole") == "pre" and it.get("responseStatus") != STATUS_NOT_PRESENTED
+    }
+    for item in evaluated:
+        if item.get("probeRole") == "transfer" and item.get("itemFamilyId") not in pre_families:
+            item["qualityFlags"].append(FLAG_TRANSFER_WITHOUT_PRE_PROBE)
 
 
 def _excluded(record: Dict[str, Any], status: str, reason: str, flags: List[str],
@@ -305,6 +352,7 @@ def evaluate_submission(
             continue
 
         approved_submitted += 1
+        _apply_server_item_metadata(record, question, flags)
         status = _response_status(ans, question, flags)
         if status != STATUS_ANSWERED:
             excluded.append(_excluded(record, status, status, flags, question))
@@ -312,6 +360,7 @@ def evaluate_submission(
 
         evaluated.append(_evaluate_answered_item(ans, question, record, flags))
 
+    _flag_transfer_integrity(evaluated, excluded)
     summary = build_evidence_summary(evaluated, excluded, approved_submitted)
     if protocol_version not in KNOWN_PROTOCOL_VERSIONS:
         summary["flags"].append(FLAG_UNRECOGNIZED_PROTOCOL_VERSION)

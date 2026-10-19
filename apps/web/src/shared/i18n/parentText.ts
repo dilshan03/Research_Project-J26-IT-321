@@ -78,6 +78,13 @@ const si = {
     behaviour: 'හැසිරීම් නිරීක්ෂණ',
     settings: 'ගිණුම් සැකසුම්',
     onboarding: 'ආරම්භක ඇගයීම',
+    more: 'තවත්',
+    short: {
+      home: 'මුල් පිටුව',
+      children: 'දරුවන්',
+      profiles: 'ප්‍රගතිය',
+      tips: 'උපදෙස්',
+    },
   },
 
   shell: {
@@ -107,6 +114,34 @@ const si = {
   },
 
   overview: {
+    // Redesigned home page
+    alertOtherChild: (name: string) => `${name}ගේ ආරම්භක ඇගයීම තවම සම්පූර්ණ කර නැත.`,
+    alertOtherChildAction: 'අරඹන්න',
+    switcherLabel: 'දරුවා තෝරන්න',
+    summaryNotStarted: (name: string) => `${name}ගේ ගණිත ඉගෙනීම ගැන දැනගැනීමට, කෙටි ආරම්භක ඇගයීම අරඹන්න.`,
+    summaryInProgress: 'ආරම්භක ඇගයීම අතරමැද නතර වී ඇත. ඉතිරි කොටස සම්පූර්ණ කළ පසු ප්‍රතිඵල පෙන්වයි.',
+    summaryCompleted: (strong: number, learning: number, check: number) =>
+      [
+        strong > 0 ? `කුසලතා ${strong}ක් හොඳින් දන්නවා` : null,
+        learning > 0 ? `${learning}ක් ඉගෙන ගනිමින්` : null,
+        check > 0 ? `${check}ක් ගැන තව බලන්න ඕනේ` : null,
+      ]
+        .filter(Boolean)
+        .join(', ') + '.',
+    summaryEarly: 'මේවා කෙටි ඇගයීමක මුල් ප්‍රතිඵල පමණි.',
+    summaryNoSkills: 'ආරම්භක ඇගයීම සම්පූර්ණයි. කුසලතා ප්‍රතිඵල තවම නැත.',
+    nextTitle: 'ඊළඟට කළ යුත්තේ',
+    nextStart: 'කෙටි ආරම්භක ඇගයීම අරඹන්න. දරුවාට විනාඩි කිහිපයක් පමණ ගත වේ.',
+    nextResume: 'නතර කළ තැනින් ආරම්භක ඇගයීම ඉදිරියට කරන්න.',
+    nextViewTips: 'උපදෙස් සියල්ල බලන්න',
+    nextViewProfile: 'ඉගෙනුම් තොරතුරු බලන්න',
+    nextNoTips: 'දැනට විශේෂ උපදෙසක් නැත. දරුවාගේ ඉගෙනුම් තොරතුරු බලන්න.',
+    skillsTitle: 'ගණිත කුසලතා',
+    skillsEmpty: 'ආරම්භක ඇගයීම සම්පූර්ණ කළ පසු කුසලතා මෙහි පෙන්වයි.',
+    statusLegend: 'හොඳින් දන්නවා • ඉගෙන ගනිමින් • තව බලන්න ඕනේ (තව ප්‍රශ්න අවශ්‍යයි)',
+    activityTitle: 'මෑත ක්‍රියාකාරකම්',
+    activityEmpty: 'තවම ක්‍රියාකාරකම් ඉතිහාසයක් නැත. දරුවා ගණිත ක්‍රියාකාරකම් කරන විට ඒවා මෙහි පෙන්වයි.',
+    profileError: 'ඉගෙනුම් තොරතුරු ලබාගත නොහැකි විය.',
     title: 'මුල් පිටුව',
     description: 'ඔබේ දරුවන්ගේ ගණිත ඉගෙනීම පිළිබඳ කෙටි විස්තරයක්.',
     addChild: 'දරුවෙකු එක් කරන්න',
@@ -247,17 +282,20 @@ const si = {
     resumeAssessment: 'නතර කළ තැනින් ඉදිරියට',
     preferencesTitle: 'ඉගෙනීමට කැමති ආකාරය',
     socialTitle: 'ඉගෙනුම් පරිසරය',
+    parentInputTitle: 'ඔබ ලබා දුන් ඉගෙනුම් තොරතුරු',
     notRecorded: 'තවම සටහන් කර නැත.',
   },
 
   skills: {
     title: 'ගණිත කුසලතා',
     subtitle: 'මෙය කෙටි ඇගයීමක මුල් ප්‍රතිඵලයකි. දරුවා තව ක්‍රියාකාරකම් කරන විට මෙය වෙනස් විය හැක.',
+    // Three parent-facing statuses. EMERGING has sufficient evidence (not "insufficient"),
+    // so it shares the "still learning" label; the exact ELP-X level stays in research details.
     level: {
-      PROFICIENT: 'හොඳින් කරයි',
-      DEVELOPING: 'දියුණු වෙමින්',
-      EMERGING: 'තව පුහුණුව අවශ්‍යයි',
-      INSUFFICIENT_EVIDENCE: 'තව තොරතුරු අවශ්‍යයි',
+      PROFICIENT: 'හොඳින් දන්නවා',
+      DEVELOPING: 'ඉගෙන ගනිමින්',
+      EMERGING: 'ඉගෙන ගනිමින්',
+      INSUFFICIENT_EVIDENCE: 'තව බලන්න ඕනේ',
     },
     levelHelp: {
       PROFICIENT: 'පළමු උත්සාහයේදීම බොහෝ ප්‍රශ්න නිවැරදිව කළා.',

@@ -39,7 +39,7 @@ export const ParentAssessmentsPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fade-in">
+    <div className="space-y-5 animate-fade-in">
       <PageHeader
         role="parent"
         title={t.title}

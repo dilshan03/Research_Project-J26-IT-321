@@ -10,6 +10,7 @@ import type {
   MathQuestion,
   MathItemAnswer,
   MathAssessmentSummary,
+  MathSubmissionExtras,
   OnboardingFullSummary,
 } from '../types/onboarding';
 
@@ -195,7 +196,8 @@ export const onboardingApi = {
   async submitMathAssessment(
     learnerId: string,
     grade: number,
-    answers: MathItemAnswer[]
+    answers: MathItemAnswer[],
+    extras?: MathSubmissionExtras
   ): Promise<OnboardingApiResponse<MathAssessmentSummary>> {
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/learners/${learnerId}/onboarding/math-assessment`, {
@@ -206,6 +208,7 @@ export const onboardingApi = {
           version: 'MATH-QB-v1.0',
           grade,
           answers,
+          ...(extras ?? {}),
         }),
       });
       const data = await res.json();

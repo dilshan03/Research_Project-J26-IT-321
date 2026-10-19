@@ -25,10 +25,13 @@ import type {
   SocialContextData,
   MathQuestion,
   MathItemAnswer,
+  MathSubmissionExtras,
   OnboardingFullSummary,
 } from '../types/onboarding';
 
 import { OnboardingStepper } from '../components/onboarding/OnboardingStepper';
+import { languageLabel } from '../components/parent/labels';
+import { parentText } from '../../../shared/i18n/parentText';
 import { AdhdInformationStep } from '../components/onboarding/AdhdInformationStep';
 import { LearningPreferencesStep } from '../components/onboarding/LearningPreferencesStep';
 import { SnapIvStep } from '../components/onboarding/SnapIvStep';
@@ -407,14 +410,15 @@ export const OnboardingPlaceholderPage: React.FC = () => {
   };
 
   // Handle Step 5: Math Assessment Submit
-  const handleMathSubmit = async (answers: MathItemAnswer[]) => {
+  const handleMathSubmit = async (answers: MathItemAnswer[], extras?: MathSubmissionExtras) => {
     if (!learnerId || !learner || isActionLoading) return;
     setIsActionLoading(true);
     try {
       const res = await onboardingApi.submitMathAssessment(
         learnerId,
         learner.grade,
-        answers
+        answers,
+        extras
       );
       if (res.success && res.data) {
         setCompletedSteps((prev) =>
@@ -478,7 +482,11 @@ export const OnboardingPlaceholderPage: React.FC = () => {
         <PortalHeader role="parent" />
       )}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+      <main
+        className={`mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 space-y-5 ${
+          isMathAssessment ? 'max-w-7xl' : 'max-w-[1100px]'
+        }`}
+      >
         {/* Navigation Breadcrumb / Context Bar (Parent steps only) */}
         {!isMathAssessment && (
           <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -487,13 +495,13 @@ export const OnboardingPlaceholderPage: React.FC = () => {
               className="inline-flex items-center gap-2 text-xs font-bold text-mq-primary hover:text-mq-primary-hover transition-colors font-sinhala"
             >
               <ArrowLeft size={16} className="shrink-0" />
-              <span>මගේ දරුවන් වෙත ආපසු යන්න (Back to My Children)</span>
+              <span>{parentText.onboarding.backToChildren}</span>
             </Link>
 
             {progress && progress.status === 'IN_PROGRESS' && (
               <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-mq-surface-yellow text-mq-warning border border-mq-warning/30 font-sinhala shrink-0">
                 <Clock size={13} className="shrink-0" />
-                <span>ප්‍රගතිය සුරැකිව පවතී (Resumable)</span>
+                <span>{parentText.onboarding.progressSaved}</span>
               </span>
             )}
           </div>
@@ -501,18 +509,19 @@ export const OnboardingPlaceholderPage: React.FC = () => {
 
         {/* Global Loading State */}
         {isLoading ? (
-          <LoadingState message="ආරම්භක ඇගයීම් පද්ධතිය පූරණය වෙමින් පවතී..." />
+          <LoadingState message={parentText.onboarding.loading} />
         ) : errorMessage || !learner ? (
           <ErrorAlert
-            message={errorMessage || 'දරුවාගේ තොරතුරු සොයාගත නොහැකි විය.'}
+            message={errorMessage || parentText.onboarding.childNotFound}
+            retryLabel={parentText.common.retry}
             onRetry={loadData}
           />
         ) : (
           <div className="space-y-6">
-            {/* Child Profile Banner & Stepper Navigation (Only shown for Parent Stages) */}
-            {!isMathAssessment && (
+            {/* Child banner and stepper for parent steps; the summary has its own header */}
+            {!isMathAssessment && currentStep !== 'summary' && (
               <>
-                <div className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="bg-white rounded-3xl border border-mq-border px-5 py-4 shadow-xs flex items-center gap-4">
                   <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
                     <motion.div
                       whileHover={shouldReduceMotion ? undefined : { scale: 1.05 }}
@@ -523,15 +532,6 @@ export const OnboardingPlaceholderPage: React.FC = () => {
                     </motion.div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary shrink-0">
-                          {learner.preferredLanguage === 'Bilingual'
-                            ? `දෙබසම (Bilingual${
-                                learner.primaryInstructionLanguage
-                                  ? ` • ${learner.primaryInstructionLanguage}`
-                                  : ''
-                              })`
-                            : `${learner.preferredLanguage} මාධ්‍යය`}
-                        </span>
                         <OnboardingStatusBadge
                           status={progress?.status === 'COMPLETED' ? 'COMPLETED' : 'IN_PROGRESS'}
                         />
@@ -544,19 +544,11 @@ export const OnboardingPlaceholderPage: React.FC = () => {
                           </span>
                         )}
                       </h1>
-                      <p className="text-xs text-mq-text-muted font-sinhala mt-0.5">
-                        {learner.grade} ශ්‍රේණිය • වයස අවුරුදු {learner.age}
+                      <p className="text-sm text-mq-text-muted mt-0.5">
+                        {parentText.common.gradeAndAge(learner.grade, learner.age)} •{' '}
+                        {parentText.onboarding.learningLanguage(languageLabel(learner.preferredLanguage))}
                       </p>
                     </div>
-                  </div>
-
-                  <div className="text-left sm:text-right shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-mq-border/50">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-mq-text-muted block">
-                      Learner ID
-                    </span>
-                    <span className="text-xs font-mono font-bold text-mq-text-strong block">
-                      {learner.learnerId}
-                    </span>
                   </div>
                 </div>
 

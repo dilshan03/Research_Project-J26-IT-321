@@ -9,7 +9,27 @@ interface RecommendationListProps {
   limit?: number;
   rulesetVersion?: string;
   showNotice?: boolean;
+  /** Set false when the page shows these codes in another research section (avoids duplicate panels). */
+  showResearchDetails?: boolean;
 }
+
+/** Technical recommendation codes for a research details section. */
+export const RecommendationResearchRows: React.FC<{
+  recommendations: ElpxStructuredRecommendation[];
+  rulesetVersion?: string;
+}> = ({ recommendations, rulesetVersion }) => (
+  <>
+    {rulesetVersion && <p className="font-mono">ruleset: {rulesetVersion}</p>}
+    <ul className="space-y-1.5 font-mono text-[11px]">
+      {recommendations.map((rec) => (
+        <li key={rec.recommendationId} className="break-words">
+          {rec.recommendationId} • {rec.strategyCode}
+          {rec.skillId ? ` • skill: ${rec.skillId}` : ''} • reasons: {rec.reasonCodes.join(', ')}
+        </li>
+      ))}
+    </ul>
+  </>
+);
 
 /**
  * Parent-friendly learning suggestions. Strategy codes, reason codes and ruleset versions are
@@ -20,6 +40,7 @@ export const RecommendationList: React.FC<RecommendationListProps> = ({
   limit,
   rulesetVersion,
   showNotice = true,
+  showResearchDetails = true,
 }) => {
   const shown = typeof limit === 'number' ? recommendations.slice(0, limit) : recommendations;
 
@@ -50,17 +71,11 @@ export const RecommendationList: React.FC<RecommendationListProps> = ({
         </p>
       )}
 
-      <ResearchDetails>
-        {rulesetVersion && <p className="font-mono">ruleset: {rulesetVersion}</p>}
-        <ul className="space-y-1.5 font-mono text-[11px]">
-          {shown.map((rec) => (
-            <li key={rec.recommendationId} className="break-words">
-              {rec.recommendationId} • {rec.strategyCode}
-              {rec.skillId ? ` • skill: ${rec.skillId}` : ''} • reasons: {rec.reasonCodes.join(', ')}
-            </li>
-          ))}
-        </ul>
-      </ResearchDetails>
+      {showResearchDetails && (
+        <ResearchDetails>
+          <RecommendationResearchRows recommendations={shown} rulesetVersion={rulesetVersion} />
+        </ResearchDetails>
+      )}
     </div>
   );
 };

@@ -6,11 +6,12 @@ import { ResearchDetails } from './ResearchDetails';
 
 type Level = keyof typeof parentText.skills.level;
 
+// EMERGING shares the "still learning" label, so it shares its style too.
 const LEVEL_STYLES: Record<Level, string> = {
   PROFICIENT: 'bg-mq-success-bg text-mq-success border-mq-success/30',
   DEVELOPING: 'bg-mq-surface-blue text-mq-primary border-mq-primary/25',
-  EMERGING: 'bg-mq-warning-bg text-mq-warning border-mq-warning/30',
-  INSUFFICIENT_EVIDENCE: 'bg-mq-surface-soft text-mq-text-muted border-mq-border',
+  EMERGING: 'bg-mq-surface-blue text-mq-primary border-mq-primary/25',
+  INSUFFICIENT_EVIDENCE: 'bg-mq-surface-soft text-mq-text border-mq-border',
 };
 
 const LEGACY_CATEGORY: Record<string, Level> = {
@@ -50,6 +51,10 @@ interface SkillEvidenceListProps {
   /** Legacy per-skill scores, used only when no ELP-X profile is available. */
   legacySkills?: SkillScore[];
   showOverall?: boolean;
+  /** Hide per-skill counts on the cards (they remain in the research details table). */
+  hideCounts?: boolean;
+  /** Hide the built-in title and subtitle when the page provides its own heading. */
+  hideHeading?: boolean;
   /** Extra technical content appended to the research details section. */
   children?: React.ReactNode;
 }
@@ -63,6 +68,8 @@ export const SkillEvidenceList: React.FC<SkillEvidenceListProps> = ({
   profile,
   legacySkills,
   showOverall = true,
+  hideCounts = false,
+  hideHeading = false,
   children,
 }) => {
   const t = parentText.skills;
@@ -71,18 +78,20 @@ export const SkillEvidenceList: React.FC<SkillEvidenceListProps> = ({
     : (legacySkills ?? []).map(fromLegacy);
 
   return (
-    <section className="space-y-4">
-      <div className="space-y-1">
-        <h3 className="text-base font-bold text-mq-text-strong flex items-center gap-2">
-          <GraduationCap size={18} className="text-mq-primary shrink-0" />
-          <span>{t.title}</span>
-        </h3>
-        <p className="text-sm text-mq-text-muted leading-relaxed">{t.subtitle}</p>
-      </div>
+    <section className="space-y-3">
+      {!hideHeading && (
+        <div className="space-y-0.5">
+          <h3 className="text-base font-bold text-mq-text-strong flex items-center gap-2">
+            <GraduationCap size={18} className="text-mq-primary shrink-0" />
+            <span>{t.title}</span>
+          </h3>
+          <p className="text-xs text-mq-text-muted leading-relaxed">{t.subtitle}</p>
+        </div>
+      )}
 
       {showOverall && profile && (
         <div
-          className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 ${
+          className={`px-4 py-3 rounded-2xl border flex flex-wrap items-center gap-x-3 gap-y-1 ${
             profile.isOverallEvidenceSufficient
               ? 'bg-mq-success-bg/50 border-mq-success/25'
               : 'bg-mq-warning-bg/50 border-mq-warning/30'
@@ -95,7 +104,7 @@ export const SkillEvidenceList: React.FC<SkillEvidenceListProps> = ({
             {t.firstTryCount(profile.totalCorrectFirstResponses, profile.totalDistinctQuestionsEvaluated)}
           </span>
           {!profile.isOverallEvidenceSufficient && (
-            <span className="text-xs text-mq-text-muted sm:basis-full">{t.overallNeedsMoreText}</span>
+            <span className="text-xs text-mq-text-muted basis-full">{t.overallNeedsMoreText}</span>
           )}
         </div>
       )}
@@ -103,19 +112,19 @@ export const SkillEvidenceList: React.FC<SkillEvidenceListProps> = ({
       {rows.length === 0 ? (
         <p className="text-sm text-mq-text-muted">{t.noSkills}</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {rows.map((row) => (
-            <div key={row.id} className="p-4 rounded-2xl bg-white border border-mq-border space-y-2 min-w-0">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <p className="text-sm font-bold text-mq-text-strong break-words min-w-0 flex-1">{row.name}</p>
-                <span
-                  className={`text-xs font-bold px-2.5 py-1 rounded-full border whitespace-nowrap ${LEVEL_STYLES[row.level]}`}
-                >
-                  {t.level[row.level]}
-                </span>
-              </div>
-              <p className="text-sm text-mq-text">{t.firstTryCount(row.correct, row.total)}</p>
-              <p className="text-xs text-mq-text-muted leading-relaxed">{t.levelHelp[row.level]}</p>
+            <div key={row.id} className="px-4 py-3 rounded-2xl bg-white border border-mq-border space-y-1.5 min-w-0">
+              <p className="text-base font-bold text-mq-text-strong break-words">{row.name}</p>
+              <span
+                className={`inline-block text-sm font-semibold px-2.5 py-0.5 rounded-full border ${LEVEL_STYLES[row.level]}`}
+              >
+                {t.level[row.level]}
+              </span>
+              {!hideCounts && <p className="text-sm text-mq-text">{t.firstTryCount(row.correct, row.total)}</p>}
+              {row.level === 'INSUFFICIENT_EVIDENCE' && (
+                <p className="text-xs text-mq-text-muted leading-relaxed">{t.levelHelp.INSUFFICIENT_EVIDENCE}</p>
+              )}
             </div>
           ))}
         </div>

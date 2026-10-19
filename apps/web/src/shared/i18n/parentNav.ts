@@ -20,3 +20,23 @@ export const PARENT_GROUP_TITLES: Record<string, string> = {
   'parent-analytics': parentText.nav.groupLearning,
   'parent-settings': parentText.nav.groupAccount,
 };
+
+/**
+ * The five main parent destinations. All other existing parent pages stay reachable
+ * under "More" in the sidebar and the mobile menu; no route is removed.
+ */
+export const PARENT_PRIMARY_PATHS = [
+  '/parent/dashboard',
+  '/learners',
+  '/parent/dashboard/learner-profiles',
+  '/parent/dashboard/recommendations',
+  '/parent/dashboard/settings',
+];
+
+/** Mobile bottom navigation (four destinations plus "More", which opens the full menu). */
+export const PARENT_BOTTOM_NAV = [
+  { path: '/parent/dashboard', label: parentText.nav.short.home },
+  { path: '/learners', label: parentText.nav.short.children },
+  { path: '/parent/dashboard/learner-profiles', label: parentText.nav.short.profiles },
+  { path: '/parent/dashboard/recommendations', label: parentText.nav.short.tips },
+];

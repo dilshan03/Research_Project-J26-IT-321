@@ -51,6 +51,12 @@ class InteractionMode(str, Enum):
     KEYBOARD = "keyboard"
 
 
+class InputMethod(str, Enum):
+    DRAG = "drag"
+    TAP = "tap"
+    SELECT = "select"
+
+
 class ClientResponseStatus(str, Enum):
     """Optional client declaration of whether an item was actually answered."""
     ANSWERED = "answered"
@@ -352,6 +358,17 @@ class MathItemAnswerSubmission(BaseModel):
             "or 'not_presented' (never shown). Omitted answers are recorded as unanswered."
         )
     )
+    # Interactive onboarding activity metadata (Optional, additive)
+    activityId: Optional[str] = Field(default=None, max_length=80, description="Onboarding activity identifier")
+    conceptId: Optional[str] = Field(default=None, max_length=80, description="Mathematical concept identifier")
+    inputMethod: Optional[InputMethod] = Field(
+        default=None,
+        description="How the confirmed answer was produced: drag, tap (tap-to-place alternative) or select"
+    )
+    missedDropCount: Optional[int] = Field(
+        default=None, ge=0,
+        description="Objects released outside a target (interface usability evidence, not a maths or attention measure)"
+    )
 
 
 class MathAssessmentSubmissionRequest(BaseModel):
@@ -366,6 +383,8 @@ class MathAssessmentSubmissionRequest(BaseModel):
         default=None,
         description="Child-expressed preferences recorded with source='child'"
     )
+    sessionStartedAt: Optional[datetime] = Field(default=None, description="When the child activity journey started")
+    sessionEndedAt: Optional[datetime] = Field(default=None, description="When the child activity journey ended")
 
 
 class SkillScore(BaseModel):

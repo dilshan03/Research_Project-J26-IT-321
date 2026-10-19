@@ -10,6 +10,11 @@ from app.db.mongodb import (
     get_questionnaires_collection,
     get_assessments_collection,
 )
+from app.db.onboarding_item_bank import (
+    ONBOARDING_ITEM_BANK_VERSION,
+    get_onboarding_v2_item,
+    get_onboarding_v2_items_for_grade,
+)
 from app.db.question_bank import (
     get_questions_for_grade,
     get_question_by_id,
@@ -619,12 +624,14 @@ async def submit_math_assessment(
 
     # Server-side evidence classification (ASSESS-EVIDENCE-v1.0): only answered mathematical items
     # approved for the learner's grade are scored; all other submitted items are kept as excluded evidence.
+    # Approved items: MATH-QB-v1.0 bank plus the onboarding-v2 activity bank for this grade.
     approved_question_ids = {q["questionId"] for q in get_questions_for_grade(grade=grade, include_answers=True)}
+    approved_question_ids |= {q["questionId"] for q in get_onboarding_v2_items_for_grade(grade)}
     evidence = evaluate_submission(
         answers=data.answers,
         learner_grade=grade,
         approved_question_ids=approved_question_ids,
-        question_lookup=get_question_by_id,
+        question_lookup=lambda qid: get_question_by_id(qid) or get_onboarding_v2_item(qid),
         request_grade=data.grade,
         protocol_version=protocol_version,
     )
@@ -713,6 +720,7 @@ async def submit_math_assessment(
         "assessmentProtocolVersion": protocol_version,
         "grade": grade,
         "questionBankVersion": QUESTION_BANK_VERSION,
+        "onboardingItemBankVersion": ONBOARDING_ITEM_BANK_VERSION,
         "thresholdVersion": THRESHOLD_CONFIG_VERSION,
         "disclaimer": PROVISIONAL_THRESHOLDS_METADATA["disclaimer"],
         "totalQuestions": total_questions,
@@ -729,6 +737,8 @@ async def submit_math_assessment(
         "evidenceSummary": evidence_summary,
         "elpxProfile": elpx_profile,
         "childPreferences": child_prefs,
+        "sessionStartedAt": data.sessionStartedAt,
+        "sessionEndedAt": data.sessionEndedAt,
         "mlPredictionNotice": (
             "Baseline derived via transparent pedagogical rules. "
             "Machine Learning / SHAP predictions will integrate when model service is attached."

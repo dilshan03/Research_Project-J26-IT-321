@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useScrollToTopOnChange } from '../../../../shared/hooks/useScrollToTopOnChange';
 import type { MathQuestion, MathItemAnswer, LearningPreferencesData } from '../../types/onboarding';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
@@ -62,6 +63,7 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
 
   // Living Canvas Discovery Stages
   const [stage, setStage] = useState<CanvasStage>('B_SHAPE_ISLAND');
+  useScrollToTopOnChange(`${stage}:${currentIndex}`);
   const [companionState, setCompanionState] = useState<CompanionState>('idle');
   const [representationMode, setRepresentationMode] = useState<RepresentationMode>('nature');
   const [showHint, setShowHint] = useState(false);

@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useScrollToTopOnChange } from '../../../../../shared/hooks/useScrollToTopOnChange';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import type { ChildPreferenceChoices, MathItemAnswer, MathSubmissionExtras } from '../../../types/onboarding';
 import { AVATAR_OPTIONS } from '../../../types';
@@ -48,6 +49,7 @@ interface Props {
  */
 export const Grade1Journey: React.FC<Props> = ({ onSubmit, isSubmitting }) => {
   const [phase, setPhase] = useState<Phase>('welcome');
+  useScrollToTopOnChange(phase);
   const [companionId, setCompanionId] = useState<string | null>(null);
   const [worldId, setWorldId] = useState<WorldId | null>(null);
   const [soundMode, setSoundMode] = useState<SoundMode | null>(null);

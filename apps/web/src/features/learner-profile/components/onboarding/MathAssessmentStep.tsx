@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useScrollToTopOnChange } from '../../../../shared/hooks/useScrollToTopOnChange';
 import type { MathQuestion, MathItemAnswer, LearningPreferencesData, MathSubmissionExtras } from '../../types/onboarding';
 import { LivingCanvasOnboarding } from './LivingCanvasOnboarding';
 import { Grade1Journey } from './journey/ChildJourney';
@@ -90,6 +91,7 @@ const StandardMathAssessmentView: React.FC<StandardViewProps> = ({
 }) => {
   const shouldReduceMotion = useReducedMotion();
   const [currentIndex, setCurrentIndex] = useState(0);
+  useScrollToTopOnChange(currentIndex);
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [hintsUsed, setHintsUsed] = useState<Record<string, boolean>>({});
   const [attempts, setAttempts] = useState<Record<string, number>>({});

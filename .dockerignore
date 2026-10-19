@@ -1,0 +1,24 @@
+# Dependencies & Virtual Environments
+**/node_modules
+**/.venv
+**/venv
+**/env
+
+# Build & Cache Artifacts
+**/dist
+**/build
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache
+
+# Git & IDE Metadata
+.git
+.gitignore
+.vscode
+.idea
+
+# Logs
+**/*.log
+npm-debug.log*

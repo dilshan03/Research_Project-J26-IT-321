@@ -348,6 +348,12 @@ export interface MathAssessmentSummary {
   impsa?: ImpsaSummary;
   imlr?: ImlrSummary;
   childPreferences?: ChildPreferenceChoices;
+  evaluatedItems?: any[];
+  excludedItems?: any[];
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
+  evidenceRulesetVersion?: string;
+  evidenceSummary?: any;
 }
 
 

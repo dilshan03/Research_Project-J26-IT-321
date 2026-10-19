@@ -253,11 +253,12 @@ class DatabaseService:
         self._init_done = True
         if MONGODB_URI and "mongodb" in MONGODB_URI:
             try:
-                # 2-second timeout so app never hangs if Atlas IP is restricted or SSL alert fires
+                # 10 s covers a slow Atlas DNS/TLS handshake. A 2 s limit made the service flip
+                # between Atlas and the local store from one start to the next (different data).
                 client = AsyncIOMotorClient(
                     MONGODB_URI,
-                    serverSelectionTimeoutMS=2000,
-                    connectTimeoutMS=2000,
+                    serverSelectionTimeoutMS=10000,
+                    connectTimeoutMS=10000,
                 )
                 await client.admin.command("ping")
                 self.client = client
@@ -267,7 +268,10 @@ class DatabaseService:
                 print(f"[DatabaseService] Connected to MongoDB Atlas: {MONGODB_DB_NAME}")
                 return
             except Exception as e:
-                print(f"[DatabaseService] MongoDB unavailable ({type(e).__name__}). Using local filesystem/in-memory fallback.")
+                print(
+                    f"[DatabaseService] WARNING: MONGODB_URI is set but Atlas is unreachable ({type(e).__name__}). "
+                    f"Using the LOCAL store in {DATA_DIR}; data written now will not appear in Atlas."
+                )
                 self.is_connected = False
         else:
             print("[DatabaseService] No MONGODB_URI configured. Running in local fallback mode.")

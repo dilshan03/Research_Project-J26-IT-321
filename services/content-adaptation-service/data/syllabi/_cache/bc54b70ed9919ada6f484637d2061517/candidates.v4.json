@@ -2828,6 +2828,92 @@
     "difficulty": "MEDIUM",
     "visual_props": {}
    }
+  ],
+  "81-88": [],
+  "70-80": [
+   {
+    "kind": "exercise",
+    "page_number": 76,
+    "source_quote": "උදා : එක්තරා පාසලකින් සිසුහු 56 දෙනෙක් පළමු ශ්‍රේණියට තෝරා ගනු ලැබුහ. එම සිසුන් පන්ති දෙකකට සමාන ව බෙදුවේ නම් එක් පන්තියක සිටින සිසුන් සංඛ්‍යාව කොපමණ ද ?",
+    "operation": "DIV",
+    "operands": [
+     56,
+     2
+    ],
+    "expected_answer": 28,
+    "raw_problem_text": "පාසලක පළමු ශ්‍රේණියට සිසුන් 56 දෙනෙක් තෝරා ගත්තා. එම සිසුන් පන්ති 2කට සමානව බෙදුවොත් එක් පන්තියක සිටින සිසුන් ගණන කීයද?",
+    "child_prompt_si": "සිසුන් 56 දෙනා පන්ති 2කට සමානව බෙදුවොත්, එක පන්තියක ළමයි කීයද?",
+    "child_prompt_en": "If 56 students are divided equally into 2 classes, how many are in one class?",
+    "english_translation": "56 students were selected for Grade 1 in a school. If they were divided equally into 2 classes, how many students are in one class?",
+    "topic": "Division",
+    "competency_code": "N/A",
+    "competency_desc": "ඉලක්කම් දෙකේ සංඛ්‍යා 2න් බෙදීම",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 79,
+    "source_quote": "ඉලක්කම් තුන තෙක් සංඛ්‍යා දෙකෙන් බෙදීම පිළිබඳ නිවැරදි අවබෝධයක් ලබා ගෙන ඇති ද යන්න තහවුරු කර ගන්න.",
+    "number_limit": 999,
+    "operation": "DIV",
+    "operands": [
+     48,
+     2
+    ],
+    "expected_answer": 24,
+    "raw_problem_text": "අඹ 48ක් පෙට්ටි 2කට සමසමව බෙදුවොත් එක් පෙට්ටියක ඇති අඹ ගණන කීයද?",
+    "child_prompt_si": "අඹ 48ක් පෙට්ටි 2කට සමසේ බෙදුවොත්, එක පෙට්ටියක අඹ කීයද?",
+    "child_prompt_en": "If 48 mangoes are divided equally into 2 boxes, how many mangoes in one box?",
+    "english_translation": "If 48 mangoes are divided equally into 2 boxes, how many mangoes are in one box?",
+    "topic": "Division",
+    "competency_code": "N/A",
+    "competency_desc": "ඉලක්කම් තුන තෙක් සංඛ්‍යා දෙකෙන් බෙදීම පිළිබඳ නිවැරදි අවබෝධයක් ලබා ගෙන ඇති ද යන්න තහවුරු කර ගන්න.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 79,
+    "source_quote": "ඉලක්කම් තුන තෙක් සංඛ්‍යා දෙකෙන් බෙදීම පිළිබඳ නිවැරදි අවබෝධයක් ලබා ගෙන ඇති ද යන්න තහවුරු කර ගන්න.",
+    "number_limit": 999,
+    "operation": "DIV",
+    "operands": [
+     150,
+     2
+    ],
+    "expected_answer": 75,
+    "raw_problem_text": "රුපියල් 150ක මුදලක් ළමුන් දෙදෙනෙකු අතර සමසේ බෙදුවහොත් එක් අයෙකුට ලැබෙන මුදල කීයද?",
+    "child_prompt_si": "රුපියල් 150ක් ළමයි 2කට සමසේ බෙදුවොත්, එක්කෙනෙකුට රුපියල් කීයද?",
+    "child_prompt_en": "If 150 rupees is divided equally between 2 children, how many rupees does each get?",
+    "english_translation": "If an amount of 150 rupees is divided equally between two children, how much money does one receive?",
+    "topic": "Division",
+    "competency_code": "N/A",
+    "competency_desc": "ඉලක්කම් තුන තෙක් සංඛ්‍යා දෙකෙන් බෙදීම පිළිබඳ නිවැරදි අවබෝධයක් ලබා ගෙන ඇති ද යන්න තහවුරු කර ගන්න.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 79,
+    "source_quote": "ඉලක්කම් තුන තෙක් සංඛ්‍යා දෙකෙන් බෙදීම පිළිබඳ නිවැරදි අවබෝධයක් ලබා ගෙන ඇති ද යන්න තහවුරු කර ගන්න.",
+    "number_limit": 999,
+    "operation": "DIV",
+    "operands": [
+     248,
+     2
+    ],
+    "expected_answer": 124,
+    "raw_problem_text": "මුද්දර 248ක් පොත් 2ක සමසමව ඇලවුවහොත් එක් පොතක ඇති මුද්දර ගණන කීයද?",
+    "child_prompt_si": "මුද්දර 248ක් පොත් 2කට සමසේ බෙදුවොත්, එක පොතක මුද්දර කීයද?",
+    "child_prompt_en": "If 248 stamps are divided equally between 2 books, how many stamps in one book?",
+    "english_translation": "If 248 stamps are pasted equally in 2 books, how many stamps are in one book?",
+    "topic": "Division",
+    "competency_code": "N/A",
+    "competency_desc": "ඉලක්කම් තුන තෙක් සංඛ්‍යා දෙකෙන් බෙදීම පිළිබඳ නිවැරදි අවබෝධයක් ලබා ගෙන ඇති ද යන්න තහවුරු කර ගන්න.",
+    "difficulty": "HARD",
+    "visual_props": {}
+   }
   ]
  }
 }

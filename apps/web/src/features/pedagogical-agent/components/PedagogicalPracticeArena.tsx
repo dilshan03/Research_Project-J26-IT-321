@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Dumbbell,
   Check,
@@ -10,6 +10,8 @@ import {
   ArrowLeft,
   Sparkles,
   Star,
+  RotateCcw,
+  Trophy,
 } from 'lucide-react';
 import { PedagogicalCompanion } from './PedagogicalCompanion';
 import { LearnerStateHUD } from './LearnerStateHUD';
@@ -475,17 +477,27 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
   const [internalGameActive, setInternalGameActive] = useState<boolean>(false);
   const isSessionPlaying = isGameActive !== undefined ? isGameActive : internalGameActive;
 
-  // Start at Question 3 (6 + 7 = ?) by default to match the reference design
-  const [currentQuestionIdx, setCurrentQuestionIdx] = useState<number>(2);
-  const [completedSteps, setCompletedSteps] = useState<number[]>([1, 2]);
+  // Start at Question 1 (index 0) and auto-advance across all 10 questions
+  const [currentQuestionIdx, setCurrentQuestionIdx] = useState<number>(0);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [isSessionComplete, setIsSessionComplete] = useState<boolean>(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [answerFeedback, setAnswerFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [explanationActive, setExplanationActive] = useState<boolean>(false);
+  const autoAdvanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeQuestion = PRACTICE_QUESTIONS[currentQuestionIdx];
 
-  // Telemetry & Real-time Pedagogical Engine (BKT + 10-Rule FSM)
-  const { logs, logAnswer, logHint } = useInteractionLogger({
+  useEffect(() => {
+    return () => {
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Telemetry & Real-time Pedagogical Engine (BKT + 10-Rule FSM) across all 10 questions
+  const { logs, metrics, logAnswer, logHint, clearLogs } = useInteractionLogger({
     sessionId: 'sess_student_practice_01',
     studentId,
     questionId: activeQuestion.id,
@@ -513,31 +525,82 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
 
   useEffect(() => {
     if (onProgressUpdate) {
-      const pct = Math.max(
-        65,
-        Math.round((completedSteps.length / PRACTICE_QUESTIONS.length) * 100)
-      );
+      const pct = Math.round((completedSteps.length / PRACTICE_QUESTIONS.length) * 100);
       onProgressUpdate(pct);
     }
   }, [completedSteps, onProgressUpdate]);
 
+  const handleGoToStep = (idx: number) => {
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    setIsSessionComplete(false);
+    setCurrentQuestionIdx(idx);
+    setSelectedOption(null);
+    setAnswerFeedback(null);
+    setExplanationActive(false);
+    resetHints();
+  };
+
+  const handleRestartFullSession = () => {
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    clearLogs();
+    setCompletedSteps([]);
+    setIsSessionComplete(false);
+    setCurrentQuestionIdx(0);
+    setSelectedOption(null);
+    setAnswerFeedback(null);
+    setExplanationActive(false);
+    resetHints();
+    playAction('wave', {
+      message: 'අපි ප්‍රශ්න 10 මුලසිට නැවත පටන් ගමු!',
+      duration: 3,
+    });
+  };
+
   const handleStartPractice = () => {
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
+    clearLogs();
+    setCompletedSteps([]);
+    setIsSessionComplete(false);
+    setCurrentQuestionIdx(0);
+    setSelectedOption(null);
+    setAnswerFeedback(null);
+    setExplanationActive(false);
+    resetHints();
     setInternalGameActive(true);
     onStartGame?.();
     playAction('wave', {
-      message: `ආයුබෝවන් ${studentName}! අපි ගණිත පුහුණුව ආරම්භ කරමු!`,
+      message: `ආයුබෝවන් ${studentName}! අපි ප්‍රශ්න 10 පුහුණුව ආරම්භ කරමු!`,
       duration: 3.5,
     });
   };
 
   const handleExitPractice = () => {
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+    }
     setInternalGameActive(false);
     onExitGame?.();
   };
 
   const handleSelectOption = (optionValue: number) => {
+    // Prevent duplicate clicks while auto-advancing after a correct answer
+    if (answerFeedback === 'correct' || isSessionComplete) return;
+
     setSelectedOption(optionValue);
     const isCorrect = optionValue === activeQuestion.answer;
+
+    // Log telemetry event with response time, idle time, and current hint level
+    logAnswer(optionValue, isCorrect, currentHintLevel);
 
     if (isCorrect) {
       setAnswerFeedback('correct');
@@ -546,29 +609,34 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
         setCompletedSteps((prev) => [...prev, activeQuestion.stepNumber]);
       }
       onGameEvent('CORRECT_ANSWER');
+
+      // Auto-advance to the next question after 1.35s so calculations proceed across all 10 questions
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+      }
+      autoAdvanceTimerRef.current = setTimeout(() => {
+        if (currentQuestionIdx < PRACTICE_QUESTIONS.length - 1) {
+          handleGoToStep(currentQuestionIdx + 1);
+        } else {
+          setIsSessionComplete(true);
+        }
+      }, 1350);
     } else {
       setAnswerFeedback('wrong');
       onGameEvent('WRONG_ANSWER');
     }
-
-    logAnswer(optionValue, isCorrect, currentHintLevel);
-  };
-
-  const handleGoToStep = (idx: number) => {
-    setCurrentQuestionIdx(idx);
-    setSelectedOption(null);
-    setAnswerFeedback(null);
-    setExplanationActive(false);
-    resetHints();
   };
 
   const handleNextQuestion = () => {
-    const nextIdx = (currentQuestionIdx + 1) % PRACTICE_QUESTIONS.length;
-    handleGoToStep(nextIdx);
-    playAction('wave', {
-      message: 'ඊළඟ ගැටලුව බලමු! ඔයාට පුළුවන්!',
-      duration: 3,
-    });
+    if (currentQuestionIdx < PRACTICE_QUESTIONS.length - 1) {
+      handleGoToStep(currentQuestionIdx + 1);
+      playAction('wave', {
+        message: 'ඊළඟ ගැටලුව බලමු! ඔයාට පුළුවන්!',
+        duration: 3,
+      });
+    } else {
+      setIsSessionComplete(true);
+    }
   };
 
   const handleHintBoardRequest = (level: HintLevel) => {
@@ -603,7 +671,7 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
   };
 
   const bktConfidencePct =
-    logs.length > 0 ? Math.round(bktComparison.hintAwareKnowledge * 100) : 72;
+    logs.length > 0 ? Math.round(bktComparison.hintAwareKnowledge * 100) : 50;
 
   // ===============================================================
   // 1. INITIAL PRACTICE START SCREEN (Before clicking Start)
@@ -646,7 +714,7 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
                 </div>
                 <div>
                   <p className="text-xs font-extrabold text-mq-text-strong sinhala">ප්‍රශ්න 10 ක්</p>
-                  <p className="text-[11px] text-mq-text-muted">Step-by-step</p>
+                  <p className="text-[11px] text-mq-text-muted">Auto-Advance</p>
                 </div>
               </div>
 
@@ -696,207 +764,249 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
       {/* =================================================== */}
       {/* CENTER COLUMN (8 cols): Practice Game Arena         */}
       {/* =================================================== */}
-      <div className="xl:col-span-8 space-y-3">
-        {/* 1. Compact Practice Hero Card */}
-        <div className="bg-gradient-to-r from-mq-secondary/15 via-mq-surface-blue to-white px-4 py-3 sm:px-5 sm:py-3.5 rounded-2xl border border-mq-secondary/30 shadow-xs relative overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 relative z-10">
-            <div className="space-y-0.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-mq-primary-dark flex items-center gap-1.5">
-                <Dumbbell size={13} className="text-mq-primary" />
-                <span>
-                  {activeQuestion.categorySi} · {activeQuestion.category}
-                </span>
-              </span>
-              <h1 className="text-lg sm:text-xl font-extrabold text-mq-text-strong leading-tight">
-                {activeQuestion.levelTitle}
-              </h1>
-            </div>
+      <div className="xl:col-span-8 space-y-3.5">
+        {/* 1. Distraction-Free 10-Step Question Progress Bar Only (ADHD Friendly) */}
+        <div className="bg-white px-4 py-3 sm:px-6 sm:py-3.5 rounded-2xl border border-mq-border shadow-xs overflow-x-auto">
+          <div className="flex items-center justify-between min-w-[420px]">
+            {PRACTICE_QUESTIONS.map((q, idx) => {
+              const isCurrent = idx === currentQuestionIdx && !isSessionComplete;
+              const isDone = completedSteps.includes(q.stepNumber);
 
-            <div className="flex items-center gap-2 self-start sm:self-auto">
-              <button
-                type="button"
-                onClick={handleExitPractice}
-                className="inline-flex items-center gap-1.5 py-1.5 px-3.5 rounded-full text-xs font-bold bg-white/90 hover:bg-white text-mq-primary-dark border border-mq-border-strong hover:border-mq-primary transition-all cursor-pointer shadow-xs sinhala"
-                title="Exit game and expand sidebar"
-              >
-                <ArrowLeft size={13} />
-                <span>ඉවත් වන්න · Exit</span>
-              </button>
+              return (
+                <React.Fragment key={q.id}>
+                  <button
+                    type="button"
+                    onClick={() => handleGoToStep(idx)}
+                    title={`Question ${q.stepNumber}: ${q.num1} ${q.operator} ${q.num2}`}
+                    className={`relative flex items-center justify-center rounded-full font-extrabold transition-all cursor-pointer shrink-0 ${
+                      isCurrent
+                        ? 'w-10 h-10 bg-mq-surface-blue text-mq-primary-dark border-2 border-mq-primary text-sm sm:text-base shadow-xs scale-105'
+                        : isDone
+                        ? 'w-8 h-8 sm:w-9 sm:h-9 bg-mq-success text-white text-xs sm:text-sm'
+                        : 'w-8 h-8 sm:w-9 sm:h-9 bg-mq-surface-soft text-mq-text-muted border border-mq-border text-xs sm:text-sm hover:border-mq-primary'
+                    }`}
+                  >
+                    {isDone && !isCurrent ? <Check size={16} strokeWidth={3} /> : q.stepNumber}
+                  </button>
 
-              <div className="btn btn-primary py-1.5 px-4 rounded-full text-xs font-bold shadow-xs pointer-events-none">
-                Question {activeQuestion.stepNumber} of {PRACTICE_QUESTIONS.length}
-              </div>
-            </div>
-          </div>
-
-          {/* Compact 10-Step Question Progression Stepper */}
-          <div className="mt-2.5 pt-2.5 border-t border-mq-border/70">
-            <div className="py-2 px-3 bg-white/85 backdrop-blur rounded-xl border border-mq-border/80 overflow-x-auto">
-              <div className="flex items-center justify-between min-w-[380px]">
-                {PRACTICE_QUESTIONS.map((q, idx) => {
-                  const isCurrent = idx === currentQuestionIdx;
-                  const isDone = completedSteps.includes(q.stepNumber) && !isCurrent;
-
-                  return (
-                    <React.Fragment key={q.id}>
-                      <button
-                        type="button"
-                        onClick={() => handleGoToStep(idx)}
-                        title={`Question ${q.stepNumber}: ${q.num1} ${q.operator} ${q.num2}`}
-                        className={`relative flex items-center justify-center rounded-full font-extrabold transition-all cursor-pointer shrink-0 ${
-                          isCurrent
-                            ? 'w-7 h-7 bg-mq-surface-blue text-mq-primary-dark border-2 border-mq-primary text-xs shadow-xs scale-105'
-                            : isDone
-                            ? 'w-6 h-6 bg-mq-primary text-white text-[11px]'
-                            : 'w-6 h-6 bg-mq-surface-soft text-mq-text-muted border border-mq-border text-[11px] hover:border-mq-primary'
-                        }`}
-                      >
-                        {isDone ? <Check size={12} strokeWidth={3} /> : q.stepNumber}
-                      </button>
-
-                      {idx < PRACTICE_QUESTIONS.length - 1 && (
-                        <div
-                          className={`flex-1 h-0.5 mx-1 rounded-full transition-colors ${
-                            isDone ? 'bg-mq-primary' : 'bg-mq-border'
-                          }`}
-                        />
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </div>
-            </div>
+                  {idx < PRACTICE_QUESTIONS.length - 1 && (
+                    <div
+                      className={`flex-1 h-1 mx-1.5 rounded-full transition-colors ${
+                        isDone ? 'bg-mq-success' : 'bg-mq-border'
+                      }`}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
 
-        {/* 2. Compact Main Math Equation Card */}
-        <div className="bg-white rounded-2xl border border-mq-border shadow-xs overflow-hidden">
-          <div className="h-1.5 w-full bg-gradient-to-r from-mq-primary-dark via-mq-primary to-mq-secondary" />
+        {isSessionComplete ? (
+          /* =================================================== */
+          /* 10-QUESTION SESSION COMPLETED SUMMARY CARD          */
+          /* =================================================== */
+          <div className="bg-white rounded-2xl border border-mq-border shadow-xs overflow-hidden animate-fade-in">
+            <div className="h-1.5 w-full bg-gradient-to-r from-mq-success via-mq-secondary to-mq-primary" />
 
-          <div className="py-4 sm:py-5 px-5 text-center space-y-2">
-            <div className="text-4xl sm:text-5xl font-extrabold text-mq-text-strong tracking-wider flex items-center justify-center gap-3 sm:gap-5 select-none">
-              <span>{activeQuestion.num1}</span>
-              <span className="text-mq-primary">{activeQuestion.operator}</span>
-              <span>{activeQuestion.num2}</span>
-              <span>=</span>
-              <span
-                className={`inline-flex items-center justify-center min-w-[1.2em] px-2.5 py-0.5 rounded-xl transition-all ${
-                  answerFeedback === 'correct'
-                    ? 'bg-mq-success-bg text-mq-success border-2 border-mq-success/40'
-                    : answerFeedback === 'wrong'
-                    ? 'bg-mq-danger-bg text-mq-danger border-2 border-mq-danger/40'
-                    : 'text-mq-border-strong'
-                }`}
-              >
-                {selectedOption !== null ? selectedOption : '?'}
-              </span>
+            <div className="p-6 sm:p-8 text-center space-y-5">
+              <div className="w-16 h-16 rounded-3xl bg-mq-surface-green border border-mq-secondary/40 flex items-center justify-center mx-auto text-mq-success shadow-xs">
+                <Trophy size={32} />
+              </div>
+
+              <div className="space-y-1.5">
+                <h2 className="text-xl sm:text-2xl font-extrabold text-mq-success sinhala">
+                  ප්‍රශ්න 10 ම සාර්ථකව අවසන්! 🎉
+                </h2>
+                <p className="text-xs sm:text-sm text-mq-text-muted sinhala">
+                  ප්‍රශ්න 10 තුළ ඔබේ සමස්ත BKT ප්‍රගුණතා මට්ටම සහ FSM ප්‍රතිඵල පහතින් බලන්න:
+                </p>
+              </div>
+
+              {/* 3 Cumulative BKT & Hint Metric Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-lg mx-auto">
+                <div className="p-3.5 rounded-2xl bg-mq-surface-green border border-mq-secondary/40">
+                  <p className="text-[11px] font-bold text-mq-text-muted uppercase">
+                    Hint-Aware P(L)
+                  </p>
+                  <p className="text-2xl font-extrabold text-mq-success mt-0.5">
+                    {Math.round(bktComparison.hintAwareKnowledge * 100)}%
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-mq-surface-blue border border-mq-primary/25">
+                  <p className="text-[11px] font-bold text-mq-text-muted uppercase">
+                    Standard P(L)
+                  </p>
+                  <p className="text-2xl font-extrabold text-mq-primary-dark mt-0.5">
+                    {Math.round(bktComparison.standardKnowledge * 100)}%
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-mq-surface-yellow border border-mq-accent-yellow/50">
+                  <p className="text-[11px] font-bold text-mq-text-muted uppercase">Hints Used</p>
+                  <p className="text-2xl font-extrabold text-[#6E4D11] mt-0.5">
+                    {metrics.totalHintsCount}
+                  </p>
+                </div>
+              </div>
+
+              {/* Restart 10 Questions & Exit Buttons */}
+              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleRestartFullSession}
+                  className="btn btn-primary py-3 px-7 rounded-full text-sm font-extrabold shadow-sm hover:shadow-md inline-flex items-center gap-2.5 cursor-pointer sinhala"
+                >
+                  <RotateCcw size={16} />
+                  <span>ප්‍රශ්න 10 නැවත මුලසිට ආරම්භ කරන්න</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleExitPractice}
+                  className="btn btn-secondary py-3 px-6 rounded-full text-sm font-bold inline-flex items-center gap-2 cursor-pointer sinhala"
+                >
+                  <ArrowLeft size={16} />
+                  <span>ඉවත් වන්න · Exit</span>
+                </button>
+              </div>
             </div>
+          </div>
+        ) : (
+          <>
+            {/* 2. Large, Clear Main Math Equation Card (ADHD Friendly) */}
+            <div className="bg-white rounded-3xl border border-mq-border shadow-xs overflow-hidden">
+              <div className="h-2 w-full bg-gradient-to-r from-mq-primary-dark via-mq-primary to-mq-secondary" />
 
-            {/* Visual Dots Aid when Hint Level >= 2 or Explanation is active */}
-            {(currentHintLevel >= 2 || explanationActive) && (
-              <div className="pt-1 flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-mq-primary-dark animate-fade-in">
-                <div className="flex items-center gap-1.5 bg-mq-surface-blue px-3 py-1 rounded-full border border-mq-primary/25">
-                  <span>{activeQuestion.num1}:</span>
-                  <span className="tracking-widest text-mq-primary">
-                    {'●'.repeat(activeQuestion.num1)}
+              <div className="py-6 sm:py-8 px-6 text-center space-y-3">
+                <div className="text-5xl sm:text-6xl font-extrabold text-mq-text-strong tracking-wider flex items-center justify-center gap-4 sm:gap-6 select-none">
+                  <span>{activeQuestion.num1}</span>
+                  <span className="text-mq-primary">{activeQuestion.operator}</span>
+                  <span>{activeQuestion.num2}</span>
+                  <span>=</span>
+                  <span
+                    className={`inline-flex items-center justify-center min-w-[1.3em] px-3 py-1 rounded-2xl transition-all ${
+                      answerFeedback === 'correct'
+                        ? 'bg-mq-success-bg text-mq-success border-2 border-mq-success/40'
+                        : answerFeedback === 'wrong'
+                        ? 'bg-mq-danger-bg text-mq-danger border-2 border-mq-danger/40'
+                        : 'text-mq-border-strong'
+                    }`}
+                  >
+                    {selectedOption !== null ? selectedOption : '?'}
                   </span>
                 </div>
-                <span className="text-mq-text-muted">+</span>
-                <div className="flex items-center gap-1.5 bg-mq-surface-green px-3 py-1 rounded-full border border-mq-secondary/35">
-                  <span>{activeQuestion.num2}:</span>
-                  <span className="tracking-widest text-mq-success">
-                    {'●'.repeat(activeQuestion.num2)}
-                  </span>
+
+                {/* Visual Dots Aid when Hint Level >= 2 or Explanation is active */}
+                {(currentHintLevel >= 2 || explanationActive) && (
+                  <div className="pt-1 flex flex-wrap items-center justify-center gap-2.5 text-sm font-bold text-mq-primary-dark animate-fade-in">
+                    <div className="flex items-center gap-1.5 bg-mq-surface-blue px-3.5 py-1.5 rounded-full border border-mq-primary/25">
+                      <span>{activeQuestion.num1}:</span>
+                      <span className="tracking-widest text-mq-primary">
+                        {'●'.repeat(activeQuestion.num1)}
+                      </span>
+                    </div>
+                    <span className="text-mq-text-muted">+</span>
+                    <div className="flex items-center gap-1.5 bg-mq-surface-green px-3.5 py-1.5 rounded-full border border-mq-secondary/35">
+                      <span>{activeQuestion.num2}:</span>
+                      <span className="tracking-widest text-mq-success">
+                        {'●'.repeat(activeQuestion.num2)}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 3. Large 2x2 Answer Option Cards Grid (ADHD Friendly) */}
+            <div className="grid grid-cols-2 gap-3.5 sm:gap-4">
+              {activeQuestion.options.map((opt, idx) => {
+                const style = OPTION_CARD_STYLES[idx % OPTION_CARD_STYLES.length];
+                const isSelected = selectedOption === opt;
+                const isCorrectSelection = isSelected && answerFeedback === 'correct';
+                const isWrongSelection = isSelected && answerFeedback === 'wrong';
+
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => handleSelectOption(opt)}
+                    className={`group relative h-24 sm:h-28 rounded-3xl border-2 font-extrabold text-4xl sm:text-5xl transition-all duration-150 flex items-center justify-center shadow-xs cursor-pointer ${
+                      isCorrectSelection
+                        ? 'bg-mq-success-bg border-mq-success text-mq-success ring-2 ring-mq-success/20 scale-[1.01]'
+                        : isWrongSelection
+                        ? 'bg-mq-danger-bg border-mq-danger text-mq-danger ring-2 ring-mq-danger/15'
+                        : `${style.bg} ${style.border} ${style.text} hover:-translate-y-0.5 hover:shadow-sm`
+                    }`}
+                  >
+                    <span>{opt}</span>
+
+                    {isCorrectSelection && (
+                      <span className="absolute top-3 right-3 text-mq-success">
+                        <CheckCircle2 size={22} />
+                      </span>
+                    )}
+                    {isWrongSelection && (
+                      <span className="absolute top-3 right-3 text-mq-danger">
+                        <AlertCircle size={22} />
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 4. Compact Feedback & Auto-Advance / Hint Action Bar */}
+            {answerFeedback && (
+              <div
+                className={`py-2.5 px-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-2 animate-fade-in ${
+                  answerFeedback === 'correct'
+                    ? 'bg-mq-success-bg border-mq-success/40 text-mq-text-strong'
+                    : 'bg-mq-warning-bg border-mq-warning/40 text-mq-text-strong'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl">{answerFeedback === 'correct' ? '🎉' : '💡'}</span>
+                  <div>
+                    <p className="text-xs sm:text-sm font-extrabold sinhala leading-snug">
+                      {answerFeedback === 'correct'
+                        ? currentQuestionIdx < PRACTICE_QUESTIONS.length - 1
+                          ? 'නිවැරදියි! තරු +25 සහ කාසි +10 ක් ලැබුණා! ඊළඟ ප්‍රශ්නයට යමින්...'
+                          : 'නිවැරදියි! ප්‍රශ්න 10 ම සාර්ථකයි!'
+                        : 'තව පොඩ්ඩක් හිතලා බලමු! දකුණු පසින් උදව්වක් ගන්නත් පුළුවන්.'}
+                    </p>
+                    <p className="text-[11px] text-mq-text-muted">
+                      {answerFeedback === 'correct'
+                        ? `Concept Mastery P(L): ${bktConfidencePct}%`
+                        : `Active Pedagogical State: ${fsmDecision.fsmState}`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {answerFeedback === 'wrong' && (
+                    <button
+                      type="button"
+                      onClick={handleGetHint}
+                      className="btn btn-secondary text-xs py-1.5 px-3.5 rounded-full font-bold"
+                    >
+                      <Lightbulb size={13} />
+                      <span>Get Hint</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleNextQuestion}
+                    className="btn btn-primary text-xs py-1.5 px-4 rounded-full font-bold inline-flex items-center gap-1.5"
+                  >
+                    <span>Next Question</span>
+                    <ArrowRight size={13} />
+                  </button>
                 </div>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* 3. Compact 2x2 Answer Option Cards Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          {activeQuestion.options.map((opt, idx) => {
-            const style = OPTION_CARD_STYLES[idx % OPTION_CARD_STYLES.length];
-            const isSelected = selectedOption === opt;
-            const isCorrectSelection = isSelected && answerFeedback === 'correct';
-            const isWrongSelection = isSelected && answerFeedback === 'wrong';
-
-            return (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => handleSelectOption(opt)}
-                className={`group relative h-20 sm:h-22 rounded-2xl border-2 font-extrabold text-3xl sm:text-4xl transition-all duration-150 flex items-center justify-center shadow-xs cursor-pointer ${
-                  isCorrectSelection
-                    ? 'bg-mq-success-bg border-mq-success text-mq-success ring-2 ring-mq-success/20 scale-[1.01]'
-                    : isWrongSelection
-                    ? 'bg-mq-danger-bg border-mq-danger text-mq-danger ring-2 ring-mq-danger/15'
-                    : `${style.bg} ${style.border} ${style.text} hover:-translate-y-0.5 hover:shadow-sm`
-                }`}
-              >
-                <span>{opt}</span>
-
-                {isCorrectSelection && (
-                  <span className="absolute top-2.5 right-2.5 text-mq-success">
-                    <CheckCircle2 size={18} />
-                  </span>
-                )}
-                {isWrongSelection && (
-                  <span className="absolute top-2.5 right-2.5 text-mq-danger">
-                    <AlertCircle size={18} />
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* 4. Compact Feedback & Next Question Action Bar */}
-        {answerFeedback && (
-          <div
-            className={`py-2.5 px-4 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-2 animate-fade-in ${
-              answerFeedback === 'correct'
-                ? 'bg-mq-success-bg border-mq-success/40 text-mq-text-strong'
-                : 'bg-mq-warning-bg border-mq-warning/40 text-mq-text-strong'
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <span className="text-xl">{answerFeedback === 'correct' ? '🎉' : '💡'}</span>
-              <div>
-                <p className="text-xs sm:text-sm font-extrabold sinhala leading-snug">
-                  {answerFeedback === 'correct'
-                    ? 'නිවැරදියි! ඔයාට තරු +25 සහ කාසි +10 ක් ලැබුණා!'
-                    : 'තව පොඩ්ඩක් හිතලා බලමු! දකුණු පසින් උදව්වක් ගන්නත් පුළුවන්.'}
-                </p>
-                <p className="text-[11px] text-mq-text-muted">
-                  {answerFeedback === 'correct'
-                    ? `Concept Mastery P(L): ${bktConfidencePct}%`
-                    : `Active Pedagogical State: ${fsmDecision.fsmState}`}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              {answerFeedback === 'wrong' && (
-                <button
-                  type="button"
-                  onClick={handleGetHint}
-                  className="btn btn-secondary text-xs py-1.5 px-3.5 rounded-full font-bold"
-                >
-                  <Lightbulb size={13} />
-                  <span>Get Hint</span>
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={handleNextQuestion}
-                className="btn btn-primary text-xs py-1.5 px-4 rounded-full font-bold inline-flex items-center gap-1.5"
-              >
-                <span>Next Question</span>
-                <ArrowRight size={13} />
-              </button>
-            </div>
-          </div>
+          </>
         )}
 
         {/* Optional Live BKT & FSM Research HUD */}

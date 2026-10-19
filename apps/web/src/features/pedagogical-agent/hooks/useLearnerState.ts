@@ -164,7 +164,18 @@ export function useLearnerState({
     async (interactions: InteractionEvent[]) => {
       if (!interactions || interactions.length === 0) return null;
 
-      // 1. Update BKT comparative model
+      const newestEvent = interactions[interactions.length - 1];
+      const isPassiveQuestionLoad =
+        newestEvent?.eventType === 'QUESTION_VIEW' &&
+        !newestEvent.idleTimeBeforeFirstActionMs &&
+        !newestEvent.responseTimeMs;
+
+      // Do not overwrite active BKT/FSM state when auto-advancing to the next question
+      if (isPassiveQuestionLoad && interactions.length > 1) {
+        return null;
+      }
+
+      // 1. Update BKT comparative model across all answered questions
       const bktResult = computeBKTComparison(interactions);
       setBktComparison(bktResult);
 
@@ -185,8 +196,18 @@ export function useLearnerState({
           setLearnerState(state);
 
           // 3. Evaluate FSM Decision Engine with full learner and BKT metrics
-          const lastEvent = interactions[interactions.length - 1];
-          const lastIsCorrect = lastEvent?.eventType === 'ANSWER_SUBMIT' ? lastEvent.isCorrect : null;
+          const actionable = interactions.filter(
+            (ev) =>
+              ev.eventType !== 'QUESTION_VIEW' ||
+              (ev.idleTimeBeforeFirstActionMs && ev.idleTimeBeforeFirstActionMs > 0) ||
+              (ev.responseTimeMs && ev.responseTimeMs > 0)
+          );
+          const lastEvent =
+            actionable.length > 0
+              ? actionable[actionable.length - 1]
+              : interactions[interactions.length - 1];
+          const lastIsCorrect =
+            lastEvent?.eventType === 'ANSWER_SUBMIT' ? lastEvent.isCorrect : null;
 
           const fsmContext = {
             consecutiveErrors: state.metrics.consecutiveErrors,

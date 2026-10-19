@@ -508,6 +508,16 @@ class MathAssessmentSummary(BaseModel):
         default=None,
         description="Counts of answered, unanswered, skipped, invalid and excluded items, and evidence-quality flags"
     )
+    evaluatedItems: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description="Detailed evaluated item records (ASSESS-EVIDENCE-v1.0)"
+    )
+    excludedItems: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description="Detailed excluded item records (ASSESS-EVIDENCE-v1.0)"
+    )
+    sessionStartedAt: Optional[Union[datetime, str]] = Field(default=None)
+    sessionEndedAt: Optional[Union[datetime, str]] = Field(default=None)
 
 
 # --- 8. Onboarding State & Aggregated Summary ---

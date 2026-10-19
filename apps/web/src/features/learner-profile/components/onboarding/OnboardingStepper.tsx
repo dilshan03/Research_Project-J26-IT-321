@@ -18,6 +18,8 @@ interface StepperProps {
   currentStep: OnboardingStepKey;
   completedSteps: string[];
   onSelectStep?: (step: OnboardingStepKey) => void;
+  /** Steps not asked for this learner (e.g. SNAP-IV when the parent reported the ADHD type). */
+  hiddenSteps?: OnboardingStepKey[];
 }
 
 interface StepItem {
@@ -68,14 +70,16 @@ export const OnboardingStepper: React.FC<StepperProps> = ({
   currentStep,
   completedSteps,
   onSelectStep,
+  hiddenSteps,
 }) => {
   const shouldReduceMotion = useReducedMotion();
-  const currentIdx = STEPS.findIndex((s) => s.key === currentStep);
+  const steps = hiddenSteps?.length ? STEPS.filter((s) => !hiddenSteps.includes(s.key)) : STEPS;
+  const currentIdx = steps.findIndex((s) => s.key === currentStep);
 
   return (
     <div className="w-full bg-white rounded-3xl border border-mq-border p-4 sm:p-5 shadow-xs">
       <div className="flex items-center justify-between gap-1 sm:gap-2 overflow-x-auto pb-1 scrollbar-none">
-        {STEPS.map((step, idx) => {
+        {steps.map((step, idx) => {
           const Icon = step.icon;
           const isCompleted = completedSteps.includes(step.key) || idx < currentIdx;
           const isCurrent = step.key === currentStep;
@@ -133,7 +137,7 @@ export const OnboardingStepper: React.FC<StepperProps> = ({
               </div>
 
               {/* Animated Connector Bar */}
-              {idx < STEPS.length - 1 && (
+              {idx < steps.length - 1 && (
                 <div className="hidden sm:block h-[3px] flex-1 bg-mq-border rounded-full -mt-5 overflow-hidden">
                   <motion.div
                     className="h-full bg-mq-success rounded-full"

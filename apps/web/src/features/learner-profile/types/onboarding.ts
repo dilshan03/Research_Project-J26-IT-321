@@ -53,6 +53,14 @@ export interface AdhdInformationRecord {
   savedAt: string;
 }
 
+/**
+ * True when the parent reported a professional diagnosis with a specific ADHD type.
+ * SNAP-IV is then not asked during onboarding (mirrors the backend resolver); it stays
+ * optional from the parent dashboard.
+ */
+export const isAdhdTypeReported = (adhd: AdhdInformationRecord | null | undefined): boolean =>
+  Boolean(adhd && adhd.diagnosisStatus === 'yes' && adhd.reportedPresentation && adhd.reportedPresentation !== 'not_specified');
+
 export type SnapIvStatus = 'COMPLETED' | 'SKIPPED' | 'NOT_STARTED';
 
 export const ADHD_DIAGNOSIS_STATUS_OPTIONS: Array<{
@@ -348,6 +356,12 @@ export interface MathAssessmentSummary {
   impsa?: ImpsaSummary;
   imlr?: ImlrSummary;
   childPreferences?: ChildPreferenceChoices;
+  evaluatedItems?: any[];
+  excludedItems?: any[];
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
+  evidenceRulesetVersion?: string;
+  evidenceSummary?: any;
 }
 
 

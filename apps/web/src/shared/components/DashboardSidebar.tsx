@@ -9,7 +9,7 @@ import {
 } from './sidebar/sidebarConfig';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import { parentText } from '../i18n/parentText';
-import { PARENT_GROUP_TITLES, PARENT_ROUTE_LABELS } from '../i18n/parentNav';
+import { PARENT_GROUP_TITLES, PARENT_PRIMARY_PATHS, PARENT_ROUTE_LABELS } from '../i18n/parentNav';
 
 interface DashboardSidebarProps {
   role: 'parent' | 'teacher';
@@ -93,6 +93,72 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     return current === item.path || current.startsWith(`${item.path}/`);
   };
 
+  const renderNavItem = (item: NavItemConfig) => {
+    const active = isItemActive(item);
+    const Icon = item.icon;
+
+    return (
+      <NavLink
+        key={item.id}
+        to={item.path}
+        aria-current={active ? 'page' : undefined}
+        className={`group relative flex items-center gap-3 px-3 rounded-2xl font-semibold transition-all duration-150 ${
+          isParent ? 'min-h-[44px] py-2 text-base' : 'py-2.5 text-xs'
+        } ${
+          active
+            ? 'bg-mq-primary text-white shadow-sm shadow-mq-primary/25 font-bold'
+            : 'text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary'
+        }`}
+      >
+        <Icon
+          size={isParent ? 19 : 17}
+          className={`shrink-0 transition-colors ${
+            active ? 'text-white' : 'text-mq-text-muted group-hover:text-mq-primary'
+          }`}
+        />
+        <span className={`flex-1 ${isParent ? 'leading-snug' : 'truncate'}`}>{itemLabel(item)}</span>
+
+        {item.badge && (
+          <span
+            className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+              active ? 'bg-white/20 text-white' : 'bg-mq-surface-blue text-mq-primary'
+            }`}
+          >
+            {item.badge}
+          </span>
+        )}
+      </NavLink>
+    );
+  };
+
+  // Parent menu: five main destinations, every other existing page kept under "More".
+  const parentItems = groups.flatMap((g) => g.items);
+  const parentPrimary = PARENT_PRIMARY_PATHS.map((p) => parentItems.find((i) => i.path === p)).filter(
+    (i): i is NavItemConfig => Boolean(i)
+  );
+  const parentMore = parentItems.filter((i) => !PARENT_PRIMARY_PATHS.includes(i.path));
+  const moreHasActive = parentMore.some(isItemActive);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+
+  const renderParentNav = () => (
+    <nav aria-label={parentText.shell.navigation} className="space-y-1">
+      {parentPrimary.map(renderNavItem)}
+      <button
+        type="button"
+        onClick={() => setIsMoreOpen((open) => !open)}
+        aria-expanded={isMoreOpen || moreHasActive}
+        className="w-full flex items-center justify-between gap-3 px-3 min-h-[44px] rounded-2xl text-base font-semibold text-mq-text-muted hover:bg-mq-surface-soft hover:text-mq-primary cursor-pointer"
+      >
+        <span>{parentText.nav.more}</span>
+        <ChevronDown
+          size={16}
+          className={`transition-transform ${isMoreOpen || moreHasActive ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {(isMoreOpen || moreHasActive) && <div className="space-y-1 pl-2">{parentMore.map(renderNavItem)}</div>}
+    </nav>
+  );
+
   const renderNavContent = () => (
     <div className="flex flex-col h-full overflow-y-auto px-4 py-4 space-y-6">
       {/* Role & User Indicator Card */}
@@ -116,6 +182,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       </div>
 
       {/* Navigation Groups */}
+      {isParent ? renderParentNav() : (
       <div className="space-y-5">
         {groups.map((group) => {
           const isCollapsed = !!collapsedGroups[group.id];
@@ -141,52 +208,14 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 
               {!isCollapsed && (
                 <div className="space-y-1">
-                  {group.items.map((item) => {
-                    const active = isItemActive(item);
-                    const Icon = item.icon;
-
-                    return (
-                      <NavLink
-                        key={item.id}
-                        to={item.path}
-                        className={`group relative flex items-center gap-3 px-3 rounded-2xl font-semibold transition-all duration-150 ${
-                          isParent ? 'min-h-[44px] py-2 text-sm' : 'py-2.5 text-xs'
-                        } ${
-                          active
-                            ? 'bg-mq-primary text-white shadow-sm shadow-mq-primary/25 font-bold'
-                            : 'text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary'
-                        }`}
-                      >
-                        <Icon
-                          size={17}
-                          className={`shrink-0 transition-colors ${
-                            active
-                              ? 'text-white'
-                              : 'text-mq-text-muted group-hover:text-mq-primary'
-                          }`}
-                        />
-                        <span className={`flex-1 ${isParent ? 'leading-snug' : 'truncate'}`}>{itemLabel(item)}</span>
-
-                        {item.badge && (
-                          <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                              active
-                                ? 'bg-white/20 text-white'
-                                : 'bg-mq-surface-blue text-mq-primary'
-                            }`}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                      </NavLink>
-                    );
-                  })}
+                  {group.items.map(renderNavItem)}
                 </div>
               )}
             </div>
           );
         })}
       </div>
+      )}
 
       {/* Research Component Info Footer */}
       <div className="mt-auto pt-4 border-t border-mq-border/80">

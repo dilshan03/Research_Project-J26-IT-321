@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -6,7 +6,7 @@ import { SkeletonUtils } from 'three-stdlib';
 import { extractBones } from './boneMap';
 import { useAgentStore } from '../store/useAgentStore';
 import * as actions from '../actions';
-import type { AgentConfig, ActionContext } from '../types/agent.types';
+import type { ActionContext } from '../types/agent.types';
 import { getAgentConfig } from '../agents/registry';
 
 interface AgentModelProps {
@@ -111,7 +111,7 @@ export function AgentModel({ agentId }: AgentModelProps) {
     
     clonedScene.traverse((obj: any) => {
       if (obj.isMesh && obj.morphTargetDictionary && obj.morphTargetInfluences) {
-        const blinkKey = config.face.blinkMorph || Object.keys(obj.morphTargetDictionary).find(k => k.toLowerCase().includes('blink') || k.toLowerCase().includes('eye_closed'));
+        const blinkKey = config.face?.blinkMorph || Object.keys(obj.morphTargetDictionary).find(k => k.toLowerCase().includes('blink') || k.toLowerCase().includes('eye_closed'));
         if (blinkKey) {
           const targetIndex = obj.morphTargetDictionary[blinkKey];
           obj.morphTargetInfluences[targetIndex] = THREE.MathUtils.lerp(

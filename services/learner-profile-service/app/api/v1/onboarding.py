@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, status
 
 from app.core.auth import require_parent
 from app.schemas.onboarding import (
+    AdhdInformationRequest,
     LearningPreferencesRequest,
     SnapIvSubmissionRequest,
     SocialContextRequest,
@@ -11,8 +12,10 @@ from app.schemas.onboarding import (
 )
 from app.services.onboarding_service import (
     get_or_create_onboarding_progress,
+    save_adhd_information,
     save_learning_preferences,
     save_snap_iv_questionnaire,
+    skip_snap_iv_questionnaire,
     save_social_context,
     get_math_questions_for_learner,
     submit_math_assessment,
@@ -58,6 +61,54 @@ async def save_preferences_endpoint(
         learner_id=learnerId,
         parent_id=current_parent["id"],
         data=data,
+    )
+    return OnboardingApiResponse(
+        success=True,
+        message=result["message"],
+        data=result,
+    )
+
+
+@router.post(
+    "/adhd-information",
+    response_model=OnboardingApiResponse,
+    summary="Save Parent-Reported ADHD Information",
+    description=(
+        "Records whether a qualified healthcare professional has diagnosed ADHD, as reported by the parent, "
+        "and the reported presentation when applicable. Stored as unverified parent-reported information, "
+        "separate from SNAP-IV screening, gameplay observations and mathematics evidence."
+    ),
+)
+async def save_adhd_information_endpoint(
+    learnerId: str,
+    data: AdhdInformationRequest,
+    current_parent: Dict[str, Any] = Depends(require_parent),
+):
+    result = await save_adhd_information(
+        learner_id=learnerId,
+        parent_id=current_parent["id"],
+        data=data,
+    )
+    return OnboardingApiResponse(
+        success=True,
+        message=result["message"],
+        data=result,
+    )
+
+
+@router.post(
+    "/snap-iv/skip",
+    response_model=OnboardingApiResponse,
+    summary="Skip Optional SNAP-IV Questionnaire",
+    description="Records that the optional SNAP-IV questionnaire was skipped for now. Existing responses are never removed.",
+)
+async def skip_snap_iv_endpoint(
+    learnerId: str,
+    current_parent: Dict[str, Any] = Depends(require_parent),
+):
+    result = await skip_snap_iv_questionnaire(
+        learner_id=learnerId,
+        parent_id=current_parent["id"],
     )
     return OnboardingApiResponse(
         success=True,

@@ -63,11 +63,12 @@ async def ingest_gameplay_activity_evidence(
     - Persists gameplay events distinctly from baseline assessment.
     - Returns ingestion counts and latest profile summary.
     """
-    # Verify learner exists and authorization if parent caller
+    # Verify learner exists, active status, and authorization if parent caller
     learner = await get_learner_by_id(
         learner_id=learner_id,
         parent_id=caller_parent_id if caller_role == "parent" else None,
         user_role=caller_role,
+        allow_archived=False,
     )
 
     events_col = get_gameplay_events_collection()
@@ -183,13 +184,21 @@ async def get_learner_elpx_profile(
 
     if baseline_doc and "evaluatedItems" in baseline_doc:
         for it in baseline_doc["evaluatedItems"]:
+            if "includedInProficiencyEstimate" in it:
+                # ASSESS-EVIDENCE-v1.0 records: independent first responses only, server-derived correctness
+                if not it["includedInProficiencyEstimate"]:
+                    continue
+                first_correct = bool(it.get("correctFirstResponse"))
+            else:
+                # Legacy records: unchanged historical behaviour
+                first_correct = it.get("isCorrect", False)
             evaluated_items.append({
                 "questionId": it.get("questionId"),
                 "skillId": it.get("skillId", "general"),
                 "skillName": it.get("skillName", "General"),
                 "skillNameSi": it.get("skillNameSi", "සාමාන්‍ය"),
                 "isCorrect": it.get("isCorrect", False),
-                "correctFirstResponse": it.get("isCorrect", False),
+                "correctFirstResponse": first_correct,
                 "attempts": it.get("attempts", 1),
                 "hintsUsed": 1 if it.get("hintUsed") else 0,
                 "responseTime": it.get("responseTimeSeconds", 0.0),

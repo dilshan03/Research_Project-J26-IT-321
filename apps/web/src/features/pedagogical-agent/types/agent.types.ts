@@ -21,10 +21,12 @@ export interface AgentConfig {
     pitch: number;
     waveType: OscillatorType;
   };
-  face: {
+  face?: {
     blinkMorph?: string;
   };
 }
+
+export type AgentAnimation = AgentActionName;
 
 export interface ActionContext {
   intensity: number;

@@ -8,7 +8,7 @@ import {
   useLearnerState,
   useAgentStore,
 } from '../../features/pedagogical-agent';
-import type { InteractionEvent, HintLevel } from '../../features/pedagogical-agent';
+import type { InteractionEvent } from '../../features/pedagogical-agent';
 
 interface TestQuestion {
   id: string;

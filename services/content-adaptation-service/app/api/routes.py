@@ -50,8 +50,12 @@ def create_blueprint(req: GenerateBlueprintRequest):
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
-    env = BlueprintEnvelope(cli_score=round(cli, 2), raw_sinhala_question=req.raw_sinhala_question,
-                            blueprint=blueprint)
+    env = BlueprintEnvelope(
+        cli_score=round(cli, 2),
+        raw_sinhala_question=req.raw_sinhala_question,
+        raw_english_question=blueprint.raw_english_question,
+        blueprint=blueprint,
+    )
     return repository.save(env)
 
 

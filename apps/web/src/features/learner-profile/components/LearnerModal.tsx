@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { X, Loader2, Sparkles, AlertCircle, Check } from 'lucide-react';
-import type { Learner, CreateLearnerData, UpdateLearnerData } from '../types';
+import { Loader2, UserPlus, UserPen, AlertCircle, Check, Languages, Info } from 'lucide-react';
+import type {
+  Learner,
+  CreateLearnerData,
+  UpdateLearnerData,
+  LanguageComprehensionLevel,
+  PrimaryInstructionLanguage,
+} from '../types';
 import { AVATAR_OPTIONS } from '../types';
+import { parentText } from '../../../shared/i18n/parentText';
+import { ParentModalShell } from './parent/ParentModalShell';
+import { comprehensionLabel } from './parent/labels';
 
 interface LearnerModalProps {
   isOpen: boolean;
@@ -9,6 +18,48 @@ interface LearnerModalProps {
   onSubmit: (data: CreateLearnerData | UpdateLearnerData) => Promise<boolean>;
   editingLearner?: Learner | null;
 }
+
+// Stored values stay in English; only their display labels are localized.
+const COMPREHENSION_LEVELS: { level: LanguageComprehensionLevel; dots: number }[] = [
+  { level: 'Understands a little', dots: 1 },
+  { level: 'Understands basic instructions', dots: 2 },
+  { level: 'Understands well', dots: 3 },
+];
+
+const LANGUAGE_IDS = ['Sinhala', 'English', 'Bilingual'] as const;
+const AGES = [6, 7, 8, 9, 10];
+const GRADES = [1, 2, 3, 4, 5];
+
+const t = parentText.childForm;
+
+const choiceClass = (isSelected: boolean) =>
+  `rounded-xl border font-semibold transition-colors cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-mq-primary/40 ${
+    isSelected
+      ? 'bg-mq-surface-blue border-mq-primary text-mq-primary ring-1 ring-mq-primary/30'
+      : 'bg-white border-mq-border text-mq-text hover:border-mq-primary/50'
+  }`;
+
+const inputClass = (hasError: boolean) =>
+  `w-full py-3 px-4 rounded-xl border text-base outline-hidden transition-colors ${
+    hasError
+      ? 'border-mq-danger focus:ring-2 focus:ring-mq-danger/20'
+      : 'border-mq-border focus:border-mq-primary focus:ring-2 focus:ring-mq-primary/20'
+  }`;
+
+const FieldLabel: React.FC<{ htmlFor?: string; required?: boolean; hint?: string; children: React.ReactNode }> = ({
+  htmlFor,
+  required,
+  hint,
+  children,
+}) => (
+  <div className="flex items-baseline justify-between gap-3 mb-2">
+    <label htmlFor={htmlFor} className="text-sm font-semibold text-mq-text-strong">
+      {children}
+      {required && <span className="text-mq-danger ml-0.5">*</span>}
+    </label>
+    {hint && <span className="text-xs text-mq-text-muted shrink-0">{hint}</span>}
+  </div>
+);
 
 export const LearnerModal: React.FC<LearnerModalProps> = ({
   isOpen,
@@ -23,6 +74,10 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
   const [age, setAge] = useState<number>(7);
   const [grade, setGrade] = useState<number>(2);
   const [preferredLanguage, setPreferredLanguage] = useState<string>('Sinhala');
+  const [sinhalaComprehension, setSinhalaComprehension] = useState<string>('');
+  const [englishComprehension, setEnglishComprehension] = useState<string>('');
+  const [primaryInstructionLanguage, setPrimaryInstructionLanguage] =
+    useState<PrimaryInstructionLanguage>('Sinhala');
   const [avatarId, setAvatarId] = useState<string>('avatar_lion');
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -33,9 +88,14 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
     if (editingLearner) {
       setFirstName(editingLearner.firstName || '');
       setPreferredName(editingLearner.preferredName || '');
-      setAge(editingLearner.age || 7);
-      setGrade(editingLearner.grade || 2);
+      setAge(typeof editingLearner.age === 'number' ? editingLearner.age : 7);
+      setGrade(typeof editingLearner.grade === 'number' ? editingLearner.grade : 2);
       setPreferredLanguage(editingLearner.preferredLanguage || 'Sinhala');
+      setSinhalaComprehension(editingLearner.sinhalaComprehension || '');
+      setEnglishComprehension(editingLearner.englishComprehension || '');
+      setPrimaryInstructionLanguage(
+        (editingLearner.primaryInstructionLanguage as PrimaryInstructionLanguage) || 'Sinhala'
+      );
       setAvatarId(editingLearner.avatarId || 'avatar_lion');
     } else {
       setFirstName('');
@@ -43,6 +103,9 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
       setAge(7);
       setGrade(2);
       setPreferredLanguage('Sinhala');
+      setSinhalaComprehension('');
+      setEnglishComprehension('');
+      setPrimaryInstructionLanguage('Sinhala');
       setAvatarId('avatar_lion');
     }
     setFormErrors({});
@@ -55,17 +118,18 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
     const errors: Record<string, string> = {};
 
     if (!firstName.trim()) {
-      errors.firstName = 'දරුවාගේ නම ඇතුළත් කරන්න (First name is required).';
+      errors.firstName = t.errorFirstNameRequired;
     } else if (firstName.trim().length < 2) {
-      errors.firstName = 'නම අකුරු 2කට වඩා වැඩි විය යුතුය (At least 2 characters).';
+      errors.firstName = t.errorFirstNameShort;
     }
 
+    // Age and Grade remain strictly independent
     if (age < 6 || age > 10) {
-      errors.age = 'වයස අවුරුදු 6 ත් 10 ත් අතර විය යුතුය (Age must be between 6 and 10).';
+      errors.age = t.errorAge;
     }
 
     if (grade < 1 || grade > 5) {
-      errors.grade = 'ශ්‍රේණිය 1 සිට 5 දක්වා විය යුතුය (Grade must be 1 to 5).';
+      errors.grade = t.errorGrade;
     }
 
     setFormErrors(errors);
@@ -80,247 +144,271 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
 
     setIsSubmitting(true);
     try {
+      const isBilingual = preferredLanguage === 'Bilingual';
       const payload: CreateLearnerData | UpdateLearnerData = {
         firstName: firstName.trim(),
         preferredName: preferredName.trim() || undefined,
         age,
         grade,
         preferredLanguage,
+        sinhalaComprehension: isBilingual && sinhalaComprehension ? sinhalaComprehension : undefined,
+        englishComprehension: isBilingual && englishComprehension ? englishComprehension : undefined,
+        primaryInstructionLanguage: isBilingual ? primaryInstructionLanguage : undefined,
         avatarId,
       };
 
       const success = await onSubmit(payload);
       if (success) {
         onClose();
+      } else {
+        setSubmitError(parentText.common.saveFailed);
       }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to save child profile.';
-      setSubmitError(msg);
+    } catch {
+      setSubmitError(parentText.common.saveFailed);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const renderComprehension = (
+    value: string,
+    setValue: React.Dispatch<React.SetStateAction<string>>,
+    label: string
+  ) => (
+    <div>
+      <FieldLabel hint={parentText.common.optional}>{label}</FieldLabel>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        {COMPREHENSION_LEVELS.map((opt) => {
+          const isSelected = value === opt.level;
+          return (
+            <button
+              key={opt.level}
+              type="button"
+              aria-pressed={isSelected}
+              onClick={() => setValue((prev) => (prev === opt.level ? '' : opt.level))}
+              className={`${choiceClass(isSelected)} min-h-[48px] px-3 py-2 text-sm text-left flex items-center justify-between gap-2`}
+            >
+              <span className="leading-snug">{comprehensionLabel(opt.level)}</span>
+              <span className="flex items-center gap-0.5 shrink-0" aria-hidden="true">
+                {[1, 2, 3].map((d) => (
+                  <span
+                    key={d}
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      d <= opt.dots ? (isSelected ? 'bg-mq-primary' : 'bg-mq-text-muted') : 'bg-mq-border'
+                    }`}
+                  />
+                ))}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/40 backdrop-blur-xs animate-fade-in">
-      <div
-        className="w-full max-w-xl bg-white rounded-3xl border border-mq-border shadow-xl overflow-hidden flex flex-col max-h-[92vh] animate-scale-up"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div className="p-5 sm:p-6 bg-mq-surface-soft border-b border-mq-border/70 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-mq-surface-blue text-mq-primary flex items-center justify-center font-bold">
-              <Sparkles size={20} />
-            </div>
-            <div>
-              <h2 className="text-base sm:text-lg font-bold text-mq-text-strong font-sinhala">
-                {isEditing ? 'දරුවාගේ තොරතුරු සංස්කරණය' : 'නව දරුවෙකු ලියාපදිංචි කිරීම'}
-              </h2>
-              <p className="text-xs text-mq-text-muted">
-                {isEditing ? 'Edit Child Learner Profile' : 'Register Child Learner Profile'}
-              </p>
-            </div>
-          </div>
+    <ParentModalShell
+      isOpen={isOpen}
+      size="lg"
+      title={isEditing ? t.editTitle : t.createTitle}
+      subtitle={isEditing ? t.editSubtitle : t.createSubtitle}
+      icon={isEditing ? <UserPen size={22} /> : <UserPlus size={22} />}
+      onClose={onClose}
+      isBusy={isSubmitting}
+      onSubmit={handleSubmit}
+      footer={
+        <>
           <button
+            type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="p-2 rounded-xl text-mq-text-muted hover:text-mq-primary hover:bg-white border border-transparent hover:border-mq-border transition-colors"
-            aria-label="Close modal"
+            className="btn btn-secondary min-h-[44px] px-5 rounded-full text-sm w-full sm:w-auto"
           >
-            <X size={18} />
+            {parentText.common.cancel}
           </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="btn btn-primary min-h-[44px] px-6 rounded-full text-sm w-full sm:w-auto inline-flex items-center justify-center gap-2"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                <span>{parentText.common.saving}</span>
+              </>
+            ) : (
+              <span>{isEditing ? t.saveEdit : t.saveNew}</span>
+            )}
+          </button>
+        </>
+      }
+    >
+      <div className="space-y-6">
+        {submitError && (
+          <div role="alert" className="p-3.5 bg-mq-danger-bg border border-mq-danger/30 rounded-xl flex items-start gap-2.5 text-sm text-mq-danger">
+            <AlertCircle size={18} className="shrink-0 mt-0.5" />
+            <span>{submitError}</span>
+          </div>
+        )}
+
+        {/* Avatar */}
+        <fieldset>
+          <legend className="text-sm font-semibold text-mq-text-strong mb-2">{t.avatar}</legend>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
+            {AVATAR_OPTIONS.map((item) => {
+              const isSelected = avatarId === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => setAvatarId(item.id)}
+                  className={`${choiceClass(isSelected)} relative min-h-[88px] p-2 flex flex-col items-center justify-center gap-1`}
+                >
+                  <span className="text-3xl leading-none" aria-hidden="true">{item.icon}</span>
+                  <span className="text-xs font-medium text-mq-text leading-tight text-center">{item.nameSi}</span>
+                  {isSelected && (
+                    <span className="absolute top-1.5 right-1.5 w-5 h-5 bg-mq-primary text-white rounded-full flex items-center justify-center">
+                      <Check size={12} strokeWidth={3} />
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        {/* Names */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div>
+            <FieldLabel htmlFor="child-first-name" required>{t.firstName}</FieldLabel>
+            <input
+              id="child-first-name"
+              type="text"
+              value={firstName}
+              onChange={(e) => {
+                setFirstName(e.target.value);
+                if (formErrors.firstName) {
+                  setFormErrors((prev) => ({ ...prev, firstName: '' }));
+                }
+              }}
+              placeholder={t.firstNamePlaceholder}
+              aria-invalid={Boolean(formErrors.firstName)}
+              className={inputClass(Boolean(formErrors.firstName))}
+            />
+            {formErrors.firstName && <p className="text-sm text-mq-danger mt-1.5">{formErrors.firstName}</p>}
+          </div>
+          <div>
+            <FieldLabel htmlFor="child-preferred-name" hint={parentText.common.optional}>
+              {t.preferredName}
+            </FieldLabel>
+            <input
+              id="child-preferred-name"
+              type="text"
+              value={preferredName}
+              onChange={(e) => setPreferredName(e.target.value)}
+              placeholder={t.preferredNamePlaceholder}
+              className={inputClass(false)}
+            />
+          </div>
         </div>
 
-        {/* Modal Body: Scrollable Form */}
-        <form onSubmit={handleSubmit} className="p-5 sm:p-6 overflow-y-auto space-y-5">
-          {submitError && (
-            <div className="p-3.5 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-start gap-2.5 text-xs sm:text-sm text-mq-danger font-medium animate-fade-in">
-              <AlertCircle size={17} className="shrink-0 mt-0.5" />
-              <span>{submitError}</span>
-            </div>
-          )}
-
-          {/* Child Avatar Picker */}
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong mb-2">
-              චරිත රූපය තෝරන්න (Select Child's Avatar)
-            </label>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-              {AVATAR_OPTIONS.map((item) => {
-                const isSelected = avatarId === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setAvatarId(item.id)}
-                    className={`p-2.5 rounded-2xl border flex flex-col items-center justify-center transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-mq-surface-blue border-mq-primary shadow-sm scale-105'
-                        : 'bg-mq-surface-soft border-mq-border hover:border-mq-primary/40'
-                    }`}
-                  >
-                    <span className="text-2xl sm:text-3xl mb-1">{item.icon}</span>
-                    <span className="text-[10px] font-bold text-mq-text truncate font-sinhala">
-                      {item.nameSi}
-                    </span>
-                    {isSelected && (
-                      <span className="w-3.5 h-3.5 bg-mq-primary text-white rounded-full flex items-center justify-center mt-1">
-                        <Check size={10} strokeWidth={3} />
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Name Fields */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong mb-1.5">
-                දරුවාගේ නම (First Name) <span className="text-mq-danger">*</span>
-              </label>
-              <input
-                type="text"
-                value={firstName}
-                onChange={(e) => {
-                  setFirstName(e.target.value);
-                  if (formErrors.firstName) {
-                    setFormErrors((prev) => ({ ...prev, firstName: '' }));
-                  }
-                }}
-                placeholder="උදා: කසුන් / Kasun"
-                className={`w-full py-2.5 px-3.5 rounded-2xl border text-sm font-semibold outline-none transition-all ${
-                  formErrors.firstName
-                    ? 'border-mq-danger focus:ring-2 focus:ring-mq-danger/20'
-                    : 'border-mq-border focus:border-mq-primary focus:ring-2 focus:ring-mq-primary/20'
-                }`}
-              />
-              {formErrors.firstName && (
-                <p className="text-xs text-mq-danger font-medium mt-1 font-sinhala">
-                  {formErrors.firstName}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong mb-1.5">
-                අමතන කෙටි නම (Preferred / Calling Name)
-              </label>
-              <input
-                type="text"
-                value={preferredName}
-                onChange={(e) => setPreferredName(e.target.value)}
-                placeholder="උදා: කසූ / Kasu (Optional)"
-                className="w-full py-2.5 px-3.5 rounded-2xl border border-mq-border focus:border-mq-primary focus:ring-2 focus:ring-mq-primary/20 text-sm font-semibold outline-none transition-all"
-              />
-            </div>
-          </div>
-
-          {/* Age and Grade Pickers */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Age */}
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong mb-1.5">
-                වයස (Age: 6–10 Years) <span className="text-mq-danger">*</span>
-              </label>
-              <div className="grid grid-cols-5 gap-1.5">
-                {[6, 7, 8, 9, 10].map((num) => (
-                  <button
-                    key={num}
-                    type="button"
-                    onClick={() => setAge(num)}
-                    className={`py-2 px-2 rounded-xl border text-xs font-bold transition-all ${
-                      age === num
-                        ? 'bg-mq-primary text-white border-mq-primary shadow-xs'
-                        : 'bg-mq-surface-soft border-mq-border text-mq-text hover:border-mq-primary/40'
-                    }`}
-                  >
-                    {num}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Grade */}
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong mb-1.5">
-                ශ්‍රේණිය (Grade: 1–5) <span className="text-mq-danger">*</span>
-              </label>
-              <div className="grid grid-cols-5 gap-1.5">
-                {[1, 2, 3, 4, 5].map((g) => (
-                  <button
-                    key={g}
-                    type="button"
-                    onClick={() => setGrade(g)}
-                    className={`py-2 px-2 rounded-xl border text-xs font-bold transition-all ${
-                      grade === g
-                        ? 'bg-mq-secondary text-white border-mq-secondary shadow-xs'
-                        : 'bg-mq-surface-soft border-mq-border text-mq-text hover:border-mq-secondary/40'
-                    }`}
-                  >
-                    G-{g}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Preferred Language */}
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong mb-1.5">
-              උපදෙස් භාෂාව (Instructional Language)
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: 'Sinhala', label: 'සිංහල (Sinhala)' },
-                { id: 'English', label: 'English' },
-                { id: 'Bilingual', label: 'දෙබසම (Bilingual)' },
-              ].map((lang) => (
+        {/* Age and grade (independent of each other) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <fieldset>
+            <FieldLabel required hint={t.ageHelp}>{t.age}</FieldLabel>
+            <div className="grid grid-cols-5 gap-2">
+              {AGES.map((num) => (
                 <button
-                  key={lang.id}
+                  key={num}
                   type="button"
-                  onClick={() => setPreferredLanguage(lang.id)}
-                  className={`py-2 px-2.5 rounded-2xl border text-xs font-bold transition-all font-sinhala ${
-                    preferredLanguage === lang.id
-                      ? 'bg-mq-surface-blue border-mq-primary text-mq-primary shadow-xs'
-                      : 'border-mq-border text-mq-text-muted hover:border-mq-primary/40'
-                  }`}
+                  aria-pressed={age === num}
+                  onClick={() => setAge(num)}
+                  className={`${choiceClass(age === num)} min-h-[46px] text-base`}
                 >
-                  {lang.label}
+                  {num}
                 </button>
               ))}
             </div>
-          </div>
+            {formErrors.age && <p className="text-sm text-mq-danger mt-1.5">{formErrors.age}</p>}
+          </fieldset>
+          <fieldset>
+            <FieldLabel required hint={t.gradeHelp}>{t.grade}</FieldLabel>
+            <div className="grid grid-cols-5 gap-2">
+              {GRADES.map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  aria-pressed={grade === g}
+                  onClick={() => setGrade(g)}
+                  className={`${choiceClass(grade === g)} min-h-[46px] text-base`}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
+            {formErrors.grade && <p className="text-sm text-mq-danger mt-1.5">{formErrors.grade}</p>}
+          </fieldset>
+        </div>
 
-          {/* Modal Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-mq-border/70">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="btn btn-secondary text-xs sm:text-sm py-2 px-4 rounded-full"
-            >
-              අවලංගු කරන්න (Cancel)
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="btn btn-primary text-xs sm:text-sm py-2 px-5 rounded-full flex items-center gap-2 shadow-sm font-sinhala"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  <span>සුරකිමින් පවතී...</span>
-                </>
-              ) : (
-                <span>{isEditing ? 'වෙනස්කම් සුරකින්න (Save)' : 'දරුවා ලියාපදිංචි කරන්න (Save Child)'}</span>
-              )}
-            </button>
+        {/* Learning language */}
+        <fieldset>
+          <FieldLabel>{t.language}</FieldLabel>
+          <div className="grid grid-cols-3 gap-2">
+            {LANGUAGE_IDS.map((id) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={preferredLanguage === id}
+                onClick={() => setPreferredLanguage(id)}
+                className={`${choiceClass(preferredLanguage === id)} min-h-[48px] px-2 text-sm`}
+              >
+                {parentText.languages[id]}
+              </button>
+            ))}
           </div>
-        </form>
+        </fieldset>
+
+        {preferredLanguage === 'Bilingual' && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-mq-surface-soft border border-mq-border space-y-5">
+            <div className="flex items-start gap-2.5">
+              <Languages size={18} className="text-mq-primary shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-mq-text-strong">{t.bilingualTitle}</p>
+                <p className="text-sm text-mq-text-muted">{t.bilingualHelp}</p>
+              </div>
+            </div>
+
+            <div>
+              <FieldLabel>{t.mainLanguage}</FieldLabel>
+              <div className="grid grid-cols-2 gap-2">
+                {(['Sinhala', 'English'] as PrimaryInstructionLanguage[]).map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    aria-pressed={primaryInstructionLanguage === id}
+                    onClick={() => setPrimaryInstructionLanguage(id)}
+                    className={`${choiceClass(primaryInstructionLanguage === id)} min-h-[46px] px-3 text-sm`}
+                  >
+                    {parentText.languages[id]}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-mq-text-muted mt-1.5">{t.mainLanguageHelp}</p>
+            </div>
+
+            {renderComprehension(sinhalaComprehension, setSinhalaComprehension, t.sinhalaUnderstanding)}
+            {renderComprehension(englishComprehension, setEnglishComprehension, t.englishUnderstanding)}
+
+            <p className="flex items-start gap-2 text-xs text-mq-text-muted">
+              <Info size={14} className="shrink-0 mt-0.5 text-mq-primary" />
+              <span>{t.understandingNote}</span>
+            </p>
+          </div>
+        )}
+
+        <p className="text-xs text-mq-text-muted">{parentText.common.requiredNote}</p>
       </div>
-    </div>
+    </ParentModalShell>
   );
 };

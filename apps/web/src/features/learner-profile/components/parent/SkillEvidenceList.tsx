@@ -71,18 +71,18 @@ export const SkillEvidenceList: React.FC<SkillEvidenceListProps> = ({
     : (legacySkills ?? []).map(fromLegacy);
 
   return (
-    <section className="space-y-4">
-      <div className="space-y-1">
+    <section className="space-y-3">
+      <div className="space-y-0.5">
         <h3 className="text-base font-bold text-mq-text-strong flex items-center gap-2">
           <GraduationCap size={18} className="text-mq-primary shrink-0" />
           <span>{t.title}</span>
         </h3>
-        <p className="text-sm text-mq-text-muted leading-relaxed">{t.subtitle}</p>
+        <p className="text-xs text-mq-text-muted leading-relaxed">{t.subtitle}</p>
       </div>
 
       {showOverall && profile && (
         <div
-          className={`p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 ${
+          className={`px-4 py-3 rounded-2xl border flex flex-wrap items-center gap-x-3 gap-y-1 ${
             profile.isOverallEvidenceSufficient
               ? 'bg-mq-success-bg/50 border-mq-success/25'
               : 'bg-mq-warning-bg/50 border-mq-warning/30'
@@ -95,7 +95,7 @@ export const SkillEvidenceList: React.FC<SkillEvidenceListProps> = ({
             {t.firstTryCount(profile.totalCorrectFirstResponses, profile.totalDistinctQuestionsEvaluated)}
           </span>
           {!profile.isOverallEvidenceSufficient && (
-            <span className="text-xs text-mq-text-muted sm:basis-full">{t.overallNeedsMoreText}</span>
+            <span className="text-xs text-mq-text-muted basis-full">{t.overallNeedsMoreText}</span>
           )}
         </div>
       )}
@@ -103,19 +103,19 @@ export const SkillEvidenceList: React.FC<SkillEvidenceListProps> = ({
       {rows.length === 0 ? (
         <p className="text-sm text-mq-text-muted">{t.noSkills}</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {rows.map((row) => (
-            <div key={row.id} className="p-4 rounded-2xl bg-white border border-mq-border space-y-2 min-w-0">
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <p className="text-sm font-bold text-mq-text-strong break-words min-w-0 flex-1">{row.name}</p>
-                <span
-                  className={`text-xs font-bold px-2.5 py-1 rounded-full border whitespace-nowrap ${LEVEL_STYLES[row.level]}`}
-                >
-                  {t.level[row.level]}
-                </span>
-              </div>
+            <div key={row.id} className="px-4 py-3 rounded-2xl bg-white border border-mq-border space-y-1.5 min-w-0">
+              <p className="text-sm font-bold text-mq-text-strong break-words">{row.name}</p>
+              <span
+                className={`inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full border ${LEVEL_STYLES[row.level]}`}
+              >
+                {t.level[row.level]}
+              </span>
               <p className="text-sm text-mq-text">{t.firstTryCount(row.correct, row.total)}</p>
-              <p className="text-xs text-mq-text-muted leading-relaxed">{t.levelHelp[row.level]}</p>
+              {row.level === 'INSUFFICIENT_EVIDENCE' && (
+                <p className="text-xs text-mq-text-muted leading-relaxed">{t.levelHelp.INSUFFICIENT_EVIDENCE}</p>
+              )}
             </div>
           ))}
         </div>

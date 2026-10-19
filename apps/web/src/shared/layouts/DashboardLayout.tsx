@@ -129,7 +129,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
         {/* Main Workspace Area */}
         <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
           {/* Main Dashboard Content Area */}
-          <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
+          {/* Parent pages use a narrower centred column so cards do not stretch across wide screens */}
+          <main
+            className={`flex-1 mx-auto w-full ${
+              isParent ? 'max-w-[1100px] px-4 sm:px-6 py-5 sm:py-6 space-y-5' : 'p-4 sm:p-6 lg:p-8 max-w-7xl space-y-6'
+            }`}
+          >
             <Outlet />
           </main>
         </div>

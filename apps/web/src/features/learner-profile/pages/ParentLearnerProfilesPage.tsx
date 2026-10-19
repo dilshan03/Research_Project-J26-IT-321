@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, Loader2, ArrowRight, Info, Palette, Home, ClipboardList } from 'lucide-react';
+import { CheckCircle2, Loader2, ArrowRight, ChevronDown, Palette, Home, ClipboardList } from 'lucide-react';
 import { learnerApi } from '../services/learnerApi';
 import { profileApi } from '../services/profileApi';
 import { onboardingApi } from '../services/onboardingApi';
@@ -145,7 +145,7 @@ export const ParentLearnerProfilesPage: React.FC = () => {
   const deletionRequest = selectedChild ? deletionRequests[selectedChild.learnerId] : undefined;
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fade-in">
+    <div className="space-y-5 animate-fade-in">
       <PageHeader
         role="parent"
         title={t.title}
@@ -172,18 +172,18 @@ export const ParentLearnerProfilesPage: React.FC = () => {
       </section>
 
       {selectedChild && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Child header */}
-          <section className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4 min-w-0">
+          <section className="bg-white rounded-3xl border border-mq-border px-5 py-4 shadow-xs flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3.5 min-w-0">
               <div
-                className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0 border ${avatar.bgColor} ${avatar.borderColor}`}
+                className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 border ${avatar.bgColor} ${avatar.borderColor}`}
                 aria-hidden="true"
               >
                 {avatar.icon}
               </div>
-              <div className="min-w-0 space-y-1">
-                <h2 className="text-xl sm:text-2xl font-bold text-mq-text-strong break-words">
+              <div className="min-w-0 space-y-0.5">
+                <h2 className="text-lg sm:text-xl font-bold text-mq-text-strong break-words">
                   {selectedChild.firstName}
                   {selectedChild.preferredName && ` (${selectedChild.preferredName})`}
                 </h2>
@@ -240,16 +240,21 @@ export const ParentLearnerProfilesPage: React.FC = () => {
               )}
 
               {!isLoadingProfile && profile && (
-                <div className="space-y-6">
-                  <section className="bg-white rounded-3xl border border-mq-border p-5 sm:p-7 shadow-xs">
+                <div className="space-y-4">
+                  <section className="bg-white rounded-3xl border border-mq-border p-5 shadow-xs">
                     <SkillEvidenceList profile={profile} />
                   </section>
 
                   {summary && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <section className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs space-y-3">
-                        <h3 className="text-base font-bold text-mq-text-strong flex items-center gap-2">
-                          <Palette size={18} className="text-mq-primary shrink-0" />
+                    <details className="group bg-white rounded-3xl border border-mq-border shadow-xs">
+                      <summary className="list-none cursor-pointer select-none flex items-center justify-between gap-2 px-5 py-3.5 text-sm font-semibold text-mq-text-strong hover:text-mq-primary">
+                        <span>{t.parentInputTitle}</span>
+                        <ChevronDown size={16} className="shrink-0 transition-transform group-open:rotate-180" />
+                      </summary>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 px-5 pb-5">
+                      <section className="space-y-1 min-w-0">
+                        <h3 className="text-sm font-bold text-mq-text-strong flex items-center gap-2">
+                          <Palette size={16} className="text-mq-primary shrink-0" />
                           <span>{t.preferencesTitle}</span>
                         </h3>
                         {prefs ? (
@@ -265,9 +270,9 @@ export const ParentLearnerProfilesPage: React.FC = () => {
                         )}
                       </section>
 
-                      <section className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs space-y-3">
-                        <h3 className="text-base font-bold text-mq-text-strong flex items-center gap-2">
-                          <Home size={18} className="text-mq-secondary shrink-0" />
+                      <section className="space-y-1 min-w-0">
+                        <h3 className="text-sm font-bold text-mq-text-strong flex items-center gap-2">
+                          <Home size={16} className="text-mq-secondary shrink-0" />
                           <span>{t.socialTitle}</span>
                         </h3>
                         {social ? (
@@ -282,12 +287,8 @@ export const ParentLearnerProfilesPage: React.FC = () => {
                         )}
                       </section>
                     </div>
+                    </details>
                   )}
-
-                  <p className="text-sm text-mq-text-muted flex items-start gap-2">
-                    <Info size={16} className="text-mq-primary shrink-0 mt-0.5" />
-                    <span>{parentText.skills.subtitle}</span>
-                  </p>
                 </div>
               )}
             </>

@@ -22,7 +22,7 @@ import { LearnerModal } from '../components/LearnerModal';
 import { OnboardingStatusBadge } from '../components/OnboardingStatusBadge';
 import { ChildSwitcher } from '../components/parent/ChildSwitcher';
 import { SkillEvidenceList } from '../components/parent/SkillEvidenceList';
-import { RecommendationList } from '../components/parent/RecommendationList';
+import { RecommendationList, RecommendationResearchRows } from '../components/parent/RecommendationList';
 import { languageLabel } from '../components/parent/labels';
 import { PageHeader } from '../../../shared/components/PageHeader';
 import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
@@ -136,7 +136,7 @@ export const ParentOverviewPage: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fade-in">
+    <div className="space-y-5 animate-fade-in">
       <PageHeader
         role="parent"
         title={t.title}
@@ -154,7 +154,7 @@ export const ParentOverviewPage: React.FC = () => {
       />
 
       {/* Welcome and quick counts */}
-      <section className="bg-white p-5 sm:p-7 rounded-3xl border border-mq-border shadow-xs space-y-5">
+      <section className="bg-white px-5 py-4 rounded-3xl border border-mq-border shadow-xs space-y-3">
         <div className="space-y-1">
           <h2 className="text-xl sm:text-2xl font-bold text-mq-text-strong break-words">
             {t.welcome(user?.fullName || parentText.shell.parentAccount)}
@@ -163,7 +163,7 @@ export const ParentOverviewPage: React.FC = () => {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {stats.map(({ label, value, Icon, tone }) => (
-            <div key={label} className="p-4 bg-mq-surface-soft rounded-2xl border border-mq-border/70 flex items-center gap-3">
+            <div key={label} className="px-4 py-2.5 bg-mq-surface-soft rounded-2xl border border-mq-border/70 flex items-center gap-3">
               <Icon size={22} className={`${tone} shrink-0`} />
               <div className="min-w-0">
                 <p className="text-2xl font-bold text-mq-text-strong leading-none">{value}</p>
@@ -216,11 +216,11 @@ export const ParentOverviewPage: React.FC = () => {
           </section>
 
           {/* Selected child */}
-          <section className="bg-white rounded-3xl border border-mq-border p-5 sm:p-7 shadow-xs space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-mq-border">
+          <section className="bg-white rounded-3xl border border-mq-border p-5 shadow-xs space-y-5">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-mq-border">
               <div className="flex items-center gap-4 min-w-0">
                 <div
-                  className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shrink-0 border ${selectedAvatar.bgColor} ${selectedAvatar.borderColor}`}
+                  className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shrink-0 border ${selectedAvatar.bgColor} ${selectedAvatar.borderColor}`}
                   aria-hidden="true"
                 >
                   {selectedAvatar.icon}
@@ -295,7 +295,7 @@ export const ParentOverviewPage: React.FC = () => {
             )}
 
             {selectedChild.onboardingStatus === 'COMPLETED' && (
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {isLoadingProfile && (
                   <div className="flex items-center justify-center p-8 text-mq-primary gap-2 text-sm font-semibold">
                     <Loader2 size={18} className="animate-spin" />
@@ -305,7 +305,14 @@ export const ParentOverviewPage: React.FC = () => {
 
                 {!isLoadingProfile && learnerProfile && (
                   <>
-                    <SkillEvidenceList profile={learnerProfile} />
+                    <SkillEvidenceList profile={learnerProfile}>
+                      {learnerProfile.structuredRecommendations?.length > 0 && (
+                        <RecommendationResearchRows
+                          recommendations={learnerProfile.structuredRecommendations.slice(0, 2)}
+                          rulesetVersion={learnerProfile.recommendationRulesetVersion}
+                        />
+                      )}
+                    </SkillEvidenceList>
 
                     {learnerProfile.structuredRecommendations?.length > 0 && (
                       <section className="space-y-3">
@@ -323,6 +330,7 @@ export const ParentOverviewPage: React.FC = () => {
                           recommendations={learnerProfile.structuredRecommendations}
                           limit={2}
                           rulesetVersion={learnerProfile.recommendationRulesetVersion}
+                          showResearchDetails={false}
                         />
                       </section>
                     )}

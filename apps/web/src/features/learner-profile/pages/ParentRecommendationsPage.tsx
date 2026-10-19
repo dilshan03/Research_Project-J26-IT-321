@@ -84,7 +84,7 @@ export const ParentRecommendationsPage: React.FC = () => {
   const childName = selectedChild ? selectedChild.preferredName || selectedChild.firstName : '';
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fade-in">
+    <div className="space-y-5 animate-fade-in">
       <PageHeader role="parent" title={t.title} description={t.description} />
 
       {errorMessage && (

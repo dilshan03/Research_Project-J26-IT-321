@@ -247,6 +247,7 @@ const si = {
     resumeAssessment: 'නතර කළ තැනින් ඉදිරියට',
     preferencesTitle: 'ඉගෙනීමට කැමති ආකාරය',
     socialTitle: 'ඉගෙනුම් පරිසරය',
+    parentInputTitle: 'ඔබ ලබා දුන් ඉගෙනුම් තොරතුරු',
     notRecorded: 'තවම සටහන් කර නැත.',
   },
 

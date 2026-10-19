@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Flame, Map, RotateCcw, Star, Volume2, VolumeX } from 'lucide-react';
 import type { BlueprintEnvelope, DistractorType, GameMicroStep } from '../types';
 import { LINES, SCENES, STORY, getEnglishQuestionFallback, speak, type Lang, type Line, type Mood } from './gameKit';
 import { Gaja } from './Gaja';
 import { BreathingBreak } from './BreathingBreak';
+import { Celebration } from './Celebration';
 import { NumberHunt } from './mechanics/NumberHunt';
 import { OperatorDrop } from './mechanics/OperatorDrop';
 import { BasketCount } from './mechanics/BasketCount';
@@ -26,6 +27,9 @@ interface Attempt {
 
 const BREAK_AFTER_WRONG = 3;
 const IDLE_NUDGE_MS = 20000;
+const ADVANCE_MS = 1400;
+/** Soft per-step time bar (only when the teacher enables the timer). Running out never fails the step. */
+const STEP_TIME_MS = 60000;
 
 function pickMechanic(step: GameMicroStep): { Comp: (p: MechanicProps) => React.ReactElement; intro: Line } {
   if (step.action_type === 'MATCH_SHAPE' || step.operation === 'SHAPE') {
@@ -124,6 +128,8 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
   const [stepIndex, setStepIndex] = useState(0);
   const [mood, setMood] = useState<Mood>('happy');
   const [line, setLine] = useState<Line | null>(() => story.intro);
+  // Bumped on every utterance so a repeated line (e.g. two retries) still re-animates the bubble.
+  const [lineKey, setLineKey] = useState(0);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [wrongRun, setWrongRun] = useState(0);
   const [stepHadMistake, setStepHadMistake] = useState(false);
@@ -131,13 +137,19 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
   const [bestStreak, setBestStreak] = useState(0);
   const [onBreak, setOnBreak] = useState(false);
   const [nudging, setNudging] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
+  const [breakCount, setBreakCount] = useState(0);
   const idleTimer = useRef<number | undefined>(undefined);
+  const advanceTimer = useRef<number | undefined>(undefined);
+  // Guards against a double tap scoring the same step twice while the celebration plays.
+  const advancing = useRef(false);
 
   const step = steps[stepIndex];
   const mechanic = useMemo(() => (step ? pickMechanic(step) : null), [step]);
 
   const say = useCallback((l: Line, m?: Mood) => {
     setLine(l);
+    setLineKey(k => k + 1);
     if (m) setMood(m);
     if (voiceOn) speak(l, lang);
   }, [voiceOn, lang]);
@@ -161,7 +173,10 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
   }, [phase, onBreak, say, mechanic]);
 
   useEffect(() => { resetIdle(); return () => window.clearTimeout(idleTimer.current); }, [resetIdle, stepIndex]);
-  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+  useEffect(() => () => {
+    window.speechSynthesis?.cancel();
+    window.clearTimeout(advanceTimer.current);
+  }, []);
 
   const start = () => {
     setPhase('play');
@@ -190,14 +205,19 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
   };
 
   const onCorrect: MechanicProps['onCorrect'] = label => {
+    if (advancing.current) return;
+    advancing.current = true;
     log(label, true);
     setWrongRun(0);
     const s = stepHadMistake ? 0 : streak + 1;
     setStreak(s);
     setBestStreak(b => Math.max(b, s));
+    setCelebrating(true);
     const customPraise = story.dialogue?.praise;
     say(customPraise || LINES.correct, 'celebrate');
-    setTimeout(() => {
+    advanceTimer.current = window.setTimeout(() => {
+      advancing.current = false;
+      setCelebrating(false);
       const next = stepIndex + 1;
       setStepHadMistake(false);
       if (next >= steps.length) {
@@ -207,10 +227,18 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
         setStepIndex(next);
         say(pickMechanic(steps[next]).intro, 'thinking');
       }
-    }, 1400);
+    }, ADVANCE_MS);
+  };
+
+  const onTimeUp = () => {
+    if (advancing.current) return;
+    say(mechanic?.intro ?? LINES.nudge, 'thinking');
   };
 
   const restart = () => {
+    window.clearTimeout(advanceTimer.current);
+    advancing.current = false;
+    setCelebrating(false);
     setAttempts([]); setStreak(0); setBestStreak(0); setWrongRun(0); setStepHadMistake(false);
     setStepIndex(0); setPhase('intro'); setMood('happy'); setLine(story.intro);
   };
@@ -219,6 +247,7 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
   const stars = mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="relative min-h-screen overflow-hidden" onPointerDown={resetIdle}>
       {/* Scene */}
       <motion.img
@@ -310,11 +339,26 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
 
           {phase === 'play' && step && mechanic && (
             <motion.section key={`step-${stepIndex}`}
-              initial={{ opacity: 0, x: 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -60 }}
+              initial={calm ? { opacity: 0 } : { opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={calm ? { opacity: 0 } : { opacity: 0, x: -60 }}
               transition={{ type: 'spring', stiffness: 200, damping: 26 }}
-              className={`mx-auto max-w-4xl mt-4 rounded-[2.5rem] bg-white/90 backdrop-blur-md shadow-2xl border-4 p-6 md:p-10 flex flex-col items-center
-                ${nudging ? 'border-mq-accent-yellow' : 'border-white'}`}
+              className={`relative mx-auto max-w-4xl mt-4 rounded-[2.5rem] bg-white/90 backdrop-blur-md shadow-2xl border-4 p-6 md:p-10 flex flex-col items-center transition-colors duration-500
+                ${celebrating ? 'border-mq-success' : nudging ? 'border-mq-accent-yellow' : 'border-white'}`}
             >
+              {settings.timer_enabled && !onBreak && !celebrating && (
+                <div className="absolute top-3 left-10 right-10 h-1.5 rounded-full bg-mq-border/60 overflow-hidden" aria-hidden>
+                  {/* Re-keyed after a break so the learner returns to a full bar, not a near-empty one. */}
+                  <motion.div
+                    key={`${stepIndex}-${breakCount}`}
+                    className="h-full rounded-full bg-mq-secondary"
+                    initial={{ width: '100%' }} animate={{ width: '0%' }}
+                    transition={{ duration: STEP_TIME_MS / 1000, ease: 'linear' }}
+                    onAnimationComplete={onTimeUp}
+                  />
+                </div>
+              )}
+              <AnimatePresence>{celebrating && <Celebration calm={calm} />}</AnimatePresence>
               {step.action_type !== 'IDENTIFY_ENTITY' && (
                 <p className={`${lang === 'si' ? 'sinhala' : 'font-medium'} text-center text-lg text-mq-text mb-6 px-6 py-2.5 rounded-full bg-mq-surface-soft border border-mq-border/50 max-w-2xl w-full mx-auto`}>
                   {activeQuestion}
@@ -362,12 +406,12 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
       {/* Companion stays in the corner during play */}
       {phase !== 'intro' && (
         <div className="fixed left-4 bottom-4 z-30">
-          <Gaja mood={mood} line={line} lang={lang} calm={calm} companionConfig={companion} />
+          <Gaja mood={mood} line={line} lineKey={lineKey} lang={lang} calm={calm} companionConfig={companion} />
         </div>
       )}
 
       <AnimatePresence>
-        {onBreak && <BreathingBreak lang={lang} onDone={() => { setOnBreak(false); say(LINES.nudge, 'happy'); }} />}
+        {onBreak && <BreathingBreak lang={lang} onDone={() => { setOnBreak(false); setBreakCount(c => c + 1); say(LINES.nudge, 'happy'); }} />}
       </AnimatePresence>
 
       <CompanionWardrobeModal
@@ -376,6 +420,7 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
         lang={lang}
       />
     </div>
+    </MotionConfig>
   );
 }
 

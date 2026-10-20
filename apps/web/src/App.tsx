@@ -14,6 +14,7 @@ import {
   OnboardingPlaceholderPage,
   ParentOverviewPage,
   ParentSnapIvPage,
+  ParentSupportInfoPage,
   ParentLearnerProfilesPage,
   ParentAssessmentsPage,
   ParentRecommendationsPage,
@@ -26,6 +27,7 @@ import TeacherLearnersPage from './pages/teacher/TeacherLearnersPage';
 import TeacherLearnerProfilesPage from './pages/teacher/TeacherLearnerProfilesPage';
 import TeacherRecommendationsPage from './pages/teacher/TeacherRecommendationsPage';
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
+import AdminDashboardPage from './features/admin/pages/AdminDashboardPage';
 
 // -------------------------------------------------------------
 // [DEV TEMP] Pedagogical Agent Test Page Import (Remove later)
@@ -140,6 +142,16 @@ function App() {
             }
           />
 
+          {/* Read-only admin dashboard (role 'admin' is set manually; every read is audit-logged) */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Compatibility Redirects */}
           <Route path="/parent" element={<Navigate to="/parent/dashboard" replace />} />
           <Route path="/teacher" element={<Navigate to="/teacher/dashboard" replace />} />
@@ -178,6 +190,9 @@ function App() {
 
             {/* 8. Behaviour Insights (Behaviour Monitoring) */}
             <Route path="behaviour" element={<ParentComingSoonPage feature="behaviour" />} />
+
+            {/* Parent-reported ADHD information and SNAP-IV history */}
+            <Route path="support-info" element={<ParentSupportInfoPage />} />
 
             {/* 9. Settings (Reuses User Profile) */}
             <Route path="settings" element={<UserProfilePage hideNavbar={true} />} />

@@ -11,6 +11,7 @@ export const PARENT_ROUTE_LABELS: Record<string, string> = {
   '/parent/dashboard/recommendations': parentText.nav.recommendations,
   '/parent/dashboard/activities': parentText.nav.activities,
   '/parent/dashboard/behaviour': parentText.nav.behaviour,
+  '/parent/dashboard/support-info': parentText.nav.supportInfo,
   '/parent/dashboard/settings': parentText.nav.settings,
 };
 

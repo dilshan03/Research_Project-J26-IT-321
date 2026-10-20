@@ -3,6 +3,7 @@ import { Navigate, Link } from 'react-router-dom';
 import { Loader2, ShieldAlert, ArrowRight } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import type { UserRole } from '../types';
+import { dashboardNameFor, dashboardPathFor } from '../roleRoutes';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -32,9 +33,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Strict Role-Based Route Authorization
   if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-    const targetDashboard =
-      user.role === 'parent' ? '/parent/dashboard' : '/teacher/dashboard';
-    const targetName = user.role === 'parent' ? 'Parent' : 'Teacher';
+    const targetDashboard = dashboardPathFor(user.role);
+    const targetName = dashboardNameFor(user.role);
 
     return (
       <div className="min-h-screen flex items-center justify-center bg-mq-bg p-4">

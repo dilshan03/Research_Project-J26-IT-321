@@ -76,6 +76,7 @@ const si = {
     recommendations: 'ඉගෙනීමට උපදෙස්',
     activities: 'ඉගෙනුම් ක්‍රියාකාරකම්',
     behaviour: 'හැසිරීම් නිරීක්ෂණ',
+    supportInfo: 'ADHD සහ සහාය තොරතුරු',
     settings: 'ගිණුම් සැකසුම්',
     onboarding: 'ආරම්භක ඇගයීම',
     more: 'තවත්',
@@ -114,7 +115,26 @@ const si = {
   },
 
   overview: {
-    // Redesigned home page
+    // Home page: one focused card per child
+    homeSubtitle: 'ඔබේ දරුවාගේ ගණිත ඉගෙනීම එක බැල්මකින්.',
+    needsStart: 'ආරම්භ කළ යුතුයි',
+    heroNotStarted: (name: string) => `${name} සමඟ කෙටි ගණිත ක්‍රීඩාවකින් පටන් ගනිමු. විනාඩි කිහිපයක් පමණයි.`,
+    heroInProgress: (name: string) => `${name} ආරම්භක ක්‍රියාකාරකම් අතරමැද නතර කළා. ඉතිරි ටික අවසන් කරමු.`,
+    heroCompleted: (name: string) => `${name}ගේ ආරම්භක ගණිත ක්‍රියාකාරකම් අවසන්! මෙන්න මුල් ප්‍රතිඵල.`,
+    heroEarly: 'මේවා මුල් ප්‍රතිඵල පමණි. දරුවා තව ක්‍රීඩා කරන විට වඩාත් පැහැදිලි වේ.',
+    ctaPlay: (name: string) => `${name}ගේ ඉගෙනුම් ලෝකයට යන්න`,
+    moreSkills: (count: number) => `තවත් කුසලතා ${count}ක් බලන්න`,
+    linkProgress: 'සම්පූර්ණ ප්‍රගතිය',
+    linkTips: 'දෙමාපියන්ට උපදෙස්',
+    linkSnap: 'SNAP-IV ප්‍රශ්නාවලිය (විකල්ප)',
+    rewardsTitle: (name: string) => `${name}ගේ ත්‍යාග`,
+    stars: 'තරු',
+    coins: 'කාසි',
+    sessions: 'ක්‍රීඩා වාර',
+    rewardsEmpty: (name: string) => `${name} ඉගෙනුම් ලෝකයේ ක්‍රීඩා කරන විට ලැබෙන තරු සහ කාසි මෙහි පෙන්වයි.`,
+    rewardsLocked: 'ආරම්භක ක්‍රියාකාරකම් අවසන් කළ පසු, දරුවාට ඉගෙනුම් ලෝකයේ ක්‍රීඩා කර ත්‍යාග දිනාගත හැක.',
+    openWorld: 'ඉගෙනුම් ලෝකය විවෘත කරන්න',
+    // Redesigned home page (previous version)
     alertOtherChild: (name: string) => `${name}ගේ ආරම්භක ඇගයීම තවම සම්පූර්ණ කර නැත.`,
     alertOtherChildAction: 'අරඹන්න',
     switcherLabel: 'දරුවා තෝරන්න',
@@ -310,6 +330,42 @@ const si = {
     overallNeedsMore: 'තව තොරතුරු අවශ්‍යයි',
     overallNeedsMoreText: 'වඩා පැහැදිලි චිත්‍රයක් ලබා ගැනීමට දරුවා තව ගණිත ක්‍රියාකාරකම් කිහිපයක් කළ යුතුයි.',
     activitiesDone: (count: number) => `ප්‍රශ්න ${count}ක් සලකා බැලුවා`,
+  },
+
+  support: {
+    title: 'ADHD සහ සහාය තොරතුරු',
+    intro:
+      'ඔබ ලබා දුන් ADHD තොරතුරු සහ SNAP-IV ප්‍රශ්නාවලිය එක තැනකින් බලන්න සහ යාවත්කාලීන කරන්න. මේ සියල්ල විකල්පයි.',
+    privacy:
+      'මෙම තොරතුරු ඔබට සහ පර්යේෂණ පරිපාලකයින්ට පමණක් පෙනේ. දරුවාගේ ඉගෙනුම් ක්‍රියාකාරකම් හෝ උපදෙස් තෝරා ගැනීමට භාවිත නොකෙරේ. MathQuest කිසිදු රෝග විනිශ්චයක් නොකරයි.',
+    loadError: 'තොරතුරු ලබාගත නොහැකි විය.',
+    notStartedTitle: 'පළමුව ආරම්භක ඇගයීම අරඹන්න',
+    notStartedText: (name: string) => `${name}ගේ ආරම්භක ඇගයීම ඇරඹූ පසු මෙම තොරතුරු මෙහි එක් කළ හැක.`,
+    edit: 'යාවත්කාලීන කරන්න',
+    add: 'එක් කරන්න',
+    cancel: 'අවලංගු කරන්න',
+    save: 'සුරකින්න',
+    saved: 'තොරතුරු සුරකින ලදී.',
+    saveError: 'සුරැකීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.',
+    notProvided: 'තවම ලබා දී නැත.',
+    // ADHD information
+    adhdTitle: 'ADHD පිළිබඳ තොරතුරු',
+    adhdDiagnosed: 'සෞඛ්‍ය වෘත්තිකයෙකු හඳුනාගෙන ඇත්ද',
+    adhdType: 'වාර්තා කළ ADHD වර්ගය',
+    adhdMonth: 'හඳුනාගත් මාසය',
+    // SNAP-IV
+    snapTitle: 'SNAP-IV ප්‍රශ්නාවලිය (විකල්පයි)',
+    snapStatus: {
+      COMPLETED: 'සම්පූර්ණ කර ඇත',
+      SKIPPED: 'මඟ හැර ඇත',
+      NOT_STARTED: 'තවම පුරවා නැත',
+    },
+    snapFill: 'පුරවන්න',
+    snapFillAgain: 'නැවත පුරවන්න',
+    snapHistory: 'පුරවූ දින',
+    snapHistoryEmpty: 'තවම කිසිදු වාරයක් නැත.',
+    snapHistoryNotice:
+      'සෑම වාරයක්ම එම කාලයේ ඔබ නිවසේදී දුටු දේ පමණක් සටහන් කරයි. වාර අතර වෙනස්කම් වෛද්‍යමය වෙනසක්, රෝග විනිශ්චයක් හෝ MathQuest නිසා ඇති වූ වෙනසක් නොවේ.',
   },
 
   research: {
@@ -551,6 +607,7 @@ const si = {
     snapHyperactivity: 'ක්‍රියාශීලී බව / ආවේගශීලී බව',
     snapScore: (score: number) => `${score} / 27`,
     snapNote: 'මෙය ඔබගේ නිරීක්ෂණවල සාරාංශයකි. රෝග විනිශ්චයක් නොවේ.',
+    snapCompleted: 'ඔබ මෙම ප්‍රශ්නාවලිය සම්පූර්ණ කර ඇත. ස්තූතියි!',
     snapSkipped: 'මඟ හැර ඇත. මෙය විකල්පයි.',
     snapNotDone: 'සම්පූර්ණ කර නැත. මෙය විකල්පයි.',
     completeNow: 'දැන් සම්පූර්ණ කරන්න',

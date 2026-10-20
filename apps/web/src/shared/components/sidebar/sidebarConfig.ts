@@ -11,6 +11,7 @@ import {
   Settings,
   FileBarChart,
   BookOpen,
+  HeartPulse,
 } from 'lucide-react';
 
 export interface NavItemConfig {
@@ -110,6 +111,16 @@ export const PARENT_NAV_GROUPS: NavGroupConfig[] = [
         matchPaths: ['/parent/dashboard/recommendations'],
         icon: Sparkles,
         description: 'Explainable pedagogical strategies',
+        componentOwner: 'Learner Profile Component',
+      },
+      {
+        id: 'support-info',
+        label: 'ADHD & Support Information',
+        labelSi: 'ADHD සහ සහාය තොරතුරු',
+        path: '/parent/dashboard/support-info',
+        matchPaths: ['/parent/dashboard/support-info'],
+        icon: HeartPulse,
+        description: 'Parent-reported ADHD information and SNAP-IV history',
         componentOwner: 'Learner Profile Component',
       },
       {

@@ -21,3 +21,8 @@ __pycache__/
 .pytest_cache/
 **/db_store/gridfs/
 
+
+# NIE Grade 4/5 teacher guides exceed GitHub limits (Grade 4 is 184 MB); share them outside git.
+# Their page transcripts are committed in data/syllabi/_cache, so only re-extraction needs the PDFs.
+services/content-adaptation-service/data/syllabi/Grade 4.pdf
+services/content-adaptation-service/data/syllabi/Grade 5.pdf

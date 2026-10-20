@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, ShieldCheck, Eye, X, RefreshCw, LogOut } from 'lucide-react';
-import { useAuth } from '../../auth/hooks/useAuth';
+import { Loader2, Eye, X, RefreshCw, FlaskConical } from 'lucide-react';
 import {
   adminApi,
   type AdminLearnerDetail,
@@ -11,9 +10,11 @@ import {
   type AdminUser,
   type Json,
 } from '../services/adminApi';
+import { AdminShell, ErrorLine, JsonBlock, Panel, Stat, Table, arr, date, fmt, navTabClass, obj, useLoad } from '../components/ui';
+import { useResearchAccess } from '../research/useResearchAccess';
 
 /* ------------------------------------------------------------------ */
-/* Small building blocks                                               */
+/* Tabs                                                                */
 /* ------------------------------------------------------------------ */
 
 type Tab = 'overview' | 'children' | 'parents' | 'teachers' | 'admins' | 'audit';
@@ -25,80 +26,6 @@ const TABS: Array<{ id: Tab; label: string }> = [
   { id: 'admins', label: 'Admins' },
   { id: 'audit', label: 'Audit log' },
 ];
-
-const fmt = (v: unknown): string => {
-  if (v === null || v === undefined || v === '') return '—';
-  if (typeof v === 'number') return Number.isInteger(v) ? String(v) : v.toFixed(3);
-  if (typeof v === 'boolean') return v ? 'true' : 'false';
-  if (typeof v === 'string') return v;
-  return JSON.stringify(v);
-};
-const date = (v: unknown) => (typeof v === 'string' && v ? new Date(v).toLocaleString() : '—');
-const arr = (v: unknown): Json[] => (Array.isArray(v) ? (v as Json[]) : []);
-const obj = (v: unknown): Json => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Json) : {});
-
-const Panel: React.FC<{ title: string; note?: string; children: React.ReactNode }> = ({ title, note, children }) => (
-  <section className="bg-white rounded-2xl border border-slate-200 p-4 space-y-3 min-w-0">
-    <div>
-      <h3 className="text-sm font-bold text-slate-900">{title}</h3>
-      {note && <p className="text-xs text-slate-500 mt-0.5">{note}</p>}
-    </div>
-    {children}
-  </section>
-);
-
-const JsonBlock: React.FC<{ label: string; value: unknown; open?: boolean }> = ({ label, value, open }) => (
-  <details open={open} className="rounded-xl border border-slate-200 bg-slate-50">
-    <summary className="cursor-pointer px-3 py-2 text-xs font-semibold text-slate-700">{label}</summary>
-    <pre className="px-3 pb-3 text-[11px] leading-snug text-slate-800 overflow-x-auto max-h-96">
-      {JSON.stringify(value ?? null, null, 2)}
-    </pre>
-  </details>
-);
-
-const Table: React.FC<{ columns: string[]; rows: React.ReactNode[][]; empty?: string }> = ({ columns, rows, empty }) =>
-  rows.length === 0 ? (
-    <p className="text-xs text-slate-500">{empty ?? 'No records.'}</p>
-  ) : (
-    <div className="overflow-x-auto rounded-xl border border-slate-200">
-      <table className="w-full text-left text-xs whitespace-nowrap">
-        <thead className="bg-slate-50 text-slate-600">
-          <tr>{columns.map((c) => <th key={c} className="px-3 py-2 font-semibold">{c}</th>)}</tr>
-        </thead>
-        <tbody>
-          {rows.map((r, i) => (
-            <tr key={i} className="border-t border-slate-100">
-              {r.map((cell, j) => <td key={j} className="px-3 py-1.5 font-mono text-slate-800">{cell}</td>)}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-
-const Stat: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
-  <div className="bg-white rounded-2xl border border-slate-200 p-4">
-    <p className="text-xs text-slate-500">{label}</p>
-    <p className="text-2xl font-bold text-slate-900 mt-1">{value}</p>
-  </div>
-);
-
-const ErrorLine: React.FC<{ message?: string }> = ({ message }) =>
-  message ? <p role="alert" className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2">{message}</p> : null;
-
-const useLoad = <T,>(load: () => Promise<AdminResult<T>>, deps: unknown[]) => {
-  const [state, setState] = useState<{ loading: boolean; data?: T; error?: string }>({ loading: true });
-  const run = useCallback(async () => {
-    setState({ loading: true });
-    const res = await load();
-    setState({ loading: false, data: res.data, error: res.ok ? undefined : res.error });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
-  useEffect(() => {
-    run();
-  }, [run]);
-  return { ...state, reload: run };
-};
 
 /* ------------------------------------------------------------------ */
 /* Child detail                                                        */
@@ -421,26 +348,14 @@ const AuditTab: React.FC = () => {
 /* ------------------------------------------------------------------ */
 
 export const AdminDashboardPage: React.FC = () => {
-  const { user, logout } = useAuth();
   const [tab, setTab] = useState<Tab>('overview');
+  // The research link is shown only when the server confirms access (admin role + researchAnalyticsAccess)
+  const researchAccess = useResearchAccess();
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <ShieldCheck size={22} className="text-blue-700" />
-            <Link to="/admin" className="font-bold">MathQuest Admin</Link>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">read-only</span>
-          </div>
-          <div className="flex items-center gap-3 text-xs text-slate-600">
-            <span>{user?.email}</span>
-            <button type="button" onClick={logout} className="inline-flex items-center gap-1 min-h-[36px] px-3 rounded-lg border border-slate-300 font-semibold hover:bg-slate-50">
-              <LogOut size={14} /> Sign out
-            </button>
-          </div>
-        </div>
-        <nav aria-label="Admin sections" className="max-w-7xl mx-auto px-4 sm:px-6 flex gap-1 overflow-x-auto">
+    <AdminShell
+      nav={
+        <>
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -454,10 +369,14 @@ export const AdminDashboardPage: React.FC = () => {
               {t.label}
             </button>
           ))}
-        </nav>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-5 space-y-4">
+          {researchAccess === 'granted' && (
+            <Link to="/admin/research" className={`${navTabClass(false)} gap-1.5`}>
+              <FlaskConical size={15} /> Research &amp; Model Analytics
+            </Link>
+          )}
+        </>
+      }
+    >
         <p className="text-xs text-slate-600 bg-white border border-slate-200 rounded-xl px-3 py-2">
           Every view on this dashboard is recorded in the admin audit log. Data is read-only. Parent-reported ADHD information and
           SNAP-IV answers are research context only and are not diagnoses.
@@ -468,8 +387,7 @@ export const AdminDashboardPage: React.FC = () => {
         {tab === 'teachers' && <UsersTab role="teacher" />}
         {tab === 'admins' && <UsersTab role="admin" />}
         {tab === 'audit' && <AuditTab />}
-      </main>
-    </div>
+    </AdminShell>
   );
 };
 

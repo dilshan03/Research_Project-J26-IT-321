@@ -845,6 +845,115 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                 <span>P(Guess<sub>eff</sub>): <b>{Math.round(bktComparison.effectiveGuess * 100)}%</b></span>
                 <span>Saved: <b style={{ color: falseDemotionPrevented > 0 ? '#4ADE80' : '#94A3B8' }}>+{Math.round(falseDemotionPrevented * 100)}%</b></span>
               </div>
+
+              {/* Step 7: 3-Model Ablation Benchmark Table (N=2,400 Interactions, 120 Students) */}
+              <div
+                style={{
+                  marginTop: '4px',
+                  padding: '8px',
+                  borderRadius: '8px',
+                  background: 'rgba(15, 23, 42, 0.82)',
+                  border: '1px solid rgba(168, 85, 247, 0.35)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.69rem', fontWeight: 800, color: '#E2E8F0' }}>
+                    📊 Step 7: 3-Model Ablation Benchmark
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.62rem',
+                      fontWeight: 700,
+                      color: '#38BDF8',
+                      background: 'rgba(56, 189, 248, 0.14)',
+                      padding: '1px 6px',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    N = 2,400 | 120 Learners
+                  </span>
+                </div>
+
+                <table
+                  style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    fontSize: '0.65rem',
+                    textAlign: 'right'
+                  }}
+                >
+                  <thead>
+                    <tr
+                      style={{
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+                        color: '#94A3B8',
+                        fontWeight: 800
+                      }}
+                    >
+                      <th style={{ textAlign: 'left', padding: '4px 2px' }}>Metric</th>
+                      <th style={{ padding: '4px 3px' }}>Std BKT</th>
+                      <th style={{ padding: '4px 3px', color: '#C084FC' }}>Hint-BKT</th>
+                      <th style={{ padding: '4px 3px', color: '#38BDF8' }}>AD-BKT</th>
+                      <th style={{ padding: '4px 2px', color: '#4ADE80' }}>Δ vs Std</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                      <td style={{ textAlign: 'left', padding: '4px 2px', color: '#E2E8F0', fontWeight: 600 }}>
+                        AUC-ROC ↑
+                      </td>
+                      <td style={{ padding: '4px 3px', color: '#94A3B8' }}>0.6183</td>
+                      <td style={{ padding: '4px 3px', color: '#CBD5E1' }}>0.6488</td>
+                      <td style={{ padding: '4px 3px', color: '#FFFFFF', fontWeight: 800 }}>0.6454</td>
+                      <td style={{ padding: '4px 2px', color: '#4ADE80', fontWeight: 700 }}>+0.0271</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                      <td style={{ textAlign: 'left', padding: '4px 2px', color: '#E2E8F0', fontWeight: 600 }}>
+                        RMSE ↓
+                      </td>
+                      <td style={{ padding: '4px 3px', color: '#94A3B8' }}>0.4807</td>
+                      <td style={{ padding: '4px 3px', color: '#CBD5E1' }}>0.4777</td>
+                      <td style={{ padding: '4px 3px', color: '#FFFFFF', fontWeight: 800 }}>0.4715</td>
+                      <td style={{ padding: '4px 2px', color: '#4ADE80', fontWeight: 700 }}>-0.0092</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                      <td style={{ textAlign: 'left', padding: '4px 2px', color: '#E2E8F0', fontWeight: 600 }}>
+                        Log-Loss ↓
+                      </td>
+                      <td style={{ padding: '4px 3px', color: '#94A3B8' }}>0.6557</td>
+                      <td style={{ padding: '4px 3px', color: '#CBD5E1' }}>0.6466</td>
+                      <td style={{ padding: '4px 3px', color: '#FFFFFF', fontWeight: 800 }}>0.6341</td>
+                      <td style={{ padding: '4px 2px', color: '#4ADE80', fontWeight: 700 }}>-0.0216</td>
+                    </tr>
+                    <tr
+                      style={{
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                        background: 'rgba(16, 185, 129, 0.08)'
+                      }}
+                    >
+                      <td style={{ textAlign: 'left', padding: '4px 2px', color: '#4ADE80', fontWeight: 800 }}>
+                        False Demotion (FDR) ↓
+                      </td>
+                      <td style={{ padding: '4px 3px', color: '#F87171', fontWeight: 700 }}>41.61%</td>
+                      <td style={{ padding: '4px 3px', color: '#FBBF24' }}>23.13%</td>
+                      <td style={{ padding: '4px 3px', color: '#4ADE80', fontWeight: 800 }}>1.71%</td>
+                      <td style={{ padding: '4px 2px', color: '#4ADE80', fontWeight: 800 }}>-39.90%</td>
+                    </tr>
+                    <tr>
+                      <td style={{ textAlign: 'left', padding: '4px 2px', color: '#38BDF8', fontWeight: 700 }}>
+                        Avg Slip Drop ↓
+                      </td>
+                      <td style={{ padding: '4px 3px', color: '#F87171' }}>-12.44%</td>
+                      <td style={{ padding: '4px 3px', color: '#FBBF24' }}>-8.59%</td>
+                      <td style={{ padding: '4px 3px', color: '#38BDF8', fontWeight: 800 }}>-2.61%</td>
+                      <td style={{ padding: '4px 2px', color: '#4ADE80', fontWeight: 700 }}>+9.83%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

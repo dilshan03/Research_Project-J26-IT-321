@@ -1,0 +1,43 @@
+{
+  "dataset": {
+    "total_interactions": 2400,
+    "unique_students": 120,
+    "archetypes": [
+      "ADHD_COMBINED",
+      "ADHD_INATTENTIVE",
+      "NEUROTYPICAL"
+    ]
+  },
+  "models": {
+    "standard_bkt": {
+      "rmse": 0.4807,
+      "auc_roc": 0.6183,
+      "accuracy": 0.6362,
+      "log_loss": 0.6557,
+      "false_demotion_rate": 0.4161,
+      "avg_slip_mastery_drop": 0.1244,
+      "mastered_slip_events": 161,
+      "sample_count": 2400
+    },
+    "hint_aware_bkt": {
+      "rmse": 0.4777,
+      "auc_roc": 0.6488,
+      "accuracy": 0.62,
+      "log_loss": 0.6466,
+      "false_demotion_rate": 0.2313,
+      "avg_slip_mastery_drop": 0.0859,
+      "mastered_slip_events": 160,
+      "sample_count": 2400
+    },
+    "proposed_ad_bkt": {
+      "rmse": 0.4715,
+      "auc_roc": 0.6454,
+      "accuracy": 0.6321,
+      "log_loss": 0.6341,
+      "false_demotion_rate": 0.0171,
+      "avg_slip_mastery_drop": 0.0261,
+      "mastered_slip_events": 175,
+      "sample_count": 2400
+    }
+  }
+}

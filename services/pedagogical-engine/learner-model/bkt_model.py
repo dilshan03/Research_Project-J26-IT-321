@@ -282,29 +282,78 @@ class HintAwareBKT:
 
         return trajectory
 
-    def evaluate_on_dataframe(self, df: pd.DataFrame) -> Dict[str, float]:
+    def evaluate_on_dataframe(
+        self,
+        df: pd.DataFrame,
+        enable_ad_slip_protection: bool = False
+    ) -> Dict[str, float]:
         """
-        Evaluates BKT predictive performance on a tabular interaction dataset.
-        Expected columns: student_id, is_correct, hint_level, inattention_index
+        Evaluates BKT predictive performance and False Mastery Demotion Rate (FDR)
+        on a tabular interaction dataset.
+        Expected columns: student_id, is_correct, hint_level, inattention_index,
+                          response_time_ms, true_mastery_latent (optional)
         """
         y_true = []
         y_pred = []
+        mastered_slip_events = 0
+        false_demotions = 0
+        mastery_drop_sum = 0.0
 
         for student_id, group in df.groupby('student_id'):
             p_current = self.p_l0
+            stability = 3.0
+            seen_rts: List[float] = []
+
             for _, row in group.iterrows():
                 is_corr = bool(row['is_correct'])
                 hint_lvl = int(row.get('hint_level', 0))
                 inatt = float(row.get('inattention_index', 0.0))
+                rt_ms = float(row.get('response_time_ms', 5000.0))
+                true_mastery = int(row.get('true_mastery_latent', 1 if p_current >= 0.70 else 0))
+
+                # Personal log-RT Z-score computation
+                rt_z = 0.0
+                if len(seen_rts) >= 3:
+                    log_rts = np.log(np.maximum(100.0, seen_rts))
+                    mean_log = float(np.mean(log_rts))
+                    std_log = float(max(0.25, np.std(log_rts)))
+                    rt_z = float((np.log(max(100.0, rt_ms)) - mean_log) / std_log)
+                seen_rts.append(rt_ms)
+
+                is_impulsive_err = (not is_corr) and (rt_ms < 2200.0)
+                is_attention_slip = bool(
+                    enable_ad_slip_protection
+                    and (not is_corr)
+                    and (is_impulsive_err or abs(rt_z) >= 1.5 or inatt >= 0.55)
+                )
 
                 # Prediction before observing result
-                pred_correct = p_current * (1.0 - self.p_s) + (1.0 - p_current) * self.p_g
+                eff_s_pred = float(np.clip(self.p_s + self.alpha_slip * inatt, self.p_s, 0.45))
+                pred_correct = p_current * (1.0 - eff_s_pred) + (1.0 - p_current) * self.p_g
                 y_true.append(1.0 if is_corr else 0.0)
                 y_pred.append(float(pred_correct))
 
-                # Update state
-                step_res = self.update_step(p_current, is_corr, hint_lvl, inatt)
+                p_before = p_current
+                step_res = self.update_step(
+                    p_current,
+                    is_corr,
+                    hint_lvl,
+                    inatt,
+                    is_attention_slip=is_attention_slip,
+                    rt_zscore=rt_z if enable_ad_slip_protection else 0.0,
+                    memory_stability=stability,
+                    elapsed_days=0.0
+                )
                 p_current = step_res['updated_knowledge']
+                stability = step_res['memory_stability']
+
+                # Check False Mastery Demotion on true-mastered students who make an attentional slip
+                if (not is_corr) and true_mastery == 1 and p_before >= 0.60 and (inatt >= 0.50 or rt_ms < 2500.0 or abs(rt_z) >= 1.3):
+                    mastered_slip_events += 1
+                    drop = max(0.0, p_before - p_current)
+                    mastery_drop_sum += drop
+                    if drop >= 0.12 or p_current < 0.55:
+                        false_demotions += 1
 
         y_true_arr = np.array(y_true)
         y_pred_arr = np.array(y_pred)
@@ -316,11 +365,16 @@ class HintAwareBKT:
             auc = 0.5
         acc = float(np.mean((y_pred_arr >= 0.5) == (y_true_arr == 1.0)))
         loss = float(log_loss(y_true_arr, np.clip(y_pred_arr, 1e-6, 1.0 - 1e-6)))
+        fdr = float(false_demotions / mastered_slip_events) if mastered_slip_events > 0 else 0.0
+        avg_slip_drop = float(mastery_drop_sum / mastered_slip_events) if mastered_slip_events > 0 else 0.0
 
         return {
             'rmse': round(rmse, 4),
             'auc_roc': round(auc, 4),
             'accuracy': round(acc, 4),
             'log_loss': round(loss, 4),
+            'false_demotion_rate': round(fdr, 4),
+            'avg_slip_mastery_drop': round(avg_slip_drop, 4),
+            'mastered_slip_events': mastered_slip_events,
             'sample_count': len(y_true)
         }

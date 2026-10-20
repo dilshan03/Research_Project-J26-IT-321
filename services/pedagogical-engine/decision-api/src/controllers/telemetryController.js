@@ -305,7 +305,16 @@ export async function evaluateLearnerState(req, res) {
  */
 export function calculateBKTStep(req, res) {
   try {
-    const { p_prior = 0.20, isCorrect, hintLevel = 0, inattentionIndex = 0.0 } = req.body;
+    const {
+      p_prior = 0.20,
+      isCorrect,
+      hintLevel = 0,
+      inattentionIndex = 0.0,
+      isAttentionSlip = false,
+      rtZScore = 0.0,
+      memoryStability = 3.0,
+      elapsedDays = 0.0
+    } = req.body;
 
     if (typeof isCorrect !== 'boolean') {
       return res.status(400).json({ success: false, error: 'Missing required field: isCorrect (boolean)' });
@@ -315,7 +324,11 @@ export function calculateBKTStep(req, res) {
       p_prior: parseFloat(p_prior),
       isCorrect,
       hintLevel: parseInt(hintLevel, 10) || 0,
-      inattentionIndex: parseFloat(inattentionIndex) || 0.0
+      inattentionIndex: parseFloat(inattentionIndex) || 0.0,
+      isAttentionSlip: Boolean(isAttentionSlip),
+      rtZScore: parseFloat(rtZScore) || 0.0,
+      memoryStability: parseFloat(memoryStability) || 3.0,
+      elapsedDays: parseFloat(elapsedDays) || 0.0
     });
 
     return res.json({

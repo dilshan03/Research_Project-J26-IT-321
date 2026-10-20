@@ -134,25 +134,58 @@ class HintAwareBKT:
             "attention_probability": round(1.0 - fused, 4)
         }
 
+    def compute_retention_state(
+        self,
+        p_prior: float,
+        memory_stability: float = 3.0,
+        elapsed_days: float = 0.0
+    ) -> Dict[str, Any]:
+        """
+        Computes Stability-Based Ebbinghaus Retention R(t) = exp(-delta_t / S_t)
+        and returns decayed prior knowledge alongside revision scheduling metrics (Step 4).
+        """
+        safe_s = float(max(0.5, memory_stability))
+        safe_dt = float(max(0.0, elapsed_days))
+        retention_score = float(np.exp(-safe_dt / safe_s)) if safe_dt > 0.0 else 1.0
+        decayed_prior = (
+            float(self.p_l0 + (p_prior - self.p_l0) * retention_score)
+            if safe_dt > 0.0
+            else float(p_prior)
+        )
+        optimal_next_days = float(max(0.5, -safe_s * np.log(0.70)))
+        return {
+            "retention_score": round(retention_score, 4),
+            "decayed_prior": round(float(np.clip(decayed_prior, 0.0, 1.0)), 4),
+            "memory_stability": round(safe_s, 2),
+            "elapsed_days": round(safe_dt, 2),
+            "revision_recommended": bool(retention_score < 0.70),
+            "optimal_next_review_days": round(optimal_next_days, 1)
+        }
+
     def update_step(
         self,
         p_prior: float,
         is_correct: bool,
         hint_level: int = 0,
-        inattention_index: float = 0.0
+        inattention_index: float = 0.0,
+        is_attention_slip: bool = False,
+        rt_zscore: float = 0.0,
+        memory_stability: float = 3.0,
+        elapsed_days: float = 0.0
     ) -> Dict[str, Any]:
         """
-        Executes a single Bayesian update step incorporating hint scaffolding and inattention slip.
-
-        :param p_prior: P(L_t-1), previous knowledge probability
-        :param is_correct: Whether the student answered correctly (True/False)
-        :param hint_level: Progressive hint level reached (0 to 4)
-        :param inattention_index: Real-time attentional drift score [0.0, 1.0]
-        :return: Dict containing posterior, updated knowledge, and effective parameters
+        Executes a single AD-BKT (Attention-Disentangled & Forgetting-Aware BKT) update step (Steps 3 & 4).
         """
-        # 1. Adapt slip based on ADHD inattention
+        # 0. Step 4: Stability-Based Forgetting Decay
+        ret_state = self.compute_retention_state(p_prior, memory_stability, elapsed_days)
+        active_prior = ret_state["decayed_prior"]
+
+        # 1. Step 3: Adapt slip based on ADHD inattention & RT z-score
         clipped_inatt = float(np.clip(inattention_index, 0.0, 1.0))
+        has_rt_anomaly = bool(abs(float(rt_zscore)) >= 1.5)
         effective_slip = float(np.clip(self.p_s + self.alpha_slip * clipped_inatt, self.p_s, 0.45))
+        if not is_correct and (is_attention_slip or has_rt_anomaly):
+            effective_slip = float(max(effective_slip, 0.62))
 
         # 2. Adapt guess based on progressive hint level assistance
         hint_fraction = float(np.clip(hint_level / 4.0, 0.0, 1.0))
@@ -163,33 +196,75 @@ class HintAwareBKT:
 
         # 3. Compute Posterior Knowledge via Bayes' Rule
         if is_correct:
-            numerator = p_prior * (1.0 - effective_slip)
-            denominator = numerator + (1.0 - p_prior) * effective_guess
+            numerator = active_prior * (1.0 - effective_slip)
+            denominator = numerator + (1.0 - active_prior) * effective_guess
         else:
-            numerator = p_prior * effective_slip
-            denominator = numerator + (1.0 - p_prior) * (1.0 - effective_guess)
+            numerator = active_prior * effective_slip
+            denominator = numerator + (1.0 - active_prior) * (1.0 - effective_guess)
 
-        p_posterior = float(numerator / denominator) if denominator > 0 else float(p_prior)
+        p_posterior = float(numerator / denominator) if denominator > 0 else float(active_prior)
 
-        # 4. Learning Transition
+        # Standard BKT comparison for False Demotion Rate
+        std_num = active_prior * (1.0 - self.p_s) if is_correct else active_prior * self.p_s
+        std_den = (
+            std_num + (1.0 - active_prior) * self.p_g
+            if is_correct
+            else std_num + (1.0 - active_prior) * (1.0 - self.p_g)
+        )
+        std_post = float(std_num / std_den) if std_den > 0 else float(active_prior)
+        std_updated = (
+            float(np.clip(std_post + (1.0 - std_post) * self.p_t, active_prior, 1.0))
+            if is_correct
+            else float(min(active_prior * 0.95, std_post))
+        )
+
+        # 4. Learning Transition & AD-BKT False Mastery Demotion Protection
+        mastery_protected = False
         if is_correct:
-            p_updated = float(p_posterior + (1.0 - p_posterior) * self.p_t)
-            p_updated = float(np.clip(p_updated, p_prior, 1.0))
+            eff_t = self.p_t * (1.0 - 0.30 * clipped_inatt)
+            p_updated = float(p_posterior + (1.0 - p_posterior) * eff_t)
+            p_updated = float(np.clip(p_updated, active_prior, 1.0))
         else:
-            p_updated = float(min(p_prior * 0.95, p_posterior))
+            if is_attention_slip or has_rt_anomaly:
+                p_updated = float(max(active_prior * 0.96, min(active_prior * 0.98, p_posterior)))
+                mastery_protected = True
+            else:
+                p_updated = float(min(active_prior * 0.95, p_posterior))
+                mastery_protected = bool(clipped_inatt >= 0.60)
             p_updated = float(np.clip(p_updated, 0.0, 1.0))
 
-        # 5. Predicted probability of answering the NEXT question correctly
+        # 5. Step 4: Update Memory Stability S_t (Spaced Retrieval Growth)
+        updated_stability = float(ret_state["memory_stability"])
+        if is_correct:
+            if hint_level == 0 and clipped_inatt < 0.60:
+                updated_stability = float(min(30.0, updated_stability * (1.0 + 0.35 * (1.0 - clipped_inatt))))
+            else:
+                updated_stability = float(min(30.0, updated_stability * (1.0 + 0.10 * (1.0 - hint_fraction))))
+        elif not mastery_protected:
+            updated_stability = float(max(1.0, updated_stability * 0.80))
+
+        optimal_next_days = float(max(0.5, -updated_stability * np.log(0.70)))
+
+        # 6. Predicted probability of answering the NEXT question correctly
         predicted_next_correct = float(p_updated * (1.0 - self.p_s) + (1.0 - p_updated) * self.p_g)
+        false_demotion_prevented = float(max(0.0, p_updated - std_updated)) if not is_correct else 0.0
 
         return {
             'prior_knowledge': float(p_prior),
+            'decayed_prior_knowledge': float(active_prior),
             'posterior_knowledge': float(p_posterior),
             'updated_knowledge': float(p_updated),
+            'standard_updated_knowledge': float(round(std_updated, 4)),
             'predicted_next_correct': float(predicted_next_correct),
             'effective_slip': float(effective_slip),
             'effective_guess': float(effective_guess),
-            'is_mastered': bool(p_updated >= self.mastery_threshold)
+            'is_mastered': bool(p_updated >= self.mastery_threshold),
+            'mastery_protected': bool(mastery_protected),
+            'false_demotion_prevented': round(false_demotion_prevented, 4),
+            'retention_score': ret_state["retention_score"],
+            'memory_stability': round(updated_stability, 2),
+            'revision_recommended': ret_state["revision_recommended"],
+            'optimal_next_review_days': round(optimal_next_days, 1)
         }
 
     def predict_sequence(self, observations: List[Tuple[bool, int, float]]) -> List[Dict[str, Any]]:

@@ -38,7 +38,10 @@ class BKTStepRequest(BaseModel):
     is_correct: bool
     hint_level: int = Field(0, ge=0, le=4)
     inattention_index: float = Field(0.0, ge=0.0, le=1.0)
+    is_attention_slip: bool = False
     rt_zscore: float = Field(0.0)
+    memory_stability: float = Field(3.0, ge=0.5, le=60.0)
+    elapsed_days: float = Field(0.0, ge=0.0)
     remaining_time_ms: Optional[float] = None
     camera_permission_granted: bool = False
     camera_attention_score: Optional[float] = Field(None, ge=0.0, le=1.0)
@@ -83,7 +86,11 @@ def update_step(req: BKTStepRequest):
             p_prior=req.p_prior,
             is_correct=req.is_correct,
             hint_level=req.hint_level,
-            inattention_index=fusion["fused_inattention_index"]
+            inattention_index=fusion["fused_inattention_index"],
+            is_attention_slip=req.is_attention_slip,
+            rt_zscore=req.rt_zscore,
+            memory_stability=req.memory_stability,
+            elapsed_days=req.elapsed_days
         )
         result["attention_fusion"] = fusion
         return {"success": True, "result": result}

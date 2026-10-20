@@ -123,13 +123,23 @@ export interface LearnerState {
  * Real-time comparison between Standard BKT and Hint-Aware ADHD BKT
  */
 export interface BKTComparisonState {
-  hintAwareKnowledge: number;         // P(L) in [0, 1]
+  hintAwareKnowledge: number;         // P(L) in [0, 1] (AD-BKT)
   standardKnowledge: number;          // P(L_std) in [0, 1]
   predictedNextCorrect: number;       // P(C_{t+1}) in [0, 1]
   effectiveSlip: number;              // P(S_eff)
   effectiveGuess: number;             // P(G_eff)
   isMastered: boolean;                // P(L) >= 0.85
   overestimationGap: number;          // standardKnowledge - hintAwareKnowledge
+  // Step 3: AD-BKT False Mastery Demotion Protection
+  masteryProtected?: boolean;
+  falseDemotionPrevented?: number;
+  // Step 4: Stability-Based Forgetting & Knowledge Retention
+  retentionScore?: number;            // R(t) = exp(-elapsedDays / memoryStability)
+  memoryStability?: number;           // S_t in days
+  decayedKnowledge?: number;          // P(L) after time decay
+  elapsedDays?: number;               // Simulated or actual elapsed days since practice
+  revisionRecommended?: boolean;      // True when R(t) < 0.70
+  optimalNextReviewDays?: number;     // -S_t * ln(0.70)
 }
 
 /**

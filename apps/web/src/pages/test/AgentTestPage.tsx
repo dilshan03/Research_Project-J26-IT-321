@@ -198,6 +198,8 @@ export function AgentTestPage() {
   const [remainingTimeSec, setRemainingTimeSec] = useState<number>(QUESTION_TIME_LIMIT_SEC);
   const [cameraPermissionGranted, setCameraPermissionGranted] = useState<boolean>(false);
   const [cameraAttentionScore, setCameraAttentionScore] = useState<number>(0.85);
+  // Step 4 Visual State: Simulated Elapsed Days (Δt) for Stability-Based Forgetting Curve
+  const [simulatedElapsedDays, setSimulatedElapsedDays] = useState<number>(0);
 
   const autoAdvanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const question = TEST_QUESTIONS[currentQuestionIdx];
@@ -243,15 +245,19 @@ export function AgentTestPage() {
     autoIntervene: true, // Automatically triggers 3D agent reaction & speech bubble
   });
 
-  // Evaluate state when logs or camera consent/score changes
+  // Evaluate state when logs, camera consent/score, or simulated elapsed days changes
   useEffect(() => {
     if (logs.length > 0) {
-      evaluateInteractions(logs, {
-        cameraPermissionGranted,
-        cameraAttentionScore,
-      });
+      evaluateInteractions(
+        logs,
+        {
+          cameraPermissionGranted,
+          cameraAttentionScore,
+        },
+        simulatedElapsedDays
+      );
     }
-  }, [logs, cameraPermissionGranted, cameraAttentionScore, evaluateInteractions]);
+  }, [logs, cameraPermissionGranted, cameraAttentionScore, simulatedElapsedDays, evaluateInteractions]);
 
   const goToQuestion = (nextIdx: number) => {
     if (autoAdvanceTimerRef.current) {
@@ -379,7 +385,7 @@ export function AgentTestPage() {
       cameraAttentionScore: cameraPermissionGranted ? cameraAttentionScore : null,
       timestamp: new Date().toISOString(),
     };
-    evaluateInteractions([...logs, simEvent], { cameraPermissionGranted, cameraAttentionScore });
+    evaluateInteractions([...logs, simEvent], { cameraPermissionGranted, cameraAttentionScore }, simulatedElapsedDays);
   };
 
   const handleSimulateFrustration = () => {
@@ -421,7 +427,7 @@ export function AgentTestPage() {
         timestamp: new Date().toISOString(),
       },
     ];
-    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore });
+    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore }, simulatedElapsedDays);
   };
 
   const handleSimulateFocusedFlow = () => {
@@ -463,7 +469,7 @@ export function AgentTestPage() {
         timestamp: new Date().toISOString(),
       },
     ];
-    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore });
+    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore }, simulatedElapsedDays);
   };
 
   const handleSimulateHintAssisted = () => {
@@ -501,10 +507,10 @@ export function AgentTestPage() {
         timestamp: new Date().toISOString(),
       },
     ];
-    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore });
+    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore }, simulatedElapsedDays);
   };
 
-  // Step 2 Novelty Trigger: Personal RT Baseline Z-Score & Attention Slip Simulation
+  // Step 2 & Step 3 Novelty Trigger: Personal RT Baseline Z-Score & Attention Slip Mastery Protection Simulation
   const handleSimulateRapidAttentionSlip = () => {
     const now = Date.now();
     const simEvents: InteractionEvent[] = [
@@ -583,7 +589,7 @@ export function AgentTestPage() {
         timestamp: new Date(now).toISOString(),
       },
     ];
-    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore });
+    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore }, simulatedElapsedDays);
   };
 
   const formattedQNum = String(question.stepNumber).padStart(2, '0');
@@ -904,7 +910,7 @@ export function AgentTestPage() {
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr 1fr',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
                     gap: '10px',
                     width: '100%',
                     marginTop: '4px',
@@ -918,7 +924,7 @@ export function AgentTestPage() {
                       border: '1px solid rgba(16, 185, 129, 0.3)',
                     }}
                   >
-                    <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>Hint-Aware P(L)</div>
+                    <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>AD-BKT P(L)</div>
                     <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#34D399' }}>
                       {Math.round(bktComparison.hintAwareKnowledge * 100)}%
                     </div>
@@ -935,6 +941,20 @@ export function AgentTestPage() {
                     <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>Standard P(L)</div>
                     <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#38BDF8' }}>
                       {Math.round(bktComparison.standardKnowledge * 100)}%
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      padding: '10px',
+                      borderRadius: '12px',
+                      background: 'rgba(168, 85, 247, 0.12)',
+                      border: '1px solid rgba(168, 85, 247, 0.3)',
+                    }}
+                  >
+                    <div style={{ fontSize: '0.72rem', color: '#94A3B8' }}>Stability S<sub>t</sub></div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#C084FC' }}>
+                      {(bktComparison.memoryStability ?? 1.0).toFixed(1)}d
                     </div>
                   </div>
 
@@ -1136,7 +1156,7 @@ export function AgentTestPage() {
               zIndex: 20,
             }}
           >
-            {/* Visual Tasks #19, #20 & #21 + Step 1 & Step 2 HUD */}
+            {/* Visual Tasks #19, #20 & #21 + Step 1, Step 2, Step 3 & Step 4 HUD */}
             <LearnerStateHUD
               learnerState={learnerState}
               bktComparison={bktComparison}
@@ -1146,6 +1166,8 @@ export function AgentTestPage() {
               cameraAttentionScore={cameraAttentionScore}
               onToggleCameraPermission={setCameraPermissionGranted}
               onChangeCameraScore={setCameraAttentionScore}
+              elapsedDays={simulatedElapsedDays}
+              onChangeElapsedDays={setSimulatedElapsedDays}
               onSimulateInattention={handleSimulateInattention}
               onSimulateFrustration={handleSimulateFrustration}
               onSimulateFocusedFlow={handleSimulateFocusedFlow}

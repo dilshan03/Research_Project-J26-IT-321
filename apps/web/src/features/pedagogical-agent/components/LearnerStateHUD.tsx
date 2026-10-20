@@ -10,6 +10,8 @@ export interface LearnerStateHUDProps {
   cameraAttentionScore?: number;
   onToggleCameraPermission?: (granted: boolean) => void;
   onChangeCameraScore?: (score: number) => void;
+  elapsedDays?: number;
+  onChangeElapsedDays?: (days: number) => void;
   onSimulateInattention?: () => void;
   onSimulateFrustration?: () => void;
   onSimulateFocusedFlow?: () => void;
@@ -131,7 +133,15 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
     effectiveSlip: 0.18,
     effectiveGuess: 0.25,
     isMastered: false,
-    overestimationGap: 0.0
+    overestimationGap: 0.0,
+    masteryProtected: false,
+    falseDemotionPrevented: 0.0,
+    retentionScore: 1.0,
+    memoryStability: 1.0,
+    decayedKnowledge: 0.20,
+    elapsedDays: 0,
+    revisionRecommended: false,
+    optimalNextReviewDays: 0.4
   },
   fsmDecision = {
     fsmState: 'OBSERVING',
@@ -156,6 +166,8 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
   cameraAttentionScore = 0.85,
   onToggleCameraPermission,
   onChangeCameraScore,
+  elapsedDays = 0,
+  onChangeElapsedDays,
   onSimulateInattention,
   onSimulateFrustration,
   onSimulateFocusedFlow,
@@ -191,6 +203,14 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
   const pL_hintAware = bktComparison.hintAwareKnowledge;
   const pL_standard = bktComparison.standardKnowledge;
   const isMastered = bktComparison.isMastered;
+  const masteryProtected = Boolean(bktComparison.masteryProtected);
+  const falseDemotionPrevented = bktComparison.falseDemotionPrevented ?? 0.0;
+  const retentionScore = bktComparison.retentionScore ?? 1.0;
+  const memoryStability = bktComparison.memoryStability ?? 1.0;
+  const decayedKnowledge = bktComparison.decayedKnowledge ?? pL_hintAware;
+  const activeElapsedDays = bktComparison.elapsedDays ?? elapsedDays;
+  const revisionRecommended = Boolean(bktComparison.revisionRecommended);
+  const optimalNextReviewDays = bktComparison.optimalNextReviewDays ?? 0.4;
 
   const fsmConfig = FSM_STATE_CONFIG[fsmDecision.fsmState] || FSM_STATE_CONFIG.OBSERVING;
 
@@ -512,11 +532,13 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         </div>
       </div>
 
-      {/* BKT Concept Mastery Hero Section (Task #20 Feature) */}
+      {/* Step 3 & Step 4 Novelty: AD-BKT Concept Mastery P(L) & Forgetting-Aware Retention */}
       <div
         style={{
           background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.15) 100%)',
-          border: '1px solid rgba(168, 85, 247, 0.35)',
+          border: masteryProtected
+            ? '1px solid rgba(56, 189, 248, 0.6)'
+            : '1px solid rgba(168, 85, 247, 0.35)',
           borderRadius: '12px',
           padding: '12px',
           display: 'flex',
@@ -528,7 +550,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '1rem' }}>🎓</span>
             <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#E2E8F0', letterSpacing: '0.3px' }}>
-              BKT Concept Mastery P(L)
+              AD-BKT Concept Mastery P(L)
             </span>
           </div>
 
@@ -551,7 +573,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', marginBottom: '4px' }}>
             <span style={{ color: '#C084FC', fontWeight: 700 }}>
-              P(L) Mastery: {Math.round(pL_hintAware * 100)}%
+              AD-BKT P(L): {Math.round(pL_hintAware * 100)}%
             </span>
             <span style={{ color: '#94A3B8', fontSize: '0.72rem' }}>
               Threshold: 85% | Next P(C): {Math.round(bktComparison.predictedNextCorrect * 100)}%
@@ -580,7 +602,30 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
           </div>
         </div>
 
-        {/* Comparative BKT Section (Standard vs Hint-Aware) Toggle */}
+        {/* Step 3 Banner: AD-BKT Attention Slip Mastery Protection */}
+        {masteryProtected && (
+          <div
+            style={{
+              padding: '6px 9px',
+              borderRadius: '8px',
+              background: 'rgba(56, 189, 248, 0.16)',
+              border: '1px solid rgba(56, 189, 248, 0.5)',
+              color: '#38BDF8',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+          >
+            <span>🛡️ Step 3: AD-BKT Mastery Protected! (ADHD Slip Disentangled)</span>
+            <span style={{ color: '#4ADE80', fontWeight: 800 }}>
+              +{Math.round(falseDemotionPrevented * 100)}% Saved
+            </span>
+          </div>
+        )}
+
+        {/* Comparative BKT Section (Standard vs AD-BKT) Toggle */}
         <div style={{ marginTop: '2px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
           <div
             onClick={() => setShowBKTDetails(!showBKTDetails)}
@@ -594,7 +639,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
               fontWeight: 700
             }}
           >
-            <span>⚖️ Standard vs Hint-Aware BKT Comparison</span>
+            <span>⚖️ Standard BKT vs AD-BKT Comparison (Step 3)</span>
             <span>{showBKTDetails ? '▲ Hide' : '▼ View'}</span>
           </div>
 
@@ -603,7 +648,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
               {/* Comparison Bars */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.72rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#A855F7', fontWeight: 600 }}>● Hint-Aware ADHD BKT:</span>
+                  <span style={{ color: '#A855F7', fontWeight: 600 }}>● AD-BKT (Attention & Hint-Aware):</span>
                   <span style={{ fontWeight: 800, color: '#FFFFFF' }}>{Math.round(pL_hintAware * 100)}%</span>
                 </div>
                 <div style={{ height: '5px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
@@ -638,13 +683,167 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
 
               {/* Research Metrics Chips */}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>
-                <span>AUC-ROC: <b>0.6271</b> (+0.013)</span>
-                <span>RMSE: <b>0.4657</b> (-0.005)</span>
-                <span>LogLoss: <b>0.6251</b></span>
+                <span>P(Slip<sub>eff</sub>): <b>{Math.round(bktComparison.effectiveSlip * 100)}%</b></span>
+                <span>P(Guess<sub>eff</sub>): <b>{Math.round(bktComparison.effectiveGuess * 100)}%</b></span>
+                <span>Saved: <b style={{ color: falseDemotionPrevented > 0 ? '#4ADE80' : '#94A3B8' }}>+{Math.round(falseDemotionPrevented * 100)}%</b></span>
               </div>
             </div>
           )}
         </div>
+      </div>
+
+      {/* Step 4 Novelty Panel: Stability-Based Forgetting & Spaced Retrieval Scheduling */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.10) 0%, rgba(168, 85, 247, 0.12) 100%)',
+          border: revisionRecommended
+            ? '1px solid rgba(245, 158, 11, 0.55)'
+            : '1px solid rgba(148, 163, 184, 0.25)',
+          borderRadius: '12px',
+          padding: '11px 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.95rem' }}>⏳</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#E2E8F0' }}>
+              Forgetting & Memory Stability (Step 4)
+            </span>
+          </div>
+
+          <span
+            style={{
+              fontSize: '0.66rem',
+              fontWeight: 800,
+              padding: '2px 8px',
+              borderRadius: '10px',
+              background: revisionRecommended ? 'rgba(245, 158, 11, 0.22)' : 'rgba(16, 185, 129, 0.2)',
+              color: revisionRecommended ? '#FBBF24' : '#34D399',
+              border: revisionRecommended ? '1px solid #F59E0B' : '1px solid #10B981'
+            }}
+          >
+            {revisionRecommended ? '🔔 REVISION DUE' : '✅ RETENTION STRONG'}
+          </span>
+        </div>
+
+        {/* Interactive Time-Gap Simulator Buttons (0d / 1d / 3d / 5d / 7d) */}
+        {onChangeElapsedDays && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(15, 23, 42, 0.65)',
+              padding: '5px 8px',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
+            }}
+          >
+            <span style={{ fontSize: '0.69rem', color: '#CBD5E1', fontWeight: 600 }}>
+              Simulate Time Gap (Δt):
+            </span>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              {[0, 1, 3, 5, 7].map((d) => {
+                const isSelected = activeElapsedDays === d;
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => onChangeElapsedDays(d)}
+                    style={{
+                      padding: '2px 7px',
+                      borderRadius: '6px',
+                      fontSize: '0.68rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      border: isSelected ? '1px solid #FBBF24' : '1px solid rgba(255,255,255,0.12)',
+                      background: isSelected ? 'rgba(245, 158, 11, 0.28)' : 'rgba(255,255,255,0.05)',
+                      color: isSelected ? '#FBBF24' : '#94A3B8'
+                    }}
+                  >
+                    {d}d
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Retention Progress Bar R_t = exp(-Δt / S_t) */}
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', marginBottom: '3px' }}>
+            <span style={{ color: '#FBBF24', fontWeight: 700 }}>
+              Retention R(t) = e<sup>-Δt/S</sup>: {Math.round(retentionScore * 100)}%
+            </span>
+            <span style={{ color: '#94A3B8', fontSize: '0.69rem' }}>
+              Decayed P(L): <b style={{ color: '#E2E8F0' }}>{Math.round(decayedKnowledge * 100)}%</b>
+            </span>
+          </div>
+          <div style={{ height: '6px', borderRadius: '3px', background: 'rgba(255, 255, 255, 0.08)', overflow: 'hidden' }}>
+            <div
+              style={{
+                width: `${Math.round(retentionScore * 100)}%`,
+                height: '100%',
+                background: revisionRecommended
+                  ? 'linear-gradient(90deg, #F59E0B, #EF4444)'
+                  : 'linear-gradient(90deg, #10B981, #38BDF8)',
+                borderRadius: '3px',
+                transition: 'width 0.4s ease'
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Memory Stability & Optimal Next Review */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '6px',
+            fontSize: '0.68rem',
+            textAlign: 'center'
+          }}
+        >
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>Stability S<sub>t</sub></div>
+            <div style={{ fontWeight: 800, color: '#34D399', fontSize: '0.76rem' }}>
+              {memoryStability.toFixed(2)}d
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>Elapsed Δt</div>
+            <div style={{ fontWeight: 800, color: '#38BDF8', fontSize: '0.76rem' }}>
+              {activeElapsedDays} days
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>Next Review</div>
+            <div style={{ fontWeight: 800, color: '#C084FC', fontSize: '0.76rem' }}>
+              {optimalNextReviewDays}d
+            </div>
+          </div>
+        </div>
+
+        {revisionRecommended && (
+          <div
+            style={{
+              padding: '5px 8px',
+              borderRadius: '6px',
+              background: 'rgba(245, 158, 11, 0.16)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              color: '#FBBF24',
+              fontSize: '0.69rem',
+              fontWeight: 700
+            }}
+          >
+            🔔 Spaced Revision Triggered (R(t) &lt; 70%): Recommend micro-review before new concept!
+          </div>
+        )}
       </div>
 
       {/* Step 1 & Step 2 Novelty Panel: Privacy-Aware Dual-Source Fusion & Personal RT Baseline */}

@@ -82,12 +82,14 @@ export interface ErrorAlertProps {
   message: string;
   messageSi?: string;
   onRetry?: () => void;
+  retryLabel?: string;
 }
 
 export const ErrorAlert: React.FC<ErrorAlertProps> = ({
   message,
   messageSi,
   onRetry,
+  retryLabel = 'Retry',
 }) => {
   return (
     <div className="p-4 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-center justify-between gap-3 text-xs sm:text-sm text-mq-danger font-medium animate-fade-in shadow-xs">
@@ -106,7 +108,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
           onClick={onRetry}
           className="text-xs font-bold underline hover:opacity-80 shrink-0 cursor-pointer"
         >
-          Retry
+          {retryLabel}
         </button>
       )}
     </div>
@@ -116,11 +118,13 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
 export interface SuccessAlertProps {
   message: string;
   onDismiss?: () => void;
+  dismissLabel?: string;
 }
 
 export const SuccessAlert: React.FC<SuccessAlertProps> = ({
   message,
   onDismiss,
+  dismissLabel = 'Dismiss',
 }) => {
   return (
     <div className="p-4 bg-mq-success-bg border border-mq-success/30 rounded-2xl flex items-center justify-between gap-3 text-xs sm:text-sm text-mq-success font-bold animate-fade-in shadow-xs">
@@ -134,7 +138,7 @@ export const SuccessAlert: React.FC<SuccessAlertProps> = ({
           onClick={onDismiss}
           className="text-xs font-bold underline hover:opacity-80 shrink-0 cursor-pointer"
         >
-          Dismiss
+          {dismissLabel}
         </button>
       )}
     </div>

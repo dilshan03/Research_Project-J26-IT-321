@@ -6,11 +6,11 @@ import type { Learner } from '../types';
 import { AVATAR_OPTIONS } from '../types';
 import { OnboardingStatusBadge } from '../components/OnboardingStatusBadge';
 import { PageHeader } from '../../../shared/components/PageHeader';
-import {
-  LoadingState,
-  EmptyState,
-  ErrorAlert,
-} from '../../../shared/components/ui/StateViews';
+import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
+import { parentText } from '../../../shared/i18n/parentText';
+
+const t = parentText.assessments;
+const STEP_LABELS = [t.steps.adhd, t.steps.snap, t.steps.preferences, t.steps.social, t.steps.handover, t.steps.math];
 
 export const ParentAssessmentsPage: React.FC = () => {
   const [learners, setLearners] = useState<Learner[]>([]);
@@ -25,10 +25,10 @@ export const ParentAssessmentsPage: React.FC = () => {
       if (res.success && res.data) {
         setLearners(res.data);
       } else {
-        setErrorMessage(res.message || 'Failed to load children profiles.');
+        setErrorMessage(t.loadError);
       }
     } catch {
-      setErrorMessage('Network connection error while connecting to service.');
+      setErrorMessage(parentText.common.networkError);
     } finally {
       setIsLoading(false);
     }
@@ -39,125 +39,89 @@ export const ParentAssessmentsPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-6 sm:space-y-8 animate-fade-in">
-      {/* Standardized Page Header */}
+    <div className="space-y-5 animate-fade-in">
       <PageHeader
         role="parent"
-        title="Onboarding & Diagnostic Assessments"
-        titleSi="ඇගයීම් සහ ප්‍රශ්නාවලි"
-        description="The 5-step onboarding flow gathers child-friendly learning preferences, SNAP-IV ADHD support scales, social learning context, and establishes Grade-appropriate baseline mathematics levels."
-        descriptionSi="ඉගෙනුම් මනාප, SNAP-IV ප්‍රශ්නාවලිය සහ ආරම්භක ගණිත ඇගයීම් සම්පූර්ණ කර දරුවාට ගැළපෙන ඉගෙනුම් මට්ටම තීරණය කරන්න."
+        title={t.title}
+        description={t.description}
         actions={
-          <Link
-            to="/learners"
-            className="btn btn-secondary py-2 px-4 rounded-full text-xs sm:text-sm font-bold shadow-xs inline-flex items-center gap-1.5"
-          >
-            <span>Manage Children (මගේ දරුවන්)</span>
+          <Link to="/learners" className="btn btn-secondary min-h-[44px] px-5 rounded-full inline-flex items-center text-sm">
+            {parentText.nav.myChildren}
           </Link>
         }
       />
 
       {errorMessage && (
-        <ErrorAlert
-          message={errorMessage}
-          messageSi="දරුවන්ගේ තොරතුරු ලබාගැනීමට නොහැකි විය."
-          onRetry={fetchLearners}
-        />
+        <ErrorAlert message={errorMessage} retryLabel={parentText.common.retry} onRetry={fetchLearners} />
       )}
 
       {isLoading ? (
-        <LoadingState
-          message="Loading onboarding assessments..."
-          messageSi="ඇගයීම් විස්තර පූරණය වෙමින් පවතී..."
-        />
+        <LoadingState message={t.loading} />
       ) : learners.length === 0 ? (
         <EmptyState
-          title="No Child Profiles Found"
-          titleSi="තවමත් දරුවන් ලියාපදිංචි කර නැත"
-          description="Register a child profile first before initiating onboarding diagnostic assessments."
-          descriptionSi="ඇගයීම් ආරම්භ කිරීමට පෙර කරුණාකර පළමුව දරුවාගේ තොරතුරු ඇතුළත් කරන්න."
+          title={t.noChildrenTitle}
+          description={t.noChildrenText}
           action={
-            <Link
-              to="/learners"
-              className="btn btn-primary text-xs sm:text-sm py-2.5 px-6 rounded-full inline-flex items-center gap-2 font-bold shadow-xs"
-            >
-              <Plus size={16} />
-              <span>Go to My Children (දරුවන් එක් කරන්න)</span>
+            <Link to="/learners" className="btn btn-primary min-h-[44px] px-6 rounded-full inline-flex items-center gap-2 text-sm">
+              <Plus size={18} />
+              <span>{t.goToChildren}</span>
             </Link>
           }
         />
       ) : (
         <div className="space-y-4">
           {learners.map((child) => {
-            const avatar =
-              AVATAR_OPTIONS.find((a) => a.id === child.avatarId) || AVATAR_OPTIONS[0];
+            const avatar = AVATAR_OPTIONS.find((a) => a.id === child.avatarId) || AVATAR_OPTIONS[0];
 
             return (
               <div
                 key={child.learnerId}
-                className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs hover:shadow-md hover:border-mq-primary/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-5"
+                className="bg-white rounded-3xl border border-mq-border p-5 sm:p-6 shadow-xs grid grid-cols-1 lg:grid-cols-[minmax(220px,1fr)_2fr_auto] lg:items-center gap-5"
               >
                 <div className="flex items-center gap-4 min-w-0">
                   <div
-                    className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0 ${avatar.bgColor} border ${avatar.borderColor}`}
+                    className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0 border ${avatar.bgColor} ${avatar.borderColor}`}
+                    aria-hidden="true"
                   >
                     {avatar.icon}
                   </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-base font-extrabold text-mq-text-strong truncate">
-                        {child.firstName} {child.preferredName && `(${child.preferredName})`}
-                      </h3>
-                      <span className="text-xs font-bold text-mq-text-muted">
-                        Grade {child.grade}
-                      </span>
-                    </div>
-                    <div className="mt-1">
-                      <OnboardingStatusBadge status={child.onboardingStatus} />
-                    </div>
+                  <div className="min-w-0 space-y-1">
+                    <h3 className="text-base font-bold text-mq-text-strong break-words">
+                      {child.firstName}
+                      {child.preferredName && ` (${child.preferredName})`}
+                    </h3>
+                    <p className="text-sm text-mq-text-muted">{parentText.common.grade(child.grade)}</p>
+                    <OnboardingStatusBadge status={child.onboardingStatus} />
                   </div>
                 </div>
 
-                {/* Steps Checklist Pills */}
-                <div className="flex items-center gap-1.5 flex-wrap text-[11px] font-semibold text-mq-text-muted">
-                  <span className="px-2.5 py-1 rounded-lg bg-mq-surface-soft border border-mq-border">
-                    1. Preferences
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-mq-surface-soft border border-mq-border">
-                    2. SNAP-IV
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-mq-surface-soft border border-mq-border">
-                    3. Social Context
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-mq-surface-soft border border-mq-border">
-                    4. Handover
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-mq-surface-soft border border-mq-border">
-                    5. Math Baseline
-                  </span>
-                </div>
+                <ol aria-label={t.stepsLabel} className="flex flex-wrap gap-2">
+                  {STEP_LABELS.map((label, idx) => (
+                    <li
+                      key={label}
+                      className="px-3 py-1.5 rounded-lg bg-mq-surface-soft border border-mq-border text-xs text-mq-text-muted"
+                    >
+                      {idx + 1}. {label}
+                    </li>
+                  ))}
+                </ol>
 
-                {/* Actions */}
-                <div className="shrink-0 flex items-center gap-2">
+                <div className="lg:justify-self-end">
                   {child.onboardingStatus === 'COMPLETED' ? (
                     <Link
                       to="/parent/dashboard/learner-profiles"
-                      className="btn btn-secondary text-xs py-2 px-4 rounded-xl font-bold inline-flex items-center gap-1.5"
+                      className="btn btn-secondary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center gap-2"
                     >
-                      <span>View Results (ප්‍රතිඵල)</span>
-                      <ArrowRight size={14} />
+                      <span>{t.viewResults}</span>
+                      <ArrowRight size={16} />
                     </Link>
                   ) : (
                     <Link
                       to={`/learners/${child.learnerId}/onboarding`}
-                      className="btn btn-primary text-xs py-2 px-5 rounded-xl font-bold inline-flex items-center gap-2 shadow-xs"
+                      className="btn btn-primary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center gap-2"
                     >
-                      <span>
-                        {child.onboardingStatus === 'IN_PROGRESS'
-                          ? 'Resume Onboarding'
-                          : 'Start Onboarding'}
-                      </span>
-                      <ArrowRight size={14} />
+                      <span>{child.onboardingStatus === 'IN_PROGRESS' ? t.resume : t.start}</span>
+                      <ArrowRight size={16} />
                     </Link>
                   )}
                 </div>

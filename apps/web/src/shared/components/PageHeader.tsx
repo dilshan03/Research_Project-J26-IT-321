@@ -22,6 +22,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   breadcrumbItems,
   showBreadcrumb = true,
 }) => {
+  const isParent = role === 'parent';
   return (
     <div className="space-y-3 pb-2 border-b border-mq-border/70">
       {/* 1. Breadcrumb */}
@@ -46,7 +47,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           </div>
 
           {(description || descriptionSi) && (
-            <p className="text-xs sm:text-sm text-mq-text-muted max-w-3xl leading-relaxed">
+            <p className={`${isParent ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'} text-mq-text-muted max-w-3xl leading-relaxed`}>
               {description}
               {descriptionSi && (
                 <span className="block text-xs text-mq-text-muted/90 font-sinhala mt-0.5">
@@ -58,7 +59,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         </div>
 
         {/* 3. Primary Page Action slot */}
-        {actions && <div className="shrink-0 flex items-center gap-3">{actions}</div>}
+        {actions && (
+          <div className={`shrink-0 flex items-center gap-3 ${isParent ? 'flex-wrap' : ''}`}>{actions}</div>
+        )}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import HomePage from './pages/public/HomePage';
 import ContentAdaptationPage from './features/content-adaptation/ContentAdaptationPage';
 import { SignInPage } from './features/auth/pages/SignInPage';
@@ -13,9 +13,11 @@ import {
   LearnersPage,
   OnboardingPlaceholderPage,
   ParentOverviewPage,
+  ParentSnapIvPage,
   ParentLearnerProfilesPage,
   ParentAssessmentsPage,
   ParentRecommendationsPage,
+  ParentComingSoonPage,
 } from './features/learner-profile';
 import { DashboardLayout } from './shared/layouts/DashboardLayout';
 import { FeaturePlaceholder } from './shared/components/FeaturePlaceholder';
@@ -41,6 +43,39 @@ function useHashRoute() {
   return hash;
 }
 
+function FloatingDevControls() {
+  const location = useLocation();
+  // Hide during child-facing onboarding to eliminate distraction
+  const isStudentDashboard = location.pathname === '/student/dashboard';
+  const isAgentTest = location.pathname === '/agent-test';
+  const isOnboarding = location.pathname.includes('/onboarding');
+
+  if (isOnboarding) return null;
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5">
+      {!isStudentDashboard && (
+        <a
+          href="/student/dashboard"
+          className="px-4 py-2 bg-mq-primary-dark text-white font-bold rounded-full shadow-2xl hover:bg-mq-primary transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40 text-xs sm:text-sm"
+        >
+          <span>🎒</span>
+          <span>Student Dashboard</span>
+        </a>
+      )}
+      {!isAgentTest && (
+        <a
+          href="/agent-test"
+          className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-full shadow-2xl hover:bg-emerald-700 transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40 text-xs sm:text-sm"
+        >
+          <span>🤖</span>
+          <span>Test 3D Agent</span>
+        </a>
+      )}
+    </div>
+  );
+}
+
 function App() {
   const hash = useHashRoute();
 
@@ -51,30 +86,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        {/* ------------------------------------------------------------- */}
-        {/* [DEV TEMP] Quick Floating Buttons for Student Dashboard & 3D Agent */}
-        {/* ------------------------------------------------------------- */}
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5">
-          {window.location.pathname !== '/student/dashboard' && (
-            <a
-              href="/student/dashboard"
-              className="px-4 py-2 bg-mq-primary-dark text-white font-bold rounded-full shadow-2xl hover:bg-mq-primary transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40 text-xs sm:text-sm"
-            >
-              <span>🎒</span>
-              <span>Student Dashboard</span>
-            </a>
-          )}
-          {window.location.pathname !== '/agent-test' && (
-            <a
-              href="/agent-test"
-              className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-full shadow-2xl hover:bg-emerald-700 transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40 text-xs sm:text-sm"
-            >
-              <span>🤖</span>
-              <span>Test 3D Agent</span>
-            </a>
-          )}
-        </div>
-        {/* ------------------------------------------------------------- */}
+        <FloatingDevControls />
 
         <Routes>
           {/* ========================================================= */}
@@ -89,6 +101,7 @@ function App() {
           {/* 2. Preserved Existing & Student Dashboard Routes          */}
           {/* ========================================================= */}
           <Route path="/student/dashboard" element={<StudentDashboardPage />} />
+          <Route path="/student/dashboard/:learnerId" element={<StudentDashboardPage />} />
           <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
 
           <Route
@@ -114,6 +127,8 @@ function App() {
             }
           >
             <Route index element={<LearnersPage />} />
+            {/* Optional SNAP-IV, opened from the parent dashboard */}
+            <Route path=":learnerId/snap-iv" element={<ParentSnapIvPage />} />
           </Route>
 
           <Route
@@ -153,51 +168,16 @@ function App() {
             <Route path="assessments" element={<ParentAssessmentsPage />} />
 
             {/* 5. Learning Progress (Pedagogical Engine) */}
-            <Route
-              path="progress"
-              element={
-                <FeaturePlaceholder
-                  featureName="Mathematics Learning Progress & Skill Mastery"
-                  responsibleComponent="Pedagogical Engine"
-                  description="Real-time curriculum tracking, skill progression trees, and mastery milestone visualizations are managed by the Pedagogical Engine."
-                  integrationStatus="In Active Research & Development"
-                />
-              }
-            />
+            <Route path="progress" element={<ParentComingSoonPage feature="progress" />} />
 
             {/* 6. Personalized Recommendations */}
             <Route path="recommendations" element={<ParentRecommendationsPage />} />
 
             {/* 7. Learning Activities (Content Adaptation) */}
-            <Route
-              path="activities"
-              element={
-                <FeaturePlaceholder
-                  featureName="Adaptive Learning Activities & Games"
-                  responsibleComponent="Content Adaptation"
-                  description="Interactive Sinhala mathematical games and personalized story themes adapted to each child's working memory and pacing profile."
-                  integrationStatus="In Active Research & Development"
-                  actionLink={{
-                    label: 'Launch Available Learner Games',
-                    href: '#/play',
-                    isExternalHash: true,
-                  }}
-                />
-              }
-            />
+            <Route path="activities" element={<ParentComingSoonPage feature="activities" />} />
 
             {/* 8. Behaviour Insights (Behaviour Monitoring) */}
-            <Route
-              path="behaviour"
-              element={
-                <FeaturePlaceholder
-                  featureName="Behaviour Insights & ADHD Engagement Monitoring"
-                  responsibleComponent="Behaviour Monitoring"
-                  description="Real-time attention span, interaction latency, and engagement heatmaps captured during learning sessions are synthesized by the Behaviour Monitoring component."
-                  integrationStatus="In Active Research & Development"
-                />
-              }
-            />
+            <Route path="behaviour" element={<ParentComingSoonPage feature="behaviour" />} />
 
             {/* 9. Settings (Reuses User Profile) */}
             <Route path="settings" element={<UserProfilePage hideNavbar={true} />} />

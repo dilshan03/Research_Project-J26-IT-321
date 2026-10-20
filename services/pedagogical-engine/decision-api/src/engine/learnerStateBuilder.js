@@ -39,10 +39,18 @@ export function buildLearnerState(interactions = [], options = {}) {
     return timeA - timeB;
   });
 
-  const recentWindow = sorted.slice(-10); // Evaluate last 10 interactions for real-time reactivity
+  // Filter actionable events for window analysis (exclude passive 0ms QUESTION_VIEW transitions)
+  const actionableEvents = sorted.filter(
+    (ev) =>
+      ev.eventType !== 'QUESTION_VIEW' ||
+      (ev.idleTimeBeforeFirstActionMs && ev.idleTimeBeforeFirstActionMs > 0) ||
+      (ev.responseTimeMs && ev.responseTimeMs > 0)
+  );
+
+  const recentWindow = (actionableEvents.length > 0 ? actionableEvents : sorted).slice(-10);
   const latest = recentWindow[recentWindow.length - 1];
 
-  // 1. Compute Base Counts & Streaks
+  // 1. Compute Base Counts & Streaks across the 10-question session
   let totalAttempts = 0;
   let correctCount = 0;
   let wrongCount = 0;
@@ -56,8 +64,21 @@ export function buildLearnerState(interactions = [], options = {}) {
   for (let i = 0; i < sorted.length; i++) {
     const ev = sorted[i];
 
+    if (
+      ev.eventType === 'QUESTION_VIEW' &&
+      !ev.idleTimeBeforeFirstActionMs &&
+      !ev.responseTimeMs
+    ) {
+      // New question loaded: reset current question hint level
+      highestHintLevel = 0;
+      continue;
+    }
+
     if (ev.eventType === 'ANSWER_SUBMIT') {
       totalAttempts++;
+      const ansHintLvl = ev.hintLevelReached || ev.hintLevel || 0;
+      highestHintLevel = Math.max(highestHintLevel, ansHintLvl);
+
       if (ev.isCorrect === true) {
         correctCount++;
         consecutiveCorrect++;

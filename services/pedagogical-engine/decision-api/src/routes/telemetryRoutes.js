@@ -7,7 +7,9 @@ import {
   calculateBKTStep,
   getBKTMasteryTrajectory,
   evaluateFSMDecision,
-  getFSMRules
+  getFSMRules,
+  upsertStudentProgress,
+  getStudentProgress
 } from '../controllers/telemetryController.js';
 
 const router = Router();
@@ -17,6 +19,12 @@ router.post('/interactions', recordInteraction);
 
 // Query interaction logs
 router.get('/interactions', getInteractions);
+
+// Persist or update per-(parentId, learnerId) student progress & mastery
+router.post('/student-progress', upsertStudentProgress);
+
+// Fetch per-(parentId, learnerId) student progress & mastery
+router.get('/student-progress', getStudentProgress);
 
 // Fetch real-time learner state computed from persistent logs
 router.get('/learner-state', getLearnerState);

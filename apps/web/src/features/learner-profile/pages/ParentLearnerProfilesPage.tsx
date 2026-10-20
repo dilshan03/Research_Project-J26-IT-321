@@ -11,7 +11,6 @@ import { PageHeader } from '../../../shared/components/PageHeader';
 import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
 import { ChildSwitcher } from '../components/parent/ChildSwitcher';
 import { SkillEvidenceList } from '../components/parent/SkillEvidenceList';
-import { Grade1V2EvidenceView } from '../components/parent/Grade1V2EvidenceView';
 import { deletionStatusLabel, optionTitle } from '../components/parent/labels';
 import { parentText } from '../../../shared/i18n/parentText';
 
@@ -244,15 +243,7 @@ export const ParentLearnerProfilesPage: React.FC = () => {
 
               {!isLoadingProfile && profile && (
                 <div className="space-y-4">
-                  {summary?.mathSummary?.assessmentProtocolVersion === 'onboarding-v2' && (
-                    <section className="bg-white rounded-3xl border border-mq-border p-5 shadow-xs">
-                      <Grade1V2EvidenceView
-                        mathSummary={summary.mathSummary}
-                        childPreferences={summary.progress?.childPreferences || summary.mathSummary.childPreferences}
-                      />
-                    </section>
-                  )}
-
+                  {/* Research-level Grade 1 evidence (dimensions, probes, IMPSA/IMLR) is admin-only */}
                   <section className="bg-white rounded-3xl border border-mq-border p-5 shadow-xs">
                     <SkillEvidenceList profile={profile} />
                   </section>

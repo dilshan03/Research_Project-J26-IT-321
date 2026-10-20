@@ -193,6 +193,18 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
               </>
             )}
 
+            {user.role === 'admin' && (
+              <Link
+                to="/admin"
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
+              >
+                <LayoutDashboard size={15} className="text-mq-primary shrink-0" />
+                <span>Admin Dashboard</span>
+              </Link>
+            )}
+
             {/* Public Website Link */}
             <Link
               to="/"

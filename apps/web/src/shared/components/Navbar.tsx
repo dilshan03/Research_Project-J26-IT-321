@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { dashboardNameFor, dashboardPathFor } from '../../features/auth/roleRoutes';
 import { UserMenu } from './UserMenu';
 
 export const Navbar: React.FC = () => {
@@ -21,8 +22,8 @@ export const Navbar: React.FC = () => {
   }, [location.pathname, location.hash]);
 
   const isHome = location.pathname === '/';
-  const dashboardLink = user?.role === 'teacher' ? '/teacher/dashboard' : '/parent/dashboard';
-  const dashboardLabel = user?.role === 'teacher' ? 'Teacher Dashboard' : 'Parent Dashboard';
+  const dashboardLink = dashboardPathFor(user?.role);
+  const dashboardLabel = `${dashboardNameFor(user?.role)} Dashboard`;
 
   const handleSignOut = () => {
     setIsMobileMenuOpen(false);

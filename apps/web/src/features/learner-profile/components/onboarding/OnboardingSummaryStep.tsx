@@ -6,7 +6,6 @@ import type { OnboardingFullSummary } from '../../types/onboarding';
 import { ADHD_DIAGNOSIS_STATUS_OPTIONS, ADHD_PRESENTATION_OPTIONS } from '../../types/onboarding';
 import { AnimatedCompanion } from './AnimatedCompanion';
 import { SkillEvidenceList } from '../parent/SkillEvidenceList';
-import { Grade1V2EvidenceView } from '../parent/Grade1V2EvidenceView';
 import { RecommendationList, RecommendationResearchRows } from '../parent/RecommendationList';
 import { ResearchDetails } from '../parent/ResearchDetails';
 import { languageLabel, optionTitle } from '../parent/labels';
@@ -108,11 +107,6 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
             <span className="basis-full text-xs text-mq-text-muted">{t.mathNote}</span>
           </div>
 
-          <Grade1V2EvidenceView
-            mathSummary={math}
-            childPreferences={summary.progress?.childPreferences || math.childPreferences}
-          />
-
           <SkillEvidenceList profile={elpx ?? null} legacySkills={math.skills} showOverall={false}>
             <p className="font-mono break-words">
               baseline accuracy: {math.accuracyPercentage}% ({math.correctAnswers}/{math.totalQuestions}) • evidenceLevel:{' '}
@@ -198,16 +192,8 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
         <Card icon={<ClipboardList size={16} />} tone="bg-mq-surface-green text-mq-success" title={t.snapTitle}>
           {snap ? (
             <>
-              <dl className="grid grid-cols-2 gap-2 text-center">
-                <div className="px-2 py-2 rounded-xl bg-mq-surface-soft border border-mq-border/60 min-w-0">
-                  <dt className="text-xs text-mq-text-muted leading-snug">{t.snapInattention}</dt>
-                  <dd className="text-base font-bold text-mq-text-strong">{t.snapScore(snap.inattentionTotal)}</dd>
-                </div>
-                <div className="px-2 py-2 rounded-xl bg-mq-surface-soft border border-mq-border/60 min-w-0">
-                  <dt className="text-xs text-mq-text-muted leading-snug">{t.snapHyperactivity}</dt>
-                  <dd className="text-base font-bold text-mq-text-strong">{t.snapScore(snap.hyperactivityTotal)}</dd>
-                </div>
-              </dl>
+              {/* Subscale scores are technical research values and are shown to admins only */}
+              <p className="text-sm font-semibold text-mq-text-strong">{t.snapCompleted}</p>
               <p className="text-xs text-mq-text-muted leading-relaxed">{t.snapNote}</p>
             </>
           ) : (

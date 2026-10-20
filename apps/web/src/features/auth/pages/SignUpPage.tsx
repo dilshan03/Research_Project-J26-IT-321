@@ -5,12 +5,12 @@ import { AuthLayout } from '../components/AuthLayout';
 import { AuthInput } from '../components/AuthInput';
 import { PasswordInput } from '../components/PasswordInput';
 import { RoleSelector } from '../components/RoleSelector';
-import type { UserRole } from '../types';
+import type { RegistrableRole } from '../types';
 import { authService } from '../services/authService';
 
 export const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
-  const [role, setRole] = useState<UserRole>('parent');
+  const [role, setRole] = useState<RegistrableRole>('parent');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -26,6 +26,7 @@ import TeacherLearnersPage from './pages/teacher/TeacherLearnersPage';
 import TeacherLearnerProfilesPage from './pages/teacher/TeacherLearnerProfilesPage';
 import TeacherRecommendationsPage from './pages/teacher/TeacherRecommendationsPage';
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
+import AdminDashboardPage from './features/admin/pages/AdminDashboardPage';
 
 // -------------------------------------------------------------
 // [DEV TEMP] Pedagogical Agent Test Page Import (Remove later)
@@ -136,6 +137,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['parent']}>
                 <OnboardingPlaceholderPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Read-only admin dashboard (role 'admin' is set manually; every read is audit-logged) */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboardPage />
               </ProtectedRoute>
             }
           />

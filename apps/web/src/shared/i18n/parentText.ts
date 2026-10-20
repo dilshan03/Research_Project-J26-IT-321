@@ -570,6 +570,7 @@ const si = {
     snapHyperactivity: 'ක්‍රියාශීලී බව / ආවේගශීලී බව',
     snapScore: (score: number) => `${score} / 27`,
     snapNote: 'මෙය ඔබගේ නිරීක්ෂණවල සාරාංශයකි. රෝග විනිශ්චයක් නොවේ.',
+    snapCompleted: 'ඔබ මෙම ප්‍රශ්නාවලිය සම්පූර්ණ කර ඇත. ස්තූතියි!',
     snapSkipped: 'මඟ හැර ඇත. මෙය විකල්පයි.',
     snapNotDone: 'සම්පූර්ණ කර නැත. මෙය විකල්පයි.',
     completeNow: 'දැන් සම්පූර්ණ කරන්න',

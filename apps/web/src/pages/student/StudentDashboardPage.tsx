@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useSearchParams, useParams } from 'react-router-dom';
+import { Link, useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import {
   Home,
   Compass,
@@ -15,6 +15,8 @@ import {
   Menu,
   X,
   ChevronRight,
+  ChevronDown,
+  LogOut,
   ShieldCheck,
   TrendingUp,
   Users,
@@ -50,17 +52,18 @@ type StudentNavId =
 
 interface StudentNavItem {
   id: StudentNavId;
-  label: string;
+  labelEn: string;
+  labelSi: string;
   icon: React.FC<{ size?: number; className?: string; strokeWidth?: number }>;
   badge?: string;
 }
 
 const STUDENT_NAV_ITEMS: StudentNavItem[] = [
-  { id: 'home', label: 'Home', icon: Home },
-  { id: 'adventure', label: 'Learning Adventure', icon: Compass },
-  { id: 'practice', label: 'Practice', icon: Dumbbell },
-  { id: 'daily-challenge', label: 'Daily Challenge', icon: Calendar },
-  { id: 'rewards', label: 'Rewards', icon: Award },
+  { id: 'home', labelEn: 'Home', labelSi: 'මුල් පිටුව', icon: Home },
+  { id: 'adventure', labelEn: 'Learning Adventure', labelSi: 'ඉගෙනුම් චාරිකාව', icon: Compass },
+  { id: 'practice', labelEn: 'Practice', labelSi: 'පුහුණුවීම්', icon: Dumbbell },
+  { id: 'daily-challenge', labelEn: 'Daily Challenge', labelSi: 'දෛනික අභියෝගය', icon: Calendar },
+  { id: 'rewards', labelEn: 'Rewards', labelSi: 'ත්‍යාග සහ කුසලාන', icon: Award },
 ];
 
 const GRADE_SI_LABELS: Record<number, string> = {
@@ -88,6 +91,29 @@ export const StudentDashboardPage: React.FC = () => {
     return cached;
   });
 
+  const navigate = useNavigate();
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleStudentLogout = () => {
+    setIsProfileDropdownOpen(false);
+    // Navigate back to the parent learners dashboard where the child card was selected
+    navigate('/learners');
+  };
+
   // Default to 'practice' where the Game + Pedagogical Agent component is linked
   const [activeNav, setActiveNav] = useState<StudentNavId>('practice');
   const [isPracticePlaying, setIsPracticePlaying] = useState<boolean>(false);
@@ -108,7 +134,15 @@ export const StudentDashboardPage: React.FC = () => {
   const studentFullName = activeLearner?.firstName || studentDisplayName;
   const studentGrade = activeLearner?.grade || 1;
   const studentAge = activeLearner?.age || 7;
-  const studentLanguage = activeLearner?.preferredLanguage || 'Sinhala';
+  const studentLanguage =
+    activeLearner?.primaryInstructionLanguage ||
+    activeLearner?.preferredLanguage ||
+    'Sinhala';
+  const isSinhala =
+    studentLanguage.toLowerCase().includes('sinhala') ||
+    studentLanguage.includes('සිංහල') ||
+    (activeLearner?.preferredLanguage === 'Bilingual' &&
+      activeLearner?.primaryInstructionLanguage !== 'English');
   const avatar = getLearnerAvatar(activeLearner?.avatarId);
 
   // Per-(parentId, learnerId) gamification & BKT mastery state
@@ -286,11 +320,12 @@ export const StudentDashboardPage: React.FC = () => {
             {STUDENT_NAV_ITEMS.map((item) => {
               const active = activeNav === item.id;
               const Icon = item.icon;
+              const label = isSinhala ? item.labelSi : item.labelEn;
               return (
                 <button
                   key={item.id}
                   type="button"
-                  title={item.label}
+                  title={label}
                   onClick={() => {
                     setActiveNav(item.id);
                     setIsPracticePlaying(false);
@@ -311,7 +346,7 @@ export const StudentDashboardPage: React.FC = () => {
           <div className="mt-auto pt-3 border-t border-mq-border/70 w-full flex justify-center">
             <button
               type="button"
-              title="My Castle (මගේ මාළිගාව)"
+              title={isSinhala ? 'මගේ මාළිගාව' : 'My Castle'}
               onClick={() => {
                 setActiveNav('castle');
                 setIsPracticePlaying(false);
@@ -331,11 +366,12 @@ export const StudentDashboardPage: React.FC = () => {
 
     return (
       <div className="flex flex-col h-full overflow-y-auto p-4 space-y-4">
-        {/* Navigation Items (Direct, Clean & Large for ADHD kids - No dropdown category titles) */}
+        {/* Navigation Items (Direct, Clean & Large for ADHD kids - Dynamic Sinhala/English based on learning language) */}
         <nav className="space-y-2.5">
           {STUDENT_NAV_ITEMS.map((item) => {
             const active = activeNav === item.id;
             const Icon = item.icon;
+            const label = isSinhala ? item.labelSi : item.labelEn;
 
             return (
               <button
@@ -361,13 +397,13 @@ export const StudentDashboardPage: React.FC = () => {
                       : 'text-mq-text-muted group-hover:text-mq-primary'
                   }`}
                 />
-                <span className="truncate flex-1 text-sm font-extrabold">{item.label}</span>
+                <span className="truncate flex-1 text-sm font-extrabold">{label}</span>
               </button>
             );
           })}
         </nav>
 
-        {/* 3. My Castle (මගේ මාළිගාව) Gamified Image Button - Extra Rounded & Friendly */}
+        {/* 3. My Castle (මගේ මාළිගාව) Gamified Image Button - Dynamic Sinhala/English */}
         <div className="mt-auto pt-3 border-t border-mq-border/70">
           <button
             type="button"
@@ -381,7 +417,7 @@ export const StudentDashboardPage: React.FC = () => {
                 ? 'border-amber-400 bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-purple-500/20 ring-4 ring-amber-400/30'
                 : 'border-amber-200/90 hover:border-amber-400 bg-gradient-to-br from-amber-50/95 via-orange-50/80 to-indigo-50/60 hover:from-amber-100 hover:to-orange-100'
             }`}
-            title="Explore My Castle & Math Kingdom (මගේ මාළිගාව)"
+            title={isSinhala ? 'මගේ මාළිගාව (රාජකීය ගණිත මාළිගාව)' : 'Explore My Castle & Math Kingdom'}
           >
             <div className="flex items-center gap-3">
               {/* Castle Island Artwork Thumbnail */}
@@ -402,16 +438,18 @@ export const StudentDashboardPage: React.FC = () => {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <span className="text-sm font-black tracking-wide text-amber-950 font-display">
-                    MY CASTLE
+                    {isSinhala ? 'මගේ මාළිගාව' : 'MY CASTLE'}
                   </span>
                   <Sparkles size={14} className="text-amber-500 animate-pulse shrink-0" />
                 </div>
-                <p className="text-xs font-bold text-amber-850 truncate sinhala leading-tight mt-0.5">
-                  මගේ මාළිගාව
+                <p className="text-xs font-bold text-amber-850 truncate leading-tight mt-0.5">
+                  {isSinhala ? 'රාජකීය ගණිත මාළිගාව' : 'Royal Math Kingdom'}
                 </p>
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-[11px] font-black text-mq-primary bg-white/95 px-2 py-0.5 rounded-full border border-amber-200 shadow-2xs">
-                    Level {studentGrade} Kingdom
+                    {isSinhala
+                      ? `${GRADE_SI_LABELS[studentGrade] || `${studentGrade} වන ශ්‍රේණිය`} රාජධානිය`
+                      : `Grade ${studentGrade} Kingdom`}
                   </span>
                 </div>
               </div>
@@ -468,13 +506,13 @@ export const StudentDashboardPage: React.FC = () => {
             {/* Stars Pill */}
             <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-amber-50 border-2 border-amber-300/80 text-sm sm:text-base font-black text-amber-950 shadow-2xs">
               <Star size={18} className="text-amber-500 fill-amber-400 shrink-0 animate-pulse" />
-              <span>{savedProgress.stars.toLocaleString()} <span className="hidden sm:inline text-xs font-extrabold text-amber-800">Stars</span></span>
+              <span>{savedProgress.stars.toLocaleString()} <span className="hidden sm:inline text-xs font-extrabold text-amber-800">{isSinhala ? 'තරු' : 'Stars'}</span></span>
             </div>
 
             {/* Coins Pill */}
             <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-yellow-50 border-2 border-yellow-300/80 text-sm sm:text-base font-black text-yellow-950 shadow-2xs">
               <Coins size={18} className="text-yellow-600 shrink-0" />
-              <span>{savedProgress.coins} <span className="hidden sm:inline text-xs font-extrabold text-yellow-800">Coins</span></span>
+              <span>{savedProgress.coins} <span className="hidden sm:inline text-xs font-extrabold text-yellow-800">{isSinhala ? 'කාසි' : 'Coins'}</span></span>
             </div>
           </div>
 
@@ -489,30 +527,99 @@ export const StudentDashboardPage: React.FC = () => {
               {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
             </button>
 
-            {/* Student Account Pill with Child's Avatar, Name & Grade */}
-            <button
-              type="button"
-              onClick={() => {
-                setActiveNav('castle');
-                setIsPracticePlaying(false);
-              }}
-              className="flex items-center gap-2.5 px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border-2 border-blue-200/90 rounded-2xl shadow-xs transition-all cursor-pointer hover:scale-105 active:scale-95"
-              title={`${studentFullName} (Grade ${studentGrade})`}
-            >
-              <div
-                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-lg sm:text-xl shrink-0 shadow-xs border ${avatar.bgColor} ${avatar.borderColor}`}
+            {/* Student Account Pill with Dropdown (Logout to Parent Dashboard) */}
+            <div className="relative shrink-0" ref={profileDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
+                className={`flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border-2 rounded-2xl shadow-xs transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+                  isProfileDropdownOpen
+                    ? 'border-mq-primary ring-2 ring-mq-primary/20'
+                    : 'border-blue-200/90'
+                }`}
+                aria-haspopup="true"
+                aria-expanded={isProfileDropdownOpen}
+                title={`${studentFullName} (${isSinhala ? `${GRADE_SI_LABELS[studentGrade] || `${studentGrade} වන ශ්‍රේණිය`}` : `Grade ${studentGrade}`}) - Account menu`}
               >
-                {avatar.icon}
-              </div>
-              <div className="flex flex-col text-left overflow-hidden max-w-[120px] sm:max-w-[150px]">
-                <span className="text-sm font-black text-mq-text-strong leading-tight truncate">
-                  {studentDisplayName}
-                </span>
-                <span className="text-[11px] font-extrabold text-mq-primary leading-none mt-0.5 truncate">
-                  Grade {studentGrade} · {studentAge} Yrs
-                </span>
-              </div>
-            </button>
+                <div
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-lg sm:text-xl shrink-0 shadow-xs border ${avatar.bgColor} ${avatar.borderColor}`}
+                >
+                  {avatar.icon}
+                </div>
+                <div className="flex flex-col text-left overflow-hidden max-w-[120px] sm:max-w-[150px]">
+                  <span className="text-sm font-black text-mq-text-strong leading-tight truncate">
+                    {studentDisplayName}
+                  </span>
+                  <span className="text-[11px] font-extrabold text-mq-primary leading-none mt-0.5 truncate">
+                    {isSinhala
+                      ? `${GRADE_SI_LABELS[studentGrade] || `${studentGrade} වන ශ්‍රේණිය`} · අවු. ${studentAge}`
+                      : `Grade ${studentGrade} · ${studentAge} Yrs`}
+                  </span>
+                </div>
+                <ChevronDown
+                  size={16}
+                  strokeWidth={2.5}
+                  className={`text-mq-primary transition-transform duration-200 ${
+                    isProfileDropdownOpen ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+
+              {/* Dropdown Menu */}
+              {isProfileDropdownOpen && (
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-3xl border-2 border-mq-border/90 shadow-xl p-2.5 z-50 animate-fade-in">
+                  {/* Child Profile Info Banner */}
+                  <div className="p-3 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-2xl border border-blue-100/80 mb-2 flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center text-2xl shrink-0 border ${avatar.bgColor} ${avatar.borderColor}`}
+                    >
+                      {avatar.icon}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-black text-mq-text-strong truncate">
+                        {studentFullName}
+                      </p>
+                      <p className="text-xs font-bold text-mq-primary">
+                        {isSinhala
+                          ? `${GRADE_SI_LABELS[studentGrade] || `${studentGrade} වන ශ්‍රේණිය`}`
+                          : `Grade ${studentGrade}`}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* My Castle Quick Option */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsProfileDropdownOpen(false);
+                      setActiveNav('castle');
+                      setIsPracticePlaying(false);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold text-mq-text-strong hover:bg-amber-50 hover:text-amber-800 transition-colors cursor-pointer text-left"
+                  >
+                    <Castle size={16} className="text-amber-600 shrink-0" />
+                    <span className="truncate flex-1">{isSinhala ? 'මගේ මාළිගාව' : 'My Castle'}</span>
+                  </button>
+
+                  <div className="my-1.5 border-t border-mq-border/70" />
+
+                  {/* Logout / Exit to Parent Dashboard */}
+                  <button
+                    type="button"
+                    onClick={handleStudentLogout}
+                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-black text-red-600 hover:bg-red-50 transition-colors cursor-pointer text-left"
+                  >
+                    <LogOut size={16} className="shrink-0 text-red-500" />
+                    <div className="flex flex-col min-w-0">
+                      <span className="leading-tight">{isSinhala ? 'ඉවත් වන්න' : 'Logout'}</span>
+                      <span className="text-[10px] font-semibold text-red-400 leading-tight mt-0.5">
+                        {isSinhala ? 'දෙමාපිය පුවරුවට' : 'To Parent Dashboard'}
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
@@ -605,11 +712,15 @@ export const StudentDashboardPage: React.FC = () => {
                             </span>
                           )}
                           <span className="text-xs font-bold px-3 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary border border-mq-primary/20">
-                            Grade {studentGrade} ({GRADE_SI_LABELS[studentGrade] || `${studentGrade} ශ්‍රේණිය`})
+                            {isSinhala
+                              ? `${GRADE_SI_LABELS[studentGrade] || `${studentGrade} වන ශ්‍රේණිය`}`
+                              : `Grade ${studentGrade}`}
                           </span>
                         </div>
-                        <p className="text-xs sm:text-sm text-mq-text-muted mt-1 sinhala">
-                          {avatar.nameSi} ({avatar.name}) · වයස අවුරුදු {studentAge} ({studentAge} Years)
+                        <p className="text-xs sm:text-sm text-mq-text-muted mt-1">
+                          {isSinhala
+                            ? `${avatar.nameSi} · වයස අවුරුදු ${studentAge}`
+                            : `${avatar.name} · ${studentAge} Years Old`}
                         </p>
                       </div>
                     </div>
@@ -617,18 +728,18 @@ export const StudentDashboardPage: React.FC = () => {
                     <div className="flex flex-wrap items-center gap-2.5">
                       <Link
                         to="/learners"
-                        className="btn btn-secondary py-2 px-4 rounded-full text-xs font-bold inline-flex items-center gap-1.5 sinhala"
+                        className="btn btn-secondary py-2 px-4 rounded-full text-xs font-bold inline-flex items-center gap-1.5"
                       >
                         <Users size={14} />
-                        <span>වෙනත් දරුවෙකු තෝරන්න (Switch Child)</span>
+                        <span>{isSinhala ? 'වෙනත් දරුවෙකු තෝරන්න' : 'Switch Child'}</span>
                       </Link>
                       <button
                         type="button"
                         onClick={() => setActiveNav('practice')}
-                        className="btn btn-primary py-2 px-5 rounded-full text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer sinhala"
+                        className="btn btn-primary py-2 px-5 rounded-full text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
                       >
                         <Dumbbell size={14} />
-                        <span>පුහුණුවට යන්න (Practice)</span>
+                        <span>{isSinhala ? 'පුහුණුවට යන්න' : 'Go to Practice'}</span>
                       </button>
                     </div>
                   </div>
@@ -638,7 +749,7 @@ export const StudentDashboardPage: React.FC = () => {
                     <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
                       <div className="flex items-center gap-2 text-xs font-bold text-mq-text-muted uppercase">
                         <GraduationCap size={15} className="text-mq-primary" />
-                        <span>Child Learner ID</span>
+                        <span>{isSinhala ? 'දරුවාගේ හැඳුනුම් අංකය' : 'Child Learner ID'}</span>
                       </div>
                       <p className="text-xs font-mono font-bold text-mq-text-strong mt-1.5 break-all">
                         {resolvedLearnerId}
@@ -648,7 +759,7 @@ export const StudentDashboardPage: React.FC = () => {
                     <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
                       <div className="flex items-center gap-2 text-xs font-bold text-mq-text-muted uppercase">
                         <ShieldCheck size={15} className="text-mq-secondary" />
-                        <span>Parent Account ID</span>
+                        <span>{isSinhala ? 'දෙමාපිය ගිණුම් අංකය' : 'Parent Account ID'}</span>
                       </div>
                       <p className="text-xs font-mono font-bold text-mq-text-strong mt-1.5 break-all">
                         {resolvedParentId}
@@ -658,7 +769,7 @@ export const StudentDashboardPage: React.FC = () => {
                     <div className="p-4 rounded-2xl bg-mq-surface-green border border-mq-secondary/40">
                       <div className="flex items-center gap-2 text-xs font-bold text-mq-text-muted uppercase">
                         <TrendingUp size={15} className="text-mq-success" />
-                        <span>Hint-Aware BKT P(L)</span>
+                        <span>{isSinhala ? 'දැනුම් මට්ටම (BKT)' : 'Hint-Aware BKT P(L)'}</span>
                       </div>
                       <p className="text-2xl font-extrabold text-mq-success mt-1">
                         {Math.round(savedProgress.hintAwareKnowledge * 100)}%
@@ -668,10 +779,10 @@ export const StudentDashboardPage: React.FC = () => {
                     <div className="p-4 rounded-2xl bg-mq-surface-blue border border-mq-primary/25">
                       <div className="flex items-center gap-2 text-xs font-bold text-mq-text-muted uppercase">
                         <Languages size={15} className="text-mq-primary" />
-                        <span>Preferred Language</span>
+                        <span>{isSinhala ? 'ඉගෙනුම් භාෂාව' : 'Instruction Language'}</span>
                       </div>
                       <p className="text-base font-extrabold text-mq-primary-dark mt-1">
-                        {studentLanguage}
+                        {isSinhala ? (studentLanguage === 'Sinhala' ? 'සිංහල' : studentLanguage) : (studentLanguage === 'Sinhala' ? 'Sinhala' : studentLanguage)}
                       </p>
                     </div>
                   </div>
@@ -693,15 +804,19 @@ export const StudentDashboardPage: React.FC = () => {
                   <div className="relative z-10 max-w-xl space-y-3">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-300 text-xs font-extrabold backdrop-blur-xs">
                       <Crown size={14} />
-                      <span className="sinhala">රාජකීය මාළිගාව · Royal Math Kingdom</span>
+                      <span>{isSinhala ? 'රාජකීය මාළිගාව' : 'Royal Math Kingdom'}</span>
                     </div>
 
                     <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-amber-100">
-                      {studentDisplayName}&apos;s Castle 🏰
+                      {isSinhala
+                        ? `${studentDisplayName}ගේ මාළිගාව 🏰`
+                        : `${studentDisplayName}'s Castle 🏰`}
                     </h1>
 
-                    <p className="text-xs sm:text-sm text-purple-200/90 leading-relaxed sinhala">
-                      සාදරයෙන් පිළිගන්නවා! ඔයා ගණිත අභ්‍යාස ජයගන්නා විට ඔයාගේ මාළිගාව තරු සහ රන් කාසි වලින් පිරී යයි!
+                    <p className="text-xs sm:text-sm text-purple-200/90 leading-relaxed">
+                      {isSinhala
+                        ? 'සාදරයෙන් පිළිගන්නවා! ඔයා ගණිත අභ්‍යාස ජයගන්නා විට ඔයාගේ මාළිගාව තරු සහ රන් කාසි වලින් පිරී යයි!'
+                        : 'Welcome! As you solve math challenges, your castle fills up with stars and gold coins!'}
                     </p>
 
                     <div className="pt-2 flex flex-wrap items-center gap-3">
@@ -711,19 +826,19 @@ export const StudentDashboardPage: React.FC = () => {
                           setActiveNav('practice');
                           setIsPracticePlaying(true);
                         }}
-                        className="btn bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-indigo-950 font-black text-sm px-5 py-2.5 rounded-2xl shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2 cursor-pointer sinhala"
+                        className="btn bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-indigo-950 font-black text-sm px-5 py-2.5 rounded-2xl shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2 cursor-pointer"
                       >
                         <Dumbbell size={16} />
-                        <span>ක්‍රීඩා පුහුණුව අරඹන්න (Start Practice)</span>
+                        <span>{isSinhala ? 'ක්‍රීඩා පුහුණුව අරඹන්න' : 'Start Practice'}</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => setActiveNav('adventure')}
-                        className="btn bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs px-4 py-2.5 rounded-2xl backdrop-blur-xs transition-all inline-flex items-center gap-2 cursor-pointer sinhala"
+                        className="btn bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs px-4 py-2.5 rounded-2xl backdrop-blur-xs transition-all inline-flex items-center gap-2 cursor-pointer"
                       >
                         <Compass size={15} />
-                        <span>ත්‍රාසජනක ගමන (Adventure)</span>
+                        <span>{isSinhala ? 'ත්‍රාසජනක ගමන' : 'Adventure'}</span>
                       </button>
                     </div>
                   </div>
@@ -737,13 +852,13 @@ export const StudentDashboardPage: React.FC = () => {
                       <Star size={24} className="fill-amber-400 text-amber-500" />
                     </div>
                     <p className="text-xs font-bold text-mq-text-muted uppercase tracking-wider">
-                      Treasury Stars
+                      {isSinhala ? 'මුළු තරු' : 'Treasury Stars'}
                     </p>
                     <p className="text-3xl font-black text-amber-950 mt-1">
                       {savedProgress.stars.toLocaleString()}
                     </p>
-                    <p className="text-xs text-mq-text-muted mt-1 sinhala">
-                      එකතු කළ මුළු තරු ප්‍රමාණය
+                    <p className="text-xs text-mq-text-muted mt-1">
+                      {isSinhala ? 'එකතු කළ මුළු තරු ප්‍රමාණය' : 'Total stars collected'}
                     </p>
                   </div>
 
@@ -753,13 +868,13 @@ export const StudentDashboardPage: React.FC = () => {
                       <Coins size={24} className="text-yellow-600" />
                     </div>
                     <p className="text-xs font-bold text-mq-text-muted uppercase tracking-wider">
-                      Kingdom Gold
+                      {isSinhala ? 'රන් කාසි' : 'Kingdom Gold'}
                     </p>
                     <p className="text-3xl font-black text-yellow-950 mt-1">
                       {savedProgress.coins.toLocaleString()}
                     </p>
-                    <p className="text-xs text-mq-text-muted mt-1 sinhala">
-                      මාළිගාවේ ඇති රන් කාසි
+                    <p className="text-xs text-mq-text-muted mt-1">
+                      {isSinhala ? 'මාළිගාවේ ඇති රන් කාසි' : 'Gold coins in the castle'}
                     </p>
                   </div>
 
@@ -769,13 +884,15 @@ export const StudentDashboardPage: React.FC = () => {
                       <Crown size={24} className="text-purple-600" />
                     </div>
                     <p className="text-xs font-bold text-mq-text-muted uppercase tracking-wider">
-                      Castle Level
+                      {isSinhala ? 'මාළිගා මට්ටම' : 'Castle Level'}
                     </p>
                     <p className="text-3xl font-black text-purple-950 mt-1">
-                      Grade {studentGrade}
+                      {isSinhala
+                        ? (GRADE_SI_LABELS[studentGrade] || `${studentGrade} ශ්‍රේණිය`)
+                        : `Grade ${studentGrade}`}
                     </p>
-                    <p className="text-xs text-mq-text-muted mt-1 sinhala">
-                      {GRADE_SI_LABELS[studentGrade] || `${studentGrade} ශ්‍රේණිය`}
+                    <p className="text-xs text-mq-text-muted mt-1">
+                      {isSinhala ? 'වත්මන් ඉගෙනුම් ශ්‍රේණිය' : 'Current learning grade'}
                     </p>
                   </div>
                 </div>
@@ -787,10 +904,12 @@ export const StudentDashboardPage: React.FC = () => {
               <div className="min-h-[60vh] rounded-3xl border-2 border-dashed border-mq-border bg-white/60 flex items-center justify-center p-8 text-center animate-fade-in">
                 <div className="max-w-md space-y-2">
                   <p className="text-sm font-bold text-mq-text-muted uppercase tracking-wider">
-                    Learning Adventure
+                    {isSinhala ? 'ත්‍රාසජනක ඉගෙනුම් චාරිකාව' : 'Learning Adventure'}
                   </p>
                   <p className="text-xs text-mq-text-muted">
-                    This section is currently empty and reserved for the Learning Adventure module.
+                    {isSinhala
+                      ? 'මෙම කොටස ළඟදීම බලාපොරොත්තු වන්න. දැනට ක්‍රීඩා පුහුණුව වෙත පිවිසෙන්න.'
+                      : 'This section is currently reserved for the upcoming Learning Adventure module.'}
                   </p>
                 </div>
               </div>
@@ -802,12 +921,14 @@ export const StudentDashboardPage: React.FC = () => {
                 <div className="max-w-md space-y-3">
                   <div className="text-3xl">{avatar.icon}</div>
                   <p className="text-sm font-bold text-mq-text-strong capitalize">
-                    {studentDisplayName} · {activeNav.replace('-', ' ')}
+                    {studentDisplayName} · {isSinhala
+                      ? (STUDENT_NAV_ITEMS.find((n) => n.id === activeNav)?.labelSi || activeNav)
+                      : (STUDENT_NAV_ITEMS.find((n) => n.id === activeNav)?.labelEn || activeNav)}
                   </p>
                   <p className="text-xs text-mq-text-muted">
-                    Switch to the <strong>Practice</strong> tab to access {studentDisplayName}&apos;s
-                    interactive math practice game and <strong>MathBot 3000</strong> pedagogical
-                    companion.
+                    {isSinhala
+                      ? 'ගණිත අභ්‍යාස ක්‍රීඩාව සහ MathBot 3000 සහායකයා භාවිතා කිරීමට පුහුණුව ටැබ් එක තෝරන්න.'
+                      : `Switch to the Practice tab to access ${studentDisplayName}'s interactive math practice game and MathBot 3000 companion.`}
                   </p>
                   <button
                     type="button"
@@ -815,7 +936,7 @@ export const StudentDashboardPage: React.FC = () => {
                     className="btn btn-primary text-xs py-2 px-5 rounded-full font-bold inline-flex items-center gap-2 cursor-pointer"
                   >
                     <Dumbbell size={14} />
-                    <span>Go to Practice</span>
+                    <span>{isSinhala ? 'පුහුණුවට යන්න' : 'Go to Practice'}</span>
                   </button>
                 </div>
               </div>

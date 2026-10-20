@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import HomePage from './pages/public/HomePage';
 import ContentAdaptationPage from './features/content-adaptation/ContentAdaptationPage';
 
@@ -13,7 +13,40 @@ import { AuthProvider } from './features/auth/context/AuthContext';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
 
 import { ProfilePage } from './pages/profile/ProfilePage';
-import { LearnersPage, OnboardingPlaceholderPage } from './features/learner-profile';
+
+
+import StandaloneDataCollection from './features/behaviour-monitoring/StandaloneDataCollection';
+import BehaviourMonitoringPage from './features/behaviour-monitoring/BehaviourMonitoringPage';
+
+// Parent / Teacher dashboards
+import BehaviourDashboard from './features/behaviour-monitoring/BehaviourDashboard';
+import InteractionDashboard from './features/behaviour-monitoring/InteractionDashboard';
+import { UserProfilePage } from './features/user-profile/pages/UserProfilePage';
+import {
+  LearnersPage,
+  OnboardingPlaceholderPage,
+  ParentOverviewPage,
+  ParentSnapIvPage,
+  ParentSupportInfoPage,
+  ParentLearnerProfilesPage,
+  ParentAssessmentsPage,
+  ParentRecommendationsPage,
+  ParentComingSoonPage,
+} from './features/learner-profile';
+import { DashboardLayout } from './shared/layouts/DashboardLayout';
+import { FeaturePlaceholder } from './shared/components/FeaturePlaceholder';
+import TeacherOverviewPage from './pages/teacher/TeacherOverviewPage';
+import TeacherLearnersPage from './pages/teacher/TeacherLearnersPage';
+import TeacherLearnerProfilesPage from './pages/teacher/TeacherLearnerProfilesPage';
+import TeacherRecommendationsPage from './pages/teacher/TeacherRecommendationsPage';
+import StudentDashboardPage from './pages/student/StudentDashboardPage';
+import AdminDashboardPage from './features/admin/pages/AdminDashboardPage';
+
+// -------------------------------------------------------------
+// [DEV TEMP] Pedagogical Agent Test Page Import (Remove later)
+// -------------------------------------------------------------
+import AgentTestPage from './pages/test/AgentTestPage';
+// -------------------------------------------------------------
 
 function useHashRoute() {
   const [hash, setHash] = useState(window.location.hash);
@@ -66,6 +99,13 @@ function FloatingDevControls() {
 function App() {
   const hash = useHashRoute();
 
+  if (hash.startsWith('#/adapt')) {
+    return <ContentAdaptationPage mode="studio" />;
+  }
+
+  if (hash.startsWith('#/play')) {
+    return <ContentAdaptationPage mode="play" />;
+  }
   // Preserve existing hash-based sub-app routes for Content Adaptation
   if (hash.startsWith('#/adapt')) return <ContentAdaptationPage mode="studio" />;
   if (hash.startsWith('#/play')) return <ContentAdaptationPage mode="play" />;
@@ -76,9 +116,6 @@ function App() {
         <FloatingDevControls />
 
         <Routes>
-          {/* ========================================================= */}
-          {/* 1. Public & Core Authentication Routes                    */}
-          {/* ========================================================= */}
 
           {/* Public pages */}
           <Route
@@ -101,6 +138,15 @@ function App() {
             element={<ForgotPasswordPage />}
           />
 
+          {/* Profile */}
+          {/* ========================================================= */}
+          {/* 1. Public & Core Authentication Routes                    */}
+          {/* ========================================================= */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route path="/sign-up" element={<SignUpPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
           {/* ========================================================= */}
           {/* 2. Preserved Existing & Student Dashboard Routes          */}
           {/* ========================================================= */}
@@ -108,8 +154,6 @@ function App() {
           <Route path="/student/dashboard/:learnerId" element={<StudentDashboardPage />} />
           <Route path="/student" element={<Navigate to="/student/dashboard" replace />} />
 
-
-          {/* Profile */}
           <Route
             path="/profile"
             element={
@@ -118,14 +162,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Learner management */}
           {/* ------------------------------------------------------------- */}
           {/* [DEV TEMP] Pedagogical Agent Test Route (Remove later) */}
           {/* ------------------------------------------------------------- */}
           <Route path="/agent-test" element={<AgentTestPage />} />
           {/* ------------------------------------------------------------- */}
           {/* Canonical My Children Route (Unified in Parent Portal Layout) */}
-
-          {/* Learner management */}
           <Route
             path="/learners"
             element={
@@ -133,12 +177,11 @@ function App() {
                 <DashboardLayout role="parent" />
               </ProtectedRoute>
             }
-          >
-            <Route index element={<LearnersPage />} />
+          />
+          <Route index element={<LearnersPage />} />
             {/* Optional SNAP-IV, opened from the parent dashboard */}
             <Route path=":learnerId/snap-iv" element={<ParentSnapIvPage />} />
-          </Route>
-
+      
 
           <Route
             path="/learners/:learnerId/onboarding"
@@ -149,12 +192,49 @@ function App() {
             }
           />
 
+          {/* Standalone behaviour data collection */}
+          <Route
+            path="/behaviour-data-collection"
+            element={<StandaloneDataCollection />}
+          />
+
+          {/* Standalone behaviour game */}
+          <Route
+            path="/behaviour-monitoring"
+            element={<BehaviourMonitoringPage />}
+          />
+
+          {/* Behaviour Dashboard */}
+          <Route
+            path="/parent/behaviour"
+            element={
+              <ProtectedRoute>
+                <BehaviourDashboard
+                  learnerName="ශිෂ්‍යයා"
+                  sessions={[]}
+                />
+              </ProtectedRoute>
+            }
+          />
           {/* Read-only admin dashboard (role 'admin' is set manually; every read is audit-logged) */}
           <Route
             path="/admin"
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Interaction Dashboard */}
+          <Route
+            path="/parent/interaction"
+            element={
+              <ProtectedRoute>
+                <InteractionDashboard
+                  learnerName="ශිෂ්‍යයා"
+                  sessions={[]}
+                />
               </ProtectedRoute>
             }
           />
@@ -291,45 +371,6 @@ function App() {
 
           {/* Catch-all Wildcard Route */}
           <Route path="*" element={<Navigate to="/" replace />} />
-
-          {/* Standalone behaviour data collection */}
-          <Route
-            path="/behaviour-data-collection"
-            element={<StandaloneDataCollection />}
-          />
-
-          {/* Standalone behaviour game */}
-          <Route
-            path="/behaviour-monitoring"
-            element={<BehaviourMonitoringPage />}
-          />
-
-          {/* Behaviour Dashboard */}
-          <Route
-            path="/parent/behaviour"
-            element={
-              <ProtectedRoute>
-                <BehaviourDashboard
-                  learnerName="ශිෂ්‍යයා"
-                  sessions={[]}
-                />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Interaction Dashboard */}
-          <Route
-            path="/parent/interaction"
-            element={
-              <ProtectedRoute>
-                <InteractionDashboard
-                  learnerName="ශිෂ්‍යයා"
-                  sessions={[]}
-                />
-              </ProtectedRoute>
-            }
-          />
-
         </Routes>
       </BrowserRouter>
     </AuthProvider>

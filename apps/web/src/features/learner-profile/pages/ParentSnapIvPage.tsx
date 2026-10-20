@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { learnerApi } from '../services/learnerApi';
 import { onboardingApi } from '../services/onboardingApi';
@@ -20,6 +20,8 @@ const BACK_TO = '/parent/dashboard';
 export const ParentSnapIvPage: React.FC = () => {
   const { learnerId } = useParams<{ learnerId: string }>();
   const navigate = useNavigate();
+  // Return to the page that opened the questionnaire (home or ADHD & support information)
+  const backTo = (useLocation().state as { from?: string } | null)?.from || BACK_TO;
 
   const [learner, setLearner] = useState<Learner | null>(null);
   const [savedResponses, setSavedResponses] = useState<SnapIvItemAnswer[] | undefined>(undefined);
@@ -60,7 +62,7 @@ export const ParentSnapIvPage: React.FC = () => {
     try {
       const res = await onboardingApi.submitSnapIv(learnerId, responses);
       if (res.success) {
-        navigate(BACK_TO, { state: { toast: t.saved } });
+        navigate(backTo, { state: { toast: t.saved } });
       } else {
         setErrorMessage(res.message || t.saveError);
       }
@@ -74,11 +76,11 @@ export const ParentSnapIvPage: React.FC = () => {
   return (
     <div className="space-y-5 animate-fade-in">
       <Link
-        to={BACK_TO}
+        to={backTo}
         className="inline-flex items-center gap-2 min-h-[44px] text-base font-semibold text-mq-primary hover:underline"
       >
         <ArrowLeft size={18} />
-        <span>{parentText.nav.short.home}</span>
+        <span>{backTo === BACK_TO ? parentText.nav.short.home : parentText.nav.supportInfo}</span>
       </Link>
 
       {learner && (
@@ -97,7 +99,7 @@ export const ParentSnapIvPage: React.FC = () => {
           initialResponses={savedResponses}
           onSave={handleSave}
           onSaveAndExit={handleSave}
-          onBack={() => navigate(BACK_TO)}
+          onBack={() => navigate(backTo)}
           isSaving={isSaving}
         />
       )}

@@ -3904,6 +3904,114 @@
     "_id": "7e416d66f49b447ea710ae0f5d17bb14"
   },
   {
+    "activity_id": "act_8d8f34d60d",
+    "cli_score": 1.0,
+    "raw_sinhala_question": "අඩු පෑන් ප්‍රමාණය තෝරන්න: 3 හෝ 7?",
+    "raw_english_question": "Pick the smaller amount: 3 or 7?",
+    "blueprint": {
+      "activity_id": "act_8d8f34d60d",
+      "source_question_id": "doc_g1_grade_1-p012-2",
+      "grade": 1,
+      "topic": "Comparison",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "COMPARE_QUANTITY",
+          "instruction_si": "වඩා කුඩා එක තෝරන්න",
+          "instruction_en": "Pick the smaller one",
+          "target_visual_asset": "COMPARISON_SCALE",
+          "correct_target_value": "3",
+          "game_options": [
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": 3.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "7",
+              "text_en": "7",
+              "numeric_value": 7.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Picks the first or most eye-catching quantity without comparing.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            3,
+            7
+          ],
+          "operation": "COMPARE",
+          "visual_props": {
+            "target": "SMALLER"
+          }
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "පොළේ පෑන් තෝරමු",
+        "title_en": "Pens at the Village Fair",
+        "backdrop_si": "ගමේ සති පොළ අද හරිම කලබලකාරී වගේම ලස්සනයි! ලිපිද්‍රව්‍ය කඩේ පාට පාට පෑන් තොගයක් විකුණන්න තියෙනවා.",
+        "backdrop_en": "The village fair is bustling with lively stalls today! The stationery shop has bundles of bright, colorful pens on display.",
+        "quest_goal_si": "පෑන් ගොඩවල් දෙකෙන් කුඩාම ප්‍රමාණය තෝරාගෙන ගජාගේ පුංචි පැන්සල් පෙට්ටිය පුරවන්න උදවු කරන්න.",
+        "quest_goal_en": "Help Gaja find the smaller pile of pens to fit neatly into his little pencil case.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යාලුවේ! මම ගජා. මගේ පොඩි බෑගයට දාගන්න අඩුම පෑන් ගණන තියෙන ගොඩ හොයලා දෙන්න පුළුවන්ද?",
+            "en": "Hello friend! I am Gaja. Can you help me pick the smaller bunch of pens to fit into my little pouch?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න... ඇඟිලි තුනක් දිගු කරලා, ඊළඟට හතක් එක්ක සසඳලා බලන්න. අඩු ප්‍රමාණය කොයිකද?",
+            "en": "Take your time... Show 3 on one hand and 7 on both hands. Which one has fewer fingers?"
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා හරිම දක්ෂයි! පෑන් 3 තමයි කුඩාම ප්‍රමාණය!",
+            "en": "Awesome! You are brilliant! 3 pens is definitely the smaller amount!"
+          },
+          "retry": {
+            "si": "කමක් නෑ යාලුවේ, කලබල වෙන්න එපා. අපි ආයෙමත් හිමීට ගණන් කරලා බලමු!",
+            "en": "No worries! Let's take a calm breath and compare the two piles again together."
+          },
+          "celebrate": {
+            "si": "ජය වේවා! ගජාගේ බෑගයට හරියටම ගැලපෙන පෑන් ටික ලැබුණා. අපි ඊළඟ කඩේට යමු!",
+            "en": "Quest Complete! Gaja has the perfect pen set now. Let's explore the next market stall!"
+          }
+        }
+      },
+      "cli_score": 1.75,
+      "effective_cli_score": 1.0,
+      "raw_sinhala_question": "අඩු පෑන් ප්‍රමාණය තෝරන්න: 3 හෝ 7?",
+      "raw_english_question": "Pick the smaller amount: 3 or 7?",
+      "target_learner_id": null,
+      "student_name": "Inattentive Profile (අවධානය)",
+      "customized_by_teacher": true,
+      "behavior_profile": {
+        "learner_id": null,
+        "student_name": "Inattentive Profile (අවධානය)",
+        "archetype_id": "INATTENTIVE",
+        "inattention_level": "HIGH",
+        "impulsivity_level": "LOW",
+        "working_memory_support": true,
+        "activity_pace": "CALM_STEP_BY_STEP",
+        "visual_assistance": "ALWAYS",
+        "audio_assistance": "READ_ON_CLICK"
+      }
+    },
+    "_id": "4db539d460b9482087cd1e4b4a2b0273"
+  },
+  {
     "activity_id": "act_5754c26b32",
     "cli_score": 2.8,
     "raw_sinhala_question": "රුපියල් 20 ක ටොෆි පැකට්ටුවක් සහ රුපියල් 15 ක බිස්කට් පැකට්ටුවක් ගැනීමට අවශ්‍ය මුළු මුදල කීයද?",

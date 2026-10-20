@@ -85,3 +85,16 @@ async def require_parent(current_user: Dict[str, Any] = Depends(get_current_user
             detail="Access restricted: Only registered parent accounts can create or modify child learner profiles.",
         )
     return current_user
+
+
+async def require_admin(current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
+    """
+    Enforces the 'admin' role (set manually on the user document; it cannot be self-registered).
+    Every other role, including parents and teachers, receives HTTP 403 Forbidden.
+    """
+    if current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access restricted: Administrator accounts only.",
+        )
+    return current_user

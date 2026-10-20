@@ -35,3 +35,6 @@ services/content-adaptation-service/data/syllabi/Grade 5.pdf
 services/pedagogical-engine/decision-api/data/
 services/pedagogical-engine/decision-api/data/*.json
 
+# NSCH datasets (local ML research data)
+research/recommendation_engine/ml_experiments/data/raw/
+

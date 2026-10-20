@@ -822,6 +822,50 @@ export function AgentTestPage() {
               </span>
             </div>
 
+            {/* Step 5 Novelty: Active FSM Intervention & Expected Mastery Gain (EMG) Difficulty Bar */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '6px 12px',
+                borderRadius: '12px',
+                background:
+                  fsmDecision.fsmState === 'DISTRACTED_RE_ENGAGE'
+                    ? 'rgba(56, 189, 248, 0.16)'
+                    : fsmDecision.fsmState === 'REVISION_DUE'
+                    ? 'rgba(245, 158, 11, 0.16)'
+                    : 'rgba(255, 255, 255, 0.04)',
+                border:
+                  fsmDecision.fsmState === 'DISTRACTED_RE_ENGAGE'
+                    ? '1px solid rgba(56, 189, 248, 0.45)'
+                    : fsmDecision.fsmState === 'REVISION_DUE'
+                    ? '1px solid rgba(245, 158, 11, 0.45)'
+                    : '1px solid rgba(255, 255, 255, 0.08)',
+                fontSize: '0.76rem',
+              }}
+            >
+              <span style={{ color: '#CBD5E1', fontWeight: 700 }}>
+                🎯 EMG Difficulty:{' '}
+                <b style={{ color: '#34D399' }}>
+                  {fsmDecision.challengeRecommendation?.recommendedDifficulty || 'OPTIMAL_ZPD'}
+                </b>
+                {fsmDecision.challengeRecommendation && (
+                  <span style={{ color: '#94A3B8', marginLeft: '6px' }}>
+                    (+{Math.round(fsmDecision.challengeRecommendation.expectedMasteryGain * 100)}% Gain)
+                  </span>
+                )}
+              </span>
+
+              <span style={{ color: '#38BDF8', fontWeight: 800 }}>
+                {fsmDecision.fsmState === 'DISTRACTED_RE_ENGAGE'
+                  ? '🛡️ Focus Re-Engage (Mastery Protected)'
+                  : fsmDecision.fsmState === 'REVISION_DUE'
+                  ? '🔔 Spaced Warm-Up Review Active'
+                  : `🤖 Policy: ${fsmDecision.decision.action}`}
+              </span>
+            </div>
+
             {/* 10-Question Interactive Stepper Bar */}
             <div
               style={{

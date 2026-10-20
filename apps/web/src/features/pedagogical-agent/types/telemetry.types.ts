@@ -143,15 +143,55 @@ export interface BKTComparisonState {
 }
 
 /**
- * Finite State Machine (FSM) Decision Engine Types (Task #21)
+ * Finite State Machine (FSM) Decision Engine Types (Task #21 + Steps 5 & 6)
  */
 export type FSMState =
   | 'OBSERVING'
   | 'ATTENTION_REDIRECT'
+  | 'DISTRACTED_RE_ENGAGE'
+  | 'REVISION_DUE'
   | 'HINT_SCAFFOLDING'
   | 'FRUSTRATION_REGULATION'
   | 'IMPULSE_BRAKING'
   | 'MASTERY_REINFORCEMENT';
+
+export type ChallengeDifficultyLevel =
+  | 'EASY_SCAFFOLD'
+  | 'OPTIMAL_ZPD'
+  | 'CHALLENGE_MASTERY';
+
+export interface ChallengeRecommendation {
+  recommendedDifficulty: ChallengeDifficultyLevel;
+  labelSinhala: string;
+  expectedMasteryGain: number;
+  predictedSuccessProb: number;
+  candidates?: Array<{
+    level: ChallengeDifficultyLevel;
+    expectedMasteryGain: number;
+    predictedSuccessProb: number;
+  }>;
+}
+
+export interface ExplainableDecisionRationale {
+  summary: string;
+  whyTriggered: string;
+  fusionSource: string;
+  masteryAndRetention: string;
+  difficultyRationale: string;
+}
+
+export interface FSMDecisionLogEntry {
+  timestamp: string;
+  ruleId: string;
+  ruleName: string;
+  state: FSMState;
+  previousState: FSMState;
+  action: string;
+  recommendedDifficulty: ChallengeDifficultyLevel;
+  expectedMasteryGain: number;
+  rationale: string;
+  fusionSource: string;
+}
 
 export interface FSMDecision {
   fsmState: FSMState;
@@ -168,6 +208,11 @@ export interface FSMDecision {
     targetHintLevel: HintLevel | null;
     messageSinhala: string;
     autoOpenHint: boolean;
+    recommendedDifficulty?: ChallengeDifficultyLevel;
+    expectedMasteryGain?: number;
   };
+  challengeRecommendation?: ChallengeRecommendation;
+  explainableRationale?: ExplainableDecisionRationale;
+  recentDecisionLogs?: FSMDecisionLogEntry[];
   timestamp: string;
 }

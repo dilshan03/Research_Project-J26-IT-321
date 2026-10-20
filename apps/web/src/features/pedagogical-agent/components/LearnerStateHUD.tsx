@@ -94,6 +94,20 @@ const FSM_STATE_CONFIG: Record<
     color: '#FBBF24',
     bg: 'rgba(245, 158, 11, 0.2)'
   },
+  DISTRACTED_RE_ENGAGE: {
+    label: 'DISTRACTED / RE-ENGAGE',
+    sinhala: 'අවධානය නැවත ගොඩනැංවීම',
+    icon: '🎯',
+    color: '#38BDF8',
+    bg: 'rgba(56, 189, 248, 0.22)'
+  },
+  REVISION_DUE: {
+    label: 'SPACED REVISION DUE',
+    sinhala: 'මතක පුනරීක්ෂණ අවස්ථාව',
+    icon: '🔔',
+    color: '#FBBF24',
+    bg: 'rgba(245, 158, 11, 0.25)'
+  },
   HINT_SCAFFOLDING: {
     label: 'HINT SCAFFOLDING',
     sinhala: 'හෝඩුවාවෙන් මඟපෙන්වීම',
@@ -179,6 +193,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
 }) => {
   const [showBKTDetails, setShowBKTDetails] = useState<boolean>(true);
   const [showFSMDetails, setShowFSMDetails] = useState<boolean>(true);
+  const [showTeacherLogs, setShowTeacherLogs] = useState<boolean>(true);
 
   const stateKey = learnerState?.cognitiveState || 'NORMAL';
   const cfg = STATE_CONFIG[stateKey] || STATE_CONFIG.NORMAL;
@@ -295,7 +310,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         </span>
       </div>
 
-      {/* FSM Decision Engine Live Inspector (Task #21 Feature) */}
+      {/* Step 5 & Step 6: State-Aware Constrained FSM, Expected Mastery Gain (EMG) & Teacher Explainable Logs */}
       <div
         style={{
           background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)',
@@ -311,7 +326,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '1rem' }}>🤖</span>
             <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#38BDF8', letterSpacing: '0.3px' }}>
-              FSM Decision Engine
+              Constrained FSM & EMG (Step 5)
             </span>
           </div>
 
@@ -367,7 +382,86 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
               </span>
             </div>
           )}
+
+          {/* Step 5 Novelty: Expected Mastery Gain (EMG) Optimal Challenge Difficulty Pill */}
+          {fsmDecision.challengeRecommendation && (
+            <div
+              style={{
+                marginTop: '6px',
+                padding: '6px 8px',
+                borderRadius: '6px',
+                background: 'rgba(16, 185, 129, 0.12)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.7rem' }}>
+                <span style={{ color: '#34D399', fontWeight: 800 }}>
+                  🎯 EMG Optimal Challenge: {fsmDecision.challengeRecommendation.recommendedDifficulty}
+                </span>
+                <span style={{ color: '#4ADE80', fontWeight: 800 }}>
+                  EMG: +{Math.round(fsmDecision.challengeRecommendation.expectedMasteryGain * 100)}%
+                </span>
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#CBD5E1' }}>
+                {fsmDecision.challengeRecommendation.labelSinhala} (P(Success):{' '}
+                {Math.round(fsmDecision.challengeRecommendation.predictedSuccessProb * 100)}%)
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Step 6 Novelty: Teacher (HITL) Explainable Decision Rationale Log Inspector */}
+        {fsmDecision.explainableRationale && (
+          <div style={{ marginTop: '2px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
+            <div
+              onClick={() => setShowTeacherLogs(!showTeacherLogs)}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: 'pointer',
+                fontSize: '0.72rem',
+                color: '#4ADE80',
+                fontWeight: 700
+              }}
+            >
+              <span>👩‍🏫 Teacher Explainable Decision Log (Step 6 HITL)</span>
+              <span>{showTeacherLogs ? '▲ Hide' : '▼ View'}</span>
+            </div>
+
+            {showTeacherLogs && (
+              <div
+                style={{
+                  marginTop: '6px',
+                  padding: '8px',
+                  borderRadius: '8px',
+                  background: 'rgba(15, 23, 42, 0.75)',
+                  border: '1px solid rgba(74, 222, 128, 0.25)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  fontSize: '0.69rem'
+                }}
+              >
+                <div style={{ color: '#F8FAFC', fontWeight: 700 }}>
+                  📌 {fsmDecision.explainableRationale.summary}
+                </div>
+                <div style={{ color: '#CBD5E1' }}>
+                  <b>Why Triggered:</b> {fsmDecision.explainableRationale.whyTriggered}
+                </div>
+                <div style={{ color: '#94A3B8' }}>
+                  <b>Signal Source:</b> {fsmDecision.explainableRationale.fusionSource}
+                </div>
+                <div style={{ color: '#38BDF8' }}>
+                  <b>Difficulty Policy:</b> {fsmDecision.explainableRationale.difficultyRationale}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* FSM Rules Catalog Toggle */}
         <div style={{ marginTop: '2px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
@@ -391,6 +485,70 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
               {/* Interactive Rule Buttons */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
+                <button
+                  onClick={() =>
+                    onTriggerFSMRule &&
+                    onTriggerFSMRule({
+                      cameraPermissionGranted: true,
+                      cameraAttentionScore: 0.30,
+                      inattentionIndex: 0.65,
+                      isAttentionSlip: true,
+                      bktKnowledge: 0.72
+                    })
+                  }
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background:
+                      fsmDecision.rule.id === 'RULE_DISTRACTED_RE_ENGAGE'
+                        ? 'rgba(56, 189, 248, 0.3)'
+                        : 'rgba(255, 255, 255, 0.05)',
+                    border:
+                      fsmDecision.rule.id === 'RULE_DISTRACTED_RE_ENGAGE'
+                        ? '1px solid #38BDF8'
+                        : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_DISTRACTED_RE_ENGAGE' ? '#38BDF8' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🎯 Step 5: Distracted Re-Engage
+                </button>
+
+                <button
+                  onClick={() =>
+                    onTriggerFSMRule &&
+                    onTriggerFSMRule({
+                      retentionScore: 0.52,
+                      revisionRecommended: true,
+                      elapsedDays: 5,
+                      memoryStability: 2.5,
+                      bktKnowledge: 0.78
+                    })
+                  }
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background:
+                      fsmDecision.rule.id === 'RULE_REVISION_DUE'
+                        ? 'rgba(245, 158, 11, 0.3)'
+                        : 'rgba(255, 255, 255, 0.05)',
+                    border:
+                      fsmDecision.rule.id === 'RULE_REVISION_DUE'
+                        ? '1px solid #FBBF24'
+                        : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_REVISION_DUE' ? '#FBBF24' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🔔 Step 5: Revision Due (R&lt;70%)
+                </button>
+
                 <button
                   onClick={() => onTriggerFSMRule && onTriggerFSMRule({ consecutiveErrors: 2, highestHintLevel: 0 })}
                   style={{

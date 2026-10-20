@@ -312,6 +312,13 @@ export function useLearnerState({
             frustrationIndex: state.metrics.frustrationIndex,
             isImpulsive: state.flags.isImpulsive,
             isFrustrated: state.flags.isFrustrated,
+            isAttentionSlip: Boolean(state.flags.isAttentionSlip || state.attentionFusion?.isAttentionSlip || bktResult.masteryProtected),
+            cameraPermissionGranted: Boolean(cameraTelemetry?.cameraPermissionGranted ?? state.attentionFusion?.cameraPermissionGranted),
+            cameraAttentionScore: cameraTelemetry?.cameraAttentionScore ?? null,
+            retentionScore: bktResult.retentionScore ?? 1.0,
+            memoryStability: bktResult.memoryStability ?? 3.0,
+            elapsedDays: bktResult.elapsedDays ?? elapsedDaysOverride,
+            revisionRecommended: Boolean(bktResult.revisionRecommended),
             lastAnswerIsCorrect: lastIsCorrect,
             bktKnowledge: bktResult.hintAwareKnowledge
           };

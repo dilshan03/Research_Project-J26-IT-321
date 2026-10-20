@@ -1,0 +1,16 @@
+# Scoped to the NSCH ML research workspace (does not affect the rest of the repository).
+# Raw survey data are also ignored by the repository root .gitignore.
+data/raw/
+data/processed/
+
+# Isolated research Python environment
+.venv/
+
+# Generated model binaries and run outputs (re-create with the documented commands)
+artifacts/**/*.joblib
+artifacts/**/*.pkl
+artifacts/**/*.npz
+
+# Python caches
+__pycache__/
+*.pyc

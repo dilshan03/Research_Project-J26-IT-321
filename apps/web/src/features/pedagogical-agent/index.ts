@@ -5,6 +5,7 @@ export { PedagogicalCompanion } from './components/PedagogicalCompanion';
 export { PedagogicalPracticeArena } from './components/PedagogicalPracticeArena';
 export { LearnerStateHUD } from './components/LearnerStateHUD';
 export { DetailsForParent } from './components/DetailsForParent';
+export { DetailsForTeacher } from './components/DetailsForTeacher';
 export { AgentDevPanel } from './components/dev/AgentDevPanel';
 export { usePedagogicalAgent } from './hooks/usePedagogicalAgent';
 export { useInteractionLogger } from './hooks/useInteractionLogger';

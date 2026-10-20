@@ -6,8 +6,6 @@ import {
   Dumbbell,
   Calendar,
   Award,
-  User,
-  Settings,
   Star,
   Coins,
   Volume2,
@@ -25,9 +23,15 @@ import {
   Castle,
   Sparkles,
   Crown,
+  Gamepad2,
+  Play,
+  RefreshCw,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import { PedagogicalPracticeArena } from '../../features/pedagogical-agent';
+import { contentAdaptationApi } from '../../features/content-adaptation/api';
+import type { BlueprintEnvelope, GameTheme } from '../../features/content-adaptation/types';
+import { GamePlayer } from '../../features/content-adaptation/game/GamePlayer';
 import {
   learnerApi,
   getActiveStudentProfile,
@@ -72,6 +76,39 @@ const GRADE_SI_LABELS: Record<number, string> = {
   3: '3 වන ශ්‍රේණිය',
   4: '4 වන ශ්‍රේණිය',
   5: '5 වන ශ්‍රේණිය',
+};
+
+const ADAPTATION_THEMES: Record<
+  GameTheme,
+  { name_si: string; name_en: string; mascotBg: string; mascotBorder: string; cardHover: string; badge: string; mascot: string }
+> = {
+  VILLAGE_MARKET: {
+    name_si: 'ගමේ පොළ',
+    name_en: 'Village Market',
+    mascotBg: 'bg-amber-50',
+    mascotBorder: 'border-amber-200/80',
+    cardHover: 'hover:border-amber-300 hover:shadow-amber-100/50',
+    badge: 'text-amber-800 bg-amber-50 border-amber-200/70',
+    mascot: '🧺',
+  },
+  JUNGLE_ADVENTURE: {
+    name_si: 'වනාන්තර චාරිකාව',
+    name_en: 'Jungle Adventure',
+    mascotBg: 'bg-emerald-50',
+    mascotBorder: 'border-emerald-200/80',
+    cardHover: 'hover:border-emerald-300 hover:shadow-emerald-100/50',
+    badge: 'text-emerald-800 bg-emerald-50 border-emerald-200/70',
+    mascot: '🐘',
+  },
+  SPACE_QUEST: {
+    name_si: 'අභ්‍යවකාශ ගමන',
+    name_en: 'Space Quest',
+    mascotBg: 'bg-sky-50',
+    mascotBorder: 'border-sky-200/80',
+    cardHover: 'hover:border-sky-300 hover:shadow-sky-100/50',
+    badge: 'text-sky-800 bg-sky-50 border-sky-200/70',
+    mascot: '🚀',
+  },
 };
 
 export const StudentDashboardPage: React.FC = () => {
@@ -119,7 +156,31 @@ export const StudentDashboardPage: React.FC = () => {
   const [isPracticePlaying, setIsPracticePlaying] = useState<boolean>(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [showResearchHUD, setShowResearchHUD] = useState(false);
+  const [showResearchHUD] = useState(false);
+
+  // Content-Adaptation Teacher-Approved Games State
+  const [approvedGames, setApprovedGames] = useState<BlueprintEnvelope[]>([]);
+  const [isLoadingGames, setIsLoadingGames] = useState<boolean>(false);
+  const [gamesError, setGamesError] = useState<string | null>(null);
+  const [activeApprovedGame, setActiveApprovedGame] = useState<BlueprintEnvelope | null>(null);
+
+  const fetchApprovedGames = useCallback(async () => {
+    setIsLoadingGames(true);
+    setGamesError(null);
+    try {
+      const list = await contentAdaptationApi.list('approved');
+      setApprovedGames(list || []);
+    } catch (err: any) {
+      console.warn('Failed to load approved games from content-adaptation-service:', err);
+      setGamesError(err?.message || 'ක්‍රීඩා ලබා ගැනීමට නොහැකි විය.');
+    } finally {
+      setIsLoadingGames(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchApprovedGames();
+  }, [fetchApprovedGames]);
 
   // Resolved Parent ID & Child Learner ID for saving all data specifically to this child
   const resolvedParentId =
@@ -220,8 +281,41 @@ export const StudentDashboardPage: React.FC = () => {
     };
   }, [resolvedParentId, resolvedLearnerId, studentDisplayName, studentGrade]);
 
-  // Sidebar automatically shrinks to the left while the Practice Game is actively playing
-  const isSidebarShrunk = activeNav === 'practice' && isPracticePlaying;
+  // Sidebar automatically shrinks to the left while either Practice Game or Approved Adventure Game is playing
+  const isSidebarShrunk =
+    (activeNav === 'practice' && isPracticePlaying) ||
+    (activeNav === 'adventure' && Boolean(activeApprovedGame));
+
+  // Filter and prioritize approved games for this specific child
+  const studentApprovedGames = React.useMemo(() => {
+    if (!approvedGames || approvedGames.length === 0) return [];
+
+    // 1. Specifically targeted to this child (target_learner_id or matching name)
+    const childSpecific = approvedGames.filter(
+      (env) =>
+        (env.blueprint.target_learner_id && env.blueprint.target_learner_id === resolvedLearnerId) ||
+        (env.blueprint.student_name &&
+          env.blueprint.student_name.toLowerCase().trim() === studentDisplayName.toLowerCase().trim())
+    );
+
+    // 2. Approved for this student's grade (without a target_learner_id reserved for another child)
+    const gradeMatching = approvedGames.filter(
+      (env) =>
+        Number(env.blueprint.grade) === Number(studentGrade) &&
+        !childSpecific.some((cs) => cs.blueprint.activity_id === env.blueprint.activity_id) &&
+        (!env.blueprint.target_learner_id || env.blueprint.target_learner_id === resolvedLearnerId)
+    );
+
+    // 3. Any other teacher-approved games available for exploration
+    const otherApproved = approvedGames.filter(
+      (env) =>
+        !childSpecific.some((cs) => cs.blueprint.activity_id === env.blueprint.activity_id) &&
+        !gradeMatching.some((gm) => gm.blueprint.activity_id === env.blueprint.activity_id) &&
+        (!env.blueprint.target_learner_id || env.blueprint.target_learner_id === resolvedLearnerId)
+    );
+
+    return [...childSpecific, ...gradeMatching, ...otherApproved];
+  }, [approvedGames, resolvedLearnerId, studentDisplayName, studentGrade]);
 
   const handleRewardEarned = useCallback(
     (starsDelta: number, coinsDelta: number) => {
@@ -308,8 +402,11 @@ export const StudentDashboardPage: React.FC = () => {
           {/* Expand Sidebar / Exit Game Button */}
           <button
             type="button"
-            onClick={() => setIsPracticePlaying(false)}
-            title="Expand Sidebar / Exit Practice Game"
+            onClick={() => {
+              setIsPracticePlaying(false);
+              setActiveApprovedGame(null);
+            }}
+            title="Expand Sidebar / Exit Game"
             className="w-11 h-11 rounded-2xl bg-mq-surface-blue text-mq-primary hover:bg-mq-primary hover:text-white border border-mq-primary/25 flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0 hover:scale-105 active:scale-95"
           >
             <ChevronRight size={20} strokeWidth={2.5} />
@@ -329,14 +426,18 @@ export const StudentDashboardPage: React.FC = () => {
                   onClick={() => {
                     setActiveNav(item.id);
                     setIsPracticePlaying(false);
+                    setActiveApprovedGame(null);
                   }}
-                  className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+                  className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 relative ${
                     active
                       ? 'bg-mq-primary text-white shadow-md shadow-mq-primary/30 ring-2 ring-mq-primary/20'
                       : 'text-mq-text-muted hover:bg-mq-surface-soft hover:text-mq-primary'
                   }`}
                 >
                   <Icon size={21} strokeWidth={2.3} />
+                  {item.id === 'adventure' && studentApprovedGames.length > 0 && !active && (
+                    <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-amber-400 border border-white" />
+                  )}
                 </button>
               );
             })}
@@ -350,6 +451,7 @@ export const StudentDashboardPage: React.FC = () => {
               onClick={() => {
                 setActiveNav('castle');
                 setIsPracticePlaying(false);
+                setActiveApprovedGame(null);
               }}
               className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                 activeNav === 'castle'
@@ -380,6 +482,7 @@ export const StudentDashboardPage: React.FC = () => {
                 onClick={() => {
                   setActiveNav(item.id);
                   setIsPracticePlaying(false);
+                  setActiveApprovedGame(null);
                   setIsMobileSidebarOpen(false);
                 }}
                 className={`w-full group relative flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 cursor-pointer text-left hover:scale-[1.02] active:scale-[0.98] ${
@@ -398,6 +501,17 @@ export const StudentDashboardPage: React.FC = () => {
                   }`}
                 />
                 <span className="truncate flex-1 text-sm font-extrabold">{label}</span>
+                {item.id === 'adventure' && studentApprovedGames.length > 0 && (
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[11px] font-black shrink-0 ${
+                      active
+                        ? 'bg-white text-mq-primary'
+                        : 'bg-amber-100 text-amber-800 border border-amber-200'
+                    }`}
+                  >
+                    {studentApprovedGames.length}
+                  </span>
+                )}
               </button>
             );
           })}
@@ -410,6 +524,7 @@ export const StudentDashboardPage: React.FC = () => {
             onClick={() => {
               setActiveNav('castle');
               setIsPracticePlaying(false);
+              setActiveApprovedGame(null);
               setIsMobileSidebarOpen(false);
             }}
             className={`w-full group relative overflow-hidden rounded-3xl p-3 border-2 transition-all duration-300 text-left cursor-pointer shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] ${
@@ -899,20 +1014,260 @@ export const StudentDashboardPage: React.FC = () => {
               </div>
             ) : activeNav === 'adventure' ? (
               /* ======================================================= */
-              /* LEARNING ADVENTURE TAB: Kept Empty as requested         */
+              /* LEARNING ADVENTURE TAB: Teacher-Approved Games          */
               /* ======================================================= */
-              <div className="min-h-[60vh] rounded-3xl border-2 border-dashed border-mq-border bg-white/60 flex items-center justify-center p-8 text-center animate-fade-in">
-                <div className="max-w-md space-y-2">
-                  <p className="text-sm font-bold text-mq-text-muted uppercase tracking-wider">
-                    {isSinhala ? 'ත්‍රාසජනක ඉගෙනුම් චාරිකාව' : 'Learning Adventure'}
-                  </p>
-                  <p className="text-xs text-mq-text-muted">
-                    {isSinhala
-                      ? 'මෙම කොටස ළඟදීම බලාපොරොත්තු වන්න. දැනට ක්‍රීඩා පුහුණුව වෙත පිවිසෙන්න.'
-                      : 'This section is currently reserved for the upcoming Learning Adventure module.'}
-                  </p>
+              activeApprovedGame ? (
+                <div className="w-full animate-fade-in -mt-2">
+                  <div className="mb-3 flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => setActiveApprovedGame(null)}
+                      className="btn btn-secondary py-2 px-4 rounded-full text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs hover:bg-mq-surface-soft"
+                    >
+                      <span>← {isSinhala ? 'ක්‍රීඩා ලැයිස්තුවට ආපසු' : 'Back to Adventure Games'}</span>
+                    </button>
+                    <span className="text-xs font-extrabold text-mq-primary bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-200/80 shadow-2xs">
+                      {isSinhala ? '🎯 ගුරුතුමා අනුමත කළ ක්‍රීඩාව' : '🎯 Teacher-Approved Game'}
+                    </span>
+                  </div>
+                  <GamePlayer
+                    envelope={activeApprovedGame}
+                    learnerId={resolvedLearnerId}
+                    onExit={() => {
+                      setActiveApprovedGame(null);
+                      handleRewardEarned(3, 10);
+                    }}
+                  />
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-6 py-2 animate-fade-in">
+                  {/* Hero Banner for Adventure (Calm, Soft Theme Matching MathQuest) */}
+                  <div className="relative overflow-hidden rounded-3xl border border-mq-border bg-white shadow-xs p-6 sm:p-7">
+                    {/* Top Accent Strip */}
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-mq-primary via-mq-secondary to-amber-400" />
+
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-1">
+                      <div className="space-y-2 max-w-2xl">
+                        {/* Badges */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mq-surface-blue border border-mq-primary/25 text-xs font-black text-mq-primary-dark">
+                            <Compass size={14} className="text-mq-primary" />
+                            <span>{isSinhala ? 'ඉගෙනුම් චාරිකාව' : 'Learning Adventure'}</span>
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-300/80 text-xs font-black text-amber-950">
+                            <Sparkles size={12} className="text-amber-500 fill-amber-400" />
+                            <span>
+                              {studentApprovedGames.length} {isSinhala ? 'ක්‍රීඩා සූදානම්' : 'Games Ready'}
+                            </span>
+                          </span>
+                        </div>
+
+                        {/* Title */}
+                        <h1 className="text-xl sm:text-2xl font-black text-mq-text-strong tracking-tight">
+                          {isSinhala
+                            ? `${studentDisplayName} වෙනුවෙන් ගුරුතුමා අනුමත කළ ක්‍රීඩා 🎯`
+                            : `Teacher-Approved Adventure Games for ${studentDisplayName} 🎯`}
+                        </h1>
+
+                        {/* Subtitle */}
+                        <p className="text-xs sm:text-sm text-mq-text-muted leading-relaxed">
+                          {isSinhala
+                            ? 'ගුරුතුමා විසින් ඔබේ ඉගෙනුම් අවශ්‍යතාවලට ගැළපෙන පරිදි අනුමත කරන ලද ගණිත ක්‍රීඩා මෙහි ඇත. ක්‍රීඩා කර තරු සහ කාසි දිනාගන්න!'
+                            : 'Fun math games approved by your teacher specifically adapted for your learning pace. Play and earn stars & coins!'}
+                        </p>
+                      </div>
+
+                      {/* Refresh Button */}
+                      <div className="shrink-0 self-start md:self-center">
+                        <button
+                          type="button"
+                          onClick={() => fetchApprovedGames()}
+                          disabled={isLoadingGames}
+                          className="btn bg-mq-surface-soft hover:bg-mq-surface-blue text-mq-primary-dark border border-mq-border-strong text-xs font-extrabold px-4 py-2 rounded-2xl inline-flex items-center gap-2 transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95 disabled:opacity-50"
+                        >
+                          <RefreshCw size={14} className={`text-mq-primary ${isLoadingGames ? 'animate-spin' : ''}`} />
+                          <span>{isSinhala ? 'නැවත පූරණය කරන්න' : 'Refresh Games'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Loading State */}
+                  {isLoadingGames && (
+                    <div className="min-h-[40vh] rounded-3xl border border-mq-border bg-white p-8 flex flex-col items-center justify-center text-center space-y-3">
+                      <div className="w-12 h-12 rounded-full border-4 border-mq-primary/30 border-t-mq-primary animate-spin" />
+                      <p className="text-sm font-extrabold text-mq-text-strong">
+                        {isSinhala ? 'අනුමත ක්‍රීඩා පූරණය වෙමින් පවතී...' : 'Loading approved games...'}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Error State */}
+                  {!isLoadingGames && gamesError && (
+                    <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-center justify-between gap-3 text-xs font-bold">
+                      <span>{gamesError}</span>
+                      <button
+                        type="button"
+                        onClick={() => fetchApprovedGames()}
+                        className="btn btn-secondary py-1 px-3 text-xs font-bold rounded-lg cursor-pointer"
+                      >
+                        {isSinhala ? 'නැවත උත්සාහ කරන්න' : 'Try Again'}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Empty State */}
+                  {!isLoadingGames && !gamesError && studentApprovedGames.length === 0 && (
+                    <div className="min-h-[45vh] rounded-3xl border-2 border-dashed border-mq-border bg-white p-8 flex flex-col items-center justify-center text-center space-y-3 animate-fade-in">
+                      <div className="w-16 h-16 rounded-3xl bg-amber-100 border border-amber-200 flex items-center justify-center text-3xl">
+                        🎮
+                      </div>
+                      <div className="max-w-md space-y-1">
+                        <h3 className="text-base font-extrabold text-mq-text-strong">
+                          {isSinhala
+                            ? 'තවමත් අනුමත කරන ලද ක්‍රීඩා නොමැත'
+                            : 'No Teacher-Approved Games Yet'}
+                        </h3>
+                        <p className="text-xs text-mq-text-muted leading-relaxed">
+                          {isSinhala
+                            ? 'ගුරුතුමා විසින් Content Adaptation Studio මඟින් ඔබ වෙනුවෙන් ක්‍රීඩා අනුමත කළ විගස ඒවා මෙහි දිස්වනු ඇත.'
+                            : 'Once your teacher reviews and approves games in the Adaptation Studio, they will appear right here.'}
+                        </p>
+                      </div>
+                      <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => fetchApprovedGames()}
+                          className="btn btn-secondary py-2 px-4 rounded-full text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <RefreshCw size={14} />
+                          <span>{isSinhala ? 'නැවත බලන්න' : 'Check Again'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveNav('practice')}
+                          className="btn btn-primary py-2 px-5 rounded-full text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Dumbbell size={14} />
+                          <span>{isSinhala ? 'පුහුණුවීම් වෙත යන්න' : 'Go to Practice'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Approved Games Grid */}
+                  {!isLoadingGames && studentApprovedGames.length > 0 && (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-base sm:text-lg font-black text-mq-text-strong flex items-center gap-2">
+                          <Gamepad2 size={20} className="text-mq-primary" />
+                          <span>
+                            {isSinhala
+                              ? `ක්‍රීඩා කිරීමට සූදානම් (${studentApprovedGames.length})`
+                              : `Ready to Play (${studentApprovedGames.length})`}
+                          </span>
+                        </h2>
+                        <span className="text-xs font-extrabold text-mq-text-muted">
+                          {isSinhala ? 'ඔබට කැමති ක්‍රීඩාවක් තෝරන්න' : 'Pick a game to start'}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {studentApprovedGames.map((env, idx) => {
+                          const bp = env.blueprint;
+                          const themeKey = (bp.game_theme || 'VILLAGE_MARKET') as GameTheme;
+                          const themeInfo =
+                            ADAPTATION_THEMES[themeKey] || ADAPTATION_THEMES.VILLAGE_MARKET;
+                          const isTargetChild =
+                            (bp.target_learner_id &&
+                              bp.target_learner_id === resolvedLearnerId) ||
+                            (bp.student_name &&
+                              bp.student_name.toLowerCase().trim() ===
+                                studentDisplayName.toLowerCase().trim());
+                          const stepsCount = bp.micro_steps?.length || 3;
+                          const questionText =
+                            bp.story_narrative?.title_si ||
+                            bp.raw_sinhala_question ||
+                            env.raw_sinhala_question ||
+                            'ගණිත ගැටලුව විසඳන්න';
+
+                          return (
+                            <div
+                              key={bp.activity_id || idx}
+                              className={`group relative rounded-3xl bg-white border-2 border-mq-border ${themeInfo.cardHover} p-5 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between hover:-translate-y-1`}
+                            >
+                              {/* Top Row: Mascot + Badges */}
+                              <div>
+                                <div className="flex items-start justify-between gap-2 mb-3">
+                                  <div
+                                    className={`w-13 h-13 rounded-2xl ${themeInfo.mascotBg} border ${themeInfo.mascotBorder} flex items-center justify-center text-3xl shadow-2xs group-hover:scale-105 transition-transform`}
+                                  >
+                                    {themeInfo.mascot}
+                                  </div>
+
+                                  <div className="flex flex-col items-end gap-1">
+                                    {isTargetChild && (
+                                      <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-400 text-amber-950 shadow-2xs">
+                                        <Sparkles size={11} /> {isSinhala ? 'ඔබ වෙනුවෙන්මයි' : 'For You'}
+                                      </span>
+                                    )}
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary-dark border border-mq-primary/25">
+                                        {GRADE_SI_LABELS[bp.grade] || `Grade ${bp.grade}`}
+                                      </span>
+                                      <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-mq-surface-soft text-mq-text-strong border border-mq-border-strong">
+                                        {bp.topic}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Theme Title */}
+                                <p className="text-xs font-bold text-mq-text-muted">
+                                  {isSinhala ? themeInfo.name_si : themeInfo.name_en}
+                                </p>
+
+                                {/* Problem Text */}
+                                <h3 className="text-sm sm:text-base font-extrabold text-mq-text-strong line-clamp-3 mt-1.5 leading-snug">
+                                  {questionText}
+                                </h3>
+
+                                {/* Extra features / Microsteps pill */}
+                                <div className="flex flex-wrap items-center gap-1.5 mt-4 pt-3 border-t border-mq-border/70">
+                                  <span className="text-[11px] font-bold text-mq-text-muted bg-mq-surface-soft px-2.5 py-0.5 rounded-lg border border-mq-border/60">
+                                    {isSinhala ? `පියවර ${stepsCount} ක්` : `${stepsCount} steps`}
+                                  </span>
+                                  {bp.adhd_game_settings?.stimulus_density === 'LOW' && (
+                                    <span className="text-[11px] font-bold text-mq-success bg-mq-surface-green border border-mq-secondary/35 px-2.5 py-0.5 rounded-lg">
+                                      {isSinhala ? 'සන්සුන් පරිසරය' : 'Calm view'}
+                                    </span>
+                                  )}
+                                  <span className="text-[11px] font-bold text-amber-900 bg-amber-50 border border-amber-200/90 px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1">
+                                    <Star size={11} className="fill-amber-400 text-amber-500" />
+                                    <span>3 {isSinhala ? 'තරු' : 'Stars'}</span>
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Play Button */}
+                              <div className="mt-4 pt-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setActiveApprovedGame(env)}
+                                  className="w-full btn bg-mq-primary hover:bg-mq-primary-hover active:bg-mq-primary-dark text-white font-extrabold text-sm py-2.5 px-4 rounded-2xl shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                                >
+                                  <Play size={16} className="fill-white" />
+                                  <span>{isSinhala ? 'සෙල්ලම් කරන්න' : 'Play Game'}</span>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
             ) : (
               /* ======================================================= */
               /* OTHER SIDEBAR TABS: Clean Empty Placeholder             */

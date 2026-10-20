@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   CheckCircle2,
-  XCircle,
   Lightbulb,
   Clock,
   RefreshCw,

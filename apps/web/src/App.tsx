@@ -117,28 +117,6 @@ function App() {
 
         <Routes>
 
-          {/* Public pages */}
-          <Route
-            path="/"
-            element={<HomePage />}
-          />
-
-          <Route
-            path="/sign-in"
-            element={<SignInPage />}
-          />
-
-          <Route
-            path="/sign-up"
-            element={<SignUpPage />}
-          />
-
-          <Route
-            path="/forgot-password"
-            element={<ForgotPasswordPage />}
-          />
-
-          {/* Profile */}
           {/* ========================================================= */}
           {/* 1. Public & Core Authentication Routes                    */}
           {/* ========================================================= */}
@@ -177,10 +155,11 @@ function App() {
                 <DashboardLayout role="parent" />
               </ProtectedRoute>
             }
-          />
-          <Route index element={<LearnersPage />} />
+          >
+            <Route index element={<LearnersPage />} />
             {/* Optional SNAP-IV, opened from the parent dashboard */}
             <Route path=":learnerId/snap-iv" element={<ParentSnapIvPage />} />
+          </Route>
       
 
           <Route

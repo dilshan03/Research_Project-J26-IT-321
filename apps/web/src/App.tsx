@@ -41,6 +41,9 @@ import TeacherLearnerProfilesPage from './pages/teacher/TeacherLearnerProfilesPa
 import TeacherRecommendationsPage from './pages/teacher/TeacherRecommendationsPage';
 import StudentDashboardPage from './pages/student/StudentDashboardPage';
 import AdminDashboardPage from './features/admin/pages/AdminDashboardPage';
+import { ResearchAccessGate } from './features/admin/research/ResearchLayout';
+import ResearchHomePage from './features/admin/research/ResearchHomePage';
+import ResearchComponentPage from './features/admin/research/ResearchComponentPage';
 
 // -------------------------------------------------------------
 // [DEV TEMP] Pedagogical Agent Test Page Import (Remove later)
@@ -201,6 +204,23 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminDashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          {/* Research & Model Analytics: admin role + researchAnalyticsAccess (enforced by the server on every request) */}
+          <Route
+            path="/admin/research"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <ResearchAccessGate><ResearchHomePage /></ResearchAccessGate>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/research/:componentId/:tab?"
+            element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <ResearchAccessGate><ResearchComponentPage /></ResearchAccessGate>
               </ProtectedRoute>
             }
           />

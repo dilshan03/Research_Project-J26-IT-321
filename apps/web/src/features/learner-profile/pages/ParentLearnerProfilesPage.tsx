@@ -82,7 +82,9 @@ export const ParentLearnerProfilesPage: React.FC = () => {
     }
 
     const child = learners.find((l) => l.learnerId === selectedLearnerId);
-    if (!child || child.onboardingStatus === 'NOT_STARTED') {
+    // The consolidated summary only exists after onboarding is completed (the API returns 400
+    // before that), and profile details are only shown for completed children.
+    if (!child || child.onboardingStatus !== 'COMPLETED') {
       setProfile(null);
       setSummary(null);
       return;

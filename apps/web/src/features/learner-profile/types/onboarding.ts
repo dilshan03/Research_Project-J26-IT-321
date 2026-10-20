@@ -246,6 +246,28 @@ export interface MathItemAnswer {
   conceptId?: string;
   inputMethod?: 'drag' | 'tap' | 'select';
   missedDropCount?: number;
+  /** Raw interaction observations (stored only; never scored or interpreted). */
+  interactionObservations?: InteractionObservations;
+}
+
+/**
+ * ONBOARDING-INTERACTION-OBS-v1.0: transparent counts and timestamps for one item, in
+ * milliseconds from item display. Not a measure of attention, impulsivity or ADHD.
+ */
+export interface InteractionObservations {
+  version: string;
+  parameters: { burstMaxGapMs: number; burstMinTaps: number; idleThresholdMs: number; maxEventsPerList: number };
+  observedDurationMs: number;
+  idleTimeBeforeFirstActionMs: number | null;
+  pointerDownCount: number;
+  keyDownCount: number;
+  tapBursts: Array<{ startMs: number; endMs: number; tapCount: number }>;
+  idleIntervals: Array<{ startMs: number; durationMs: number }>;
+  pageEvents: Array<{ type: 'hidden' | 'visible' | 'blur' | 'focus'; atMs: number }>;
+  hiddenDurationMs: number;
+  invalidTapCount: number | null;
+  invalidTaps: Array<{ atMs: number }>;
+  truncated: boolean;
 }
 
 /** Request-level fields sent alongside answers by the interactive onboarding journey. */

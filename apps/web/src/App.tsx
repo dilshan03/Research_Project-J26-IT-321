@@ -72,8 +72,10 @@ function FloatingDevControls() {
   const isStudentDashboard = location.pathname === '/student/dashboard';
   const isAgentTest = location.pathname === '/agent-test';
   const isOnboarding = location.pathname.includes('/onboarding');
+  // Not shown on the admin dashboard (including research analytics); other dashboards keep them
+  const isAdmin = location.pathname === '/admin' || location.pathname.startsWith('/admin/');
 
-  if (isOnboarding) return null;
+  if (isOnboarding || isAdmin) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5">

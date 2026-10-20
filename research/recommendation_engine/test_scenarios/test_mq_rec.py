@@ -50,6 +50,13 @@ def skill(skill_id, level, n=None, sufficient=None):
     return s
 
 
+def intro(*concepts, source="system", instrument="SYNTHETIC-CURRICULUM"):
+    return {
+        "provenance": {"source": source, "instrument": instrument},
+        "concepts": [{"skillId": s, "stage": stage, "basis": f"synthetic sequence: {s} {stage}"} for s, stage in concepts],
+    }
+
+
 def run(data):
     return evaluate(LearnerContext.from_dict(data))
 
@@ -103,6 +110,18 @@ class TestLearnerContextSchema(unittest.TestCase):
         self.assertEqual(ctx.clinicalReference.provenance.source, "clinician")
         self.assertIsNot(type(ctx.parentReportedAdhdContext), type(ctx.clinicalReference))
 
+    def test_concept_introduction_must_be_provenance_backed(self):
+        bad = [
+            intro(("addition", "introduction"), source="parent"),       # parents cannot assert curriculum stage
+            intro(("addition", "introduction"), instrument=""),          # instrument required
+            {"provenance": {"source": "system", "instrument": "X"},
+             "concepts": [{"skillId": "addition", "stage": "introduction"}]},  # basis required
+            intro(("addition", "new")),                                  # unknown stage
+        ]
+        for value in bad:
+            with self.assertRaises(ContextValidationError, msg=value):
+                LearnerContext.from_dict(base(conceptIntroduction=value))
+
     def test_skill_without_elpx_level_is_rejected(self):
         with self.assertRaises(ContextValidationError):
             LearnerContext.from_dict(base(mathEvidence=math({"skillId": "addition"})))
@@ -155,10 +174,34 @@ class TestRules(unittest.TestCase):
         out = run(base(mathEvidence=math(skill("a", "DEVELOPING", n=4), skill("b", "PROFICIENT", n=4))))
         self.assertNotIn("CRA_SCAFFOLDING", codes(out))
 
-    def test_accessible_numbers_for_skill_without_estimate(self):
+    def test_missing_estimate_alone_never_triggers_accessible_numbers(self):
         out = run(base(grade=1, mathEvidence=math(skill("addition", "INSUFFICIENT_EVIDENCE", n=0))))
+        self.assertNotIn("ACCESSIBLE_NUMBERS", codes(out))
+        self.assertEqual(trace(out, "MQ-RS2-04")["status"], "MISSING_INPUT")
+        self.assertIn("MQ-RS2-04", out["summary"]["blockedByMissingInput"])
+        self.assertIn("CONCEPT_INTRODUCTION_EVIDENCE_MISSING", {n["code"] for n in out["uncertaintyNotices"]})
+
+    def test_accessible_numbers_require_explicit_introduction_evidence(self):
+        out = run(base(grade=1, conceptIntroduction=intro(("multiplication", "introduction"))))
         self.assertEqual(codes(out), ["ACCESSIBLE_NUMBERS"])
-        self.assertNotIn("10", out["recommendations"][0]["action"])  # draft bounds are not applied as numbers
+        rec = out["recommendations"][0]
+        self.assertEqual(rec["inputEvidenceSummary"]["stageSource"], "system:SYNTHETIC-CURRICULUM")
+        self.assertEqual(rec["trace"]["contributingFeatures"],
+                         ["conceptIntroduction[multiplication].stage", "skills[multiplication].provisionalSkillLevel"])
+        text = json.dumps({k: v for k, v in rec.items() if k != "evidence"})
+        for bound in ("≤", "<= 10", "<= 20", "10)", "20)"):
+            self.assertNotIn(bound, text)  # no grade-specific number limits
+
+    def test_introduction_of_an_already_estimated_concept_is_refused(self):
+        out = run(base(mathEvidence=math(skill("addition", "DEVELOPING", n=5)),
+                       conceptIntroduction=intro(("addition", "introduction"))))
+        self.assertNotIn("ACCESSIBLE_NUMBERS", codes(out))
+        self.assertIn("CONCEPT_ALREADY_ESTIMATED", {n["code"] for n in out["uncertaintyNotices"]})
+
+    def test_practice_or_review_stage_does_not_trigger(self):
+        for stage in ("practice", "review"):
+            out = run(base(conceptIntroduction=intro(("addition", stage))))
+            self.assertNotIn("ACCESSIBLE_NUMBERS", codes(out), stage)
 
     def test_task_chunking_only_from_parent_pace_preference(self):
         self.assertIn("TASK_CHUNKING", codes(run(base(learningPreferences=prefs(activityPace="calm_step_by_step")))))
@@ -217,8 +260,20 @@ class TestNonDiagnosticSafeguards(unittest.TestCase):
             childPreferences=child(soundMode="quiet"),
             learningPreferences=prefs(audioAssistance="read_everything", activityPace="calm_step_by_step"),
             mathEvidence=math(skill("addition", "EMERGING", n=4), skill("fractions", "INSUFFICIENT_EVIDENCE", n=1)),
+            conceptIntroduction=intro(("fractions", "introduction")),
             **extra,
         )
+
+    def test_rich_fixture_exercises_all_four_recommendation_rules(self):
+        self.assertEqual(sorted(codes(run(self._rich()))),
+                         ["ACCESSIBLE_NUMBERS", "CHILD_SENSORY_PREFERENCE", "CRA_SCAFFOLDING", "TASK_CHUNKING"])
+
+    def test_no_recommendation_from_adhd_report_snap_iv_or_response_time_alone(self):
+        out = run(base(
+            parentReportedAdhdContext=self.ADHD, snapIvSummary=self.SNAP, clinicalReference=self.CLIN,
+            interactionObservations={"provenance": {"source": "telemetry"}, "responseLatencySeconds": 95.0},
+        ))
+        self.assertEqual(out["recommendations"], [])
 
     def test_adhd_report_snap_iv_and_clinical_label_never_change_recommendations(self):
         without = run(self._rich())["recommendations"]

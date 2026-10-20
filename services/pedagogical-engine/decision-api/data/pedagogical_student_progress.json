@@ -4,15 +4,15 @@
     "learnerId": "lrn_e4d0ac37b8",
     "studentName": "Esa",
     "grade": 1,
-    "stars": 350,
-    "coins": 150,
+    "stars": 450,
+    "coins": 190,
     "learningProgressPct": 0,
     "completedSteps": [],
     "hintAwareKnowledge": 0.2,
     "standardKnowledge": 0.2,
     "totalHintsUsed": 0,
     "sessionsCompleted": 1,
-    "updatedAt": "2026-10-20T05:42:07.360Z",
+    "updatedAt": "2026-10-20T07:53:27.311Z",
     "lastFsmState": "OBSERVING",
     "studentId": "lrn_e4d0ac37b8",
     "lastCognitiveState": "NORMAL"
@@ -34,5 +34,23 @@
     "lastCognitiveState": "NORMAL",
     "lastFsmState": "OBSERVING",
     "studentId": "lrn_7574835f26"
+  },
+  {
+    "parentId": "6acb27e594049997a510aca0",
+    "learnerId": "lrn_209d161b2e",
+    "studentName": "Kasun",
+    "grade": 2,
+    "stars": 100,
+    "coins": 50,
+    "learningProgressPct": 0,
+    "completedSteps": [],
+    "hintAwareKnowledge": 0.2,
+    "standardKnowledge": 0.2,
+    "totalHintsUsed": 0,
+    "sessionsCompleted": 0,
+    "updatedAt": "2026-10-20T08:51:47.460Z",
+    "lastFsmState": "OBSERVING",
+    "studentId": "lrn_209d161b2e",
+    "lastCognitiveState": "NORMAL"
   }
 ]

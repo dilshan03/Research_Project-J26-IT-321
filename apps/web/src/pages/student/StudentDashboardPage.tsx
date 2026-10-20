@@ -12,16 +12,17 @@ import {
   Coins,
   Volume2,
   VolumeX,
-  Activity,
   Menu,
   X,
-  ChevronDown,
   ChevronRight,
   ShieldCheck,
   TrendingUp,
   Users,
   GraduationCap,
   Languages,
+  Castle,
+  Sparkles,
+  Crown,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import { PedagogicalPracticeArena } from '../../features/pedagogical-agent';
@@ -44,46 +45,22 @@ type StudentNavId =
   | 'rewards'
   | 'progress'
   | 'profile'
-  | 'settings';
+  | 'settings'
+  | 'castle';
 
-interface StudentNavGroup {
-  id: string;
-  title: string;
-  items: {
-    id: StudentNavId;
-    label: string;
-    icon: React.FC<{ size?: number; className?: string }>;
-    badge?: string;
-  }[];
+interface StudentNavItem {
+  id: StudentNavId;
+  label: string;
+  icon: React.FC<{ size?: number; className?: string; strokeWidth?: number }>;
+  badge?: string;
 }
 
-const STUDENT_NAV_GROUPS: StudentNavGroup[] = [
-  {
-    id: 'student-learning',
-    title: 'LEARNING & ADVENTURE',
-    items: [
-      { id: 'home', label: 'Home', icon: Home },
-      { id: 'adventure', label: 'Learning Adventure', icon: Compass },
-      { id: 'practice', label: 'Practice', icon: Dumbbell },
-      { id: 'daily-challenge', label: 'Daily Challenge', icon: Calendar },
-    ],
-  },
-  {
-    id: 'student-rewards',
-    title: 'PROGRESS & REWARDS',
-    items: [
-      { id: 'rewards', label: 'Rewards', icon: Award },
-      { id: 'progress', label: 'My Progress', icon: TrendingUp },
-    ],
-  },
-  {
-    id: 'student-account',
-    title: 'ACCOUNT',
-    items: [
-      { id: 'profile', label: 'Profile', icon: User },
-      { id: 'settings', label: 'Settings', icon: Settings },
-    ],
-  },
+const STUDENT_NAV_ITEMS: StudentNavItem[] = [
+  { id: 'home', label: 'Home', icon: Home },
+  { id: 'adventure', label: 'Learning Adventure', icon: Compass },
+  { id: 'practice', label: 'Practice', icon: Dumbbell },
+  { id: 'daily-challenge', label: 'Daily Challenge', icon: Calendar },
+  { id: 'rewards', label: 'Rewards', icon: Award },
 ];
 
 const GRADE_SI_LABELS: Record<number, string> = {
@@ -114,7 +91,6 @@ export const StudentDashboardPage: React.FC = () => {
   // Default to 'practice' where the Game + Pedagogical Agent component is linked
   const [activeNav, setActiveNav] = useState<StudentNavId>('practice');
   const [isPracticePlaying, setIsPracticePlaying] = useState<boolean>(false);
-  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [showResearchHUD, setShowResearchHUD] = useState(false);
@@ -213,13 +189,6 @@ export const StudentDashboardPage: React.FC = () => {
   // Sidebar automatically shrinks to the left while the Practice Game is actively playing
   const isSidebarShrunk = activeNav === 'practice' && isPracticePlaying;
 
-  const toggleGroup = (groupId: string) => {
-    setCollapsedGroups((prev) => ({
-      ...prev,
-      [groupId]: !prev[groupId],
-    }));
-  };
-
   const handleRewardEarned = useCallback(
     (starsDelta: number, coinsDelta: number) => {
       setSavedProgress((prev) => {
@@ -301,20 +270,20 @@ export const StudentDashboardPage: React.FC = () => {
   const renderSidebarContent = (shrunk = false) => {
     if (shrunk) {
       return (
-        <div className="flex flex-col items-center h-full py-4 px-2 space-y-4 overflow-y-auto">
+        <div className="flex flex-col items-center h-full py-5 px-2.5 space-y-4 overflow-y-auto">
           {/* Expand Sidebar / Exit Game Button */}
           <button
             type="button"
             onClick={() => setIsPracticePlaying(false)}
             title="Expand Sidebar / Exit Practice Game"
-            className="w-10 h-10 rounded-xl bg-mq-surface-blue text-mq-primary hover:bg-mq-primary hover:text-white border border-mq-primary/25 flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0"
+            className="w-11 h-11 rounded-2xl bg-mq-surface-blue text-mq-primary hover:bg-mq-primary hover:text-white border border-mq-primary/25 flex items-center justify-center transition-all cursor-pointer shadow-xs shrink-0 hover:scale-105 active:scale-95"
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={20} strokeWidth={2.5} />
           </button>
 
           {/* Compact Nav Icons */}
-          <div className="flex flex-col items-center space-y-2 w-full pt-2 border-t border-mq-border/70">
-            {STUDENT_NAV_GROUPS.flatMap((g) => g.items).map((item) => {
+          <div className="flex flex-col items-center space-y-2.5 w-full pt-3 border-t border-mq-border/70">
+            {STUDENT_NAV_ITEMS.map((item) => {
               const active = activeNav === item.id;
               const Icon = item.icon;
               return (
@@ -326,120 +295,134 @@ export const StudentDashboardPage: React.FC = () => {
                     setActiveNav(item.id);
                     setIsPracticePlaying(false);
                   }}
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                     active
-                      ? 'bg-mq-primary text-white shadow-sm shadow-mq-primary/25'
+                      ? 'bg-mq-primary text-white shadow-md shadow-mq-primary/30 ring-2 ring-mq-primary/20'
                       : 'text-mq-text-muted hover:bg-mq-surface-soft hover:text-mq-primary'
                   }`}
                 >
-                  <Icon size={18} />
+                  <Icon size={21} strokeWidth={2.3} />
                 </button>
               );
             })}
+          </div>
+
+          {/* Compact Castle Icon */}
+          <div className="mt-auto pt-3 border-t border-mq-border/70 w-full flex justify-center">
+            <button
+              type="button"
+              title="My Castle (මගේ මාළිගාව)"
+              onClick={() => {
+                setActiveNav('castle');
+                setIsPracticePlaying(false);
+              }}
+              className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+                activeNav === 'castle'
+                  ? 'bg-gradient-to-tr from-amber-500 to-orange-400 text-white shadow-md shadow-amber-500/30 ring-2 ring-amber-400/40'
+                  : 'text-amber-600 bg-amber-50/80 hover:bg-amber-100 hover:text-amber-700'
+              }`}
+            >
+              <Castle size={22} strokeWidth={2.2} />
+            </button>
           </div>
         </div>
       );
     }
 
     return (
-      <div className="flex flex-col h-full overflow-y-auto px-4 py-4 space-y-5">
-        {/* Collapsible Navigation Groups (Exact match with DashboardSidebar.tsx) */}
-        <div className="space-y-5">
-          {STUDENT_NAV_GROUPS.map((group) => {
-            const isCollapsed = !!collapsedGroups[group.id];
+      <div className="flex flex-col h-full overflow-y-auto p-4 space-y-4">
+        {/* Navigation Items (Direct, Clean & Large for ADHD kids - No dropdown category titles) */}
+        <nav className="space-y-2.5">
+          {STUDENT_NAV_ITEMS.map((item) => {
+            const active = activeNav === item.id;
+            const Icon = item.icon;
 
             return (
-              <div key={group.id} className="space-y-1.5">
-                <button
-                  type="button"
-                  onClick={() => toggleGroup(group.id)}
-                  className="w-full flex items-center justify-between px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-mq-text-muted hover:text-mq-primary transition-colors cursor-pointer"
-                  aria-expanded={!isCollapsed}
-                >
-                  <span>{group.title}</span>
-                  <ChevronDown
-                    size={14}
-                    className={`transition-transform duration-200 ${
-                      isCollapsed ? '-rotate-90' : ''
-                    }`}
-                  />
-                </button>
-
-                {!isCollapsed && (
-                  <div className="space-y-1">
-                    {group.items.map((item) => {
-                      const active = activeNav === item.id;
-                      const Icon = item.icon;
-
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={() => {
-                            setActiveNav(item.id);
-                            setIsPracticePlaying(false);
-                            setIsMobileSidebarOpen(false);
-                          }}
-                          className={`w-full group relative flex items-center gap-3 px-3 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-150 cursor-pointer text-left ${
-                            active
-                              ? 'bg-mq-primary text-white shadow-sm shadow-mq-primary/25 font-bold'
-                              : 'text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary'
-                          }`}
-                        >
-                          <Icon
-                            size={17}
-                            className={`shrink-0 transition-colors ${
-                              active
-                                ? 'text-white'
-                                : 'text-mq-text-muted group-hover:text-mq-primary'
-                            }`}
-                          />
-                          <span className="truncate flex-1">{item.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  setActiveNav(item.id);
+                  setIsPracticePlaying(false);
+                  setIsMobileSidebarOpen(false);
+                }}
+                className={`w-full group relative flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all duration-200 cursor-pointer text-left hover:scale-[1.02] active:scale-[0.98] ${
+                  active
+                    ? 'bg-mq-primary text-white shadow-md shadow-mq-primary/25 ring-2 ring-mq-primary/20'
+                    : 'text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary bg-stone-50/70'
+                }`}
+              >
+                <Icon
+                  size={22}
+                  strokeWidth={2.3}
+                  className={`shrink-0 transition-colors ${
+                    active
+                      ? 'text-white'
+                      : 'text-mq-text-muted group-hover:text-mq-primary'
+                  }`}
+                />
+                <span className="truncate flex-1 text-sm font-extrabold">{item.label}</span>
+              </button>
             );
           })}
-        </div>
+        </nav>
 
-        {/* 3. Research Component Info Footer */}
-        <div className="mt-auto pt-4 border-t border-mq-border/80 space-y-2.5">
+        {/* 3. My Castle (මගේ මාළිගාව) Gamified Image Button - Extra Rounded & Friendly */}
+        <div className="mt-auto pt-3 border-t border-mq-border/70">
           <button
             type="button"
             onClick={() => {
-              setActiveNav('practice');
-              setShowResearchHUD((prev) => !prev);
+              setActiveNav('castle');
+              setIsPracticePlaying(false);
+              setIsMobileSidebarOpen(false);
             }}
-            className={`w-full flex items-center justify-between px-3 py-2 rounded-2xl text-xs font-bold border transition-all cursor-pointer ${
-              showResearchHUD
-                ? 'bg-mq-primary text-white border-mq-primary shadow-xs'
-                : 'bg-mq-surface-blue/60 text-mq-primary-dark border-mq-primary/20 hover:border-mq-primary/50'
+            className={`w-full group relative overflow-hidden rounded-3xl p-3 border-2 transition-all duration-300 text-left cursor-pointer shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] ${
+              activeNav === 'castle'
+                ? 'border-amber-400 bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-purple-500/20 ring-4 ring-amber-400/30'
+                : 'border-amber-200/90 hover:border-amber-400 bg-gradient-to-br from-amber-50/95 via-orange-50/80 to-indigo-50/60 hover:from-amber-100 hover:to-orange-100'
             }`}
+            title="Explore My Castle & Math Kingdom (මගේ මාළිගාව)"
           >
-            <span className="flex items-center gap-2">
-              <Activity size={14} />
-              <span>BKT & FSM Inspector</span>
-            </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white text-mq-primary font-extrabold">
-              {showResearchHUD ? 'HIDE' : 'LIVE'}
-            </span>
-          </button>
+            <div className="flex items-center gap-3">
+              {/* Castle Island Artwork Thumbnail */}
+              <div className="relative w-13 h-13 rounded-2xl overflow-hidden shrink-0 border-2 border-amber-300 shadow-sm bg-gradient-to-tr from-indigo-600 via-purple-600 to-amber-500 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <img
+                  src="/floating-island.png"
+                  alt="My Castle"
+                  className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLElement).style.display = 'none';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                <Castle size={22} className="absolute text-amber-200 drop-shadow-md pointer-events-none" />
+              </div>
 
-          <div className="p-3 bg-mq-surface-soft rounded-2xl border border-mq-border/60">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-mq-primary-dark mb-1">
-              <ShieldCheck size={14} className="text-mq-secondary" />
-              <span>Child Session Synced</span>
+              {/* Text Info */}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-black tracking-wide text-amber-950 font-display">
+                    MY CASTLE
+                  </span>
+                  <Sparkles size={14} className="text-amber-500 animate-pulse shrink-0" />
+                </div>
+                <p className="text-xs font-bold text-amber-850 truncate sinhala leading-tight mt-0.5">
+                  මගේ මාළිගාව
+                </p>
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="text-[11px] font-black text-mq-primary bg-white/95 px-2 py-0.5 rounded-full border border-amber-200 shadow-2xs">
+                    Level {studentGrade} Kingdom
+                  </span>
+                </div>
+              </div>
+
+              <ChevronRight
+                size={18}
+                strokeWidth={2.5}
+                className="text-amber-600/70 group-hover:text-amber-700 group-hover:translate-x-1 transition-all shrink-0"
+              />
             </div>
-            <p className="text-[10px] text-mq-text-muted leading-tight font-mono truncate">
-              Child: {resolvedLearnerId}
-            </p>
-            <p className="text-[10px] text-mq-text-muted leading-tight font-mono truncate">
-              Parent: {resolvedParentId}
-            </p>
-          </div>
+          </button>
         </div>
       </div>
     );
@@ -448,84 +431,84 @@ export const StudentDashboardPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-mq-bg text-mq-text">
       {/* ========================================================= */}
-      {/* 1. TOP PORTAL HEADER (Synced with Active Child Profile)   */}
+      {/* 1. TOP PORTAL HEADER (Simple, High-Contrast & Kid-Attractive) */}
       {/* ========================================================= */}
       <header
-        className="w-full bg-white/95 backdrop-blur-md sticky top-0 z-40 shadow-xs border-b border-mq-border h-16"
+        className="w-full bg-white/95 backdrop-blur-md sticky top-0 z-40 shadow-xs border-b border-mq-border h-18 sm:h-20"
         aria-label="Student Portal Header"
       >
         <div className="w-full max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
-          {/* Left: Mobile Drawer Trigger + MathQuest* Logo + STUDENT PORTAL Pill */}
+          {/* Left: Mobile Trigger + Cheerful Logo */}
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
               onClick={() => setIsMobileSidebarOpen((prev) => !prev)}
-              className="lg:hidden p-2 rounded-xl text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft border border-mq-border/70 transition-colors shrink-0 cursor-pointer"
+              className="lg:hidden p-2.5 rounded-2xl text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft border border-mq-border/70 transition-colors shrink-0 cursor-pointer"
               aria-label="Open navigation sidebar"
             >
-              <Menu size={20} />
+              <Menu size={22} />
             </button>
 
             <Link
               to="/student/dashboard"
-              className="flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary/40 rounded-lg p-0.5 shrink-0"
+              className="flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary/40 rounded-2xl p-1 shrink-0 transition-transform hover:scale-105 active:scale-95"
             >
-              <span className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center">
+              <span className="text-2xl sm:text-3xl font-black tracking-tight flex items-center drop-shadow-xs">
                 <span className="text-mq-primary-dark">Math</span>
                 <span className="text-mq-secondary">Quest</span>
-                <span className="text-mq-accent-yellow ml-0.5 text-2xl leading-none -mt-2">
-                  *
+                <span className="text-amber-400 ml-0.5 text-3xl leading-none -mt-2 animate-bounce">
+                  ★
                 </span>
               </span>
             </Link>
           </div>
 
-          {/* Center: Student Stars & Coins (Saved per Child) */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Center: Kid Rewards Pill (Stars & Coins) - Bold, Friendly, Chunky */}
+          <div className="flex items-center gap-2.5 sm:gap-4">
             {/* Stars Pill */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mq-surface-yellow border border-mq-warning/30 text-xs font-extrabold text-mq-text-strong">
-              <Star size={14} className="text-mq-warning fill-mq-accent-yellow shrink-0" />
-              <span>{savedProgress.stars.toLocaleString()} Stars</span>
+            <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-amber-50 border-2 border-amber-300/80 text-sm sm:text-base font-black text-amber-950 shadow-2xs">
+              <Star size={18} className="text-amber-500 fill-amber-400 shrink-0 animate-pulse" />
+              <span>{savedProgress.stars.toLocaleString()} <span className="hidden sm:inline text-xs font-extrabold text-amber-800">Stars</span></span>
             </div>
 
             {/* Coins Pill */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mq-surface-soft border border-mq-border text-xs font-extrabold text-mq-text-strong">
-              <Coins size={14} className="text-mq-warning shrink-0" />
-              <span>{savedProgress.coins} Coins</span>
+            <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-yellow-50 border-2 border-yellow-300/80 text-sm sm:text-base font-black text-yellow-950 shadow-2xs">
+              <Coins size={18} className="text-yellow-600 shrink-0" />
+              <span>{savedProgress.coins} <span className="hidden sm:inline text-xs font-extrabold text-yellow-800">Coins</span></span>
             </div>
           </div>
 
-          {/* Right: Sound + Active Child Profile Pill */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          {/* Right: Sound Toggle + Cheerful Child Profile Pill */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               type="button"
               onClick={() => setSoundEnabled((prev) => !prev)}
-              className="p-2 rounded-full text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft border border-mq-border/60 transition-colors cursor-pointer"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft border border-mq-border/70 transition-all cursor-pointer hover:scale-105 active:scale-95"
               title={soundEnabled ? 'Mute sound' : 'Enable sound'}
             >
-              {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+              {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
             </button>
 
             {/* Student Account Pill with Child's Avatar, Name & Grade */}
             <button
               type="button"
               onClick={() => {
-                setActiveNav('profile');
+                setActiveNav('castle');
                 setIsPracticePlaying(false);
               }}
-              className="flex items-center gap-2 px-2.5 py-1.5 bg-mq-surface-blue hover:bg-[#dcebff] border border-mq-border rounded-full shadow-xs transition-colors cursor-pointer"
+              className="flex items-center gap-2.5 px-3 py-1.5 sm:py-2 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border-2 border-blue-200/90 rounded-2xl shadow-xs transition-all cursor-pointer hover:scale-105 active:scale-95"
               title={`${studentFullName} (Grade ${studentGrade})`}
             >
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-sm shrink-0 shadow-xs border ${avatar.bgColor} ${avatar.borderColor}`}
+                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-lg sm:text-xl shrink-0 shadow-xs border ${avatar.bgColor} ${avatar.borderColor}`}
               >
                 {avatar.icon}
               </div>
-              <div className="flex flex-col text-left overflow-hidden max-w-[140px]">
-                <span className="text-xs font-bold text-mq-text-strong leading-tight truncate">
+              <div className="flex flex-col text-left overflow-hidden max-w-[120px] sm:max-w-[150px]">
+                <span className="text-sm font-black text-mq-text-strong leading-tight truncate">
                   {studentDisplayName}
                 </span>
-                <span className="text-[10px] font-semibold text-mq-primary leading-none mt-0.5 truncate">
+                <span className="text-[11px] font-extrabold text-mq-primary leading-none mt-0.5 truncate">
                   Grade {studentGrade} · {studentAge} Yrs
                 </span>
               </div>
@@ -538,10 +521,10 @@ export const StudentDashboardPage: React.FC = () => {
       {/* 2. BODY SHELL (Sidebar + Main Content Area)               */}
       {/* ========================================================= */}
       <div className="flex-1 flex w-full relative">
-        {/* Desktop Persistent Sidebar (Shrinks to left rail while playing Practice Game) */}
+        {/* Desktop Persistent Sidebar (Floats with margin and rounded-[28px] for kid-friendly UI) */}
         <aside
-          className={`hidden lg:flex flex-col bg-white border-r border-mq-border shrink-0 sticky top-16 h-[calc(100vh-4rem)] z-30 transition-all duration-300 ease-in-out ${
-            isSidebarShrunk ? 'w-16' : 'w-64 xl:w-72'
+          className={`hidden lg:flex flex-col bg-white border border-mq-border/80 rounded-[28px] shadow-xs shrink-0 sticky top-22 sm:top-24 h-[calc(100vh-6.5rem)] sm:h-[calc(100vh-7.2rem)] my-3.5 ml-3.5 sm:my-4 sm:ml-4 z-30 transition-all duration-300 ease-in-out overflow-hidden ${
+            isSidebarShrunk ? 'w-18' : 'w-64 xl:w-72'
           }`}
           aria-label="Student Dashboard Navigation"
         >
@@ -555,7 +538,7 @@ export const StudentDashboardPage: React.FC = () => {
               className="fixed inset-0 bg-mq-text-strong/40 backdrop-blur-xs z-50 lg:hidden animate-fade-in"
               onClick={() => setIsMobileSidebarOpen(false)}
             />
-            <div className="fixed top-0 bottom-0 left-0 w-72 max-w-[85vw] bg-white z-50 shadow-2xl border-r border-mq-border flex flex-col lg:hidden">
+            <div className="fixed top-3.5 bottom-3.5 left-3.5 w-72 max-w-[85vw] bg-white z-50 shadow-2xl border border-mq-border/80 rounded-[28px] flex flex-col lg:hidden overflow-hidden">
               <div className="flex items-center justify-between px-4 py-3.5 border-b border-mq-border bg-mq-surface-soft/60">
                 <div className="flex items-center gap-2">
                   <span className="font-extrabold text-base">
@@ -691,6 +674,109 @@ export const StudentDashboardPage: React.FC = () => {
                         {studentLanguage}
                       </p>
                     </div>
+                  </div>
+                </div>
+              </div>
+            ) : activeNav === 'castle' ? (
+              /* ======================================================= */
+              /* MY CASTLE REALM TAB: Gamified Castle for ADHD Learner   */
+              /* ======================================================= */
+              <div className="space-y-6 py-2 animate-fade-in">
+                {/* Hero Realm Banner */}
+                <div className="relative overflow-hidden rounded-3xl border border-amber-300/80 bg-gradient-to-br from-indigo-900 via-purple-900 to-amber-900 p-6 sm:p-8 text-white shadow-lg">
+                  {/* Background Castle Island graphic */}
+                  <img
+                    src="/floating-island.png"
+                    alt="Castle Realm"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 w-64 sm:w-96 object-contain opacity-25 sm:opacity-40 pointer-events-none mix-blend-screen"
+                  />
+                  <div className="relative z-10 max-w-xl space-y-3">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 border border-amber-300/40 text-amber-300 text-xs font-extrabold backdrop-blur-xs">
+                      <Crown size={14} />
+                      <span className="sinhala">රාජකීය මාළිගාව · Royal Math Kingdom</span>
+                    </div>
+
+                    <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-amber-100">
+                      {studentDisplayName}&apos;s Castle 🏰
+                    </h1>
+
+                    <p className="text-xs sm:text-sm text-purple-200/90 leading-relaxed sinhala">
+                      සාදරයෙන් පිළිගන්නවා! ඔයා ගණිත අභ්‍යාස ජයගන්නා විට ඔයාගේ මාළිගාව තරු සහ රන් කාසි වලින් පිරී යයි!
+                    </p>
+
+                    <div className="pt-2 flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveNav('practice');
+                          setIsPracticePlaying(true);
+                        }}
+                        className="btn bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-indigo-950 font-black text-sm px-5 py-2.5 rounded-2xl shadow-md hover:shadow-lg transition-all inline-flex items-center gap-2 cursor-pointer sinhala"
+                      >
+                        <Dumbbell size={16} />
+                        <span>ක්‍රීඩා පුහුණුව අරඹන්න (Start Practice)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setActiveNav('adventure')}
+                        className="btn bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold text-xs px-4 py-2.5 rounded-2xl backdrop-blur-xs transition-all inline-flex items-center gap-2 cursor-pointer sinhala"
+                      >
+                        <Compass size={15} />
+                        <span>ත්‍රාසජනක ගමන (Adventure)</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Kingdom Realm Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Star Treasury */}
+                  <div className="p-5 rounded-3xl bg-white border border-amber-200 shadow-xs hover:border-amber-300 transition-colors">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-600 mb-3">
+                      <Star size={24} className="fill-amber-400 text-amber-500" />
+                    </div>
+                    <p className="text-xs font-bold text-mq-text-muted uppercase tracking-wider">
+                      Treasury Stars
+                    </p>
+                    <p className="text-3xl font-black text-amber-950 mt-1">
+                      {savedProgress.stars.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-mq-text-muted mt-1 sinhala">
+                      එකතු කළ මුළු තරු ප්‍රමාණය
+                    </p>
+                  </div>
+
+                  {/* Gold Coins */}
+                  <div className="p-5 rounded-3xl bg-white border border-yellow-200 shadow-xs hover:border-yellow-300 transition-colors">
+                    <div className="w-12 h-12 rounded-2xl bg-yellow-100 border border-yellow-200 flex items-center justify-center text-yellow-600 mb-3">
+                      <Coins size={24} className="text-yellow-600" />
+                    </div>
+                    <p className="text-xs font-bold text-mq-text-muted uppercase tracking-wider">
+                      Kingdom Gold
+                    </p>
+                    <p className="text-3xl font-black text-yellow-950 mt-1">
+                      {savedProgress.coins.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-mq-text-muted mt-1 sinhala">
+                      මාළිගාවේ ඇති රන් කාසි
+                    </p>
+                  </div>
+
+                  {/* Kingdom Rank */}
+                  <div className="p-5 rounded-3xl bg-white border border-purple-200 shadow-xs hover:border-purple-300 transition-colors">
+                    <div className="w-12 h-12 rounded-2xl bg-purple-100 border border-purple-200 flex items-center justify-center text-purple-600 mb-3">
+                      <Crown size={24} className="text-purple-600" />
+                    </div>
+                    <p className="text-xs font-bold text-mq-text-muted uppercase tracking-wider">
+                      Castle Level
+                    </p>
+                    <p className="text-3xl font-black text-purple-950 mt-1">
+                      Grade {studentGrade}
+                    </p>
+                    <p className="text-xs text-mq-text-muted mt-1 sinhala">
+                      {GRADE_SI_LABELS[studentGrade] || `${studentGrade} ශ්‍රේණිය`}
+                    </p>
                   </div>
                 </div>
               </div>

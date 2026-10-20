@@ -126,12 +126,26 @@ function prefixLines(stream, label, color) {
   });
 }
 
+async function waitForPort(port, maxWaitMs = 4500) {
+  const start = Date.now();
+  while (Date.now() - start < maxWaitMs) {
+    if (await isPortInUse(port)) return true;
+    await new Promise((r) => setTimeout(r, 300));
+  }
+  return false;
+}
+
 async function main() {
   console.log(`\n${BOLD}============================================================${RESET}`);
   console.log(`${BOLD}🚀 Starting MathQuest All-in-One Development Environment...${RESET}`);
   console.log(`${BOLD}============================================================${RESET}\n`);
 
   for (const svc of SERVICES) {
+    if (svc.port === 5173) {
+      // Wait briefly for Auth Service (5000) to finish connecting before starting Vite
+      await waitForPort(5000, 4500);
+    }
+
     const inUse = await isPortInUse(svc.port);
     if (inUse) {
       console.log(

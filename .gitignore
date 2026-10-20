@@ -30,3 +30,8 @@ __pycache__/
 # Their page transcripts are committed in data/syllabi/_cache
 services/content-adaptation-service/data/syllabi/Grade 4.pdf
 services/content-adaptation-service/data/syllabi/Grade 5.pdf
+
+# Pedagogical Decision API local runtime telemetry logs
+services/pedagogical-engine/decision-api/data/
+services/pedagogical-engine/decision-api/data/*.json
+

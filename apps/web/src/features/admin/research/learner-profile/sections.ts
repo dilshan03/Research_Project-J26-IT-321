@@ -1,6 +1,7 @@
 /** Typed views of the Learner Profile snapshot sections (validated server-side against MQ-RESEARCH-SNAPSHOT-v1). */
 import type { ResearchSnapshot, SoftwareTestRun } from '../types';
 import type { Contribution, ReliabilityPoint } from '../components/charts';
+import type { ImlrDemoSection } from './imlr/types';
 
 export interface Calibration {
   mean_predicted: number;
@@ -196,6 +197,7 @@ export interface LearnerProfileSections {
   nsch: NschSection;
   mqRec: MqRecSection;
   elpx: ElpxSection;
+  imlrDemo?: ImlrDemoSection;
   softwareTests: SoftwareTestRun[];
 }
 

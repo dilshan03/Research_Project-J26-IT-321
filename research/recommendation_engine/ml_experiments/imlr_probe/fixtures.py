@@ -103,37 +103,46 @@ def _run(form: Dict[str, Any], pre: List[Dict[str, Any]], teach_wrong: List[int]
 
 OK, NO = {"answer": "correct"}, {"answer": "incorrect"}
 
+# "title" is a short display name for demonstrations; it does not affect any calculation.
 SCENARIOS: Dict[str, Dict[str, Any]] = {
     "all_independent": {
+        "title": "All transfer answers given without help",
         "description": "Pre 1/2 correct; teaching with one escalation; three transfer answers without help.",
         "build": lambda f: _run(f, [OK, NO], [1, 0], [OK, NO, OK]),
     },
     "pre_correct_still_taught": {
+        "title": "Correct before teaching, still taught",
         "description": "Both pre items correct; the standardised teaching phase is still delivered (Decision 1).",
         "build": lambda f: _run(f, [OK, OK], [0, 0], [OK, OK, NO]),
     },
     "help_before_transfer_response": {
+        "title": "Asked for help before answering",
         "description": "Child asks for help on transfer item 2 before answering.",
         "build": lambda f: _run(f, [NO, NO], [2, 1], [OK, {"answer": "correct", "help_before": 1}, NO]),
     },
     "help_after_transfer_response": {
+        "title": "Asked for help only after answering",
         "description": "Help requested only after the first transfer response was confirmed.",
         "build": lambda f: _run(f, [OK, NO], [0, 1], [{"answer": "incorrect", "help_after": True}, OK, OK]),
     },
     "missing_assistance_record": {
+        "title": "Help records missing or incomplete",
         "description": "Transfer item 3 has no ITEM_ENDED record; item 2 reports incomplete recording.",
         "build": lambda f: _run(f, [NO, OK], [1, 0], [OK, {"answer": "correct", "recording": "incomplete"},
                                                          {"answer": "correct", "end_item": False}]),
     },
     "unanswered_transfer": {
+        "title": "Some new questions not answered",
         "description": "Transfer item 2 skipped; item 3 presented but never answered.",
         "build": lambda f: _run(f, [OK, NO], [0, 0], [OK, {"skip": True}, {"answer": None}]),
     },
     "break_during_transfer": {
+        "title": "Took a break during a new question",
         "description": "Child takes a break during transfer item 1, then answers; a break is not support.",
         "build": lambda f: _run(f, [NO, NO], [1, 1], [{"answer": "correct", "take_break": True}, NO, OK]),
     },
     "teaching_window_not_closed": {
+        "title": "Teaching not formally closed",
         "description": "Teaching window never closed before transfer: independence cannot be confirmed.",
         "build": lambda f: _run(f, [OK, NO], [0, 0], [OK, OK, OK], close_window=False),
     },

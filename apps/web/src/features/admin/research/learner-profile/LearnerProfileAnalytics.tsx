@@ -11,6 +11,7 @@ import { ModelsTab } from './ModelsTab';
 import { ExplainabilityTab } from './ExplainabilityTab';
 import { RecommendationsTab } from './RecommendationsTab';
 import { EvaluationTab } from './EvaluationTab';
+import { ImlrDemoTab } from './imlr/ImlrDemoTab';
 
 export const LearnerProfileAnalytics: React.FC<{ tab: LearnerProfileTab }> = ({ tab }) => {
   const detail = useLoad(() => researchApi.component('learner-profile'), []);
@@ -67,6 +68,7 @@ export const LearnerProfileAnalytics: React.FC<{ tab: LearnerProfileTab }> = ({ 
       {tab === 'explainability' && <ExplainabilityTab sections={sections} />}
       {tab === 'recommendations' && <RecommendationsTab sections={sections} {...liveProps} />}
       {tab === 'evaluation' && <EvaluationTab sections={sections} />}
+      {tab === 'imlr-demo' && <ImlrDemoTab demo={sections.imlrDemo} />}
     </div>
   );
 };

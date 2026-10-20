@@ -102,9 +102,9 @@ def assert_sanitized(value: Any, where: str = "$") -> None:
             raise ValueError(f"Reference to a binary or raw data file at {where}")
 
 
-def run_suite(name: str, command: str, start_dir: Path, top_dir: Path) -> Dict[str, Any]:
+def run_suite(name: str, command: str, start_dir: Path, top_dir: Path, pattern: str = "test*.py") -> Dict[str, Any]:
     started = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    proc = subprocess.run([sys.executable, str(HERE / "run_tests.py"), str(start_dir), str(top_dir)],
+    proc = subprocess.run([sys.executable, str(HERE / "run_tests.py"), str(start_dir), str(top_dir), pattern],
                           cwd=str(top_dir), capture_output=True, text=True, encoding="utf-8")
     base = {"suite": name, "kind": "software_test", "command": command, "ranAtUtc": started}
     try:
@@ -408,10 +408,92 @@ def constant_number(src: str, name: str) -> float:
 
 
 # --------------------------------------------------------------------------------------------------------------
+# IMLR probe prototype (scripted synthetic scenarios run through the unmodified prototype)
+# --------------------------------------------------------------------------------------------------------------
+
+IMLR_DEMO_SEED = 7
+_EVENT_FIELDS = ("seq", "t", "type", "itemId", "level", "origin", "action", "position", "assistanceRecording")
+_ITEM_FIELDS = ("itemId", "role", "presented", "answered", "skipped", "firstResponseSeconds", "firstResponsePosition",
+                "correctFirstResponse", "revisions", "instructionReplays", "supportBeforeFirstResponse",
+                "supportLevels", "childHelpRequests", "assistanceRecording", "assistanceStatus", "flags")
+
+
+def imlr_demo_section(sources: Sources) -> Dict[str, Any]:
+    """
+    Runs every scripted scenario through the prototype exactly as its tests do. Per scenario, the prediction-time
+    INPUTS (frozen snapshot and pre/teaching evidence) and the transfer OUTCOMES are exported as separate blocks.
+    """
+    from imlr_probe import events as ev
+    from imlr_probe import fixtures, forms, item_bank, protocol
+    from imlr_probe.outcome import build_research_record, evaluate_transfer
+    from imlr_probe.snapshot import build_prediction_snapshot, pre_probe_evidence
+
+    for name in ("protocol.py", "item_bank.py", "forms.py", "events.py", "snapshot.py", "outcome.py", "fixtures.py"):
+        sources.add(f"imlr.{name}", ML_ROOT / "imlr_probe" / name, "synthetic")
+
+    form = forms.assign_form(IMLR_DEMO_SEED)
+    transfer_ids = {it["itemId"] for it in forms.items_by_role(form, protocol.TRANSFER)}
+    scenarios = []
+    for sid, spec in fixtures.SCENARIOS.items():
+        log = fixtures.scenario(sid, form)
+        snap = build_prediction_snapshot(form, log)
+        out = evaluate_transfer(form, log)
+        record = build_research_record(snap, out)
+        cutoff = snap["meta"]["predictionTime"]["seq"]
+        before = [e for e in log if e["seq"] < cutoff]
+        if transfer_ids & {e.get("itemId") for e in before}:
+            raise RuntimeError(f"{sid}: transfer events before prediction time")
+        scenarios.append({
+            "id": sid,
+            "title": spec["title"],
+            "description": spec["description"],
+            "synthetic": True,
+            "inputs": {
+                "preProbe": [{k: p[k] for k in _ITEM_FIELDS} for p in pre_probe_evidence(form, log)],
+                "teaching": [{k: t[k] for k in _ITEM_FIELDS}
+                             for t in (ev.item_evidence(it, before) for it in forms.items_by_role(form, protocol.TEACHING))],
+                "teachingWindow": ev.teaching_window(before),
+                "snapshot": snap,
+            },
+            "outcomes": {
+                **out,
+                "itemDetails": [{k: d[k] for k in _ITEM_FIELDS}
+                                for d in (ev.item_evidence(it, log) for it in forms.items_by_role(form, protocol.TRANSFER))],
+                "label": record["label"],
+                "separation": record["separation"],
+            },
+            "events": [{**{k: e[k] for k in _EVENT_FIELDS if k in e},
+                        "window": "before_prediction_time" if e["seq"] < cutoff else
+                                  ("prediction_time" if e["seq"] == cutoff else "after_prediction_time")}
+                       for e in log],
+        })
+
+    return {
+        "provenance": "synthetic",
+        "notice": fixtures.SYNTHETIC_NOTICE,
+        "protocol": protocol.protocol_descriptor(),
+        "snapshotSchemaVersion": protocol.SNAPSHOT_SCHEMA_VERSION,
+        "outcomeSchemaVersion": protocol.OUTCOME_SCHEMA_VERSION,
+        "itemBank": {
+            "version": item_bank.BANK_VERSION,
+            "familyId": item_bank.FAMILY_ID,
+            "conceptId": item_bank.CONCEPT_ID,
+            "expertReview": item_bank.EXPERT_REVIEW,
+            "cells": {k: {"largest": list(v["largest"]), "gap": v["gap"], "smallestMin": v["smallestMin"],
+                          "roles": list(v["roles"])} for k, v in item_bank.CELLS.items()},
+            "items": [{**i, "counts": list(i["counts"])} for i in item_bank.ITEMS],
+        },
+        "form": form,
+        "scenarios": scenarios,
+    }
+
+
+# --------------------------------------------------------------------------------------------------------------
 # Model registry (statuses mirror what is actually implemented; nothing planned is shown as working)
 # --------------------------------------------------------------------------------------------------------------
 
-def model_registry(nsch: Dict[str, Any], mqrec: Dict[str, Any], elpx: Dict[str, Any]) -> List[Dict[str, Any]]:
+def model_registry(nsch: Dict[str, Any], mqrec: Dict[str, Any], elpx: Dict[str, Any],
+                   imlr: Dict[str, Any]) -> List[Dict[str, Any]]:
     sel = nsch["selectedModel"]
     return [
         {"id": "elpx", "name": "ELP-X Bayesian skill estimation", "family": "Beta-Binomial Bayesian estimation",
@@ -452,6 +534,12 @@ def model_registry(nsch: Dict[str, Any], mqrec: Dict[str, Any], elpx: Dict[str, 
          "status": "NOT_IMPLEMENTED", "provenance": "documentation",
          "description": "Planned trajectory modelling across sessions. No implementation exists.",
          "location": "research/recommendation_engine/longitudinal/README.md"},
+        {"id": "imlr-probe", "name": "IMLR learning-transfer probe", "family": "Assessment protocol with frozen evidence boundary",
+         "version": f"{imlr['protocol']['protocolId']} {imlr['protocol']['protocolVersion']}",
+         "status": "PROTOTYPE", "provenance": "synthetic",
+         "description": "Pre-probe, standard teaching and new transfer questions, demonstrated on scripted synthetic "
+                        "scenarios only. Not used with children; no prediction model.",
+         "location": "research/recommendation_engine/ml_experiments/imlr_probe"},
         {"id": "adhd-presentation", "name": "ADHD presentation classification", "family": None, "version": None,
          "status": "NOT_IMPLEMENTED", "provenance": "documentation",
          "description": "Only possible offline with clinically established labels and ethics approval. Not started.",
@@ -466,6 +554,7 @@ def build(skip_tests: bool = False) -> Dict[str, Any]:
     nsch = nsch_section(sources)
     mqrec = mqrec_section(sources)
     elpx = elpx_section(sources)
+    imlr = imlr_demo_section(sources)
 
     tests: List[Dict[str, Any]] = []
     if not skip_tests:
@@ -473,8 +562,11 @@ def build(skip_tests: bool = False) -> Dict[str, Any]:
                                "python -m unittest discover -s test_scenarios -t . (from research/recommendation_engine)",
                                REC_ROOT / "test_scenarios", REC_ROOT))
         tests.append(run_suite("NSCH baseline verification tests",
-                               ".venv\\Scripts\\python.exe -m unittest discover -s tests -t . (from ml_experiments)",
-                               ML_ROOT / "tests", ML_ROOT))
+                               ".venv\\Scripts\\python.exe -m unittest tests.test_nsch_baseline (from ml_experiments)",
+                               ML_ROOT / "tests", ML_ROOT, "test_nsch*.py"))
+        tests.append(run_suite("IMLR probe prototype tests",
+                               ".venv\\Scripts\\python.exe -m unittest tests.test_imlr_probe (from ml_experiments)",
+                               ML_ROOT / "tests", ML_ROOT, "test_imlr*.py"))
 
     snapshot = {
         "schemaVersion": SCHEMA_VERSION,
@@ -483,8 +575,8 @@ def build(skip_tests: bool = False) -> Dict[str, Any]:
         "generatedAtUtc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "generator": {"script": rel(Path(__file__)), "version": EXPORTER_VERSION},
         "sources": sources.items,
-        "models": model_registry(nsch, mqrec, elpx),
-        "sections": {"nsch": nsch, "mqRec": mqrec, "elpx": elpx, "softwareTests": tests},
+        "models": model_registry(nsch, mqrec, elpx, imlr),
+        "sections": {"nsch": nsch, "mqRec": mqrec, "elpx": elpx, "imlrDemo": imlr, "softwareTests": tests},
     }
     assert_sanitized(snapshot)
     return snapshot

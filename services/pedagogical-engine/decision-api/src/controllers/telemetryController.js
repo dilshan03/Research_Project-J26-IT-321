@@ -217,7 +217,16 @@ export async function getInteractions(req, res) {
  */
 export async function getLearnerState(req, res) {
   try {
-    const { parentId, studentId, learnerId, sessionId, limit = 20 } = req.query;
+    const {
+      parentId,
+      studentId,
+      learnerId,
+      sessionId,
+      limit = 20,
+      cameraPermissionGranted,
+      cameraAttentionScore,
+      cameraInattentionScore
+    } = req.query;
 
     let logs = [];
     try {
@@ -237,7 +246,19 @@ export async function getLearnerState(req, res) {
       logs = readFromLocalStorage({ parentId, studentId, learnerId, sessionId, limit });
     }
 
-    const learnerState = buildLearnerState(logs);
+    const cameraTelemetry =
+      cameraPermissionGranted !== undefined
+        ? {
+            cameraPermissionGranted:
+              cameraPermissionGranted === 'true' || cameraPermissionGranted === true,
+            cameraAttentionScore:
+              cameraAttentionScore !== undefined ? parseFloat(cameraAttentionScore) : undefined,
+            cameraInattentionScore:
+              cameraInattentionScore !== undefined ? parseFloat(cameraInattentionScore) : undefined
+          }
+        : null;
+
+    const learnerState = buildLearnerState(logs, { cameraTelemetry });
 
     return res.json({
       success: true,
@@ -261,8 +282,8 @@ export async function getLearnerState(req, res) {
  */
 export async function evaluateLearnerState(req, res) {
   try {
-    const { interactions = [] } = req.body;
-    const learnerState = buildLearnerState(interactions);
+    const { interactions = [], cameraTelemetry = null } = req.body;
+    const learnerState = buildLearnerState(interactions, { cameraTelemetry });
 
     return res.json({
       success: true,

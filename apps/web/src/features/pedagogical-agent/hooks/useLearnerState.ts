@@ -163,7 +163,10 @@ export function useLearnerState({
    * Evaluate state using backend Decision API, BKT comparison, and FSM Engine
    */
   const evaluateInteractions = useCallback(
-    async (interactions: InteractionEvent[]) => {
+    async (
+      interactions: InteractionEvent[],
+      cameraTelemetry?: { cameraPermissionGranted: boolean; cameraAttentionScore?: number | null }
+    ) => {
       if (!interactions || interactions.length === 0) return null;
 
       const newestEvent = interactions[interactions.length - 1];
@@ -183,11 +186,11 @@ export function useLearnerState({
 
       try {
         setIsLoading(true);
-        // 2. Fetch Learner State from backend
+        // 2. Fetch Learner State from backend (passing optional cameraTelemetry for Step 1 & Step 2 fusion)
         const res = await fetch('/api/telemetry/learner-state/evaluate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ interactions })
+          body: JSON.stringify({ interactions, cameraTelemetry: cameraTelemetry || null })
         });
 
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);

@@ -19,7 +19,151 @@ export const THRESHOLDS = {
   CONSECUTIVE_ERRORS_FOR_FRUSTRATION: 2,  // 2+ consecutive errors trigger frustration flag
   FRUSTRATION_CUTOFF: 0.65,               // Threshold for isFrustrated
   INATTENTION_CUTOFF: 0.60,               // Threshold for isInattentive
+  RT_ZSCORE_LAPSE_CUTOFF: 1.5,            // |z| >= 1.5 relative to personal RT baseline indicates attention lapse
+  CAMERA_FUSION_WEIGHT: 0.60,             // Weight for optional camera behavior signal when permitted
+  GAMEPLAY_FUSION_WEIGHT: 0.40            // Weight for gameplay telemetry signal in multimodal mode
 };
+
+/**
+ * Normalizes raw interaction telemetry (converting remainingTimeMs/timeLimitMs to responseTimeMs if needed)
+ */
+export function normalizeInteractionEvent(ev = {}) {
+  const effectiveResponseTimeMs =
+    typeof ev.responseTimeMs === 'number' && ev.responseTimeMs > 0
+      ? ev.responseTimeMs
+      : typeof ev.timeLimitMs === 'number' && typeof ev.remainingTimeMs === 'number'
+        ? Math.max(100, ev.timeLimitMs - ev.remainingTimeMs)
+        : ev.responseTimeMs || 0;
+
+  return {
+    ...ev,
+    responseTimeMs: effectiveResponseTimeMs
+  };
+}
+
+/**
+ * Computes learner-specific Response Time (RT) baseline and log-normal Z-score
+ * for detecting child-relative attention lapses (rush / slow drift).
+ */
+export function computePersonalRtBaseline(responseTimesMs = [], latestResponseTimeMs = null) {
+  const validRts = responseTimesMs.filter((rt) => typeof rt === 'number' && rt > 100);
+  if (validRts.length === 0) {
+    return {
+      sampleCount: 0,
+      meanMs: THRESHOLDS.OPTIMAL_RESPONSE_TIME_MS,
+      stdMs: 2000,
+      logMean: Math.log(THRESHOLDS.OPTIMAL_RESPONSE_TIME_MS),
+      logStd: 0.45,
+      latestRtZScore: 0.0,
+      isRtAnomaly: false
+    };
+  }
+
+  const meanMs = validRts.reduce((a, b) => a + b, 0) / validRts.length;
+  const varianceMs =
+    validRts.reduce((acc, v) => acc + Math.pow(v - meanMs, 2), 0) / Math.max(1, validRts.length);
+  const stdMs = Math.max(500, Math.sqrt(varianceMs));
+
+  const logRts = validRts.map((rt) => Math.log(Math.max(100, rt)));
+  const logMean =
+    validRts.length >= 3
+      ? logRts.reduce((a, b) => a + b, 0) / logRts.length
+      : Math.log(THRESHOLDS.OPTIMAL_RESPONSE_TIME_MS);
+  const logVar =
+    validRts.length >= 3
+      ? logRts.reduce((acc, v) => acc + Math.pow(v - logMean, 2), 0) / logRts.length
+      : Math.pow(0.45, 2);
+  const logStd = Math.max(0.25, Math.sqrt(logVar));
+
+  let latestRtZScore = 0.0;
+  if (typeof latestResponseTimeMs === 'number' && latestResponseTimeMs > 100) {
+    latestRtZScore = (Math.log(latestResponseTimeMs) - logMean) / logStd;
+  }
+
+  return {
+    sampleCount: validRts.length,
+    meanMs: Number(meanMs.toFixed(0)),
+    stdMs: Number(stdMs.toFixed(0)),
+    logMean: Number(logMean.toFixed(4)),
+    logStd: Number(logStd.toFixed(4)),
+    latestRtZScore: Number(latestRtZScore.toFixed(2)),
+    isRtAnomaly: Math.abs(latestRtZScore) >= THRESHOLDS.RT_ZSCORE_LAPSE_CUTOFF
+  };
+}
+
+/**
+ * Privacy-Aware Dual-Source Attention Fusion (Gameplay Telemetry + Optional Camera Signal)
+ * Seamlessly switches between Multimodal Mode (when camera permission is granted)
+ * and Telemetry-Only Fallback Mode (when camera is disabled).
+ */
+export function computeFusedAttentionState({
+  gameplayInattentionIndex = 0.1,
+  personalRtBaseline = null,
+  latestEvent = null,
+  cameraTelemetry = null
+} = {}) {
+  // Boost gameplay inattention slightly if personal RT Z-score indicates severe slow drift
+  let adjustedGameplayInatt = gameplayInattentionIndex;
+  if (personalRtBaseline && personalRtBaseline.latestRtZScore >= THRESHOLDS.RT_ZSCORE_LAPSE_CUTOFF) {
+    const zBoost = Math.min(0.25, (personalRtBaseline.latestRtZScore - THRESHOLDS.RT_ZSCORE_LAPSE_CUTOFF) * 0.12);
+    adjustedGameplayInatt = Math.min(1.0, adjustedGameplayInatt + zBoost);
+  }
+
+  // Also check if remainingTimeMs hit 0 (timeout)
+  if (latestEvent && typeof latestEvent.remainingTimeMs === 'number' && latestEvent.remainingTimeMs <= 0) {
+    adjustedGameplayInatt = Math.max(adjustedGameplayInatt, 0.85);
+  }
+
+  // Extract optional camera signal from either options.cameraTelemetry or the latest event
+  const camSource = cameraTelemetry || latestEvent || {};
+  const cameraPermissionGranted = Boolean(
+    camSource.cameraPermissionGranted ?? camSource.cameraPermission ?? false
+  );
+
+  let cameraInattentionIndex = null;
+  if (cameraPermissionGranted) {
+    if (typeof camSource.cameraInattentionScore === 'number') {
+      cameraInattentionIndex = Math.max(0.0, Math.min(1.0, camSource.cameraInattentionScore));
+    } else if (typeof camSource.cameraAttentionScore === 'number') {
+      cameraInattentionIndex = Math.max(0.0, Math.min(1.0, 1.0 - camSource.cameraAttentionScore));
+    }
+  }
+
+  const useMultimodal = cameraPermissionGranted && cameraInattentionIndex !== null;
+  const fusedInattentionIndex = useMultimodal
+    ? THRESHOLDS.CAMERA_FUSION_WEIGHT * cameraInattentionIndex +
+      THRESHOLDS.GAMEPLAY_FUSION_WEIGHT * adjustedGameplayInatt
+    : adjustedGameplayInatt;
+
+  const clippedFused = Math.max(0.0, Math.min(1.0, fusedInattentionIndex));
+  const attentionProbability = Number((1.0 - clippedFused).toFixed(2));
+
+  // Detect if latest incorrect response is likely an ADHD attention/impulsivity slip rather than a knowledge gap
+  const isLatestWrong = latestEvent?.eventType === 'ANSWER_SUBMIT' && latestEvent?.isCorrect === false;
+  const isImpulsiveClick =
+    isLatestWrong &&
+    typeof latestEvent?.responseTimeMs === 'number' &&
+    latestEvent.responseTimeMs > 0 &&
+    latestEvent.responseTimeMs < THRESHOLDS.MIN_IMPULSIVE_RESPONSE_TIME_MS;
+
+  const isAttentionSlip = Boolean(
+    isLatestWrong &&
+      (clippedFused >= THRESHOLDS.INATTENTION_CUTOFF ||
+        isImpulsiveClick ||
+        (personalRtBaseline && personalRtBaseline.isRtAnomaly))
+  );
+
+  return {
+    fusionMode: useMultimodal ? 'MULTIMODAL_CAMERA_AND_GAMEPLAY' : 'TELEMETRY_ONLY_FALLBACK',
+    cameraPermissionGranted,
+    gameplayInattentionIndex: Number(adjustedGameplayInatt.toFixed(2)),
+    cameraInattentionIndex: cameraInattentionIndex !== null ? Number(cameraInattentionIndex.toFixed(2)) : null,
+    fusedInattentionIndex: Number(clippedFused.toFixed(2)),
+    attentionProbability,
+    isAttentionSlip,
+    personalRtBaseline
+  };
+}
 
 /**
  * Builds the comprehensive learner state from an array of interaction events
@@ -32,12 +176,14 @@ export function buildLearnerState(interactions = [], options = {}) {
     return createDefaultLearnerState();
   }
 
-  // Ensure chronological order (oldest to newest)
-  const sorted = [...interactions].sort((a, b) => {
-    const timeA = new Date(a.timestamp || a.receivedAt || 0).getTime();
-    const timeB = new Date(b.timestamp || b.receivedAt || 0).getTime();
-    return timeA - timeB;
-  });
+  // Ensure chronological order (oldest to newest) and normalize remainingTimeMs -> responseTimeMs
+  const sorted = [...interactions]
+    .map((ev) => normalizeInteractionEvent(ev))
+    .sort((a, b) => {
+      const timeA = new Date(a.timestamp || a.receivedAt || 0).getTime();
+      const timeB = new Date(b.timestamp || b.receivedAt || 0).getTime();
+      return timeA - timeB;
+    });
 
   // Filter actionable events for window analysis (exclude passive 0ms QUESTION_VIEW transitions)
   const actionableEvents = sorted.filter(
@@ -102,8 +248,19 @@ export function buildLearnerState(interactions = [], options = {}) {
     }
   }
 
-  // 2. Inattention Index Calculation (0.0 to 1.0)
-  const inattentionIndex = calculateInattentionIndex(recentWindow, latest);
+  // 2. Personal RT Baseline & Privacy-Aware Dual-Source Attention Fusion (Step 1 & Step 2)
+  const personalRtBaseline = computePersonalRtBaseline(
+    recentResponseTimes,
+    latest?.responseTimeMs || null
+  );
+  const gameplayInattentionIndex = calculateInattentionIndex(recentWindow, latest);
+  const attentionFusion = computeFusedAttentionState({
+    gameplayInattentionIndex,
+    personalRtBaseline,
+    latestEvent: latest,
+    cameraTelemetry: options.cameraTelemetry || null
+  });
+  const inattentionIndex = attentionFusion.fusedInattentionIndex;
 
   // 3. Frustration Index Calculation (0.0 to 1.0)
   const frustrationIndex = calculateFrustrationIndex(recentWindow, consecutiveErrors);
@@ -144,6 +301,10 @@ export function buildLearnerState(interactions = [], options = {}) {
     evaluatedAt: new Date().toISOString(),
     metrics: {
       inattentionIndex: Number(inattentionIndex.toFixed(2)),
+      gameplayInattentionIndex: attentionFusion.gameplayInattentionIndex,
+      cameraInattentionIndex: attentionFusion.cameraInattentionIndex,
+      attentionProbability: attentionFusion.attentionProbability,
+      rtZScore: personalRtBaseline.latestRtZScore,
       frustrationIndex: Number(frustrationIndex.toFixed(2)),
       persistenceScore: Number(persistenceScore.toFixed(2)),
       accuracyRate,
@@ -159,8 +320,10 @@ export function buildLearnerState(interactions = [], options = {}) {
       isInattentive,
       isFrustrated,
       isImpulsive,
+      isAttentionSlip: attentionFusion.isAttentionSlip,
       needsHintPrompt: consecutiveErrors >= 2 && highestHintLevel === 0
     },
+    attentionFusion,
     cognitiveState,
     recommendedIntervention: recommendation
   };
@@ -396,12 +559,24 @@ function generatePedagogicalRecommendation(cognitiveState, context) {
  * Default fallback state when no logs exist yet
  */
 function createDefaultLearnerState() {
+  const defaultBaseline = computePersonalRtBaseline([], null);
+  const defaultFusion = computeFusedAttentionState({
+    gameplayInattentionIndex: 0.1,
+    personalRtBaseline: defaultBaseline,
+    latestEvent: null,
+    cameraTelemetry: null
+  });
+
   return {
     studentId: 'unknown',
     sessionId: 'unknown',
     evaluatedAt: new Date().toISOString(),
     metrics: {
       inattentionIndex: 0.1,
+      gameplayInattentionIndex: 0.1,
+      cameraInattentionIndex: null,
+      attentionProbability: 0.9,
+      rtZScore: 0.0,
       frustrationIndex: 0.0,
       persistenceScore: 0.5,
       accuracyRate: 0,
@@ -417,8 +592,10 @@ function createDefaultLearnerState() {
       isInattentive: false,
       isFrustrated: false,
       isImpulsive: false,
+      isAttentionSlip: false,
       needsHintPrompt: false
     },
+    attentionFusion: defaultFusion,
     cognitiveState: 'NORMAL',
     recommendedIntervention: {
       action: 'IDLE_OBSERVE',

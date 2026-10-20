@@ -59,6 +59,81 @@ class HintAwareBKT:
         self.alpha_slip = float(alpha_slip)
         self.mastery_threshold = float(mastery_threshold)
 
+    @staticmethod
+    def compute_personal_rt_zscore(
+        response_times_ms: List[float],
+        latest_rt_ms: Optional[float] = None
+    ) -> Dict[str, Any]:
+        """
+        Computes learner-specific log-RT baseline and z-score to detect child-relative
+        attention lapses (impulsive rush z <= -1.5 or attentional drift z >= +1.5).
+        """
+        valid = [float(rt) for rt in response_times_ms if rt is not None and float(rt) > 100.0]
+        if not valid:
+            return {
+                "sample_count": 0,
+                "mean_ms": 6000.0,
+                "std_ms": 2000.0,
+                "rt_zscore": 0.0,
+                "is_rt_anomaly": False
+            }
+
+        mean_ms = float(np.mean(valid))
+        std_ms = float(max(500.0, np.std(valid)))
+        log_rts = np.log(np.maximum(100.0, valid))
+        log_mean = float(np.mean(log_rts)) if len(valid) >= 3 else float(np.log(6000.0))
+        log_std = float(max(0.25, np.std(log_rts))) if len(valid) >= 3 else 0.45
+
+        rt_zscore = 0.0
+        if latest_rt_ms is not None and float(latest_rt_ms) > 100.0:
+            rt_zscore = float((np.log(float(latest_rt_ms)) - log_mean) / log_std)
+
+        return {
+            "sample_count": len(valid),
+            "mean_ms": round(mean_ms, 1),
+            "std_ms": round(std_ms, 1),
+            "rt_zscore": round(rt_zscore, 2),
+            "is_rt_anomaly": bool(abs(rt_zscore) >= 1.5)
+        }
+
+    @staticmethod
+    def fuse_attention_signals(
+        gameplay_inattention_index: float = 0.1,
+        rt_zscore: float = 0.0,
+        remaining_time_ms: Optional[float] = None,
+        camera_permission_granted: bool = False,
+        camera_attention_score: Optional[float] = None
+    ) -> Dict[str, Any]:
+        """
+        Privacy-Aware Dual-Source Attention Fusion (Step 1 & Step 2):
+        - Mode A (Multimodal): 0.60 * camera_inattention + 0.40 * gameplay_inattention
+        - Mode B (Telemetry-Only Fallback): 1.00 * gameplay_inattention when camera permission is disabled.
+        """
+        gp_inatt = float(np.clip(gameplay_inattention_index, 0.0, 1.0))
+        if rt_zscore >= 1.5:
+            gp_inatt = float(min(1.0, gp_inatt + min(0.25, (rt_zscore - 1.5) * 0.12)))
+        if remaining_time_ms is not None and float(remaining_time_ms) <= 0.0:
+            gp_inatt = float(max(gp_inatt, 0.85))
+
+        use_multimodal = bool(camera_permission_granted and camera_attention_score is not None)
+        if use_multimodal:
+            cam_inatt = float(np.clip(1.0 - float(camera_attention_score), 0.0, 1.0))
+            fused = float(np.clip(0.60 * cam_inatt + 0.40 * gp_inatt, 0.0, 1.0))
+            mode = "MULTIMODAL_CAMERA_AND_GAMEPLAY"
+        else:
+            cam_inatt = None
+            fused = gp_inatt
+            mode = "TELEMETRY_ONLY_FALLBACK"
+
+        return {
+            "fusion_mode": mode,
+            "camera_permission_granted": bool(camera_permission_granted),
+            "gameplay_inattention_index": round(gp_inatt, 4),
+            "camera_inattention_index": round(cam_inatt, 4) if cam_inatt is not None else None,
+            "fused_inattention_index": round(fused, 4),
+            "attention_probability": round(1.0 - fused, 4)
+        }
+
     def update_step(
         self,
         p_prior: float,

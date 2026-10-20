@@ -38,11 +38,17 @@ class BKTStepRequest(BaseModel):
     is_correct: bool
     hint_level: int = Field(0, ge=0, le=4)
     inattention_index: float = Field(0.0, ge=0.0, le=1.0)
+    rt_zscore: float = Field(0.0)
+    remaining_time_ms: Optional[float] = None
+    camera_permission_granted: bool = False
+    camera_attention_score: Optional[float] = Field(None, ge=0.0, le=1.0)
 
 class Observation(BaseModel):
     is_correct: bool
     hint_level: int = 0
     inattention_index: float = 0.0
+    camera_permission_granted: bool = False
+    camera_attention_score: Optional[float] = None
 
 class BKTTrajectoryRequest(BaseModel):
     observations: List[Observation]
@@ -66,12 +72,20 @@ def health():
 @app.post("/bkt/step")
 def update_step(req: BKTStepRequest):
     try:
+        fusion = bkt.fuse_attention_signals(
+            gameplay_inattention_index=req.inattention_index,
+            rt_zscore=req.rt_zscore,
+            remaining_time_ms=req.remaining_time_ms,
+            camera_permission_granted=req.camera_permission_granted,
+            camera_attention_score=req.camera_attention_score
+        )
         result = bkt.update_step(
             p_prior=req.p_prior,
             is_correct=req.is_correct,
             hint_level=req.hint_level,
-            inattention_index=req.inattention_index
+            inattention_index=fusion["fused_inattention_index"]
         )
+        result["attention_fusion"] = fusion
         return {"success": True, "result": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

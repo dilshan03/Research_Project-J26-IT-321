@@ -6,10 +6,15 @@ export interface LearnerStateHUDProps {
   bktComparison?: BKTComparisonState;
   fsmDecision?: FSMDecision;
   isLoading?: boolean;
+  cameraPermissionGranted?: boolean;
+  cameraAttentionScore?: number;
+  onToggleCameraPermission?: (granted: boolean) => void;
+  onChangeCameraScore?: (score: number) => void;
   onSimulateInattention?: () => void;
   onSimulateFrustration?: () => void;
   onSimulateFocusedFlow?: () => void;
   onSimulateHintAssisted?: () => void;
+  onSimulateRapidAttentionSlip?: () => void;
   onTriggerFSMRule?: (context: Record<string, any>) => void;
   compact?: boolean;
   style?: React.CSSProperties;
@@ -147,10 +152,15 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
     timestamp: new Date().toISOString()
   },
   isLoading = false,
+  cameraPermissionGranted = false,
+  cameraAttentionScore = 0.85,
+  onToggleCameraPermission,
+  onChangeCameraScore,
   onSimulateInattention,
   onSimulateFrustration,
   onSimulateFocusedFlow,
   onSimulateHintAssisted,
+  onSimulateRapidAttentionSlip,
   onTriggerFSMRule,
   compact = false,
   style = {}
@@ -164,6 +174,19 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
   const inattention = learnerState?.metrics.inattentionIndex ?? 0.1;
   const frustration = learnerState?.metrics.frustrationIndex ?? 0.0;
   const persistence = learnerState?.metrics.persistenceScore ?? 0.5;
+  const fusion = learnerState?.attentionFusion;
+  const isMultimodal =
+    fusion?.fusionMode === 'MULTIMODAL_CAMERA_AND_GAMEPLAY' || cameraPermissionGranted;
+  const gameplayInatt = fusion?.gameplayInattentionIndex ?? learnerState?.metrics.gameplayInattentionIndex ?? inattention;
+  const cameraInatt =
+    fusion?.cameraInattentionIndex ??
+    (cameraPermissionGranted ? Number((1 - cameraAttentionScore).toFixed(2)) : null);
+  const attentionProb = fusion?.attentionProbability ?? Number((1 - inattention).toFixed(2));
+  const rtBaseline = fusion?.personalRtBaseline;
+  const rtZScore = rtBaseline?.latestRtZScore ?? learnerState?.metrics.rtZScore ?? 0.0;
+  const isAttentionSlip = Boolean(
+    fusion?.isAttentionSlip || learnerState?.flags?.isAttentionSlip
+  );
 
   const pL_hintAware = bktComparison.hintAwareKnowledge;
   const pL_standard = bktComparison.standardKnowledge;
@@ -624,6 +647,163 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         </div>
       </div>
 
+      {/* Step 1 & Step 2 Novelty Panel: Privacy-Aware Dual-Source Fusion & Personal RT Baseline */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.10) 0%, rgba(56, 189, 248, 0.12) 100%)',
+          border: isMultimodal
+            ? '1px solid rgba(16, 185, 129, 0.45)'
+            : '1px solid rgba(56, 189, 248, 0.35)',
+          borderRadius: '12px',
+          padding: '11px 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.95rem' }}>📡</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#E2E8F0' }}>
+              Attention Fusion & RT Baseline
+            </span>
+          </div>
+
+          <span
+            style={{
+              fontSize: '0.66rem',
+              fontWeight: 800,
+              padding: '2px 8px',
+              borderRadius: '10px',
+              background: isMultimodal ? 'rgba(16, 185, 129, 0.22)' : 'rgba(56, 189, 248, 0.2)',
+              color: isMultimodal ? '#34D399' : '#38BDF8',
+              border: isMultimodal ? '1px solid #10B981' : '1px solid #38BDF8'
+            }}
+          >
+            {isMultimodal ? '📷 MULTIMODAL (Cam+Game)' : '🛡️ TELEMETRY FALLBACK'}
+          </span>
+        </div>
+
+        {/* Interactive Camera Consent & Score Controls */}
+        {onToggleCameraPermission && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              padding: '7px 9px',
+              borderRadius: '8px',
+              background: 'rgba(15, 23, 42, 0.65)',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: '#CBD5E1', fontWeight: 600 }}>
+                Peer Camera Consent:
+              </span>
+              <button
+                type="button"
+                onClick={() => onToggleCameraPermission(!cameraPermissionGranted)}
+                style={{
+                  padding: '3px 10px',
+                  borderRadius: '6px',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  border: cameraPermissionGranted ? '1px solid #10B981' : '1px solid #64748B',
+                  background: cameraPermissionGranted ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+                  color: cameraPermissionGranted ? '#4ADE80' : '#94A3B8'
+                }}
+              >
+                {cameraPermissionGranted ? 'ON (Permitted)' : 'OFF (Privacy Mode)'}
+              </button>
+            </div>
+
+            {cameraPermissionGranted && onChangeCameraScore && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.69rem', color: '#94A3B8' }}>
+                  <span>Camera Visual Attention:</span>
+                  <b style={{ color: '#34D399' }}>{Math.round(cameraAttentionScore * 100)}%</b>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={Math.round(cameraAttentionScore * 100)}
+                  onChange={(e) => onChangeCameraScore(Number(e.target.value) / 100)}
+                  style={{ width: '100%', accentColor: '#10B981', cursor: 'pointer' }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Fusion Signal Breakdown & Personal RT Z-Score */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '6px',
+            fontSize: '0.69rem',
+            textAlign: 'center'
+          }}
+        >
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>Game I<sub>att</sub></div>
+            <div style={{ fontWeight: 800, color: '#38BDF8', fontSize: '0.78rem' }}>
+              {Math.round(gameplayInatt * 100)}%
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>Cam I<sub>att</sub></div>
+            <div style={{ fontWeight: 800, color: cameraInatt !== null ? '#34D399' : '#64748B', fontSize: '0.78rem' }}>
+              {cameraInatt !== null ? `${Math.round(cameraInatt * 100)}%` : 'OFF'}
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>RT Z-Score</div>
+            <div
+              style={{
+                fontWeight: 800,
+                color: Math.abs(rtZScore) >= 1.5 ? '#FBBF24' : '#E2E8F0',
+                fontSize: '0.78rem'
+              }}
+            >
+              {rtZScore > 0 ? `+${rtZScore}` : rtZScore}σ
+            </div>
+          </div>
+        </div>
+
+        {/* Personal RT Baseline & Attention Slip Banner */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.68rem', color: '#94A3B8' }}>
+          <span>
+            Child RT μ: <b>{rtBaseline ? `${(rtBaseline.meanMs / 1000).toFixed(1)}s` : '6.0s'}</b> (±
+            {rtBaseline ? `${(rtBaseline.stdMs / 1000).toFixed(1)}s` : '2.0s'})
+          </span>
+          <span>
+            P(Focused): <b style={{ color: '#4ADE80' }}>{Math.round(attentionProb * 100)}%</b>
+          </span>
+        </div>
+
+        {isAttentionSlip && (
+          <div
+            style={{
+              padding: '5px 8px',
+              borderRadius: '6px',
+              background: 'rgba(245, 158, 11, 0.18)',
+              border: '1px solid rgba(245, 158, 11, 0.45)',
+              color: '#FBBF24',
+              fontSize: '0.7rem',
+              fontWeight: 700
+            }}
+          >
+            🛡️ Attention Slip Detected (|z| ≥ 1.5 or rapid/idle error) — Ready for AD-BKT Mastery Protection!
+          </div>
+        )}
+      </div>
+
       {/* Real-time ADHD Meters (Inattention, Frustration, Persistence) */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '2px' }}>
         {/* Inattention Gauge */}
@@ -809,6 +989,25 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                 }}
               >
                 🔥 Frustration Struggle
+              </button>
+            )}
+
+            {onSimulateRapidAttentionSlip && (
+              <button
+                onClick={onSimulateRapidAttentionSlip}
+                style={{
+                  gridColumn: '1 / -1',
+                  padding: '6px 8px',
+                  borderRadius: '8px',
+                  background: 'rgba(56, 189, 248, 0.14)',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  color: '#38BDF8',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  cursor: 'pointer'
+                }}
+              >
+                🛡️ Rapid RT Z-Score Attention Slip (&lt; 0.8s Error)
               </button>
             )}
           </div>

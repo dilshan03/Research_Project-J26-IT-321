@@ -8,7 +8,7 @@ import {
   useLearnerState,
   useAgentStore,
 } from '../../features/pedagogical-agent';
-import type { InteractionEvent } from '../../features/pedagogical-agent';
+import type { InteractionEvent, HintLevel } from '../../features/pedagogical-agent';
 
 interface TestQuestion {
   id: string;
@@ -179,6 +179,8 @@ const TEST_QUESTIONS: TestQuestion[] = [
   },
 ];
 
+const QUESTION_TIME_LIMIT_SEC = 30;
+
 export function AgentTestPage() {
   const { playAction, onGameEvent, resetHints } = usePedagogicalAgent();
   const currentHintLevel = useAgentStore((state) => state.currentHintLevel);
@@ -192,6 +194,11 @@ export function AgentTestPage() {
   const [showDevPanel, setShowDevPanel] = useState<boolean>(false);
   const [showLogsDrawer, setShowLogsDrawer] = useState<boolean>(true); // Default open for live inspection
 
+  // Step 1 & Step 2 Visual State: Live Remaining Time & Privacy-Aware Optional Camera Fusion
+  const [remainingTimeSec, setRemainingTimeSec] = useState<number>(QUESTION_TIME_LIMIT_SEC);
+  const [cameraPermissionGranted, setCameraPermissionGranted] = useState<boolean>(false);
+  const [cameraAttentionScore, setCameraAttentionScore] = useState<number>(0.85);
+
   const autoAdvanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const question = TEST_QUESTIONS[currentQuestionIdx];
 
@@ -203,6 +210,16 @@ export function AgentTestPage() {
       }
     };
   }, []);
+
+  // Countdown remainingTimeSec per question
+  useEffect(() => {
+    setRemainingTimeSec(QUESTION_TIME_LIMIT_SEC);
+    if (isSessionComplete) return;
+    const interval = setInterval(() => {
+      setRemainingTimeSec((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [currentQuestionIdx, isSessionComplete]);
 
   // Initialize Research Telemetry Logger across all 10 questions (Task #17)
   const { logs, metrics, logAnswer, logHint, clearLogs } = useInteractionLogger({
@@ -226,12 +243,15 @@ export function AgentTestPage() {
     autoIntervene: true, // Automatically triggers 3D agent reaction & speech bubble
   });
 
-  // Evaluate state when logs array changes
+  // Evaluate state when logs or camera consent/score changes
   useEffect(() => {
     if (logs.length > 0) {
-      evaluateInteractions(logs);
+      evaluateInteractions(logs, {
+        cameraPermissionGranted,
+        cameraAttentionScore,
+      });
     }
-  }, [logs, evaluateInteractions]);
+  }, [logs, cameraPermissionGranted, cameraAttentionScore, evaluateInteractions]);
 
   const goToQuestion = (nextIdx: number) => {
     if (autoAdvanceTimerRef.current) {
@@ -241,6 +261,7 @@ export function AgentTestPage() {
     setCurrentQuestionIdx(nextIdx);
     setSelectedOption(null);
     setFeedback(null);
+    setRemainingTimeSec(QUESTION_TIME_LIMIT_SEC);
     resetHints();
   };
 
@@ -251,8 +272,13 @@ export function AgentTestPage() {
     setSelectedOption(num);
     const isCorrect = num === question.answer;
 
-    // Record telemetry event with latency, accuracy, and current hint level
-    logAnswer(num, isCorrect, currentHintLevel);
+    // Record telemetry event with latency, remainingTimeMs, accuracy, hint level & optional camera telemetry
+    logAnswer(num, isCorrect, currentHintLevel, {
+      remainingTimeMs: remainingTimeSec * 1000,
+      timeLimitMs: QUESTION_TIME_LIMIT_SEC * 1000,
+      cameraPermissionGranted,
+      cameraAttentionScore: cameraPermissionGranted ? cameraAttentionScore : null,
+    });
 
     if (isCorrect) {
       setFeedback('correct');
@@ -286,6 +312,7 @@ export function AgentTestPage() {
     }
     setSelectedOption(null);
     setFeedback(null);
+    setRemainingTimeSec(QUESTION_TIME_LIMIT_SEC);
     resetHints();
     playAction('wave');
   };
@@ -301,6 +328,7 @@ export function AgentTestPage() {
     setCurrentQuestionIdx(0);
     setSelectedOption(null);
     setFeedback(null);
+    setRemainingTimeSec(QUESTION_TIME_LIMIT_SEC);
     resetHints();
     playAction('wave', {
       message: 'අපි ප්‍රශ්න 10 මුලසිට නැවත පටන් ගමු!',
@@ -345,9 +373,13 @@ export function AgentTestPage() {
       totalHintsRequested: 0,
       responseTimeMs: 25000,
       idleTimeBeforeFirstActionMs: 22000,
+      remainingTimeMs: 5000,
+      timeLimitMs: 30000,
+      cameraPermissionGranted,
+      cameraAttentionScore: cameraPermissionGranted ? cameraAttentionScore : null,
       timestamp: new Date().toISOString(),
     };
-    evaluateInteractions([...logs, simEvent]);
+    evaluateInteractions([...logs, simEvent], { cameraPermissionGranted, cameraAttentionScore });
   };
 
   const handleSimulateFrustration = () => {
@@ -366,6 +398,8 @@ export function AgentTestPage() {
         totalHintsRequested: 0,
         responseTimeMs: 4000,
         idleTimeBeforeFirstActionMs: 1500,
+        remainingTimeMs: 26000,
+        timeLimitMs: 30000,
         timestamp: new Date().toISOString(),
       },
       {
@@ -382,10 +416,12 @@ export function AgentTestPage() {
         totalHintsRequested: 0,
         responseTimeMs: 3500,
         idleTimeBeforeFirstActionMs: 1000,
+        remainingTimeMs: 26500,
+        timeLimitMs: 30000,
         timestamp: new Date().toISOString(),
       },
     ];
-    evaluateInteractions([...logs, ...simEvents]);
+    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore });
   };
 
   const handleSimulateFocusedFlow = () => {
@@ -404,6 +440,8 @@ export function AgentTestPage() {
         totalHintsRequested: 0,
         responseTimeMs: 5000,
         idleTimeBeforeFirstActionMs: 1200,
+        remainingTimeMs: 25000,
+        timeLimitMs: 30000,
         timestamp: new Date().toISOString(),
       },
       {
@@ -420,10 +458,12 @@ export function AgentTestPage() {
         totalHintsRequested: 0,
         responseTimeMs: 4800,
         idleTimeBeforeFirstActionMs: 1100,
+        remainingTimeMs: 25200,
+        timeLimitMs: 30000,
         timestamp: new Date().toISOString(),
       },
     ];
-    evaluateInteractions([...logs, ...simEvents]);
+    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore });
   };
 
   const handleSimulateHintAssisted = () => {
@@ -456,10 +496,94 @@ export function AgentTestPage() {
         totalHintsRequested: 4,
         responseTimeMs: 6000,
         idleTimeBeforeFirstActionMs: 800,
+        remainingTimeMs: 24000,
+        timeLimitMs: 30000,
         timestamp: new Date().toISOString(),
       },
     ];
-    evaluateInteractions([...logs, ...simEvents]);
+    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore });
+  };
+
+  // Step 2 Novelty Trigger: Personal RT Baseline Z-Score & Attention Slip Simulation
+  const handleSimulateRapidAttentionSlip = () => {
+    const now = Date.now();
+    const simEvents: InteractionEvent[] = [
+      {
+        id: 'sim_base1_' + Math.random().toString(36).substring(2, 7),
+        sessionId: 'sess_adhd_study_01',
+        studentId: 'student_trial_01',
+        questionId: question.id,
+        concept: question.concept,
+        eventType: 'ANSWER_SUBMIT',
+        attemptNumber: 1,
+        selectedAnswer: question.answer,
+        isCorrect: true,
+        hintLevelReached: 0,
+        totalHintsRequested: 0,
+        responseTimeMs: 5200,
+        idleTimeBeforeFirstActionMs: 1100,
+        remainingTimeMs: 24800,
+        timeLimitMs: 30000,
+        timestamp: new Date(now - 30000).toISOString(),
+      },
+      {
+        id: 'sim_base2_' + Math.random().toString(36).substring(2, 7),
+        sessionId: 'sess_adhd_study_01',
+        studentId: 'student_trial_01',
+        questionId: question.id,
+        concept: question.concept,
+        eventType: 'ANSWER_SUBMIT',
+        attemptNumber: 1,
+        selectedAnswer: question.answer,
+        isCorrect: true,
+        hintLevelReached: 0,
+        totalHintsRequested: 0,
+        responseTimeMs: 5500,
+        idleTimeBeforeFirstActionMs: 1000,
+        remainingTimeMs: 24500,
+        timeLimitMs: 30000,
+        timestamp: new Date(now - 20000).toISOString(),
+      },
+      {
+        id: 'sim_base3_' + Math.random().toString(36).substring(2, 7),
+        sessionId: 'sess_adhd_study_01',
+        studentId: 'student_trial_01',
+        questionId: question.id,
+        concept: question.concept,
+        eventType: 'ANSWER_SUBMIT',
+        attemptNumber: 1,
+        selectedAnswer: question.answer,
+        isCorrect: true,
+        hintLevelReached: 0,
+        totalHintsRequested: 0,
+        responseTimeMs: 5100,
+        idleTimeBeforeFirstActionMs: 900,
+        remainingTimeMs: 24900,
+        timeLimitMs: 30000,
+        timestamp: new Date(now - 10000).toISOString(),
+      },
+      {
+        id: 'sim_slip_' + Math.random().toString(36).substring(2, 7),
+        sessionId: 'sess_adhd_study_01',
+        studentId: 'student_trial_01',
+        questionId: question.id,
+        concept: question.concept,
+        eventType: 'ANSWER_SUBMIT',
+        attemptNumber: 1,
+        selectedAnswer: question.options[0],
+        isCorrect: false,
+        hintLevelReached: 0,
+        totalHintsRequested: 0,
+        responseTimeMs: 700,
+        idleTimeBeforeFirstActionMs: 300,
+        remainingTimeMs: 29300,
+        timeLimitMs: 30000,
+        cameraPermissionGranted,
+        cameraAttentionScore: cameraPermissionGranted ? cameraAttentionScore : null,
+        timestamp: new Date(now).toISOString(),
+      },
+    ];
+    evaluateInteractions([...logs, ...simEvents], { cameraPermissionGranted, cameraAttentionScore });
   };
 
   const formattedQNum = String(question.stepNumber).padStart(2, '0');
@@ -517,6 +641,31 @@ export function AgentTestPage() {
 
         {/* Live Metrics Telemetry Badges */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Camera Consent Quick Toggle Pill (Step 1 & Step 2 Visual Indicator) */}
+          <button
+            type="button"
+            onClick={() => setCameraPermissionGranted(!cameraPermissionGranted)}
+            title="Toggle optional peer camera consent (Multimodal vs Telemetry-Only Fallback)"
+            style={{
+              padding: '5px 10px',
+              borderRadius: '18px',
+              fontSize: '0.75rem',
+              fontWeight: 800,
+              cursor: 'pointer',
+              background: cameraPermissionGranted
+                ? 'rgba(16, 185, 129, 0.2)'
+                : 'rgba(56, 189, 248, 0.12)',
+              color: cameraPermissionGranted ? '#34D399' : '#38BDF8',
+              border: cameraPermissionGranted
+                ? '1px solid rgba(16, 185, 129, 0.45)'
+                : '1px solid rgba(56, 189, 248, 0.3)',
+            }}
+          >
+            {cameraPermissionGranted
+              ? `📷 Camera ON (${Math.round(cameraAttentionScore * 100)}%)`
+              : '🛡️ Camera OFF (Telemetry Mode)'}
+          </button>
+
           <div
             style={{
               display: 'flex',
@@ -642,6 +791,26 @@ export function AgentTestPage() {
               >
                 මූලික එකතු කිරීම
               </span>
+
+              {/* Live Remaining Time Pill (Step 1 Telemetry Indicator) */}
+              <span
+                style={{
+                  fontSize: '0.8rem',
+                  fontWeight: 800,
+                  color: remainingTimeSec <= 8 ? '#F87171' : '#34D399',
+                  background:
+                    remainingTimeSec <= 8 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.12)',
+                  border:
+                    remainingTimeSec <= 8
+                      ? '1px solid rgba(239, 68, 68, 0.4)'
+                      : '1px solid rgba(16, 185, 129, 0.3)',
+                  padding: '3px 10px',
+                  borderRadius: '14px',
+                }}
+              >
+                ⏳ ඉතිරි කාලය: {remainingTimeSec}s / {QUESTION_TIME_LIMIT_SEC}s
+              </span>
+
               <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#E2E8F0' }}>
                 ප්‍රශ්න අංක: {formattedQNum} / {formattedTotalQ}
               </span>
@@ -967,16 +1136,21 @@ export function AgentTestPage() {
               zIndex: 20,
             }}
           >
-            {/* Visual Tasks #19, #20 & #21 HUD: Real-time Inattention, Frustration, BKT & FSM */}
+            {/* Visual Tasks #19, #20 & #21 + Step 1 & Step 2 HUD */}
             <LearnerStateHUD
               learnerState={learnerState}
               bktComparison={bktComparison}
               fsmDecision={fsmDecision}
               isLoading={isStateLoading}
+              cameraPermissionGranted={cameraPermissionGranted}
+              cameraAttentionScore={cameraAttentionScore}
+              onToggleCameraPermission={setCameraPermissionGranted}
+              onChangeCameraScore={setCameraAttentionScore}
               onSimulateInattention={handleSimulateInattention}
               onSimulateFrustration={handleSimulateFrustration}
               onSimulateFocusedFlow={handleSimulateFocusedFlow}
               onSimulateHintAssisted={handleSimulateHintAssisted}
+              onSimulateRapidAttentionSlip={handleSimulateRapidAttentionSlip}
               onTriggerFSMRule={triggerFSMContext}
             />
 
@@ -1046,6 +1220,9 @@ export function AgentTestPage() {
                       </span>
                       <span style={{ color: '#94A3B8', fontWeight: 400 }}>
                         {evt.responseTimeMs ? `${(evt.responseTimeMs / 1000).toFixed(2)}s` : ''}
+                        {typeof evt.remainingTimeMs === 'number'
+                          ? ` (Rem: ${Math.round(evt.remainingTimeMs / 1000)}s)`
+                          : ''}
                       </span>
                     </div>
                     {evt.eventType === 'ANSWER_SUBMIT' && (
@@ -1057,6 +1234,9 @@ export function AgentTestPage() {
                       >
                         Answer: {evt.selectedAnswer} ({evt.isCorrect ? 'Correct' : 'Incorrect'}) |
                         Hint: L{evt.hintLevelReached}
+                        {evt.cameraPermissionGranted
+                          ? ` | 📷 Cam: ${Math.round((evt.cameraAttentionScore ?? 0.85) * 100)}%`
+                          : ' | 🛡️ Cam: OFF'}
                       </div>
                     )}
                     {evt.eventType === 'HINT_REQUEST' && (

@@ -25,6 +25,10 @@ export interface InteractionEvent {
   
   responseTimeMs: number;
   idleTimeBeforeFirstActionMs: number;
+  remainingTimeMs?: number;
+  timeLimitMs?: number;
+  cameraPermissionGranted?: boolean;
+  cameraAttentionScore?: number | null;
   
   timestamp: string; // ISO 8601 string
 }
@@ -49,8 +53,33 @@ export type CognitiveState =
   | 'IMPULSIVE_GUESSING'
   | 'PRODUCTIVE_STRUGGLE';
 
+export interface PersonalRtBaseline {
+  sampleCount: number;
+  meanMs: number;
+  stdMs: number;
+  logMean?: number;
+  logStd?: number;
+  latestRtZScore: number;
+  isRtAnomaly: boolean;
+}
+
+export interface AttentionFusionState {
+  fusionMode: 'MULTIMODAL_CAMERA_AND_GAMEPLAY' | 'TELEMETRY_ONLY_FALLBACK';
+  cameraPermissionGranted: boolean;
+  gameplayInattentionIndex: number;
+  cameraInattentionIndex: number | null;
+  fusedInattentionIndex: number;
+  attentionProbability: number;
+  isAttentionSlip: boolean;
+  personalRtBaseline?: PersonalRtBaseline | null;
+}
+
 export interface LearnerMetrics {
-  inattentionIndex: number; // 0.0 to 1.0
+  inattentionIndex: number; // 0.0 to 1.0 (Fused)
+  gameplayInattentionIndex?: number;
+  cameraInattentionIndex?: number | null;
+  attentionProbability?: number;
+  rtZScore?: number;
   frustrationIndex: number; // 0.0 to 1.0
   persistenceScore: number; // 0.0 to 1.0
   accuracyRate: number;     // 0.0 to 1.0
@@ -67,6 +96,7 @@ export interface LearnerFlags {
   isInattentive: boolean;
   isFrustrated: boolean;
   isImpulsive: boolean;
+  isAttentionSlip?: boolean;
   needsHintPrompt: boolean;
 }
 
@@ -84,6 +114,7 @@ export interface LearnerState {
   evaluatedAt: string;
   metrics: LearnerMetrics;
   flags: LearnerFlags;
+  attentionFusion?: AttentionFusionState;
   cognitiveState: CognitiveState;
   recommendedIntervention: PedagogicalIntervention;
 }

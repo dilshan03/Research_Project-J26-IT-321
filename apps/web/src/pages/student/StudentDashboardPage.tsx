@@ -18,7 +18,6 @@ import {
   ChevronDown,
   ChevronRight,
   ShieldCheck,
-  Globe,
   TrendingUp,
   Users,
   GraduationCap,
@@ -344,48 +343,7 @@ export const StudentDashboardPage: React.FC = () => {
 
     return (
       <div className="flex flex-col h-full overflow-y-auto px-4 py-4 space-y-5">
-        {/* 1. Active Child Learner Profile Card */}
-        <div className="p-3.5 bg-mq-surface-blue/70 border border-mq-primary/20 rounded-2xl space-y-2.5">
-          <div className="flex items-center gap-3">
-            <div
-              className={`w-11 h-11 rounded-2xl flex items-center justify-center text-2xl shadow-xs shrink-0 border ${avatar.bgColor} ${avatar.borderColor}`}
-              title={avatar.name}
-            >
-              {avatar.icon}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <p className="text-sm font-extrabold text-mq-text-strong truncate">
-                  {studentFullName}
-                </p>
-                {activeLearner?.preferredName && (
-                  <span className="text-[10px] font-bold text-mq-primary bg-white px-1.5 py-0.5 rounded-full border border-mq-primary/20 truncate">
-                    "{activeLearner.preferredName}"
-                  </span>
-                )}
-              </div>
-              <p className="text-[11px] font-semibold text-mq-text-muted truncate sinhala">
-                {avatar.nameSi} ({avatar.name})
-              </p>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <span className="inline-block w-2 h-2 rounded-full bg-mq-success" />
-                <span className="text-[11px] font-bold text-mq-primary">
-                  Grade {studentGrade} · {studentAge} Yrs
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <Link
-            to="/learners"
-            className="w-full py-1.5 px-3 rounded-xl bg-white/90 hover:bg-white text-mq-primary-dark border border-mq-border/80 hover:border-mq-primary text-[11px] font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs sinhala"
-          >
-            <Users size={13} />
-            <span>දරුවා මාරු කරන්න · Switch Child</span>
-          </Link>
-        </div>
-
-        {/* 2. Collapsible Navigation Groups (Exact match with DashboardSidebar.tsx) */}
+        {/* Collapsible Navigation Groups (Exact match with DashboardSidebar.tsx) */}
         <div className="space-y-5">
           {STUDENT_NAV_GROUPS.map((group) => {
             const isCollapsed = !!collapsedGroups[group.id];
@@ -519,14 +477,10 @@ export const StudentDashboardPage: React.FC = () => {
                   *
                 </span>
               </span>
-
-              <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-mq-surface-blue text-mq-primary border border-mq-primary/20">
-                Student Portal
-              </span>
             </Link>
           </div>
 
-          {/* Center: Student Stars, Coins & Learning Progress (Saved per Child) */}
+          {/* Center: Student Stars & Coins (Saved per Child) */}
           <div className="hidden md:flex items-center gap-3">
             {/* Stars Pill */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-mq-surface-yellow border border-mq-warning/30 text-xs font-extrabold text-mq-text-strong">
@@ -539,23 +493,9 @@ export const StudentDashboardPage: React.FC = () => {
               <Coins size={14} className="text-mq-warning shrink-0" />
               <span>{savedProgress.coins} Coins</span>
             </div>
-
-            {/* Learning Progress Bar */}
-            <div className="hidden xl:flex items-center gap-2.5 pl-2">
-              <span className="text-xs font-bold text-mq-text-muted">Learning Progress</span>
-              <div className="w-28 h-2 bg-mq-surface-soft rounded-full overflow-hidden border border-mq-border">
-                <div
-                  className="h-full bg-mq-primary rounded-full transition-all duration-500"
-                  style={{ width: `${savedProgress.learningProgressPct}%` }}
-                />
-              </div>
-              <span className="text-xs font-extrabold text-mq-primary">
-                {savedProgress.learningProgressPct}%
-              </span>
-            </div>
           </div>
 
-          {/* Right: Sound + Switch Child + Active Child Profile Pill */}
+          {/* Right: Sound + Active Child Profile Pill */}
           <div className="flex items-center gap-2.5 shrink-0">
             <button
               type="button"
@@ -565,23 +505,6 @@ export const StudentDashboardPage: React.FC = () => {
             >
               {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
             </button>
-
-            <Link
-              to="/learners"
-              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft px-3 py-1.5 rounded-full border border-mq-border/60 transition-colors sinhala"
-              title="Back to Parent Dashboard (My Children)"
-            >
-              <Users size={14} />
-              <span>මගේ දරුවන්</span>
-            </Link>
-
-            <Link
-              to="/"
-              className="hidden lg:inline-flex items-center gap-1.5 text-xs font-semibold text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft px-3 py-1.5 rounded-full border border-mq-border/60 transition-colors"
-            >
-              <Globe size={14} />
-              <span>Public Website</span>
-            </Link>
 
             {/* Student Account Pill with Child's Avatar, Name & Grade */}
             <button
@@ -638,9 +561,6 @@ export const StudentDashboardPage: React.FC = () => {
                   <span className="font-extrabold text-base">
                     <span className="text-mq-primary-dark">Math</span>
                     <span className="text-mq-secondary">Quest</span>
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary">
-                    Student Portal
                   </span>
                 </div>
                 <button

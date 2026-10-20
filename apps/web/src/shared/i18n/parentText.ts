@@ -114,7 +114,26 @@ const si = {
   },
 
   overview: {
-    // Redesigned home page
+    // Home page: one focused card per child
+    homeSubtitle: 'ඔබේ දරුවාගේ ගණිත ඉගෙනීම එක බැල්මකින්.',
+    needsStart: 'ආරම්භ කළ යුතුයි',
+    heroNotStarted: (name: string) => `${name} සමඟ කෙටි ගණිත ක්‍රීඩාවකින් පටන් ගනිමු. විනාඩි කිහිපයක් පමණයි.`,
+    heroInProgress: (name: string) => `${name} ආරම්භක ක්‍රියාකාරකම් අතරමැද නතර කළා. ඉතිරි ටික අවසන් කරමු.`,
+    heroCompleted: (name: string) => `${name}ගේ ආරම්භක ගණිත ක්‍රියාකාරකම් අවසන්! මෙන්න මුල් ප්‍රතිඵල.`,
+    heroEarly: 'මේවා මුල් ප්‍රතිඵල පමණි. දරුවා තව ක්‍රීඩා කරන විට වඩාත් පැහැදිලි වේ.',
+    ctaPlay: (name: string) => `${name}ගේ ඉගෙනුම් ලෝකයට යන්න`,
+    moreSkills: (count: number) => `තවත් කුසලතා ${count}ක් බලන්න`,
+    linkProgress: 'සම්පූර්ණ ප්‍රගතිය',
+    linkTips: 'දෙමාපියන්ට උපදෙස්',
+    linkSnap: 'SNAP-IV ප්‍රශ්නාවලිය (විකල්ප)',
+    rewardsTitle: (name: string) => `${name}ගේ ත්‍යාග`,
+    stars: 'තරු',
+    coins: 'කාසි',
+    sessions: 'ක්‍රීඩා වාර',
+    rewardsEmpty: (name: string) => `${name} ඉගෙනුම් ලෝකයේ ක්‍රීඩා කරන විට ලැබෙන තරු සහ කාසි මෙහි පෙන්වයි.`,
+    rewardsLocked: 'ආරම්භක ක්‍රියාකාරකම් අවසන් කළ පසු, දරුවාට ඉගෙනුම් ලෝකයේ ක්‍රීඩා කර ත්‍යාග දිනාගත හැක.',
+    openWorld: 'ඉගෙනුම් ලෝකය විවෘත කරන්න',
+    // Redesigned home page (previous version)
     alertOtherChild: (name: string) => `${name}ගේ ආරම්භක ඇගයීම තවම සම්පූර්ණ කර නැත.`,
     alertOtherChildAction: 'අරඹන්න',
     switcherLabel: 'දරුවා තෝරන්න',

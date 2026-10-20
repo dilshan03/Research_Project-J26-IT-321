@@ -42,3 +42,17 @@ Run from this directory (environment: `.venv`, packages pinned in `requirements-
 
 Raw data (`data/raw/`), the virtual environment and model binaries (`artifacts/**/*.joblib`, `*.npz`) are
 git-ignored; metadata, metrics and the report are small text files.
+
+---
+
+## Prototype: IMLR probe (`imlr_probe/`)
+
+This is an isolated research prototype of the redesigned learning-transfer probe:
+- **Documents:** `IMLR_ML_FEASIBILITY.md` (audit) and `IMLR_PROBE_REDESIGN.md` (design).
+- **Status:** not connected to MathQuest, synthetic fixtures only, no model trained.
+- **Details and the approvals still required:** see `imlr_probe/README.md`.
+
+```
+.venv\Scripts\python.exe -m imlr_probe.demo
+.venv\Scripts\python.exe -m unittest tests.test_imlr_probe -v
+```

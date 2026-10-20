@@ -1,6 +1,6 @@
 /**
  * MathQuest Unified Local Runner (start-all.js)
- * Starts all 5 MathQuest services concurrently inside a single terminal.
+ * Starts all 6 MathQuest services concurrently inside a single terminal.
  *
  * Usage:
  *   npm run dev
@@ -77,6 +77,13 @@ const SERVICES = [
     port: 8003,
     cwd: path.join(ROOT_DIR, 'services', 'content-adaptation-service'),
     command: `${resolvePython(path.join(ROOT_DIR, 'services', 'content-adaptation-service'))} -m uvicorn app.main:app --host 0.0.0.0 --port 8003 --reload`,
+  },
+  {
+    name: 'BEHAVIOR:8004',
+    color: '\x1b[96m', // Bright Cyan
+    port: 8004,
+    cwd: path.join(ROOT_DIR, 'services', 'behaviour-signal-service'),
+    command: `${resolvePython(path.join(ROOT_DIR, 'services', 'behaviour-signal-service'))} -m uvicorn app.main:app --host 0.0.0.0 --port 8004 --reload`,
   },
   {
     name: 'WEB     :5173',
@@ -170,6 +177,9 @@ async function main() {
         console.log(`${svc.color}${BOLD}[${svc.name}]${RESET} Exited with code ${code}`);
       }
     });
+
+    // Stagger startup slightly so simultaneous MongoDB Atlas DNS SRV lookups do not collide
+    await new Promise((r) => setTimeout(r, 600));
   }
 
   console.log(`\n${BOLD}✅ Press Ctrl+C at any time to stop all services.${RESET}\n`);

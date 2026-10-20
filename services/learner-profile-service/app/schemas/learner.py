@@ -44,6 +44,18 @@ class CreateLearnerRequest(BaseModel):
         default="Sinhala",
         description="Language for instructional audio and prompts (default: Sinhala)"
     )
+    sinhalaComprehension: Optional[str] = Field(
+        default=None,
+        description="Optional Sinhala comprehension level for bilingual learners"
+    )
+    englishComprehension: Optional[str] = Field(
+        default=None,
+        description="Optional English comprehension level for bilingual learners"
+    )
+    primaryInstructionLanguage: Optional[str] = Field(
+        default=None,
+        description="Optional primary instruction language for bilingual learners (Sinhala or English)"
+    )
     avatarId: Optional[str] = Field(
         default="avatar_1",
         description="Selected character avatar identifier"
@@ -86,6 +98,18 @@ class UpdateLearnerRequest(BaseModel):
         None,
         description="Updated preferred language"
     )
+    sinhalaComprehension: Optional[str] = Field(
+        None,
+        description="Updated Sinhala comprehension level"
+    )
+    englishComprehension: Optional[str] = Field(
+        None,
+        description="Updated English comprehension level"
+    )
+    primaryInstructionLanguage: Optional[str] = Field(
+        None,
+        description="Updated primary instruction language"
+    )
     avatarId: Optional[str] = Field(
         None,
         description="Updated avatar identifier"
@@ -113,8 +137,14 @@ class LearnerResponse(BaseModel):
     age: int
     grade: int
     preferredLanguage: str
+    sinhalaComprehension: Optional[str] = None
+    englishComprehension: Optional[str] = None
+    primaryInstructionLanguage: Optional[str] = None
     avatarId: str
     onboardingStatus: str
+    isArchived: bool = False
+    archivedAt: Optional[str] = None
+    archivedBy: Optional[str] = None
     createdAt: str
     updatedAt: str
 
@@ -130,3 +160,46 @@ class LearnerListResponse(BaseModel):
     message: str = "Learner profiles retrieved successfully."
     data: List[LearnerResponse]
     total: int
+
+
+class DeletionRequestStatus(str, Enum):
+    PENDING_REVIEW = "PENDING_REVIEW"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    COMPLETED = "COMPLETED"
+
+
+class CreateDeletionRequest(BaseModel):
+    reason: Optional[str] = Field(
+        None,
+        max_length=500,
+        description="Optional reason or notes provided by the parent for requesting permanent deletion"
+    )
+
+
+class DeletionRequestResponse(BaseModel):
+    requestId: str
+    learnerId: str
+    parentId: str
+    learnerName: Optional[str] = None
+    status: DeletionRequestStatus
+    requestedAt: str
+    reviewOutcome: Optional[str] = None
+    completedAt: Optional[str] = None
+    reason: Optional[str] = None
+    createdAt: str
+    updatedAt: str
+
+
+class SingleDeletionRequestResponse(BaseModel):
+    success: bool = True
+    message: str = "Deletion request processed successfully."
+    data: Optional[DeletionRequestResponse] = None
+
+
+class DeletionRequestListResponse(BaseModel):
+    success: bool = True
+    message: str = "Deletion requests retrieved successfully."
+    data: List[DeletionRequestResponse]
+    total: int
+

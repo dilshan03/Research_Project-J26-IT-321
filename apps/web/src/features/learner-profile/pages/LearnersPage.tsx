@@ -1,46 +1,84 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Plus,
-  Users,
-  Loader2,
-  AlertCircle,
-  CheckCircle2,
-  HeartHandshake,
-  ShieldAlert,
-  ArrowRight,
-} from 'lucide-react';
-import { Navbar } from '../../../shared/components/Navbar';
+import { Plus, Users, Archive, UserCheck } from 'lucide-react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { learnerApi } from '../services/learnerApi';
-import type { Learner, CreateLearnerData, UpdateLearnerData } from '../types';
+import type {
+  Learner,
+  CreateLearnerData,
+  UpdateLearnerData,
+  DeletionRequest,
+} from '../types';
 import { LearnerCard } from '../components/LearnerCard';
 import { LearnerModal } from '../components/LearnerModal';
+import { ArchiveLearnerModal } from '../components/ArchiveLearnerModal';
+import { RequestDeletionModal } from '../components/RequestDeletionModal';
+import { PageHeader } from '../../../shared/components/PageHeader';
+import {
+  LoadingState,
+  EmptyState,
+  ErrorAlert,
+  SuccessAlert,
+} from '../../../shared/components/ui/StateViews';
+import { parentText } from '../../../shared/i18n/parentText';
+
+const t = parentText.children;
 
 export const LearnersPage: React.FC = () => {
   const { user } = useAuth();
 
-  const [learners, setLearners] = useState<Learner[]>([]);
+  const [activeTab, setActiveTab] = useState<'active' | 'archived'>('active');
+  const [activeLearners, setActiveLearners] = useState<Learner[]>([]);
+  const [archivedLearners, setArchivedLearners] = useState<Learner[]>([]);
+  const [deletionRequests, setDeletionRequests] = useState<Record<string, DeletionRequest>>({});
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
-  // Modal state
+  // Add / Edit Modal
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingLearner, setEditingLearner] = useState<Learner | null>(null);
 
-  const fetchLearners = useCallback(async () => {
+  // Archive Modal
+  const [learnerToArchive, setLearnerToArchive] = useState<Learner | null>(null);
+  const [isArchiveModalOpen, setIsArchiveModalOpen] = useState<boolean>(false);
+
+  // Deletion Request Modal
+  const [learnerToDelete, setLearnerToDelete] = useState<Learner | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+
+  // Restore state
+  const [restoringLearnerId, setRestoringLearnerId] = useState<string | null>(null);
+
+  const fetchAllData = useCallback(async () => {
     setIsLoading(true);
     setErrorMessage(null);
     try {
-      const response = await learnerApi.listLearners();
-      if (response.success && response.data) {
-        setLearners(response.data);
+      const [activeRes, archivedRes, delReqRes] = await Promise.all([
+        learnerApi.listLearners(false),
+        learnerApi.listLearners(true),
+        learnerApi.listDeletionRequests(),
+      ]);
+
+      if (activeRes.success && activeRes.data) {
+        setActiveLearners(activeRes.data);
       } else {
-        setErrorMessage(response.message || 'දරුවන්ගේ තොරතුරු ලබාගැනීමට නොහැකි විය.');
+        setErrorMessage(t.loadError);
+      }
+
+      if (archivedRes.success && archivedRes.data) {
+        setArchivedLearners(archivedRes.data);
+      }
+
+      if (delReqRes.success && delReqRes.data) {
+        const reqMap: Record<string, DeletionRequest> = {};
+        delReqRes.data.forEach((req) => {
+          reqMap[req.learnerId] = req;
+        });
+        setDeletionRequests(reqMap);
       }
     } catch {
-      setErrorMessage('සේවාදායකය සමඟ සම්බන්ධ වීමට නොහැකි විය (Network error).');
+      setErrorMessage(parentText.common.networkError);
     } finally {
       setIsLoading(false);
     }
@@ -48,11 +86,16 @@ export const LearnersPage: React.FC = () => {
 
   useEffect(() => {
     if (user && user.role === 'parent') {
-      fetchLearners();
+      fetchAllData();
     } else {
       setIsLoading(false);
     }
-  }, [user, fetchLearners]);
+  }, [user, fetchAllData]);
+
+  const showToast = (message: string, durationMs = 4000) => {
+    setSuccessToast(message);
+    setTimeout(() => setSuccessToast(null), durationMs);
+  };
 
   const handleOpenAddModal = () => {
     setEditingLearner(null);
@@ -73,170 +116,212 @@ export const LearnersPage: React.FC = () => {
         data as UpdateLearnerData
       );
       if (res.success && res.data) {
-        setSuccessToast(`"${res.data.firstName}" දරුවාගේ තොරතුරු සාර්ථකව යාවත්කාලීන කරන ලදී.`);
-        setTimeout(() => setSuccessToast(null), 4000);
-        await fetchLearners();
+        showToast(t.updated(res.data.firstName));
+        await fetchAllData();
         return true;
       }
       throw new Error(res.message || 'Failed to update child profile.');
     } else {
       const res = await learnerApi.createLearner(data as CreateLearnerData);
       if (res.success && res.data) {
-        setSuccessToast(`"${res.data.firstName}" දරුවා සාර්ථකව ලියාපදිංචි කරන ලදී!`);
-        setTimeout(() => setSuccessToast(null), 4000);
-        await fetchLearners();
+        showToast(t.created(res.data.firstName));
+        await fetchAllData();
         return true;
       }
       throw new Error(res.message || 'Failed to create child profile.');
     }
   };
 
-  // Guard for Teacher role
-  if (user && user.role === 'teacher') {
-    return (
-      <div className="min-h-screen bg-mq-bg font-sans text-mq-text">
-        <Navbar />
-        <main className="max-w-4xl mx-auto px-4 py-12">
-          <div className="bg-white rounded-3xl border border-mq-border p-8 text-center space-y-4 shadow-sm">
-            <div className="w-16 h-16 rounded-2xl bg-mq-surface-soft text-mq-primary flex items-center justify-center mx-auto">
-              <ShieldAlert size={32} />
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-mq-text-strong font-sinhala">
-              ගුරු පිවිසුම (Teacher Portal)
-            </h1>
-            <p className="text-sm text-mq-text-muted max-w-md mx-auto">
-              ළමා ඉගෙනුම් පැතිකඩ කළමනාකරණය දෙමාපිය ගිණුම් සඳහා පමණක් වෙන් කර ඇත. ගුරුවරුන් සඳහා වන පන්ති කාමර විශ්ලේෂණ ඉක්මනින් බලාපොරොත්තු වන්න.
-            </p>
-            <div className="pt-2">
-              <Link to="/profile" className="btn btn-primary py-2 px-5 rounded-full text-sm inline-flex items-center gap-2">
-                <span>පැතිකඩ වෙත ආපසු යන්න (Back to Profile)</span>
-                <ArrowRight size={15} />
-              </Link>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  // Archive Handler
+  const handleOpenArchiveModal = (learner: Learner) => {
+    setLearnerToArchive(learner);
+    setIsArchiveModalOpen(true);
+  };
+
+  const handleConfirmArchive = async (learner: Learner) => {
+    const res = await learnerApi.archiveLearner(learner.learnerId);
+    if (!res.success) {
+      throw new Error(res.message || 'Failed to archive learner profile.');
+    }
+    showToast(t.archived(learner.firstName));
+    await fetchAllData();
+  };
+
+  // Restore Handler
+  const handleConfirmRestore = async (learner: Learner) => {
+    setRestoringLearnerId(learner.learnerId);
+    try {
+      const res = await learnerApi.restoreLearner(learner.learnerId);
+      if (res.success) {
+        showToast(t.restored(learner.firstName));
+        await fetchAllData();
+      } else {
+        setErrorMessage(t.restoreError);
+      }
+    } catch {
+      setErrorMessage(parentText.common.networkError);
+    } finally {
+      setRestoringLearnerId(null);
+    }
+  };
+
+  // Deletion Request Handler
+  const handleOpenDeletionModal = (learner: Learner) => {
+    setLearnerToDelete(learner);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleSubmitDeletionRequest = async (learner: Learner, reason?: string) => {
+    const res = await learnerApi.requestPermanentDeletion(learner.learnerId, reason);
+    if (!res.success) {
+      throw new Error(res.message || 'Failed to submit permanent deletion request.');
+    }
+    showToast(t.deletionRequested(learner.firstName), 5000);
+    await fetchAllData();
+  };
+
+  const displayedLearners = activeTab === 'active' ? activeLearners : archivedLearners;
+
+  const tabClass = (isActive: boolean, tone: 'primary' | 'amber') =>
+    `inline-flex items-center gap-2 min-h-[44px] px-4 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${
+      isActive
+        ? tone === 'primary'
+          ? 'bg-mq-surface-blue text-mq-primary ring-1 ring-mq-primary/30'
+          : 'bg-amber-50 text-amber-900 ring-1 ring-amber-300'
+        : 'text-mq-text-muted hover:text-mq-text-strong hover:bg-mq-surface-soft'
+    }`;
+
+  const countClass = (isActive: boolean, tone: 'primary' | 'amber') =>
+    `text-xs min-w-[24px] text-center px-2 py-0.5 rounded-full font-bold ${
+      isActive
+        ? tone === 'primary'
+          ? 'bg-mq-primary text-white'
+          : 'bg-amber-600 text-white'
+        : 'bg-mq-surface-soft text-mq-text-muted border border-mq-border'
+    }`;
 
   return (
-    <div className="min-h-screen bg-mq-bg font-sans text-mq-text selection:bg-mq-surface-blue">
-      <Navbar />
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
-        {/* Page Top Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-mq-primary mb-1">
-              <Users size={15} />
-              <span>දෙමාපිය උපකරණ පුවරුව (Parent Portal)</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong font-sinhala">
-              මගේ දරුවන් (My Children)
-            </h1>
-            <p className="text-xs sm:text-sm text-mq-text-muted mt-1 font-sinhala">
-              MathQuest අනුවර්තී ගණිත ඉගෙනුම් සහාය සඳහා දරුවන්ගේ පැතිකඩ මෙතැනින් කළමනාකරණය කරන්න.
-            </p>
-          </div>
-
+    <div className="space-y-6 animate-fade-in">
+      <PageHeader
+        role="parent"
+        title={t.title}
+        description={t.description}
+        actions={
           <button
+            type="button"
+            data-testid="add-child-button"
             onClick={handleOpenAddModal}
-            className="btn btn-primary py-2.5 px-5 rounded-full flex items-center justify-center gap-2 text-xs sm:text-sm font-bold shadow-sm self-start sm:self-auto font-sinhala shrink-0"
+            className="btn btn-primary min-h-[44px] px-5 rounded-full inline-flex items-center justify-center gap-2 text-sm"
           >
-            <Plus size={17} strokeWidth={2.5} />
-            <span>නව දරුවෙකු එක් කරන්න (Add Child)</span>
+            <Plus size={18} strokeWidth={2.5} />
+            <span>{t.addChild}</span>
           </button>
-        </div>
+        }
+      />
 
-        {/* Feedback Toasts / Banners */}
-        {successToast && (
-          <div className="p-4 bg-mq-success-bg border border-mq-success/30 rounded-2xl flex items-center gap-3 text-xs sm:text-sm text-mq-success font-bold animate-fade-in shadow-xs">
-            <CheckCircle2 size={18} className="shrink-0" />
-            <span className="font-sinhala">{successToast}</span>
-          </div>
-        )}
+      {successToast && (
+        <SuccessAlert
+          message={successToast}
+          dismissLabel={parentText.common.dismiss}
+          onDismiss={() => setSuccessToast(null)}
+        />
+      )}
 
-        {errorMessage && (
-          <div className="p-4 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-center justify-between gap-3 text-xs sm:text-sm text-mq-danger font-medium animate-fade-in shadow-xs">
-            <div className="flex items-center gap-2.5">
-              <AlertCircle size={18} className="shrink-0" />
-              <span className="font-sinhala">{errorMessage}</span>
-            </div>
-            <button
-              onClick={fetchLearners}
-              className="text-xs font-bold underline hover:opacity-80 shrink-0"
-            >
-              නැවත උත්සාහ කරන්න (Retry)
-            </button>
-          </div>
-        )}
+      {errorMessage && (
+        <ErrorAlert message={errorMessage} retryLabel={parentText.common.retry} onRetry={fetchAllData} />
+      )}
 
-        {/* Content Area */}
-        {isLoading ? (
-          <div className="bg-white rounded-3xl border border-mq-border p-12 flex flex-col items-center justify-center text-center space-y-3 shadow-sm min-h-[320px]">
-            <Loader2 size={32} className="animate-spin text-mq-primary" />
-            <p className="text-sm font-bold text-mq-text-strong font-sinhala">
-              දරුවන්ගේ පැතිකඩ පූරණය වෙමින් පවතී...
-            </p>
-            <p className="text-xs text-mq-text-muted">
-              Loading child learner profiles from MathQuest...
-            </p>
-          </div>
-        ) : learners.length === 0 ? (
-          /* Empty State */
-          <div className="bg-white rounded-3xl border border-mq-border p-8 sm:p-12 text-center shadow-sm flex flex-col items-center justify-center space-y-5">
-            <div className="w-20 h-20 rounded-3xl bg-mq-surface-soft border border-mq-border flex items-center justify-center text-4xl shadow-inner">
-              <HeartHandshake size={36} className="text-mq-primary" />
-            </div>
+      {/* Active vs archived */}
+      <div role="tablist" className="flex flex-wrap items-center gap-2 border-b border-mq-border pb-3">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'active'}
+          onClick={() => setActiveTab('active')}
+          className={tabClass(activeTab === 'active', 'primary')}
+        >
+          <UserCheck size={17} />
+          <span>{t.tabActive}</span>
+          <span className={countClass(activeTab === 'active', 'primary')}>{activeLearners.length}</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === 'archived'}
+          onClick={() => setActiveTab('archived')}
+          className={tabClass(activeTab === 'archived', 'amber')}
+        >
+          <Archive size={17} />
+          <span>{t.tabArchived}</span>
+          <span className={countClass(activeTab === 'archived', 'amber')}>{archivedLearners.length}</span>
+        </button>
+      </div>
 
-            <div className="max-w-md space-y-2">
-              <h3 className="text-lg sm:text-xl font-bold text-mq-text-strong font-sinhala">
-                තවමත් දරුවෙකු ලියාපදිංචි කර නැත
-              </h3>
-              <p className="text-xs sm:text-sm text-mq-text-muted font-sinhala leading-relaxed">
-                ඔබේ දරුවාගේ අවධානය සහ ගණිත කුසලතා මට්ටමට ගැළපෙන අනුවර්තී අධ්‍යාපනික අත්දැකීම ලබා දීමට පළමුව දරුවාගේ තොරතුරු ඇතුළත් කරන්න.
-              </p>
-              <p className="text-xs text-mq-text-muted italic">
-                Register your child aged 6–10 (Grades 1–5) to start personalized ADHD learning support.
-              </p>
-            </div>
-
-            <button
-              onClick={handleOpenAddModal}
-              className="btn btn-primary py-3 px-6 rounded-full flex items-center gap-2 text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all font-sinhala"
-            >
-              <Plus size={18} strokeWidth={2.5} />
-              <span>පළමු දරුවා ලියාපදිංචි කරන්න (Register First Child)</span>
-            </button>
-          </div>
+      {isLoading ? (
+        <LoadingState message={t.loading} />
+      ) : displayedLearners.length === 0 ? (
+        activeTab === 'active' ? (
+          <EmptyState
+            icon={<Users size={36} />}
+            title={t.emptyActiveTitle}
+            description={
+              archivedLearners.length > 0 ? t.emptyActiveWithArchived(archivedLearners.length) : t.emptyActiveText
+            }
+            action={
+              <button
+                type="button"
+                onClick={handleOpenAddModal}
+                className="btn btn-primary min-h-[44px] px-6 rounded-full inline-flex items-center gap-2 text-sm"
+              >
+                <Plus size={18} strokeWidth={2.5} />
+                <span>{t.addFirstChild}</span>
+              </button>
+            }
+          />
         ) : (
-          /* Learner Cards Grid */
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-mq-text-muted">
-                ලියාපදිංචි දරුවන් ({learners.length}) • Registered Learners
-              </span>
-            </div>
+          <EmptyState icon={<Archive size={36} />} title={t.emptyArchivedTitle} description={t.emptyArchivedText} />
+        )
+      ) : (
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-5">
+          {displayedLearners.map((learner) => (
+            <LearnerCard
+              key={learner.learnerId}
+              learner={learner}
+              onEdit={handleOpenEditModal}
+              onArchive={handleOpenArchiveModal}
+              onRestore={handleConfirmRestore}
+              onRequestDeletion={handleOpenDeletionModal}
+              deletionRequest={deletionRequests[learner.learnerId] || null}
+            />
+          ))}
+        </div>
+      )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {learners.map((learner) => (
-                <LearnerCard
-                  key={learner.learnerId}
-                  learner={learner}
-                  onEdit={handleOpenEditModal}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* Add / Edit Modal */}
       <LearnerModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleModalSubmit}
         editingLearner={editingLearner}
+      />
+
+      <ArchiveLearnerModal
+        isOpen={isArchiveModalOpen}
+        learner={learnerToArchive}
+        onClose={() => {
+          setIsArchiveModalOpen(false);
+          setLearnerToArchive(null);
+        }}
+        onConfirmArchive={handleConfirmArchive}
+      />
+
+      <RequestDeletionModal
+        isOpen={isDeleteModalOpen}
+        learner={learnerToDelete}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setLearnerToDelete(null);
+        }}
+        onSubmitRequest={handleSubmitDeletionRequest}
       />
     </div>
   );

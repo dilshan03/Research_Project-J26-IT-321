@@ -20,11 +20,14 @@ import {
   Users,
 } from 'lucide-react';
 import { Navbar } from '../../../shared/components/Navbar';
+import { PageHeader } from '../../../shared/components/PageHeader';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { authService } from '../../auth/services/authService';
 import type { UserRole } from '../../auth/types';
 
-export const UserProfilePage: React.FC = () => {
+export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
+  hideNavbar = false,
+}) => {
   const { user, updateUser, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -164,25 +167,38 @@ export const UserProfilePage: React.FC = () => {
   const displayUsername = user.username || (user.email ? user.email.split('@')[0] : 'User');
 
   return (
-    <div className="min-h-screen bg-mq-bg font-sans text-mq-text flex flex-col selection:bg-mq-surface-blue">
+    <div className={hideNavbar ? "w-full text-mq-text flex flex-col" : "min-h-screen bg-mq-bg text-mq-text flex flex-col selection:bg-mq-surface-blue"}>
       {/* Existing Navbar */}
-      <Navbar />
+      {!hideNavbar && <Navbar />}
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+      <main className={hideNavbar ? "w-full py-2 space-y-6" : "flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6"}>
+        {/* Page Header when embedded in Dashboard shell */}
+        {hideNavbar && (
+          <PageHeader
+            role={user.role === 'admin' ? undefined : user.role}
+            title="Account Settings"
+            titleSi="ගිණුම් සැකසුම්"
+            description="Manage your verified account profile, identity credentials, security settings, and notifications."
+            descriptionSi="ඔබගේ පරිශීලක පැතිකඩ, මුරපදය සහ ගිණුම් තොරතුරු මෙතැනින් කළමනාකරණය කරන්න."
+          />
+        )}
+
         {/* Navigation Breadcrumb / Back Link */}
-        <div className="flex items-center justify-between">
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-mq-primary hover:text-mq-primary-hover transition-colors"
-          >
-            <ArrowLeft size={16} />
-            <span>Back to Home</span>
-          </Link>
-          <span className="text-xs font-semibold uppercase tracking-wider text-mq-text-muted">
-            User Account
-          </span>
-        </div>
+        {!hideNavbar && (
+          <div className="flex items-center justify-between">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-mq-primary hover:text-mq-primary-hover transition-colors"
+            >
+              <ArrowLeft size={16} />
+              <span>Back to Home</span>
+            </Link>
+            <span className="text-xs font-semibold uppercase tracking-wider text-mq-text-muted">
+              User Account
+            </span>
+          </div>
+        )}
 
         {/* Global Feedback Banners */}
         {saveSuccessMessage && (

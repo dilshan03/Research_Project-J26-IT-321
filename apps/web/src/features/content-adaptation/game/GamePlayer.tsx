@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-// If this file is in a different folder, adjust this relative import.
-import { useGameplayTracker } from '../../behaviour-monitoring/useGameplayTracker';
+import { useMemo, useState } from 'react';
 import { ArrowLeft, CheckCircle2, RotateCcw, Sparkles, Star, Volume2 } from 'lucide-react';
 import type {
   BlueprintEnvelope, DistractorType, GameChoiceOption, GameMicroStep, GameTheme, VisualAssetTag,
@@ -10,114 +8,131 @@ type Lang = 'si' | 'en';
 
 interface Attempt {
   step_order: number;
-  option: string;
+  label: string;
   correct: boolean;
   distractor_type?: DistractorType | null;
+  at: number;
 }
 
-const THEMES: Record<GameTheme, { name_si: string; name_en: string; bg: string; card: string; accent: string; mascot: string }> = {
-  VILLAGE_MARKET: {
-    name_si: 'ගමේ පොළ', name_en: 'Village Market',
-    bg: 'from-amber-50 via-orange-50 to-yellow-50', card: 'border-amber-200', accent: 'bg-amber-500', mascot: '🧺',
-  },
-  JUNGLE_ADVENTURE: {
-    name_si: 'වනාන්තර චාරිකාව', name_en: 'Jungle Adventure',
-    bg: 'from-emerald-50 via-teal-50 to-lime-50', card: 'border-emerald-200', accent: 'bg-emerald-500', mascot: '🐘',
-  },
-  SPACE_QUEST: {
-    name_si: 'අභ්‍යවකාශ ගමන', name_en: 'Space Quest',
-    bg: 'from-indigo-50 via-sky-50 to-violet-50', card: 'border-indigo-200', accent: 'bg-indigo-500', mascot: '🚀',
-  },
-};
+const BREAK_AFTER_WRONG = 3;
+const IDLE_NUDGE_MS = 20000;
+const ADVANCE_MS = 1400;
+/** Soft per-step time bar (only when the teacher enables the timer). Running out never fails the step. */
+const STEP_TIME_MS = 60000;
 
-const ASSET_ICON: Record<VisualAssetTag, string> = {
-  COIN_BAG: '🪙', FRUIT_BASKET: '🍎', OPERATOR_CHEST: '🧰', NUMBER_BLOCK: '🔢', CHARACTER_AVATAR: '🧒',
-};
-
-const FEEDBACK = {
-  correct: { si: 'හරි! ඉතා හොඳයි!', en: 'Correct! Well done!' },
-  retry: { si: 'කමක් නැහැ, නැවත උත්සාහ කරන්න', en: "That's okay, try again" },
-  done: { si: 'ඔබ ක්‍රීඩාව අවසන් කළා!', en: 'You finished the activity!' },
-};
-
-function speak(text: string, lang: Lang) {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = lang === 'si' ? 'si-LK' : 'en-US';
-  u.rate = 0.85;
-  window.speechSynthesis.speak(u);
+function pickMechanic(step: GameMicroStep): { Comp: (p: MechanicProps) => React.ReactElement; intro: Line } {
+  if (step.action_type === 'MATCH_SHAPE' || step.operation === 'SHAPE') {
+    return { Comp: ShapeMatcher, intro: { si: 'යාළුවේ! ගජා සොයන නිවැරදි හැඩය තෝරමු!', en: "Let's find the shape Gaja is looking for!" } };
+  }
+  if (step.action_type === 'COMPLETE_PATTERN' || step.operation === 'PATTERN') {
+    return { Comp: PatternTrain, intro: { si: 'ලස්සන දුම්රිය රටාවේ ඊළඟට එන වර්ණය තෝරමු!', en: "Let's find what comes next in the train pattern!" } };
+  }
+  if (step.action_type === 'COMPARE_QUANTITY' || step.operation === 'COMPARE') {
+    // The step says whether to pick the bigger or the smaller one.
+    return { Comp: ComparisonScale, intro: { si: step.instruction_si, en: step.instruction_en } };
+  }
+  if (step.operation === 'COUNT' && step.action_type === 'CALCULATE_MICROSTEP') {
+    return { Comp: CountObjects, intro: { si: 'එකින් එක තට්ටු කරලා ගණන් කරමු!', en: "Let's tap each one and count!" } };
+  }
+  if (step.action_type === 'IDENTIFY_ENTITY') return { Comp: NumberHunt, intro: LINES.identify };
+  if (step.action_type === 'SELECT_OPERATOR') return { Comp: OperatorDrop, intro: LINES.operator };
+  const ops = step.operands ?? [];
+  const answer = Number(step.correct_target_value);
+  const small = ops.length === 2 && ops.every(n => n <= 10) && answer <= 20;
+  if (small && (step.operation === 'ADD' || step.operation === 'SUB')) {
+    return { Comp: BasketCount, intro: step.operation === 'SUB' ? LINES.basketSub : LINES.basketAdd };
+  }
+  return { Comp: BalanceScale, intro: LINES.balance };
 }
 
-/** Visual quantity cue: shows up to 10 items so counting stays manageable. */
-function QuantityVisual({ value, icon, calm }: { value?: number | null; icon: string; calm: boolean }) {
-  if (value == null || value > 10 || value < 1) return null;
-  return (
-    <div className="flex flex-wrap justify-center gap-0.5 mt-1 text-lg leading-none" aria-hidden>
-      {Array.from({ length: value }).map((_, i) => (
-        <span key={i} className={calm ? '' : 'animate-fade-in'} style={{ animationDelay: `${i * 40}ms` }}>{icon}</span>
-      ))}
-    </div>
-  );
-}
-
-function OptionCard({
-  option, lang, state, onPick, showQuantity, calm,
-}: {
-  option: GameChoiceOption; lang: Lang; state: 'idle' | 'wrong' | 'correct';
-  onPick: () => void; showQuantity: boolean; calm: boolean;
-}) {
-  const styles = {
-    idle: 'bg-white border-mq-border hover:border-mq-primary hover:-translate-y-1 hover:shadow-lg',
-    wrong: 'bg-mq-surface-soft border-mq-border opacity-40 cursor-not-allowed',
-    correct: 'bg-[var(--mq-success-bg)] border-mq-success ring-4 ring-mq-success/20',
-  }[state];
-  return (
-    <button
-      type="button"
-      id={`option-${option.text_en.replace(/\W+/g, '-')}`}
-      disabled={state !== 'idle'}
-      onClick={onPick}
-      className={`min-h-28 rounded-3xl border-2 px-4 py-5 text-center transition-all duration-200 ${styles}`}
-    >
-      <span className={`block text-3xl font-extrabold text-mq-text-strong ${lang === 'si' ? 'sinhala text-2xl' : ''}`}>
-        {lang === 'si' ? option.text_si : option.text_en}
-      </span>
-      {showQuantity && <QuantityVisual value={option.numeric_value} icon="🔵" calm={calm} />}
-      {state === 'correct' && <CheckCircle2 className="mx-auto mt-2 text-mq-success" size={28} />}
-    </button>
-  );
-}
-
-export function GamePlayer({ envelope, onExit, learnerId = 'local-demo-learner' }: { envelope: BlueprintEnvelope; onExit: () => void; learnerId?: string }) {
+export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; onExit: () => void }) {
   const { blueprint } = envelope;
   const settings = blueprint.adhd_game_settings;
-  const theme = THEMES[blueprint.game_theme];
-  const calm = settings.stimulus_density === 'LOW';
+  const staticStory = STORY[blueprint.game_theme];
+
+  const story = useMemo(() => {
+    const sn = blueprint.story_narrative;
+    if (!sn) {
+      return {
+        title: staticStory.title,
+        intro: staticStory.intro,
+        outro: staticStory.outro,
+        backdrop: { si: '', en: '' },
+        questGoal: { si: '', en: '' },
+        dialogue: undefined,
+      };
+    }
+    return {
+      title: {
+        si: sn.title_si || staticStory.title.si,
+        en: sn.title_en || staticStory.title.en,
+      },
+      intro: {
+        si: sn.gaja_dialogue?.intro?.si || staticStory.intro.si,
+        en: sn.gaja_dialogue?.intro?.en || staticStory.intro.en,
+      },
+      outro: {
+        si: sn.gaja_dialogue?.celebrate?.si || staticStory.outro.si,
+        en: sn.gaja_dialogue?.celebrate?.en || staticStory.outro.en,
+      },
+      backdrop: {
+        si: sn.backdrop_si || '',
+        en: sn.backdrop_en || '',
+      },
+      questGoal: {
+        si: sn.quest_goal_si || '',
+        en: sn.quest_goal_en || '',
+      },
+      dialogue: sn.gaja_dialogue,
+    };
+  }, [blueprint.story_narrative, staticStory]);
 
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const activityId = useMemo(() => `mathquest-${blueprint.game_theme}-${blueprint.grade}-${blueprint.topic}`, [blueprint.game_theme, blueprint.grade, blueprint.topic]);
   const tracker = useGameplayTracker({ learnerId, activityId, gameTheme: blueprint.game_theme, grade: blueprint.grade, containerRef: gameContainerRef });
   const { isTracking, onStepStart, onAnswerSelect, onAnswerSubmit, onGameExit } = tracker;
   const [lang, setLang] = useState<Lang>('si');
+
+  const activeQuestion = useMemo(() => {
+    if (lang === 'en') {
+      return (
+        blueprint.raw_english_question ||
+        envelope.raw_english_question ||
+        getEnglishQuestionFallback(question) ||
+        blueprint.story_narrative?.quest_goal_en ||
+        question
+      );
+    }
+    return blueprint.raw_sinhala_question || question;
+  }, [
+    lang,
+    blueprint.raw_english_question,
+    blueprint.raw_sinhala_question,
+    envelope.raw_english_question,
+    blueprint.story_narrative?.quest_goal_en,
+    question,
+  ]);
+
+  const reduced = useReducedMotion();
+  const calm = settings.stimulus_density === 'LOW' || !!reduced;
+  const isMoney = /money/i.test(blueprint.topic) || question.includes('රුපියල්');
+  const steps = blueprint.micro_steps;
+
+  const [voiceOn, setVoiceOn] = useState(true);
+  const [phase, setPhase] = useState<'intro' | 'play' | 'done'>('intro');
+  const [isWardrobeOpen, setIsWardrobeOpen] = useState(false);
+  const { companion } = useCompanion();
   const [stepIndex, setStepIndex] = useState(0);
-  const [wrongPicks, setWrongPicks] = useState<Set<string>>(new Set());
-  const [solved, setSolved] = useState(false);
+  const [mood, setMood] = useState<Mood>('happy');
+  const [line, setLine] = useState<Line | null>(() => story.intro);
+  // Bumped on every utterance so a repeated line (e.g. two retries) still re-animates the bubble.
+  const [lineKey, setLineKey] = useState(0);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [feedback, setFeedback] = useState<'correct' | 'retry' | null>(null);
 
   const steps = blueprint.micro_steps;
   const finished = stepIndex >= steps.length;
   const step: GameMicroStep | undefined = steps[stepIndex];
-  useEffect(() => {
-    if (isTracking && step) {
-      onStepStart(step.step_order, step.action_type);
-    }
-  }, [isTracking, stepIndex, step?.step_order]);
-  const exitGame = async () => {
-    try { await onGameExit(); } catch (error) { console.error('Failed to finish tracking session', error); }
-    onExit();
-  };
   const stars = useMemo(() => {
     const mistakes = attempts.filter(a => !a.correct).length;
     return mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
@@ -125,8 +140,6 @@ export function GamePlayer({ envelope, onExit, learnerId = 'local-demo-learner' 
 
   const pick = (opt: GameChoiceOption) => {
     if (!step || solved) return;
-    onAnswerSelect(opt.text_en);
-    onAnswerSubmit(opt.text_en, opt.is_correct);
     setAttempts(a => [...a, {
       step_order: step.step_order, option: opt.text_en, correct: opt.is_correct, distractor_type: opt.distractor_type,
     }]);
@@ -134,24 +147,55 @@ export function GamePlayer({ envelope, onExit, learnerId = 'local-demo-learner' 
       setSolved(true);
       setFeedback('correct');
     } else {
-      setWrongPicks(s => new Set(s).add(opt.text_en));
-      setFeedback('retry');
+      const customRetry = story.dialogue?.retry;
+      say(hint ?? (customRetry || LINES.retry), 'encourage');
     }
   };
 
-  const next = () => {
-    setStepIndex(i => i + 1);
-    setWrongPicks(new Set());
-    setSolved(false);
-    setFeedback(null);
+  const onCorrect: MechanicProps['onCorrect'] = label => {
+    if (advancing.current) return;
+    advancing.current = true;
+    log(label, true);
+    setWrongRun(0);
+    const s = stepHadMistake ? 0 : streak + 1;
+    setStreak(s);
+    setBestStreak(b => Math.max(b, s));
+    setCelebrating(true);
+    const customPraise = story.dialogue?.praise;
+    say(customPraise || LINES.correct, 'celebrate');
+    advanceTimer.current = window.setTimeout(() => {
+      advancing.current = false;
+      setCelebrating(false);
+      const next = stepIndex + 1;
+      setStepHadMistake(false);
+      if (next >= steps.length) {
+        setPhase('done');
+        say(story.outro, 'celebrate');
+      } else {
+        setStepIndex(next);
+        say(pickMechanic(steps[next]).intro, 'thinking');
+      }
+    }, ADVANCE_MS);
+  };
+
+  const onTimeUp = () => {
+    if (advancing.current) return;
+    say(mechanic?.intro ?? LINES.nudge, 'thinking');
   };
 
   const restart = () => {
-    setStepIndex(0); setWrongPicks(new Set()); setSolved(false); setFeedback(null); setAttempts([]);
+    window.clearTimeout(advanceTimer.current);
+    advancing.current = false;
+    setCelebrating(false);
+    setAttempts([]); setStreak(0); setBestStreak(0); setWrongRun(0); setStepHadMistake(false);
+    setStepIndex(0); setPhase('intro'); setMood('happy'); setLine(story.intro);
   };
 
+  const mistakes = attempts.filter(a => !a.correct).length;
+  const stars = mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
+
   return (
-    <div ref={gameContainerRef} className={`min-h-screen bg-gradient-to-br ${theme.bg} relative overflow-hidden`}>
+    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} relative overflow-hidden`}>
       {/* Decorative background is removed when the visual-clutter filter + low density are on */}
       {!(settings.visual_clutter_filter && calm) && (
         <>
@@ -161,7 +205,7 @@ export function GamePlayer({ envelope, onExit, learnerId = 'local-demo-learner' 
       )}
 
       <header className="relative z-10 flex items-center justify-between px-6 py-4">
-        <button id="game-exit" onClick={() => void exitGame()} className="btn btn-secondary"><ArrowLeft size={18} /> {lang === 'si' ? 'ආපසු' : 'Back'}</button>
+        <button id="game-exit" onClick={onExit} className="btn btn-secondary"><ArrowLeft size={18} /> {lang === 'si' ? 'ආපසු' : 'Back'}</button>
         <div className="text-center">
           <p className="text-xs uppercase tracking-widest text-mq-text-muted font-semibold">{blueprint.topic} · Grade {blueprint.grade}</p>
           <p className={`font-bold text-mq-text-strong ${lang === 'si' ? 'sinhala' : ''}`}>
@@ -178,69 +222,47 @@ export function GamePlayer({ envelope, onExit, learnerId = 'local-demo-learner' 
         </div>
       </header>
 
-      <main className="relative z-10 max-w-3xl mx-auto px-6 pb-16">
-        {/* Progress path: one dot per micro-step, no countdown timer */}
-        <div className="flex items-center justify-center gap-3 my-6" aria-label="Progress">
-          {steps.map((s, i) => (
-            <div key={s.step_order} className="flex items-center gap-3">
-              <div className={`w-11 h-11 rounded-full flex items-center justify-center font-bold border-2 transition-all
-                ${i < stepIndex ? `${theme.accent} text-white border-transparent`
-                  : i === stepIndex ? 'bg-white border-mq-primary text-mq-primary scale-110 shadow-md'
-                  : 'bg-white/60 border-mq-border text-mq-text-muted'}`}>
-                {i < stepIndex ? <Star size={18} fill="currentColor" /> : s.step_order}
-              </div>
-              {i < steps.length - 1 && <div className={`w-10 h-1 rounded-full ${i < stepIndex ? theme.accent : 'bg-mq-border'}`} />}
-            </div>
-          ))}
-        </div>
-
-        {/* The original problem stays visible to reduce working-memory load */}
-        <section className={`rounded-3xl bg-white/80 backdrop-blur border ${theme.card} px-6 py-4 mb-6 shadow-sm`}>
-          <p className="sinhala text-lg text-mq-text-strong text-center">{envelope.raw_sinhala_question}</p>
-        </section>
-
-        {!finished && step && (
-          <section key={step.step_order} className={`rounded-[2rem] bg-white shadow-[var(--mq-shadow-md)] border ${theme.card} p-8 ${calm ? '' : 'animate-fade-in'}`}>
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <span className="text-4xl" aria-hidden>{ASSET_ICON[step.target_visual_asset]}</span>
-              <h1 className={`text-2xl md:text-3xl font-extrabold text-center ${lang === 'si' ? 'sinhala' : ''}`}>
-                {lang === 'si' ? step.instruction_si : step.instruction_en}
+      <main className="relative z-10 px-4 md:px-8 pb-48">
+        <AnimatePresence mode="wait">
+          {phase === 'intro' && (
+            <motion.section key="intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, y: -20 }}
+              className="flex flex-col items-center text-center pt-6">
+              <h1 className={`text-4xl md:text-5xl font-extrabold text-mq-text-strong drop-shadow-sm mb-3 ${lang === 'si' ? 'sinhala' : ''}`}>
+                {story.title[lang]}
               </h1>
-              <button id="speak-instruction" aria-label="Read instruction aloud"
-                onClick={() => speak(lang === 'si' ? step.instruction_si : step.instruction_en, lang)}
-                className="w-10 h-10 rounded-full bg-mq-surface-blue text-mq-primary flex items-center justify-center hover:bg-mq-primary hover:text-white transition">
-                <Volume2 size={20} />
-              </button>
-            </div>
-
-            <div className={`grid gap-4 mt-8 ${step.game_options.length > 3 ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'}`}>
-              {step.game_options.map(opt => (
-                <OptionCard
-                  key={opt.text_en}
-                  option={opt}
-                  lang={lang}
-                  calm={calm}
-                  showQuantity={step.action_type === 'CALCULATE_MICROSTEP' && blueprint.grade <= 2}
-                  state={solved && opt.is_correct ? 'correct' : wrongPicks.has(opt.text_en) || solved ? 'wrong' : 'idle'}
-                  onPick={() => pick(opt)}
-                />
-              ))}
-            </div>
-
-            <div className="min-h-16 mt-6 flex items-center justify-center" aria-live="polite">
-              {feedback === 'retry' && (
-                <p className={`px-5 py-2 rounded-full bg-[var(--mq-warning-bg)] text-mq-text font-semibold ${lang === 'si' ? 'sinhala' : ''}`}>
-                  {FEEDBACK.retry[lang]}
+              {story.backdrop[lang] && (
+                <p className={`max-w-xl text-base md:text-lg text-mq-text-strong/80 mb-4 px-4 ${lang === 'si' ? 'sinhala' : 'font-medium'}`}>
+                  {story.backdrop[lang]}
                 </p>
               )}
-              {feedback === 'correct' && (
-                <div className="flex items-center gap-4">
-                  <p className={`px-5 py-2 rounded-full bg-[var(--mq-success-bg)] text-mq-success font-bold ${lang === 'si' ? 'sinhala' : ''}`}>
-                    <Sparkles size={18} className="inline -mt-1 mr-1" />{FEEDBACK.correct[lang]}
-                  </p>
-                  <button id="next-step" onClick={next} className="btn btn-primary text-lg px-6">
-                    {lang === 'si' ? 'ඊළඟ' : 'Next'} →
-                  </button>
+              <Gaja mood="happy" line={story.intro} lang={lang} calm={calm} size="lg" companionConfig={companion} />
+              <motion.button id="start-quest" onClick={start}
+                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                className="btn btn-primary mt-8 text-2xl px-10 py-4 !min-h-0">
+                {lang === 'si' ? 'අපි යමු!' : "Let's go!"}
+              </motion.button>
+            </motion.section>
+          )}
+
+          {phase === 'play' && step && mechanic && (
+            <motion.section key={`step-${stepIndex}`}
+              initial={calm ? { opacity: 0 } : { opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={calm ? { opacity: 0 } : { opacity: 0, x: -60 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 26 }}
+              className={`relative mx-auto max-w-4xl mt-4 rounded-[2.5rem] bg-white/90 backdrop-blur-md shadow-2xl border-4 p-6 md:p-10 flex flex-col items-center transition-colors duration-500
+                ${celebrating ? 'border-mq-success' : nudging ? 'border-mq-accent-yellow' : 'border-white'}`}
+            >
+              {settings.timer_enabled && !onBreak && !celebrating && (
+                <div className="absolute top-3 left-10 right-10 h-1.5 rounded-full bg-mq-border/60 overflow-hidden" aria-hidden>
+                  {/* Re-keyed after a break so the learner returns to a full bar, not a near-empty one. */}
+                  <motion.div
+                    key={`${stepIndex}-${breakCount}`}
+                    className="h-full rounded-full bg-mq-secondary"
+                    initial={{ width: '100%' }} animate={{ width: '0%' }}
+                    transition={{ duration: STEP_TIME_MS / 1000, ease: 'linear' }}
+                    onAnimationComplete={onTimeUp}
+                  />
                 </div>
               )}
             </div>
@@ -259,12 +281,30 @@ export function GamePlayer({ envelope, onExit, learnerId = 'local-demo-learner' 
             </div>
             <div className="flex justify-center gap-3">
               <button id="game-restart" onClick={restart} className="btn btn-secondary"><RotateCcw size={18} /> {lang === 'si' ? 'නැවත' : 'Play again'}</button>
-              <button id="game-finish" onClick={() => void exitGame()} className="btn btn-primary">{lang === 'si' ? 'අවසන්' : 'Finish'}</button>
+              <button id="game-finish" onClick={onExit} className="btn btn-primary">{lang === 'si' ? 'අවසන්' : 'Finish'}</button>
             </div>
           </section>
         )}
       </main>
+
+      {/* Companion stays in the corner during play */}
+      {phase !== 'intro' && (
+        <div className="fixed left-4 bottom-4 z-30">
+          <Gaja mood={mood} line={line} lineKey={lineKey} lang={lang} calm={calm} companionConfig={companion} />
+        </div>
+      )}
+
+      <AnimatePresence>
+        {onBreak && <BreathingBreak lang={lang} onDone={() => { setOnBreak(false); setBreakCount(c => c + 1); say(LINES.nudge, 'happy'); }} />}
+      </AnimatePresence>
+
+      <CompanionWardrobeModal
+        isOpen={isWardrobeOpen}
+        onClose={() => setIsWardrobeOpen(false)}
+        lang={lang}
+      />
     </div>
+    </MotionConfig>
   );
 }
 

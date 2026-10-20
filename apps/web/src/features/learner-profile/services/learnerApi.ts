@@ -3,6 +3,7 @@ import type {
   CreateLearnerData,
   UpdateLearnerData,
   LearnerApiResponse,
+  DeletionRequest,
 } from '../types';
 
 const API_BASE_URL =
@@ -17,11 +18,25 @@ const LEARNERS_ENDPOINT = `${API_BASE_URL}/api/v1/learners`;
  */
 export const learnerApi = {
   /**
-   * Fetches all child learner profiles belonging to the authenticated parent.
+   * Fetches child learner profiles belonging to the authenticated parent,
+   * with optional filtering for active or archived status.
    */
-  async listLearners(): Promise<LearnerApiResponse<Learner[]>> {
+  async listLearners(
+    isArchived?: boolean,
+    includeArchived?: boolean
+  ): Promise<LearnerApiResponse<Learner[]>> {
     try {
-      const response = await fetch(LEARNERS_ENDPOINT, {
+      const params = new URLSearchParams();
+      if (isArchived !== undefined) {
+        params.append('is_archived', String(isArchived));
+      }
+      if (includeArchived !== undefined) {
+        params.append('include_archived', String(includeArchived));
+      }
+      const queryString = params.toString();
+      const url = queryString ? `${LEARNERS_ENDPOINT}?${queryString}` : LEARNERS_ENDPOINT;
+
+      const response = await fetch(url, {
         method: 'GET',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -146,4 +161,156 @@ export const learnerApi = {
       };
     }
   },
+
+  /**
+   * Safely archives an active child learner profile.
+   */
+  async archiveLearner(learnerId: string): Promise<LearnerApiResponse<Learner>> {
+    try {
+      const response = await fetch(`${LEARNERS_ENDPOINT}/${learnerId}/archive`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.detail || 'Failed to archive learner profile.',
+          error: data.detail,
+        };
+      }
+      return data;
+    } catch {
+      return {
+        success: false,
+        message: 'Could not connect to the Learner Profile Service.',
+        error: 'SERVICE_UNAVAILABLE',
+      };
+    }
+  },
+
+  /**
+   * Restores an archived child learner profile back to active status.
+   */
+  async restoreLearner(learnerId: string): Promise<LearnerApiResponse<Learner>> {
+    try {
+      const response = await fetch(`${LEARNERS_ENDPOINT}/${learnerId}/restore`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.detail || 'Failed to restore learner profile.',
+          error: data.detail,
+        };
+      }
+      return data;
+    } catch {
+      return {
+        success: false,
+        message: 'Could not connect to the Learner Profile Service.',
+        error: 'SERVICE_UNAVAILABLE',
+      };
+    }
+  },
+
+  /**
+   * Submits a formal request for permanent deletion review.
+   */
+  async requestPermanentDeletion(
+    learnerId: string,
+    reason?: string
+  ): Promise<LearnerApiResponse<DeletionRequest>> {
+    try {
+      const response = await fetch(`${LEARNERS_ENDPOINT}/${learnerId}/deletion-request`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: reason || null }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.detail || 'Failed to submit deletion request.',
+          error: data.detail,
+        };
+      }
+      return data;
+    } catch {
+      return {
+        success: false,
+        message: 'Could not connect to the Learner Profile Service.',
+        error: 'SERVICE_UNAVAILABLE',
+      };
+    }
+  },
+
+  /**
+   * Retrieves deletion request status for a specific learner.
+   */
+  async getDeletionRequest(
+    learnerId: string
+  ): Promise<LearnerApiResponse<DeletionRequest>> {
+    try {
+      const response = await fetch(`${LEARNERS_ENDPOINT}/${learnerId}/deletion-request`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.detail || 'Failed to retrieve deletion request status.',
+          error: data.detail,
+        };
+      }
+      return data;
+    } catch {
+      return {
+        success: false,
+        message: 'Could not connect to the Learner Profile Service.',
+        error: 'SERVICE_UNAVAILABLE',
+      };
+    }
+  },
+
+  /**
+   * Lists all deletion requests submitted by the authenticated parent.
+   */
+  async listDeletionRequests(): Promise<LearnerApiResponse<DeletionRequest[]>> {
+    try {
+      const response = await fetch(`${LEARNERS_ENDPOINT}/deletion-requests`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data.detail || 'Failed to retrieve deletion requests.',
+          error: data.detail,
+        };
+      }
+      return data;
+    } catch {
+      return {
+        success: false,
+        message: 'Could not connect to the Learner Profile Service.',
+        error: 'SERVICE_UNAVAILABLE',
+      };
+    }
+  },
 };
+

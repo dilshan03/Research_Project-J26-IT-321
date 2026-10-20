@@ -3,6 +3,7 @@
  */
 
 export type OnboardingStepKey =
+  | 'adhd_information'
   | 'preferences'
   | 'snap_iv'
   | 'social_context'
@@ -19,6 +20,94 @@ export interface LearningPreferencesData {
   celebrationStyle: 'gentle_star' | 'badge_sound' | 'minimal';
   additionalNotes?: string;
 }
+
+/**
+ * Parent-reported ADHD information.
+ * A parent's report of a professional diagnosis: never verified by MathQuest, never inferred
+ * from SNAP-IV or gameplay, and kept separate from screening and mathematics evidence.
+ */
+export type AdhdDiagnosisStatus = 'yes' | 'no' | 'not_sure' | 'prefer_not_to_say';
+
+export type AdhdReportedPresentation =
+  | 'predominantly_inattentive'
+  | 'predominantly_hyperactive_impulsive'
+  | 'combined'
+  | 'not_specified';
+
+export interface AdhdInformationData {
+  version: string;
+  diagnosisStatus: AdhdDiagnosisStatus;
+  reportedPresentation?: AdhdReportedPresentation;
+  diagnosisReportedMonth?: string; // YYYY-MM
+}
+
+export interface AdhdInformationRecord {
+  version: string;
+  diagnosisStatus: AdhdDiagnosisStatus;
+  reportedPresentation: AdhdReportedPresentation | null;
+  diagnosisReportedMonth: string | null;
+  informationType: 'PARENT_REPORTED_PROFESSIONAL_DIAGNOSIS' | 'PARENT_REPORTED_DIAGNOSIS_STATUS';
+  source: 'parent';
+  verificationStatus: 'NOT_VERIFIED';
+  disclaimer: string;
+  savedAt: string;
+}
+
+/**
+ * True when the parent reported a professional diagnosis with a specific ADHD type.
+ * SNAP-IV is then not asked during onboarding (mirrors the backend resolver); it stays
+ * optional from the parent dashboard.
+ */
+export const isAdhdTypeReported = (adhd: AdhdInformationRecord | null | undefined): boolean =>
+  Boolean(adhd && adhd.diagnosisStatus === 'yes' && adhd.reportedPresentation && adhd.reportedPresentation !== 'not_specified');
+
+export type SnapIvStatus = 'COMPLETED' | 'SKIPPED' | 'NOT_STARTED';
+
+/** Parent view of ADHD & support information. SNAP-IV history carries dates only, never scores. */
+export interface SupportInformation {
+  learnerId: string;
+  onboardingStatus: string;
+  adhdInformation: AdhdInformationRecord | null;
+  snapIv: {
+    status: SnapIvStatus;
+    history: Array<{ completedAt: string | null; version?: string }>;
+    notice: string;
+  };
+}
+
+export const ADHD_DIAGNOSIS_STATUS_OPTIONS: Array<{
+  value: AdhdDiagnosisStatus;
+  labelEn: string;
+  labelSi: string;
+}> = [
+  { value: 'yes', labelEn: 'Yes', labelSi: 'ඔව්' },
+  { value: 'no', labelEn: 'No', labelSi: 'නැත' },
+  { value: 'not_sure', labelEn: 'Not sure', labelSi: 'විශ්වාස නැත' },
+  { value: 'prefer_not_to_say', labelEn: 'Prefer not to say', labelSi: 'පැවසීමට අකමැතියි' },
+];
+
+export const ADHD_PRESENTATION_OPTIONS: Array<{
+  value: AdhdReportedPresentation;
+  labelEn: string;
+  labelSi: string;
+}> = [
+  {
+    value: 'predominantly_inattentive',
+    labelEn: 'Predominantly inattentive',
+    labelSi: 'ප්‍රධාන වශයෙන් අවධානය අඩු වීම',
+  },
+  {
+    value: 'predominantly_hyperactive_impulsive',
+    labelEn: 'Predominantly hyperactive-impulsive',
+    labelSi: 'ප්‍රධාන වශයෙන් අධික ක්‍රියාශීලී බව සහ ආවේගශීලී බව',
+  },
+  { value: 'combined', labelEn: 'Combined', labelSi: 'දෙකම (ඒකාබද්ධ)' },
+  {
+    value: 'not_specified',
+    labelEn: 'Not sure / Not specified',
+    labelSi: 'විශ්වාස නැත / සඳහන් කර නැත',
+  },
+];
 
 export interface SnapIvItemAnswer {
   itemId: number;
@@ -70,12 +159,145 @@ export interface MathQuestion {
   hintSi: string;
 }
 
+export type AssessmentProtocolVersion = 'onboarding-v1' | 'onboarding-v2';
+
+export type ProbeRole =
+  | 'calibration'
+  | 'pre'
+  | 'support'
+  | 'transfer'
+  | 'representation';
+
+export type RepresentationType =
+  | 'concrete'
+  | 'pictorial'
+  | 'visual'
+  | 'symbolic'
+  | 'verbal';
+
+export type InteractionMode = 'touch' | 'mouse' | 'keyboard';
+
+export interface SupportEvent {
+  level: number; // 1, 2, 3
+  type: string;
+  timestampSeconds?: number;
+  deliveredAt?: string;
+}
+
+export interface InstructionEvent {
+  action: string;
+  timestampSeconds?: number;
+  occurredAt?: string;
+}
+
+export interface RevisionEvent {
+  priorResponse?: string | number;
+  newResponse?: string | number;
+  timestampSeconds?: number;
+  revisedAt?: string;
+}
+
+export interface ChildPreferenceChoices {
+  source: 'child';
+  avatarId?: string;
+  soundMode?: string;
+  theme?: string;
+  chosenAt?: string;
+}
+
+export interface ImpsaSummary {
+  status: 'PROVISIONAL' | 'INSUFFICIENT_EVIDENCE';
+  eligibleUnassistedItems: number;
+  skillEvidence?: Array<Record<string, any>>;
+  estimatedProficiency?: number;
+  credibleInterval?: { lower: number; upper: number };
+  uncertaintyNote?: string;
+  evidenceSufficiency: 'SUFFICIENT' | 'INSUFFICIENT';
+}
+
+export interface ImlrSummary {
+  status:
+    | 'TRANSFER_OBSERVED'
+    | 'TRANSFER_NOT_YET_OBSERVED'
+    | 'ALREADY_DEMONSTRATED'
+    | 'INSUFFICIENT_EVIDENCE';
+  conceptId?: string;
+  preProbeCorrect?: boolean;
+  supportDelivered?: string[];
+  unassistedTransferCorrect?: boolean;
+  evidenceLevel: string;
+  uncertaintyNote?: string;
+}
+
 export interface MathItemAnswer {
   questionId: string;
   userAnswer: string | number;
   attempts: number;
-  responseTimeSeconds: number;
+  /** Measured time to the first confirmed response; omitted when not measured (never estimated). */
+  responseTimeSeconds?: number;
   hintUsed: boolean;
+  firstConfirmedResponse?: string | number;
+  isFirstResponseCorrect?: boolean;
+  demonstrationUsed?: boolean;
+  selfCorrectionsCount?: number;
+
+  // Protocol v2 Additive Fields (Optional, backward-compatible)
+  probeRole?: ProbeRole;
+  itemFamilyId?: string;
+  representation?: RepresentationType;
+  supportBeforeFirstResponse?: boolean;
+  supportEvents?: SupportEvent[];
+  instructionEvents?: InstructionEvent[];
+  revisionEvents?: RevisionEvent[];
+  interactionMode?: InteractionMode;
+  dimensionTags?: string[];
+  responseStatus?: 'answered' | 'skipped' | 'not_presented';
+
+  // Interactive onboarding activity metadata (Optional, additive)
+  activityId?: string;
+  conceptId?: string;
+  inputMethod?: 'drag' | 'tap' | 'select';
+  missedDropCount?: number;
+  /** Raw interaction observations (stored only; never scored or interpreted). */
+  interactionObservations?: InteractionObservations;
+}
+
+/**
+ * ONBOARDING-INTERACTION-OBS-v1.0: transparent counts and timestamps for one item, in
+ * milliseconds from item display. Not a measure of attention, impulsivity or ADHD.
+ */
+export interface InteractionObservations {
+  version: string;
+  parameters: { burstMaxGapMs: number; burstMinTaps: number; idleThresholdMs: number; maxEventsPerList: number };
+  observedDurationMs: number;
+  idleTimeBeforeFirstActionMs: number | null;
+  pointerDownCount: number;
+  keyDownCount: number;
+  tapBursts: Array<{ startMs: number; endMs: number; tapCount: number }>;
+  idleIntervals: Array<{ startMs: number; durationMs: number }>;
+  pageEvents: Array<{ type: 'hidden' | 'visible' | 'blur' | 'focus'; atMs: number }>;
+  hiddenDurationMs: number;
+  invalidTapCount: number | null;
+  invalidTaps: Array<{ atMs: number }>;
+  truncated: boolean;
+}
+
+/** Request-level fields sent alongside answers by the interactive onboarding journey. */
+export interface MathSubmissionExtras {
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
+  childPreferences?: ChildPreferenceChoices;
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
+}
+
+export interface MathAssessmentSubmission {
+  version: string;
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
+  grade: number;
+  answers: MathItemAnswer[];
+  childPreferences?: ChildPreferenceChoices;
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
 }
 
 export interface SkillScore {
@@ -85,11 +307,73 @@ export interface SkillScore {
   totalQuestions: number;
   correctQuestions: number;
   accuracyPercentage: number;
-  proficiencyCategory: 'Emerging' | 'Developing' | 'Proficient';
+  proficiencyCategory: 'Emerging' | 'Developing' | 'Proficient' | 'INSUFFICIENT_EVIDENCE';
+}
+
+export interface ElpxCredibleInterval {
+  lower: number;
+  upper: number;
+  confidenceLevel: number;
+}
+
+export interface ElpxSkillEstimate {
+  skillId: string;
+  skillName: string;
+  skillNameSi: string;
+  distinctQuestionsAssessed: number;
+  correctFirstResponses: number;
+  rawAccuracy: number;
+  rawAccuracyPercentage: number;
+  posteriorAlpha: number;
+  posteriorBeta: number;
+  estimatedProficiency: number;
+  estimatedProficiencyPercentage: number;
+  credibleInterval: ElpxCredibleInterval;
+  credibleIntervalWidth: number;
+  posteriorVariance: number;
+  evidenceSufficiency: 'SUFFICIENT' | 'INSUFFICIENT';
+  isEvidenceSufficient: boolean;
+  provisionalSkillLevel: 'INSUFFICIENT_EVIDENCE' | 'EMERGING' | 'DEVELOPING' | 'PROFICIENT';
+  isProvisional: boolean;
+}
+
+export interface ElpxStructuredRecommendation {
+  recommendationId: string;
+  skillId?: string | null;
+  strategyCode: string;
+  reasonCodes: string[];
+  inputEvidenceSummary: Record<string, any>;
+  recommendationRulesetVersion: string;
+  titleEn: string;
+  titleSi: string;
+  descriptionEn: string;
+  descriptionSi: string;
+}
+
+export interface ElpxProfile {
+  learnerId: string;
+  grade: number;
+  profileVersion: string;
+  algorithmVersion: string;
+  recommendationRulesetVersion: string;
+  evidenceStatus: 'SUFFICIENT' | 'INSUFFICIENT';
+  isOverallEvidenceSufficient: boolean;
+  totalDistinctQuestionsEvaluated: number;
+  totalCorrectFirstResponses: number;
+  rawOverallAccuracy: number;
+  skillEstimates: ElpxSkillEstimate[];
+  structuredRecommendations: ElpxStructuredRecommendation[];
+  explanationReasonCodes: string[];
+  learningPreferences?: Record<string, any>;
+  disclaimer: string;
+  lastUpdated: string;
+  mlPrediction?: any;
+  shapValues?: any;
 }
 
 export interface MathAssessmentSummary {
   grade: number;
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
   totalQuestions: number;
   correctAnswers: number;
   accuracyPercentage: number;
@@ -98,8 +382,22 @@ export interface MathAssessmentSummary {
   strengths: string[];
   areasForGrowth: string[];
   recommendations: string[];
+  thresholdVersion?: string;
+  disclaimer?: string;
   mlPredictionNotice: string;
+  elpxProfile?: ElpxProfile;
+  // Protocol v2 Additive Fields (Optional)
+  impsa?: ImpsaSummary;
+  imlr?: ImlrSummary;
+  childPreferences?: ChildPreferenceChoices;
+  evaluatedItems?: any[];
+  excludedItems?: any[];
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
+  evidenceRulesetVersion?: string;
+  evidenceSummary?: any;
 }
+
 
 export interface OnboardingProgress {
   learnerId: string;
@@ -111,8 +409,20 @@ export interface OnboardingProgress {
   snapIvCompleted: boolean;
   socialContextCompleted: boolean;
   mathAssessmentCompleted: boolean;
+  learningPreferences?: LearningPreferencesData;
+  snapIvResponses?: SnapIvItemAnswer[];
+  socialContext?: SocialContextData;
   snapIvSummary?: SnapIvScoreSummary;
   mathSummary?: MathAssessmentSummary;
+  // Protocol v2 Additive Fields (Optional)
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
+  childPreferences?: ChildPreferenceChoices;
+  impsaSummary?: ImpsaSummary;
+  imlrSummary?: ImlrSummary;
+  // Parent-reported ADHD information and optional SNAP-IV status (Optional)
+  adhdInformationCompleted?: boolean;
+  adhdInformation?: AdhdInformationRecord | null;
+  snapIvStatus?: SnapIvStatus;
   updatedAt: string;
 }
 
@@ -121,6 +431,8 @@ export interface OnboardingFullSummary {
   progress: OnboardingProgress;
   learningPreferences?: LearningPreferencesData;
   snapIvSummary?: SnapIvScoreSummary;
+  snapIvStatus?: SnapIvStatus;
+  adhdInformation?: AdhdInformationRecord | null;
   socialContext?: SocialContextData;
   mathSummary?: MathAssessmentSummary;
 }

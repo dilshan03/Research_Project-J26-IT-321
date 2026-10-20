@@ -28,6 +28,7 @@ class AnalysisResponse(BaseModel):
 class BlueprintEnvelope(BaseModel):
     cli_score: float
     raw_sinhala_question: str
+    raw_english_question: Optional[str] = None
     blueprint: GameActivityBlueprint
 
 

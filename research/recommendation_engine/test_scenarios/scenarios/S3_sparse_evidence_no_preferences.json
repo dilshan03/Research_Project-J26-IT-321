@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "MQ-LEARNER-CONTEXT-v0.1",
+  "learnerRef": "SYN-L003",
+  "grade": 3,
+  "notes": {"description": "Sparse evidence (fewer than 3 items per skill); no preferences or social context submitted", "synthetic": true},
+  "mathEvidence": {
+    "provenance": {"source": "assessment", "instrument": "ELP-X-v1.0"},
+    "skills": [
+      {"skillId": "multiplication", "provisionalSkillLevel": "INSUFFICIENT_EVIDENCE", "distinctQuestionsAssessed": 2, "isEvidenceSufficient": false},
+      {"skillId": "fractions", "provisionalSkillLevel": "INSUFFICIENT_EVIDENCE", "distinctQuestionsAssessed": 0, "isEvidenceSufficient": false}
+    ]
+  }
+}

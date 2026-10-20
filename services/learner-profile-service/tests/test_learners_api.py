@@ -284,3 +284,68 @@ async def test_cross_parent_access_forbidden():
         assert res_list_b.status_code == 200
         b_learner_ids = [c["learnerId"] for c in res_list_b.json()["data"]]
         assert parent_a_learner_id not in b_learner_ids
+
+
+@pytest.mark.asyncio
+async def test_age_grade_independence_and_bilingual_comprehension():
+    """
+    Verify:
+    1. Age 10 and Grade 1 is valid, independent, and preserved.
+    2. Bilingual selection supports comprehension levels and primary instruction language.
+    3. Fields persist through create, patch, and get retrieval.
+    """
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        client.cookies.set("mathquest_session", TEST_PARENT_A_SESSION)
+
+        # Create child with Age 10, Grade 1, and Bilingual settings
+        res = await client.post(
+            "/api/v1/learners",
+            json={
+                "firstName": "Kavindu",
+                "preferredName": "Kavi",
+                "age": 10,
+                "grade": 1,
+                "preferredLanguage": "Bilingual",
+                "sinhalaComprehension": "Understands well",
+                "englishComprehension": "Understands basic instructions",
+                "primaryInstructionLanguage": "Sinhala",
+                "avatarId": "avatar_elephant",
+            },
+        )
+        assert res.status_code == 201
+        data = res.json()["data"]
+        learner_id = data["learnerId"]
+
+        # Verify age and grade independence
+        assert data["age"] == 10
+        assert data["grade"] == 1
+        assert data["preferredLanguage"] == "Bilingual"
+        assert data["sinhalaComprehension"] == "Understands well"
+        assert data["englishComprehension"] == "Understands basic instructions"
+        assert data["primaryInstructionLanguage"] == "Sinhala"
+
+        # Verify retrieval preserves all fields
+        res_get = await client.get(f"/api/v1/learners/{learner_id}")
+        assert res_get.status_code == 200
+        retrieved = res_get.json()["data"]
+        assert retrieved["age"] == 10
+        assert retrieved["grade"] == 1
+        assert retrieved["preferredLanguage"] == "Bilingual"
+        assert retrieved["sinhalaComprehension"] == "Understands well"
+        assert retrieved["englishComprehension"] == "Understands basic instructions"
+        assert retrieved["primaryInstructionLanguage"] == "Sinhala"
+
+        # Update comprehension levels and verify persistence
+        res_patch = await client.patch(
+            f"/api/v1/learners/{learner_id}",
+            json={
+                "englishComprehension": "Understands well",
+                "primaryInstructionLanguage": "English",
+            },
+        )
+        assert res_patch.status_code == 200
+        patched = res_patch.json()["data"]
+        assert patched["age"] == 10
+        assert patched["grade"] == 1
+        assert patched["englishComprehension"] == "Understands well"
+        assert patched["primaryInstructionLanguage"] == "English"

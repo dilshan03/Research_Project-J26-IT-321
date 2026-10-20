@@ -1,12 +1,13 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional, List, Dict, Any, Union
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 # --- Step / Status Enums ---
 
 class OnboardingStep(str, Enum):
+    ADHD_INFORMATION = "adhd_information"
     PREFERENCES = "preferences"
     SNAP_IV = "snap_iv"
     SOCIAL_CONTEXT = "social_context"
@@ -19,6 +20,48 @@ class StepStatus(str, Enum):
     NOT_STARTED = "NOT_STARTED"
     IN_PROGRESS = "IN_PROGRESS"
     COMPLETED = "COMPLETED"
+
+
+# --- Protocol Versioning & Multi-Phase Assessment Enums ---
+
+class AssessmentProtocolVersion(str, Enum):
+    V1 = "onboarding-v1"
+    V2 = "onboarding-v2"
+
+
+class ProbeRole(str, Enum):
+    CALIBRATION = "calibration"
+    PRE = "pre"
+    SUPPORT = "support"
+    TRANSFER = "transfer"
+    REPRESENTATION = "representation"
+
+
+class RepresentationType(str, Enum):
+    CONCRETE = "concrete"
+    PICTORIAL = "pictorial"
+    VISUAL = "visual"
+    SYMBOLIC = "symbolic"
+    VERBAL = "verbal"
+
+
+class InteractionMode(str, Enum):
+    TOUCH = "touch"
+    MOUSE = "mouse"
+    KEYBOARD = "keyboard"
+
+
+class InputMethod(str, Enum):
+    DRAG = "drag"
+    TAP = "tap"
+    SELECT = "select"
+
+
+class ClientResponseStatus(str, Enum):
+    """Optional client declaration of whether an item was actually answered."""
+    ANSWERED = "answered"
+    SKIPPED = "skipped"
+    NOT_PRESENTED = "not_presented"
 
 
 # --- 1. Learning Preferences ---
@@ -48,7 +91,91 @@ class LearningPreferencesRequest(BaseModel):
     additionalNotes: Optional[str] = Field(None, max_length=500)
 
 
-# --- 2. SNAP-IV 18-Item Questionnaire ---
+# --- 2. Child-Expressed Preferences (Source Attribution: Child) ---
+
+class ChildPreferenceChoices(BaseModel):
+    """
+    Child-expressed preferences captured directly from the child.
+    Requirement: Explicitly record that the source is strictly 'child'.
+    """
+    source: str = Field(default="child", description="Explicit source attribution, strictly 'child'")
+    avatarId: Optional[str] = Field(None, description="Child-chosen companion avatar identifier")
+    soundMode: Optional[str] = Field(None, description="Child-chosen sound mode: gentle, quiet, off")
+    theme: Optional[str] = Field(None, description="Child-chosen visual theme (e.g., 'watercolor_island')")
+    chosenAt: Optional[datetime] = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
+        description="Timestamp when child made the preference choices"
+    )
+
+    @field_validator("source")
+    @classmethod
+    def validate_source_is_child(cls, v: str) -> str:
+        if not v or v.strip().lower() != "child":
+            raise ValueError("ChildPreferenceChoices source must strictly be 'child'")
+        return "child"
+
+
+# --- 2b. Parent-Reported ADHD Information ---
+# A parent's report of a diagnosis made by a healthcare professional. It is never verified
+# by MathQuest, never inferred from SNAP-IV or gameplay, and kept separate from:
+#   - SNAP-IV screening observations (parent questionnaire),
+#   - gameplay behaviour observations (Behaviour Signal component),
+#   - mathematics assessment evidence.
+
+ADHD_INFORMATION_VERSION = "ADHD-INFO-v1.0"
+
+
+class AdhdDiagnosisStatus(str, Enum):
+    YES = "yes"
+    NO = "no"
+    NOT_SURE = "not_sure"
+    PREFER_NOT_TO_SAY = "prefer_not_to_say"
+
+
+class AdhdReportedPresentation(str, Enum):
+    PREDOMINANTLY_INATTENTIVE = "predominantly_inattentive"
+    PREDOMINANTLY_HYPERACTIVE_IMPULSIVE = "predominantly_hyperactive_impulsive"
+    COMBINED = "combined"
+    NOT_SPECIFIED = "not_specified"
+
+
+class AdhdInformationRequest(BaseModel):
+    version: str = Field(default=ADHD_INFORMATION_VERSION, description="ADHD information form version")
+    diagnosisStatus: AdhdDiagnosisStatus = Field(
+        ...,
+        description="Parent answer: has a qualified healthcare professional diagnosed ADHD?"
+    )
+    reportedPresentation: Optional[AdhdReportedPresentation] = Field(
+        default=None,
+        description="Presentation reported by the professional. Required when diagnosisStatus is 'yes'; not allowed otherwise."
+    )
+    diagnosisReportedMonth: Optional[str] = Field(
+        default=None,
+        pattern=r"^\d{4}-(0[1-9]|1[0-2])$",
+        description="Optional month (YYYY-MM) the diagnosis was reported. Only allowed when diagnosisStatus is 'yes'."
+    )
+
+    @model_validator(mode="after")
+    def validate_consistency(self) -> "AdhdInformationRequest":
+        if self.diagnosisStatus == AdhdDiagnosisStatus.YES:
+            if self.reportedPresentation is None:
+                raise ValueError(
+                    "reportedPresentation is required when diagnosisStatus is 'yes' (use 'not_specified' if unknown)."
+                )
+        elif self.reportedPresentation is not None or self.diagnosisReportedMonth is not None:
+            raise ValueError(
+                "reportedPresentation and diagnosisReportedMonth can only be provided when diagnosisStatus is 'yes'."
+            )
+
+        if self.diagnosisReportedMonth:
+            year, month = (int(part) for part in self.diagnosisReportedMonth.split("-"))
+            now = datetime.now(timezone.utc)
+            if year < 2000 or (year, month) > (now.year, now.month):
+                raise ValueError("diagnosisReportedMonth must be between 2000-01 and the current month.")
+        return self
+
+
+# --- 3. SNAP-IV 18-Item Questionnaire ---
 
 class SnapIvItemResponse(BaseModel):
     itemId: int = Field(..., ge=1, le=18, description="SNAP-IV item index 1-18")
@@ -99,7 +226,7 @@ class SnapIvScoreSummary(BaseModel):
     )
 
 
-# --- 3. Social Learning Context ---
+# --- 4. Social Learning Context ---
 
 class SocialContextRequest(BaseModel):
     version: str = Field(default="SOCIAL-CONTEXT-v1.0")
@@ -122,7 +249,90 @@ class SocialContextRequest(BaseModel):
     optionalNotes: Optional[str] = Field(None, max_length=500)
 
 
-# --- 4. Mathematics Question & Assessment ---
+# --- 5. Event Evidence Schemas (Support, Instruction, Revision) ---
+
+class SupportEvent(BaseModel):
+    level: int = Field(..., ge=1, le=3, description="Support scaffold level (1=clarify, 2=visual cue, 3=worked demonstration)")
+    type: str = Field(..., description="Description or code of scaffold delivered (e.g., 'clarification', 'visual_cue', 'worked_demonstration')")
+    timestampSeconds: Optional[float] = Field(None, ge=0.0, description="Offset in seconds from item start")
+    deliveredAt: Optional[datetime] = None
+
+
+class InstructionEvent(BaseModel):
+    action: str = Field(..., description="Action type: delivered, replayed, clarified, audio_toggled")
+    timestampSeconds: Optional[float] = Field(None, ge=0.0, description="Offset in seconds from item start")
+    occurredAt: Optional[datetime] = None
+
+
+class RevisionEvent(BaseModel):
+    priorResponse: Optional[Union[str, int, float]] = None
+    newResponse: Optional[Union[str, int, float]] = None
+    timestampSeconds: Optional[float] = Field(None, ge=0.0, description="Offset in seconds from item start")
+    revisedAt: Optional[datetime] = None
+
+
+# --- 5b. Raw interaction observations (ONBOARDING-INTERACTION-OBS-v1.0) ---
+# Transparent counts and timestamps recorded during one onboarding item. They are stored as
+# observations only: never used for mathematical correctness, IMPSA, IMLR or ELP-X, and never
+# interpreted as attention, impulsivity or ADHD indicators. Times are milliseconds from item display.
+
+INTERACTION_OBSERVATION_VERSION = "ONBOARDING-INTERACTION-OBS-v1.0"
+MAX_OBSERVATION_EVENTS = 50
+
+
+class ObservationParameters(BaseModel):
+    burstMaxGapMs: float = Field(..., gt=0, description="Max gap between taps counted in one burst")
+    burstMinTaps: int = Field(..., ge=2, description="Minimum taps for a burst to be recorded")
+    idleThresholdMs: float = Field(..., gt=0, description="Minimum gap without interaction recorded as idle")
+    maxEventsPerList: int = Field(..., ge=1)
+
+
+class TapBurst(BaseModel):
+    startMs: float = Field(..., ge=0)
+    endMs: float = Field(..., ge=0)
+    tapCount: int = Field(..., ge=2)
+
+
+class IdleInterval(BaseModel):
+    startMs: float = Field(..., ge=0)
+    durationMs: float = Field(..., ge=0)
+
+
+class PageEventType(str, Enum):
+    HIDDEN = "hidden"
+    VISIBLE = "visible"
+    BLUR = "blur"
+    FOCUS = "focus"
+
+
+class PageEvent(BaseModel):
+    type: PageEventType
+    atMs: float = Field(..., ge=0)
+
+
+class InvalidTap(BaseModel):
+    atMs: float = Field(..., ge=0)
+
+
+class InteractionObservations(BaseModel):
+    version: str = Field(default=INTERACTION_OBSERVATION_VERSION)
+    parameters: Optional[ObservationParameters] = None
+    observedDurationMs: Optional[float] = Field(default=None, ge=0)
+    idleTimeBeforeFirstActionMs: Optional[float] = Field(
+        default=None, ge=0, description="Item display to first pointer/key interaction; null if none occurred"
+    )
+    pointerDownCount: int = Field(default=0, ge=0)
+    keyDownCount: int = Field(default=0, ge=0)
+    tapBursts: List[TapBurst] = Field(default_factory=list, max_length=MAX_OBSERVATION_EVENTS)
+    idleIntervals: List[IdleInterval] = Field(default_factory=list, max_length=MAX_OBSERVATION_EVENTS)
+    pageEvents: List[PageEvent] = Field(default_factory=list, max_length=MAX_OBSERVATION_EVENTS)
+    hiddenDurationMs: Optional[float] = Field(default=None, ge=0)
+    invalidTapCount: Optional[int] = Field(default=None, ge=0, description="Null when not measurable")
+    invalidTaps: List[InvalidTap] = Field(default_factory=list, max_length=MAX_OBSERVATION_EVENTS)
+    truncated: bool = Field(default=False, description="True if any event list hit the client cap")
+
+
+# --- 6. Mathematics Question & Assessment ---
 
 class QuestionType(str, Enum):
     MULTIPLE_CHOICE = "multiple_choice"
@@ -159,12 +369,87 @@ class MathItemAnswerSubmission(BaseModel):
     attempts: int = Field(default=1, ge=1)
     responseTimeSeconds: float = Field(default=0.0, ge=0.0)
     hintUsed: bool = Field(default=False)
+    # Valid assessment evidence tracking
+    firstConfirmedResponse: Optional[Union[str, int, float]] = None
+    isFirstResponseCorrect: Optional[bool] = None
+    demonstrationUsed: Optional[bool] = False
+    selfCorrectionsCount: Optional[int] = 0
+
+    # --- Protocol v2 Additive Fields (Optional, backward-compatible) ---
+    probeRole: Optional[ProbeRole] = Field(
+        default=None,
+        description="Role in multi-phase protocol: calibration, pre, support, transfer, representation"
+    )
+    itemFamilyId: Optional[str] = Field(
+        default=None,
+        description="Identifier linking isomorphic problem sets across representations or dynamic probes"
+    )
+    representation: Optional[RepresentationType] = Field(
+        default=None,
+        description="Item representation format: concrete, pictorial, visual, symbolic, verbal"
+    )
+    supportBeforeFirstResponse: Optional[bool] = Field(
+        default=False,
+        description="Whether hints, prompts, or demonstrations were accessed before the first confirmed response"
+    )
+    supportEvents: Optional[List[SupportEvent]] = Field(
+        default_factory=list,
+        description="Ordered sequence of scaffolding interventions delivered during item"
+    )
+    instructionEvents: Optional[List[InstructionEvent]] = Field(
+        default_factory=list,
+        description="Instruction delivery and audio replay events"
+    )
+    revisionEvents: Optional[List[RevisionEvent]] = Field(
+        default_factory=list,
+        description="Pre-confirmation adjustments and strategy changes"
+    )
+    interactionMode: Optional[InteractionMode] = Field(
+        default=None,
+        description="Input modality: touch, mouse, keyboard"
+    )
+    dimensionTags: Optional[List[str]] = Field(
+        default_factory=list,
+        description="Observable dimension tags addressed: MP, IC, SR, RU, SC, IA, CP"
+    )
+    responseStatus: Optional[ClientResponseStatus] = Field(
+        default=None,
+        description=(
+            "Optional declaration for items without an answer: 'skipped' (shown, not answered) "
+            "or 'not_presented' (never shown). Omitted answers are recorded as unanswered."
+        )
+    )
+    # Interactive onboarding activity metadata (Optional, additive)
+    activityId: Optional[str] = Field(default=None, max_length=80, description="Onboarding activity identifier")
+    conceptId: Optional[str] = Field(default=None, max_length=80, description="Mathematical concept identifier")
+    inputMethod: Optional[InputMethod] = Field(
+        default=None,
+        description="How the confirmed answer was produced: drag, tap (tap-to-place alternative) or select"
+    )
+    missedDropCount: Optional[int] = Field(
+        default=None, ge=0,
+        description="Objects released outside a target (interface usability evidence, not a maths or attention measure)"
+    )
+    interactionObservations: Optional[InteractionObservations] = Field(
+        default=None,
+        description="Raw interaction observations (ONBOARDING-INTERACTION-OBS-v1.0); stored only, never scored"
+    )
 
 
 class MathAssessmentSubmissionRequest(BaseModel):
     version: str = Field(default="MATH-QB-v1.0")
+    assessmentProtocolVersion: Optional[str] = Field(
+        default=AssessmentProtocolVersion.V1.value,
+        description="Assessment protocol version: 'onboarding-v1' (default) or 'onboarding-v2'"
+    )
     grade: int = Field(..., ge=1, le=5)
     answers: List[MathItemAnswerSubmission] = Field(..., min_length=1)
+    childPreferences: Optional[ChildPreferenceChoices] = Field(
+        default=None,
+        description="Child-expressed preferences recorded with source='child'"
+    )
+    sessionStartedAt: Optional[datetime] = Field(default=None, description="When the child activity journey started")
+    sessionEndedAt: Optional[datetime] = Field(default=None, description="When the child activity journey ended")
 
 
 class SkillScore(BaseModel):
@@ -175,12 +460,76 @@ class SkillScore(BaseModel):
     correctQuestions: int
     accuracyPercentage: float
     proficiencyCategory: str = Field(
-        description="Provisional descriptive category: 'Emerging' (<50%), 'Developing' (50-79%), 'Proficient' (>=80%)"
+        description="Provisional descriptive category: 'Emerging' (0-49%), 'Developing' (50-79%), 'Proficient' (80-100%), or 'INSUFFICIENT_EVIDENCE' (<3 questions)"
+    )
+
+
+# --- 7. Provisional IMPSA and IMLR Summary Schemas ---
+
+class ImpsaSummary(BaseModel):
+    """
+    Provisional Independent Mathematical Problem-Solving Ability summary.
+    Evaluated strictly on eligible, unassisted first attempts before hints/demonstrations.
+    """
+    status: str = Field(
+        default="INSUFFICIENT_EVIDENCE",
+        description="Status: 'PROVISIONAL', 'INSUFFICIENT_EVIDENCE'"
+    )
+    eligibleUnassistedItems: int = Field(
+        default=0,
+        ge=0,
+        description="Count of items completed without any assistance prior to first response"
+    )
+    skillEvidence: Optional[List[Dict[str, Any]]] = Field(
+        default_factory=list,
+        description="Item and concept level unassisted performance evidence"
+    )
+    estimatedProficiency: Optional[float] = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="Provisional unassisted proficiency estimate (0.00 - 1.00)"
+    )
+    credibleInterval: Optional[Dict[str, float]] = Field(
+        default=None,
+        description="Bayesian credible interval bounds {'lower': float, 'upper': float}"
+    )
+    uncertaintyNote: Optional[str] = Field(
+        default="Provisional estimate based on brief intake. Revise after continuous gameplay observations.",
+        description="Epistemic uncertainty advisory"
+    )
+    evidenceSufficiency: str = Field(
+        default="INSUFFICIENT",
+        description="'SUFFICIENT' if eligible items >= 3, else 'INSUFFICIENT'"
+    )
+
+
+class ImlrSummary(BaseModel):
+    """
+    Provisional Independent Mathematical Learning Readiness summary.
+    Captures responsiveness to scaffolding and subsequent unassisted transfer.
+    """
+    status: str = Field(
+        default="INSUFFICIENT_EVIDENCE",
+        description="'TRANSFER_OBSERVED', 'TRANSFER_NOT_YET_OBSERVED', 'ALREADY_DEMONSTRATED', or 'INSUFFICIENT_EVIDENCE'"
+    )
+    conceptId: Optional[str] = Field(None, description="Target mathematical concept probed")
+    preProbeCorrect: Optional[bool] = Field(None, description="Outcome of unassisted pre-probe")
+    supportDelivered: Optional[List[str]] = Field(default_factory=list, description="List of scaffold steps provided")
+    unassistedTransferCorrect: Optional[bool] = Field(None, description="Outcome of unassisted transfer item")
+    evidenceLevel: str = Field(default="PROVISIONAL", description="'PROVISIONAL' or 'INSUFFICIENT'")
+    uncertaintyNote: Optional[str] = Field(
+        default="Initial transfer indicator from a single probe; does not certify durable learning gain.",
+        description="Dynamic assessment uncertainty guidance"
     )
 
 
 class MathAssessmentSummary(BaseModel):
     grade: int
+    assessmentProtocolVersion: Optional[str] = Field(
+        default=AssessmentProtocolVersion.V1.value,
+        description="Assessment protocol version used for evaluation"
+    )
     totalQuestions: int
     correctAnswers: int
     accuracyPercentage: float
@@ -191,12 +540,52 @@ class MathAssessmentSummary(BaseModel):
     strengths: List[str]
     areasForGrowth: List[str]
     recommendations: List[str]
+    thresholdVersion: Optional[str] = Field(default="PROV-THRESH-v1.0")
+    disclaimer: Optional[str] = Field(
+        default="Provisional demonstration thresholds for prototype formative feedback only. Not validated mathematics mastery standards."
+    )
     mlPredictionNotice: str = Field(
         default="Baseline derived via transparent pedagogical rules. Machine Learning / SHAP predictions will integrate when model service is attached."
     )
+    elpxProfile: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Versioned ELP-X evidence-aware proficiency estimates and explainable recommendations"
+    )
+    # Protocol v2 Additive Summaries (Optional)
+    impsa: Optional[ImpsaSummary] = Field(
+        default=None,
+        description="Provisional Independent Mathematical Problem-Solving Ability summary"
+    )
+    imlr: Optional[ImlrSummary] = Field(
+        default=None,
+        description="Provisional Independent Mathematical Learning Readiness summary"
+    )
+    childPreferences: Optional[ChildPreferenceChoices] = Field(
+        default=None,
+        description="Child-expressed preferences recorded with source='child'"
+    )
+    # Evidence-integrity additive fields (Optional)
+    evidenceRulesetVersion: Optional[str] = Field(
+        default=None,
+        description="Version of the server-side assessment evidence rules applied"
+    )
+    evidenceSummary: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Counts of answered, unanswered, skipped, invalid and excluded items, and evidence-quality flags"
+    )
+    evaluatedItems: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description="Detailed evaluated item records (ASSESS-EVIDENCE-v1.0)"
+    )
+    excludedItems: Optional[List[Dict[str, Any]]] = Field(
+        default=None,
+        description="Detailed excluded item records (ASSESS-EVIDENCE-v1.0)"
+    )
+    sessionStartedAt: Optional[Union[datetime, str]] = Field(default=None)
+    sessionEndedAt: Optional[Union[datetime, str]] = Field(default=None)
 
 
-# --- Onboarding State & Aggregated Summary ---
+# --- 8. Onboarding State & Aggregated Summary ---
 
 class OnboardingProgressResponse(BaseModel):
     learnerId: str
@@ -208,8 +597,35 @@ class OnboardingProgressResponse(BaseModel):
     snapIvCompleted: bool
     socialContextCompleted: bool
     mathAssessmentCompleted: bool
+    learningPreferences: Optional[Dict[str, Any]] = None
+    snapIvResponses: Optional[List[Dict[str, Any]]] = None
+    socialContext: Optional[Dict[str, Any]] = None
     snapIvSummary: Optional[SnapIvScoreSummary] = None
     mathSummary: Optional[MathAssessmentSummary] = None
+    # Protocol v2 Additive Fields (Optional)
+    assessmentProtocolVersion: Optional[str] = Field(
+        default=None,
+        description="Protocol version active for onboarding"
+    )
+    childPreferences: Optional[ChildPreferenceChoices] = Field(
+        default=None,
+        description="Child-expressed preferences if captured"
+    )
+    impsaSummary: Optional[ImpsaSummary] = Field(
+        default=None,
+        description="Provisional IMPSA output if protocol v2 was completed"
+    )
+    imlrSummary: Optional[ImlrSummary] = Field(
+        default=None,
+        description="Provisional IMLR output if protocol v2 was completed"
+    )
+    # Parent-reported ADHD information and optional SNAP-IV status (Optional, additive)
+    adhdInformationCompleted: Optional[bool] = None
+    adhdInformation: Optional[Dict[str, Any]] = None
+    snapIvStatus: Optional[str] = Field(
+        default=None,
+        description="'COMPLETED', 'SKIPPED' or 'NOT_STARTED'. SNAP-IV is optional."
+    )
     updatedAt: str
 
 
@@ -217,3 +633,4 @@ class OnboardingApiResponse(BaseModel):
     success: bool = True
     message: str = "Operation completed successfully."
     data: Optional[Any] = None
+

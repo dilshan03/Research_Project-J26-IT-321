@@ -11,10 +11,9 @@ if ROOT_ENV.exists():
 else:
     load_dotenv()
 
-MONGODB_URI = os.getenv(
-    "MONGODB_URI",
-    "mongodb+srv://mathquest_app:Test123456@mathquest-cluster.kaofydq.mongodb.net/?appName=mathquest-cluster"
-)
+# No fallback: the URI must come from the environment / root .env.
+# When missing, connect_to_database() refuses to connect and health checks report it.
+MONGODB_URI = os.getenv("MONGODB_URI", "")
 MONGODB_DB_NAME = os.getenv("MONGODB_DB_NAME", "mathquest_db")
 PORT = int(os.getenv("LEARNER_PROFILE_PORT", os.getenv("PORT", "5001")))
 CORS_ORIGINS = [

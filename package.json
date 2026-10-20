@@ -1,0 +1,12 @@
+{
+  "name": "Research_Project-J26-IT-321",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MathQuest Adaptive Learning Platform for ADHD Learners",
+  "scripts": {
+    "dev": "node start-all.js",
+    "start": "node start-all.js",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
+  }
+}

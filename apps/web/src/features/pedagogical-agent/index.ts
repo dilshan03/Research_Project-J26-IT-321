@@ -4,6 +4,7 @@ export { HintBoard } from './components/HintBoard';
 export { PedagogicalCompanion } from './components/PedagogicalCompanion';
 export { PedagogicalPracticeArena } from './components/PedagogicalPracticeArena';
 export { LearnerStateHUD } from './components/LearnerStateHUD';
+export { DetailsForParent } from './components/DetailsForParent';
 export { AgentDevPanel } from './components/dev/AgentDevPanel';
 export { usePedagogicalAgent } from './hooks/usePedagogicalAgent';
 export { useInteractionLogger } from './hooks/useInteractionLogger';

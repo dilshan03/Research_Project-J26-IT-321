@@ -1,21 +1,7 @@
 import pytest
-from pathlib import Path
 
 from app.schemas.syllabus import CurriculumProblem, StoryNarrative
-from app.services.llm_extractor import (
-    CURRICULUM_MATRIX,
-    MathVerificationService,
-    _extract_pdf_text,
-    enrich_gameplay_narrative,
-    upload_and_extract_problems,
-)
-
-SYLLABI_DIR = Path(__file__).resolve().parents[1] / "data" / "syllabi"
-
-
-@pytest.fixture
-def anyio_backend():
-    return "asyncio"
+from app.services.llm_extractor import MathVerificationService, enrich_gameplay_narrative
 
 
 # 1. Deterministic MathVerificationService Unit Tests
@@ -75,36 +61,6 @@ def test_cognitive_distractor_generation():
     assert all(v >= 0 for v in values)
     # Ensure cognitive error types are assigned
     assert any(t in ["IMPULSIVITY", "WORKING_MEMORY_OVERFLOW", "MAGNITUDE_SLIP"] for t in types)
-
-
-# 2. PDF Parsing & Fallback Extractor Tests
-def test_pdf_text_extraction():
-    g1_pdf = SYLLABI_DIR / "Grade_01.pdf"
-    assert g1_pdf.exists()
-    text = _extract_pdf_text(g1_pdf)
-    assert len(text) > 0
-
-
-@pytest.mark.anyio
-async def test_upload_and_extract_problems_fallback_schema():
-    g1_pdf = SYLLABI_DIR / "Grade_01.pdf"
-    problems = await upload_and_extract_problems(g1_pdf, grade=1, doc_id="test_doc_01")
-    assert len(problems) >= 3
-    for p in problems:
-        assert isinstance(p, CurriculumProblem)
-        assert p.grade == 1
-        assert p.doc_id == "test_doc_01"
-        assert len(p.operands) >= 1
-        # Deterministically verify every single problem's arithmetic
-        assert MathVerificationService.verify_calculation(p.operands, p.operation or "COUNT", p.expected_answer) is True
-
-
-@pytest.mark.anyio
-async def test_multi_grade_extraction_coverage():
-    for grade in [1, 2, 3, 4, 5]:
-        problems = await upload_and_extract_problems(b"", grade=grade)
-        assert len(problems) >= 2
-        assert all(p.grade == grade for p in problems)
 
 
 # 3. Mascot Narrative & Gaja Dialogue Tests

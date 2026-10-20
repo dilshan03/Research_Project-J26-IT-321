@@ -10,6 +10,8 @@ import {
 interface GajaProps {
   mood: Mood;
   line?: Line | null;
+  /** Changes on every utterance so a repeated line still re-animates the bubble. */
+  lineKey?: number;
   lang: Lang;
   calm: boolean;
   size?: 'md' | 'lg';
@@ -51,6 +53,7 @@ const ARCHETYPE_EMOJI: Record<string, string> = {
 export function Gaja({
   mood,
   line,
+  lineKey = 0,
   lang,
   calm,
   size = 'md',
@@ -59,18 +62,21 @@ export function Gaja({
   const isLg = size === 'lg';
   const dim = isLg ? 'w-60 h-60 md:w-72 md:h-72' : 'w-36 h-36 md:w-44 md:h-44';
   const aura = AURA_OPTIONS.find((a: AuraOption) => a.id === companionConfig.aura) || AURA_OPTIONS[0];
+  const celebrating = mood === 'celebrate' && !calm;
 
+  // Celebrate is a short burst (3 hops) that settles, not an endless frantic loop;
+  // otherwise a slow idle float. Calm mode stays still.
   const bounceVariants = calm
-    ? { y: 0 }
-    : mood === 'celebrate'
+    ? { y: 0, scale: 1 }
+    : celebrating
     ? { y: [0, -20, 0], scale: [1, 1.04, 1] }
-    : { y: [0, -6, 0] };
+    : { y: [0, -6, 0], scale: 1 };
 
-  const bounceTransition = {
-    duration: mood === 'celebrate' ? 0.6 : 3,
-    repeat: Infinity,
-    ease: 'easeInOut' as const,
-  };
+  const bounceTransition = celebrating
+    ? { duration: 0.6, repeat: 2, ease: 'easeInOut' as const }
+    : { duration: 3, repeat: Infinity, ease: 'easeInOut' as const };
+
+  const accessoryTransition = { duration: 0.6, repeat: 2 };
 
   const isBaseElephant = companionConfig.archetype === 'gaja';
 
@@ -125,8 +131,8 @@ export function Gaja({
               className={`absolute bottom-1 z-10 flex items-center justify-center drop-shadow-md ${
                 isLg ? 'text-5xl' : 'text-3xl'
               }`}
-              animate={mood === 'celebrate' ? { scale: [1, 1.1, 1] } : {}}
-              transition={{ duration: 0.6, repeat: Infinity }}
+              animate={celebrating ? { scale: [1, 1.1, 1] } : { scale: 1 }}
+              transition={accessoryTransition}
             >
               <span>{OUTFIT_ICONS[companionConfig.outfit]}</span>
             </motion.div>
@@ -141,8 +147,8 @@ export function Gaja({
               style={{
                 filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
               }}
-              animate={mood === 'celebrate' ? { rotate: [-5, 5, -5] } : {}}
-              transition={{ duration: 0.6, repeat: Infinity }}
+              animate={celebrating ? { rotate: [0, -5, 5, 0] } : { rotate: 0 }}
+              transition={accessoryTransition}
             >
               <span>{EYEWEAR_ICONS[companionConfig.eyewear]}</span>
             </motion.div>
@@ -156,15 +162,17 @@ export function Gaja({
               isLg ? '-top-10 text-6xl' : '-top-6 text-4xl'
             }`}
             animate={
-              mood === 'celebrate'
-                ? { y: [0, -8, 0], rotate: [-8, 8, -8] }
-                : { y: [0, -2, 0] }
+              calm
+                ? { y: 0, rotate: 0 }
+                : celebrating
+                ? { y: [0, -8, 0], rotate: [0, -8, 8, 0] }
+                : { y: [0, -2, 0], rotate: 0 }
             }
-            transition={{
-              duration: mood === 'celebrate' ? 0.6 : 2.5,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+            transition={
+              celebrating
+                ? { ...accessoryTransition, ease: 'easeInOut' }
+                : { duration: 2.5, repeat: Infinity, ease: 'easeInOut' }
+            }
           >
             <span>{HEADWEAR_ICONS[companionConfig.headwear]}</span>
           </motion.div>
@@ -175,7 +183,7 @@ export function Gaja({
       <AnimatePresence mode="wait">
         {line && (
           <motion.div
-            key={`${line.en}-${lang}`}
+            key={`${lineKey}-${lang}`}
             role="status"
             aria-live="polite"
             initial={{ opacity: 0, y: 10, scale: 0.9 }}

@@ -6,6 +6,7 @@ import { AuthInput } from '../components/AuthInput';
 import { PasswordInput } from '../components/PasswordInput';
 import { authService } from '../services/authService';
 import { useAuth } from '../hooks/useAuth';
+import { dashboardPathFor } from '../roleRoutes';
 
 export const SignInPage: React.FC = () => {
   const navigate = useNavigate();
@@ -58,20 +59,21 @@ export const SignInPage: React.FC = () => {
       setSuccessMessage('Sign in successful. Redirecting...');
       setTimeout(() => {
         navigate('/');
-      }, 1000);
+      }, 700);
     } else if (response.success) {
       const userEmail = email.trim();
       const userName = userEmail.split('@')[0];
-      login({
+      const fallbackUser = {
         id: '',
         fullName: userName.charAt(0).toUpperCase() + userName.slice(1),
         email: userEmail,
-        role: 'parent',
-      });
+        role: 'parent' as const,
+      };
+      login(fallbackUser);
       setSuccessMessage('Sign in successful. Redirecting...');
       setTimeout(() => {
         navigate('/');
-      }, 1000);
+      }, 700);
     } else {
       setGlobalError(
         response.error?.message || response.message || 'Sign in failed. Please try again.'

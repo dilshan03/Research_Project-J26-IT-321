@@ -10,28 +10,13 @@ import { AVATAR_OPTIONS } from '../types';
 import type { ElpxProfile, SnapIvStatus } from '../types/onboarding';
 import { LearnerModal } from '../components/LearnerModal';
 import { setActiveStudentProfile } from '../utils/activeStudentStorage';
+import { readRememberedChild, rememberChild } from '../utils/rememberedChild';
 import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
 import { parentText } from '../../../shared/i18n/parentText';
 
 const t = parentText.overview;
 const levelText = parentText.skills.level;
 
-// Only the learner ID is remembered (per browser), never any learning data.
-const SELECTED_CHILD_KEY = 'mathquest.parent.selectedLearnerId';
-const readRememberedChild = (): string | null => {
-  try {
-    return window.localStorage.getItem(SELECTED_CHILD_KEY);
-  } catch {
-    return null;
-  }
-};
-const rememberChild = (learnerId: string) => {
-  try {
-    window.localStorage.setItem(SELECTED_CHILD_KEY, learnerId);
-  } catch {
-    // Storage unavailable (private mode etc.): selection still works for this visit.
-  }
-};
 
 const avatarOf = (child: Learner) => AVATAR_OPTIONS.find((a) => a.id === child.avatarId) || AVATAR_OPTIONS[0];
 const nameOf = (child: Learner) => child.preferredName || child.firstName;
@@ -384,9 +369,8 @@ export const ParentOverviewPage: React.FC = () => {
                   </>
                 )}
                 {snapIvStatus && (
-                  <Link to={`/learners/${selectedChild.learnerId}/snap-iv`} className="inline-flex items-center gap-1 min-h-[44px] px-3 rounded-xl text-base font-semibold text-mq-text hover:bg-mq-surface-soft">
-                    <span>{t.linkSnap}</span>
-                    {snapIvStatus === 'COMPLETED' && <CheckCircle2 size={16} className="text-mq-success" />}
+                  <Link to="/parent/dashboard/support-info" className="inline-flex items-center gap-1 min-h-[44px] px-3 rounded-xl text-base font-semibold text-mq-text hover:bg-mq-surface-soft">
+                    <span>{parentText.nav.supportInfo}</span>
                     <ChevronRight size={16} />
                   </Link>
                 )}

@@ -14,6 +14,7 @@ import {
   OnboardingPlaceholderPage,
   ParentOverviewPage,
   ParentSnapIvPage,
+  ParentSupportInfoPage,
   ParentLearnerProfilesPage,
   ParentAssessmentsPage,
   ParentRecommendationsPage,
@@ -189,6 +190,9 @@ function App() {
 
             {/* 8. Behaviour Insights (Behaviour Monitoring) */}
             <Route path="behaviour" element={<ParentComingSoonPage feature="behaviour" />} />
+
+            {/* Parent-reported ADHD information and SNAP-IV history */}
+            <Route path="support-info" element={<ParentSupportInfoPage />} />
 
             {/* 9. Settings (Reuses User Profile) */}
             <Route path="settings" element={<UserProfilePage hideNavbar={true} />} />

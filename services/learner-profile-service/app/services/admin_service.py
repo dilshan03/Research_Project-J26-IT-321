@@ -31,7 +31,9 @@ from app.services.evidence_service import get_learner_elpx_profile
 logger = logging.getLogger("learner_profile.admin_service")
 
 USER_FIELDS = ("fullName", "email", "role", "username", "createdAt", "updatedAt", "lastLoginAt")
-SENSITIVE_QUESTIONNAIRE_FIELDS = ("adhdInformation", "snapIv")
+SENSITIVE_QUESTIONNAIRE_FIELDS = ("adhdInformation", "snapIv", "snapIvHistory")
+# Medication information is no longer collected; any record saved earlier is never returned.
+WITHDRAWN_QUESTIONNAIRE_FIELDS = ("medicationInformation",)
 MAX_LIST = 500
 MAX_EVENTS = 50
 
@@ -188,7 +190,10 @@ async def get_learner_detail(admin: Dict[str, Any], learner_id: str, include_sen
     except HTTPException as exc:
         elpx_profile = {"unavailable": exc.detail}
 
-    questionnaires = {k: v for k, v in questionnaire.items() if k not in SENSITIVE_QUESTIONNAIRE_FIELDS}
+    questionnaires = {
+        k: v for k, v in questionnaire.items()
+        if k not in SENSITIVE_QUESTIONNAIRE_FIELDS and k not in WITHDRAWN_QUESTIONNAIRE_FIELDS
+    }
     sensitive = {
         "available": {k: bool(questionnaire.get(k)) for k in SENSITIVE_QUESTIONNAIRE_FIELDS},
         "included": include_sensitive,

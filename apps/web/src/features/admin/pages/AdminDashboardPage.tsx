@@ -251,9 +251,10 @@ const ChildDetail: React.FC<{ learnerId: string; onClose: () => void }> = ({ lea
         {!sens.included ? (
           <div className="flex flex-wrap items-center gap-3">
             <p className="text-xs text-slate-600">
-              Available: ADHD information {sens.available.adhdInformation ? 'yes' : 'no'} • SNAP-IV {sens.available.snapIv ? 'yes' : 'no'}
+              Available: ADHD information {sens.available.adhdInformation ? 'yes' : 'no'} • SNAP-IV{' '}
+              {sens.available.snapIv ? 'yes' : 'no'}
             </p>
-            {(sens.available.adhdInformation || sens.available.snapIv) && (
+            {Object.values(sens.available).some(Boolean) && (
               <button
                 type="button"
                 onClick={() => setIncludeSensitive(true)}
@@ -266,7 +267,8 @@ const ChildDetail: React.FC<{ learnerId: string; onClose: () => void }> = ({ lea
         ) : (
           <div className="space-y-2">
             <JsonBlock label="ADHD information" value={sens.adhdInformation} open />
-            <JsonBlock label="SNAP-IV (responses and scores)" value={sens.snapIv} open />
+            <JsonBlock label="SNAP-IV latest (responses and scores)" value={sens.snapIv} open />
+            <JsonBlock label={`SNAP-IV history (${sens.snapIvHistory?.length ?? 0})`} value={sens.snapIvHistory} />
             <button type="button" onClick={() => setIncludeSensitive(false)} className="text-xs font-semibold text-slate-600 hover:text-slate-900">
               Hide sensitive details
             </button>

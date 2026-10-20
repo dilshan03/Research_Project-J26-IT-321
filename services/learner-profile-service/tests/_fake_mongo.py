@@ -83,3 +83,6 @@ class FakeCollection:
             values = target.setdefault(key, [])
             if value not in values:
                 values.append(value)
+        for key, value in update.get("$push", {}).items():
+            values = target.setdefault(key, [])
+            values.extend(value["$each"] if isinstance(value, dict) and "$each" in value else [value])

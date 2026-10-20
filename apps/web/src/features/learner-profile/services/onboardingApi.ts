@@ -12,6 +12,7 @@ import type {
   MathAssessmentSummary,
   MathSubmissionExtras,
   OnboardingFullSummary,
+  SupportInformation,
 } from '../types/onboarding';
 
 const API_BASE_URL =
@@ -93,6 +94,23 @@ export const onboardingApi = {
       return data;
     } catch {
       return { success: false, message: 'Network error while saving ADHD information.', error: 'NETWORK_ERROR' };
+    }
+  },
+
+  /** ADHD information and SNAP-IV history (dates only). Read-only. */
+  async getSupportInformation(learnerId: string): Promise<OnboardingApiResponse<SupportInformation>> {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/learners/${learnerId}/support-information`, {
+        credentials: 'include',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const detail = typeof data.detail === 'string' ? data.detail : 'Could not load support information.';
+        return { success: false, message: detail, error: detail };
+      }
+      return data;
+    } catch {
+      return { success: false, message: 'Network error while loading support information.', error: 'NETWORK_ERROR' };
     }
   },
 

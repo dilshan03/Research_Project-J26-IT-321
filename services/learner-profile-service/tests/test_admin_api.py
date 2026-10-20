@@ -136,7 +136,8 @@ class TestAdminReads:
         data = (await _get(f"/learners/{LEARNER}")).json()["data"]
         assert "adhdInformation" not in data["questionnaires"] and "snapIv" not in data["questionnaires"]
         assert data["sensitiveParentReports"] == {
-            "available": {"adhdInformation": True, "snapIv": True}, "included": False,
+            "available": {"adhdInformation": True, "snapIv": True, "snapIvHistory": False},
+            "included": False,
         }
         assert data["questionnaires"]["learningPreferences"] == {"visualAssistance": "always"}
         assert data["assessments"][0]["evaluatedItems"][0]["questionId"] == "g1_num_count_01"

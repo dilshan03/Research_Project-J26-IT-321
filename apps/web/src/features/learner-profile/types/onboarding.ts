@@ -63,6 +63,18 @@ export const isAdhdTypeReported = (adhd: AdhdInformationRecord | null | undefine
 
 export type SnapIvStatus = 'COMPLETED' | 'SKIPPED' | 'NOT_STARTED';
 
+/** Parent view of ADHD & support information. SNAP-IV history carries dates only, never scores. */
+export interface SupportInformation {
+  learnerId: string;
+  onboardingStatus: string;
+  adhdInformation: AdhdInformationRecord | null;
+  snapIv: {
+    status: SnapIvStatus;
+    history: Array<{ completedAt: string | null; version?: string }>;
+    notice: string;
+  };
+}
+
 export const ADHD_DIAGNOSIS_STATUS_OPTIONS: Array<{
   value: AdhdDiagnosisStatus;
   labelEn: string;

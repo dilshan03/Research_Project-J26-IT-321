@@ -67,10 +67,11 @@ export interface AdminLearnerDetail {
   onboardingProgress: Json | null;
   questionnaires: Json;
   sensitiveParentReports: {
-    available: { adhdInformation: boolean; snapIv: boolean };
+    available: Record<string, boolean>;
     included: boolean;
     adhdInformation?: Json | null;
     snapIv?: Json | null;
+    snapIvHistory?: Json[] | null;
   };
   assessments: Json[];
   elpxProfile: Json | null;

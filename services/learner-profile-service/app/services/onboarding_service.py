@@ -462,7 +462,15 @@ async def save_snap_iv_questionnaire(
         "savedAt": now,
     }
 
-    # Store in questionnaires collection separately from main profile
+    # `snapIv` keeps the latest submission (unchanged contract); `snapIvHistory` keeps every
+    # submission so repeated questionnaires are never overwritten. A record saved before history
+    # existed is copied into the history first, so nothing is lost.
+    existing = await questionnaires_col.find_one({"learnerId": learner_id}) or {}
+    history_entries = []
+    if existing.get("snapIv") and not existing.get("snapIvHistory"):
+        history_entries.append(existing["snapIv"])
+    history_entries.append(payload)
+
     await questionnaires_col.update_one(
         {"learnerId": learner_id},
         {
@@ -472,6 +480,7 @@ async def save_snap_iv_questionnaire(
                 "snapIv": payload,
                 "updatedAt": now,
             },
+            "$push": {"snapIvHistory": {"$each": history_entries}},
             "$setOnInsert": {"createdAt": now},
         },
         upsert=True

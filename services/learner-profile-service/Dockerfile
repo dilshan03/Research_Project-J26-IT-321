@@ -6,7 +6,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Retries + longer timeout: parallel compose builds share bandwidth and a slow
+# download otherwise aborts pip with exit code 2 (ReadTimeoutError).
+RUN pip install --no-cache-dir --default-timeout=120 --retries 10 -r requirements.txt
 
 COPY . .
 

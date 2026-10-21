@@ -17,6 +17,7 @@ import type {
 } from '../../content-adaptation/types';
 import { useGameplayTracker } from '../../behaviour-monitoring/useGameplayTracker';
 import { Gaja } from '../../content-adaptation/game/Gaja';
+import { SCENES } from '../../content-adaptation/game/gameKit';
 import { PedagogicalCompanion } from './PedagogicalCompanion';
 import { useInteractionLogger } from '../hooks/useInteractionLogger';
 import { useLearnerState } from '../hooks/useLearnerState';
@@ -627,16 +628,42 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
     setCompletedRewarded(false);
   };
 
+  const sceneBg = SCENES[blueprint.game_theme] || SCENES.VILLAGE_MARKET;
+
   return (
     <div
       ref={gameContainerRef}
       className={`min-h-screen bg-gradient-to-br ${theme.bg} relative overflow-x-hidden flex flex-col justify-between`}
     >
+      {/* Immersive Theme Scene Background Image */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none select-none overflow-hidden"
+        aria-hidden="true"
+      >
+        <img
+          src={sceneBg}
+          alt={theme.name_en}
+          className={`w-full h-full object-cover object-center transition-all duration-700 scale-100 ${
+            calm ? 'opacity-20 blur-[1px]' : 'opacity-35 md:opacity-40'
+          }`}
+        />
+        {/* Soft, calming theme-tinted overlay for optimal contrast & ADHD focus */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-br ${
+            blueprint.game_theme === 'SPACE_QUEST'
+              ? 'from-indigo-950/35 via-slate-900/20 to-sky-950/40'
+              : blueprint.game_theme === 'JUNGLE_ADVENTURE'
+              ? 'from-emerald-900/15 via-white/55 to-teal-900/25'
+              : 'from-amber-900/15 via-white/60 to-orange-900/25'
+          } backdrop-blur-[0.5px]`}
+        />
+      </div>
+
       {/* Decorative background shapes */}
       {!(settings.visual_clutter_filter && calm) && (
         <>
-          <div className="absolute -top-24 -left-24 w-72 h-72 bg-mq-secondary/15 rounded-full blur-2xl animate-morph pointer-events-none" />
-          <div className="absolute -bottom-24 -right-16 w-80 h-80 bg-mq-accent-yellow/15 rounded-full blur-2xl animate-morph-square pointer-events-none" />
+          <div className="absolute -top-24 -left-24 w-72 h-72 bg-mq-secondary/15 rounded-full blur-2xl animate-morph pointer-events-none z-0" />
+          <div className="absolute -bottom-24 -right-16 w-80 h-80 bg-mq-accent-yellow/15 rounded-full blur-2xl animate-morph-square pointer-events-none z-0" />
         </>
       )}
 

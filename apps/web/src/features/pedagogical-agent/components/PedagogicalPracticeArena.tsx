@@ -59,29 +59,29 @@ const PRACTICE_QUESTIONS: PracticeQuestion[] = [
     answer: 9,
     options: [7, 8, 9, 10],
     defaultGuidanceEn:
-      '"Welcome! Start by counting 4 steps forward, then add 5 more. You know what 4 + 4 is!"',
-    defaultGuidanceSi: 'පළමුව 4 සිට ඉදිරියට පියවර 5ක් ගණන් කර බලමු. 4 + 4 = 8 බව මතක තබා ගන්න!',
+      '"Look at 4 and 5. Count the dots step by step!"',
+    defaultGuidanceSi: '4 ට තව 5ක් එකතු කරමු! පහළ තිත් ටික එකින් එක ගණන් කර බලන්න.',
     hints: {
       1: {
-        en: 'Hint 1: Think of doubling! What is 4 + 4?',
-        si: 'හෝඩුවාව 1: 4 + 4 කීයද කියා මුලින්ම සිතන්න.',
+        en: 'Hint 1: Look at 4 and 5. We are adding them together (+)!',
+        si: 'හෝඩුවාව 1: 4 ට තව 5ක් එකතු කරමු (+)!',
       },
       2: {
-        en: 'Hint 2: Since 4 + 4 = 8, adding 1 more gives 4 + 5.',
-        si: 'හෝඩුවාව 2: 4 + 4 = 8 නිසා, ඊට තව 1ක් එකතු කරන්න.',
+        en: 'Hint 2: Count the blue dots (4), then count the green dots (5) from left to right!',
+        si: 'හෝඩුවාව 2: නිල් තිත් 4 ගණන් කරලා, එතැන් සිට කොළ තිත් 5ත් එක දිගට ගණන් කරන්න!',
       },
       3: {
-        en: 'Hint 3: Count one by one from 4: 5, 6, 7, 8, 9!',
-        si: 'හෝඩුවාව 3: 4 සිට ඉදිරියට ගණන් කරමු: 5, 6, 7, 8, 9!',
+        en: 'Hint 3: 4 ➔ 5, 6, 7, 8, 9... තිත් ඔක්කොම එකතු කළාම කීයද?',
+        si: 'හෝඩුවාව 3: 4 න් පටන් අරන් ඉදිරියට ගණන් කරමු: 5, 6, 7, 8, 9!',
       },
       4: {
-        en: 'Hint 4: 4 + 5 equals 9! Click the card with 9.',
-        si: 'හෝඩුවාව 4: 4 + 5 හි නිවැරදි පිළිතුර 9 වේ!',
+        en: 'Hint 4: 4 + 4 = 8 යි. තව 1ක් දැම්මම 9 වෙනවා! කාඩ් එකෙන් 9 තෝරන්න.',
+        si: 'හෝඩුවාව 4: 4 + 4 = 8 යි. තව 1ක් දැම්මම 9 වෙනවා! කාඩ් එකෙන් 9 තෝරන්න.',
       },
     },
     explainStep: {
-      en: 'Step Breakdown: Break 5 into (4 + 1). First do 4 + 4 = 8, then 8 + 1 = 9.',
-      si: 'පියවර පැහැදිලි කිරීම: 4 + 4 = 8 වේ. එයට ඉතිරි 1 එකතු කළ විට 8 + 1 = 9 ලැබේ.',
+      en: 'Step Breakdown: Start at 4, count 5 more: 5, 6, 7, 8, 9.',
+      si: 'පියවර පැහැදිලි කිරීම: 4 ට 4ක් දැම්මොත් 8යි. තව 1ක් එකතු කළ විට 9 ලැබේ.',
     },
   },
   {
@@ -96,29 +96,29 @@ const PRACTICE_QUESTIONS: PracticeQuestion[] = [
     answer: 11,
     options: [10, 11, 12, 13],
     defaultGuidanceEn:
-      '"Great rhythm! 5 + 5 makes a clean 10. How much is 1 more than 10?"',
-    defaultGuidanceSi: '5 + 5 = 10 බව ඔයා දන්නවා! එහෙනම් 10 ට තව 1ක් එකතු කළාම කීයද?',
+      '"5 + 5 makes 10! How much is 1 more than 10?"',
+    defaultGuidanceSi: '5 + 5 = 10 බව ඔයා දන්නවා! 10 ට තව 1ක් දැම්මම කීයද?',
     hints: {
       1: {
-        en: 'Hint 1: Use your hands! Two hands of 5 fingers make 10.',
-        si: 'හෝඩුවාව 1: අත් දෙකේ ඇඟිලි 5 බැගින් එකතු කළ විට 10 කි.',
+        en: 'Hint 1: 5 and 6 are next-door numbers!',
+        si: 'හෝඩුවාව 1: 5 ට තව 6ක් එකතු කරමු!',
       },
       2: {
-        en: 'Hint 2: 6 is just 5 + 1. So 5 + 6 is the same as (5 + 5) + 1.',
-        si: 'හෝඩුවාව 2: 6 යනු 5 + 1 වේ. එවිට (5 + 5) + 1 ලෙස ගත හැක.',
+        en: 'Hint 2: Count the 5 blue dots, then count the 6 green dots one by one!',
+        si: 'හෝඩුවාව 2: නිල් තිත් 5 ගණන් කර, එතැන් සිට කොළ තිත් 6 එකින් එක ගණන් කරන්න!',
       },
       3: {
-        en: 'Hint 3: 10 + 1 gives the next number after 10.',
-        si: 'හෝඩුවාව 3: 10 ට 1ක් එකතු කළ විට 10 ට පසුව එන සංඛ්‍යාව ලැබේ.',
+        en: 'Hint 3: 5 + 5 = 10 යි. 6 කියන්නේ 5 ට වඩා 1ක් වැඩියි. එහෙනම් 10 ට තව 1ක් දාන්න!',
+        si: 'හෝඩුවාව 3: 5 + 5 = 10 යි. 6 ට තව 1ක් වැඩි නිසා 10 ට තව 1ක් දාන්න!',
       },
       4: {
-        en: 'Hint 4: 5 + 6 = 11! Select 11 below.',
-        si: 'හෝඩුවාව 4: 5 + 6 හි නිවැරදි උත්තරය 11 වේ!',
+        en: 'Hint 4: 10 න් පස්සේ එන ඊළඟ අංකය තමයි 11! කාඩ් එකෙන් 11 තෝරන්න.',
+        si: 'හෝඩුවාව 4: 10 න් පස්සේ එන ඊළඟ අංකය තමයි 11! කාඩ් එකෙන් 11 තෝරන්න.',
       },
     },
     explainStep: {
-      en: 'Step Breakdown: Make a 10 first! 5 + 5 = 10, then add the remaining 1 to get 11.',
-      si: 'පියවර පැහැදිලි කිරීම: මුලින්ම 10 හදාගමු (5 + 5 = 10). ඉන්පසු 10 + 1 = 11 වේ.',
+      en: 'Step Breakdown: 5 + 5 = 10, then 10 + 1 = 11.',
+      si: 'පියවර පැහැදිලි කිරීම: 5 + 5 = 10. තව 1ක් එකතු කළ විට 11 ලැබේ.',
     },
   },
   {
@@ -133,30 +133,29 @@ const PRACTICE_QUESTIONS: PracticeQuestion[] = [
     answer: 13,
     options: [11, 12, 13, 14],
     defaultGuidanceEn:
-      '"Take your time, Nethmi. Think about the numbers carefully. If you know what 6 + 6 is, you can figure this out!"',
-    defaultGuidanceSi:
-      'හදිසි වෙන්න එපා නෙත්මි. 6 + 6 කීයද කියලා මතක් කරගත්තොත්, මේ උත්තරය පහසුවෙන්ම හොයාගන්න පුළුවන්!',
+      '"6 + 6 = 12. Add 1 more!"',
+    defaultGuidanceSi: '6 + 6 = 12 බව මතක තබා ගන්න. ඊට තව 1ක් එකතු කරමු.',
     hints: {
       1: {
-        en: 'Hint 1: Start with a Near-Double! What is 6 + 6?',
-        si: 'හෝඩුවාව 1: මුලින්ම 6 + 6 කීයද කියා මතක් කරගන්න.',
+        en: 'Hint 1: 6 + 7 addition.',
+        si: 'හෝඩුවාව 1: 6 ට තව 7ක් එකතු කරමු.',
       },
       2: {
-        en: 'Hint 2: 6 + 6 = 12. Since 7 is 1 more than 6, add 1 more to 12!',
-        si: 'හෝඩුවාව 2: 6 + 6 = 12 කි. 7 යනු 6 ට වඩා 1ක් වැඩි නිසා 12 ට 1ක් එකතු කරන්න.',
+        en: 'Hint 2: Count the 6 blue dots, then keep counting the 7 green dots!',
+        si: 'හෝඩුවාව 2: නිල් තිත් 6 ගණන් කරලා, එතැන් සිට කොළ තිත් 7 ගණන් කරගෙන යන්න!',
       },
       3: {
-        en: 'Hint 3: Or make 10 first: 6 + 4 = 10, with 3 left over (10 + 3).',
-        si: 'හෝඩුවාව 3: නැතහොත් 6 + 4 = 10 හදාගෙන ඉතිරි 3 එකතු කරන්න (10 + 3).',
+        en: 'Hint 3: 6 + 6 = 12 යි. 7 ට තව 1ක් වැඩි නිසා 12 ට තව 1ක් එකතු කරන්න!',
+        si: 'හෝඩුවාව 3: 6 + 6 = 12 යි. 7 ට තව 1ක් වැඩි නිසා 12 ට තව 1ක් එකතු කරන්න!',
       },
       4: {
-        en: 'Hint 4: 12 + 1 = 13! Choose the card with 13.',
-        si: 'හෝඩුවාව 4: 12 + 1 = 13! නිවැරදි පිළිතුර 13 වේ.',
+        en: 'Hint 4: 12 ට 1ක් දැම්මම 13 ලැබෙනවා! කාඩ් වලින් 13 තෝරන්න.',
+        si: 'හෝඩුවාව 4: 12 ට 1ක් දැම්මම 13 ලැබෙනවා! කාඩ් වලින් 13 තෝරන්න.',
       },
     },
     explainStep: {
-      en: 'Step Breakdown: 6 + 7 = 6 + (6 + 1) = (6 + 6) + 1 = 12 + 1 = 13.',
-      si: 'පියවර පැහැදිලි කිරීම: 6 + 7 = (6 + 6) + 1 = 12 + 1 = 13 ලෙස පියවරෙන් පියවර ලැබේ.',
+      en: 'Step Breakdown: (6 + 6) + 1 = 12 + 1 = 13.',
+      si: 'පියවර පැහැදිලි කිරීම: 6 + 6 = 12. තව 1ක් දැමූ විට 13 ලැබේ.',
     },
   },
   {
@@ -171,29 +170,29 @@ const PRACTICE_QUESTIONS: PracticeQuestion[] = [
     answer: 13,
     options: [12, 13, 14, 15],
     defaultGuidanceEn:
-      '"How many more does 8 need to reach 10? Take 2 from 5 to make 10 first!"',
-    defaultGuidanceSi: '8 ට 10 වෙන්න තව කීයක් ඕනද? 5 න් 2ක් අරන් මුලින්ම 10 හදාගමු!',
+      '"8 needs 2 to make 10. Split 5 into 2 and 3!"',
+    defaultGuidanceSi: '8 ට 10 වෙන්න තව 2ක් ඕනෑ. 5 න් 2ක් අරන් 10 හදමු!',
     hints: {
       1: {
-        en: 'Hint 1: 8 needs 2 more to become 10.',
-        si: 'හෝඩුවාව 1: 8 ට තව 2ක් එකතු කළ විට 10 ලැබේ.',
+        en: 'Hint 1: 8 is very close to 10!',
+        si: 'හෝඩුවාව 1: 8 ට තව 5ක් එකතු කරමු.',
       },
       2: {
-        en: 'Hint 2: Split 5 into 2 and 3.',
-        si: 'හෝඩුවාව 2: 5 යන සංඛ්‍යාව 2 සහ 3 ලෙස කොටස් දෙකකට වෙන් කරන්න.',
+        en: 'Hint 2: Count the blue dots (8), then count the green dots (5) one by one!',
+        si: 'හෝඩුවාව 2: නිල් තිත් 8 ගණන් කර, එතැන් සිට කොළ තිත් 5 එකින් එක එකතු කරන්න!',
       },
       3: {
-        en: 'Hint 3: Now add (8 + 2) + 3 = 10 + 3.',
-        si: 'හෝඩුවාව 3: දැන් (8 + 2) + 3 = 10 + 3 ලෙස එකතු කරන්න.',
+        en: 'Hint 3: 8 ට 2ක් දැම්මම 10යි. 5 න් ඉතිරි 3 එකතු කර (10 + 3) බලන්න!',
+        si: 'හෝඩුවාව 3: 8 ට 2ක් දැම්මම 10යි. 5 න් ඉතිරි 3 එකතු කර (10 + 3) බලන්න!',
       },
       4: {
-        en: 'Hint 4: 10 + 3 = 13! Click 13.',
-        si: 'හෝඩුවාව 4: 10 + 3 = 13 වේ!',
+        en: 'Hint 4: 10 ට 3ක් එකතු කළාම 13යි! කාඩ් එකෙන් 13 තෝරන්න.',
+        si: 'හෝඩුවාව 4: 10 ට 3ක් එකතු කළාම 13යි! කාඩ් එකෙන් 13 තෝරන්න.',
       },
     },
     explainStep: {
-      en: 'Step Breakdown: Bridge through 10 -> 8 + 5 = (8 + 2) + 3 = 10 + 3 = 13.',
-      si: 'පියවර පැහැදිලි කිරීම: 8 + 2 = 10. ඉතිරි 3 එකතු කළ විට 10 + 3 = 13 ලැබේ.',
+      en: 'Step Breakdown: 8 + 2 = 10, then 10 + 3 = 13.',
+      si: 'පියවර පැහැදිලි කිරීම: 8 + 2 = 10. ඉතිරි 3 එකතු කළ විට 13 ලැබේ.',
     },
   },
   {
@@ -208,29 +207,29 @@ const PRACTICE_QUESTIONS: PracticeQuestion[] = [
     answer: 15,
     options: [13, 14, 15, 16],
     defaultGuidanceEn:
-      '"Halfway through Level 01! Think of 7 + 7 = 14, then add just 1 more!"',
-    defaultGuidanceSi: 'අපි භාගයක්ම ඉවරයි! 7 + 7 = 14 බව මතක් කරගෙන තව 1ක් එකතු කරන්න.',
+      '"7 + 7 = 14. 8 is 1 more than 7!"',
+    defaultGuidanceSi: '7 + 7 = 14 බව මතක් කරගන්න. 8 ට තව 1ක් එකතු කරමු.',
     hints: {
       1: {
-        en: 'Hint 1: Recall the double: 7 + 7 = 14.',
-        si: 'හෝඩුවාව 1: 7 + 7 = 14 බව මතක් කරගන්න.',
+        en: 'Hint 1: 7 + 8 addition.',
+        si: 'හෝඩුවාව 1: 7 ට 8ක් එකතු කරමු.',
       },
       2: {
-        en: 'Hint 2: 8 is 1 more than 7, so add 1 to 14.',
-        si: 'හෝඩුවාව 2: 8 යනු 7 ට වඩා 1ක් වැඩි නිසා 14 ට 1ක් එකතු කරන්න.',
+        en: 'Hint 2: Count the 7 blue dots and then keep counting the 8 green dots!',
+        si: 'හෝඩුවාව 2: නිල් තිත් 7 ගණන් කර, එතැන් සිට කොළ තිත් 8 ගණන් කරගෙන යන්න!',
       },
       3: {
-        en: 'Hint 3: Or make 10: 8 + 2 = 10, plus remaining 5.',
-        si: 'හෝඩුවාව 3: නැතහොත් 8 + 2 = 10 හදා ඉතිරි 5 එකතු කරන්න.',
+        en: 'Hint 3: 7 + 7 = 14 යි. 8 ට තව 1ක් වැඩි නිසා 14 ට 1ක් එකතු කරන්න!',
+        si: 'හෝඩුවාව 3: 7 + 7 = 14 යි. 8 ට තව 1ක් වැඩි නිසා 14 ට 1ක් එකතු කරන්න!',
       },
       4: {
-        en: 'Hint 4: 14 + 1 = 15! Choose 15.',
-        si: 'හෝඩුවාව 4: නිවැරදි පිළිතුර 15 වේ!',
+        en: 'Hint 4: 14 ට 1ක් දැම්මම 15 වෙනවා! කාඩ් වලින් 15 තෝරන්න.',
+        si: 'හෝඩුවාව 4: 14 ට 1ක් දැම්මම 15 වෙනවා! කාඩ් වලින් 15 තෝරන්න.',
       },
     },
     explainStep: {
-      en: 'Step Breakdown: 7 + 8 = 7 + (7 + 1) = 14 + 1 = 15.',
-      si: 'පියවර පැහැදිලි කිරීම: 7 + 7 = 14 වේ. 14 + 1 = 15 ලෙස පිළිතුර ලැබේ.',
+      en: 'Step Breakdown: 7 + 7 = 14, then 14 + 1 = 15.',
+      si: 'පියවර පැහැදිලි කිරීම: 7 + 7 = 14. තව 1ක් දැමූ විට 15 ලැබේ.',
     },
   },
   {
@@ -245,29 +244,29 @@ const PRACTICE_QUESTIONS: PracticeQuestion[] = [
     answer: 13,
     options: [11, 12, 13, 14],
     defaultGuidanceEn:
-      '"9 is super close to 10! Give 1 from 4 to 9 so it becomes 10."',
-    defaultGuidanceSi: '9 කියන්නේ 10 ට ඉතාම ළඟ අගයක්! 4 න් 1ක් අරන් 9 ට දීලා 10 හදාගමු.',
+      '"9 needs only 1 to become 10! Take 1 from 4."',
+    defaultGuidanceSi: '9 ට 10 වෙන්න ඕනෑ 1යි! 4 න් 1ක් 9 ට දෙමු.',
     hints: {
       1: {
-        en: 'Hint 1: Add 1 to 9 to make 10.',
-        si: 'හෝඩුවාව 1: 9 ට 1ක් එකතු කර 10 සාදාගන්න.',
+        en: 'Hint 1: 9 is 1 step away from 10.',
+        si: 'හෝඩුවාව 1: 9 ට තව 4ක් එකතු කරමු.',
       },
       2: {
-        en: 'Hint 2: Taking 1 from 4 leaves 3.',
-        si: 'හෝඩුවාව 2: 4 න් 1ක් ගත් පසු ඉතිරි වන්නේ 3 කි.',
+        en: 'Hint 2: Count the 9 blue dots, then count the 4 green dots!',
+        si: 'හෝඩුවාව 2: නිල් තිත් 9 ගණන් කර, එතැන් සිට කොළ තිත් 4 දිගටම ගණන් කරන්න!',
       },
       3: {
-        en: 'Hint 3: Now combine 10 and 3.',
-        si: 'හෝඩුවාව 3: දැන් 10 සහ 3 එකතු කරන්න.',
+        en: 'Hint 3: 9 ට 1ක් දැම්මම 10යි. 4 න් ඉතිරි 3 එකතු කර (10 + 3) බලන්න!',
+        si: 'හෝඩුවාව 3: 9 ට 1ක් දැම්මම 10යි. 4 න් ඉතිරි 3 එකතු කර (10 + 3) බලන්න!',
       },
       4: {
-        en: 'Hint 4: 10 + 3 = 13!',
-        si: 'හෝඩුවාව 4: 10 + 3 = 13 වේ!',
+        en: 'Hint 4: 10 + 3 = 13 යි! කාඩ් එකෙන් 13 තෝරන්න.',
+        si: 'හෝඩුවාව 4: 10 + 3 = 13 යි! කාඩ් එකෙන් 13 තෝරන්න.',
       },
     },
     explainStep: {
-      en: 'Step Breakdown: 9 + 4 = (9 + 1) + 3 = 10 + 3 = 13.',
-      si: 'පියවර පැහැදිලි කිරීම: (9 + 1) + 3 = 10 + 3 = 13.',
+      en: 'Step Breakdown: 9 + 1 = 10, then 10 + 3 = 13.',
+      si: 'පියවර පැහැදිලි කිරීම: 9 + 1 = 10. ඉතිරි 3 දැමූ විට 13 ලැබේ.',
     },
   },
   {
@@ -282,29 +281,29 @@ const PRACTICE_QUESTIONS: PracticeQuestion[] = [
     answer: 16,
     options: [14, 15, 16, 18],
     defaultGuidanceEn:
-      '"Double 8! Think of two rows of 8 crayons. Take your time."',
-    defaultGuidanceSi: '8 ඒවා දෙකක්! 8 + 2 = 10 හදාගෙන ඉතිරි 6 එකතු කර බලන්න.',
+      '"Double 8! 8 + 2 makes 10, plus remaining 6!"',
+    defaultGuidanceSi: '8 ඒවා දෙකක්! 8 + 2 = 10 හදා ඉතිරි 6 එකතු කරමු.',
     hints: {
       1: {
-        en: 'Hint 1: Take 2 from the second 8 to make 10.',
-        si: 'හෝඩුවාව 1: දෙවන 8 න් 2ක් ගෙන පළමු 8 ට එකතු කර 10 සාදන්න.',
+        en: 'Hint 1: Two identical numbers: 8 + 8.',
+        si: 'හෝඩුවාව 1: 8 ට තව 8ක් එකතු කරමු.',
       },
       2: {
-        en: 'Hint 2: After taking 2 from 8, 6 is left.',
-        si: 'හෝඩුවාව 2: 8 න් 2ක් ගත් විට ඉතිරි වන්නේ 6 කි.',
+        en: 'Hint 2: Count the 8 blue dots, then count the 8 green dots!',
+        si: 'හෝඩුවාව 2: නිල් තිත් 8 ගණන් කර, එතැන් සිට කොළ තිත් 8 දිගටම ගණන් කරන්න!',
       },
       3: {
-        en: 'Hint 3: Add 10 + 6.',
-        si: 'හෝඩුවාව 3: දැන් 10 ට 6ක් එකතු කරන්න.',
+        en: 'Hint 3: 8 ට 2ක් දැම්මම 10යි. ඉතිරි 6 එකතු කර (10 + 6) බලන්න!',
+        si: 'හෝඩුවාව 3: 8 ට 2ක් දැම්මම 10යි. ඉතිරි 6 එකතු කර (10 + 6) බලන්න!',
       },
       4: {
-        en: 'Hint 4: 10 + 6 = 16!',
-        si: 'හෝඩුවාව 4: නිවැරදි පිළිතුර 16 වේ!',
+        en: 'Hint 4: 10 ට 6ක් දැම්මම 16 වෙනවා! කාඩ් වලින් 16 තෝරන්න.',
+        si: 'හෝඩුවාව 4: 10 ට 6ක් දැම්මම 16 වෙනවා! කාඩ් වලින් 16 තෝරන්න.',
       },
     },
     explainStep: {
-      en: 'Step Breakdown: 8 + 8 = (8 + 2) + 6 = 10 + 6 = 16.',
-      si: 'පියවර පැහැදිලි කිරීම: (8 + 2) + 6 = 10 + 6 = 16.',
+      en: 'Step Breakdown: (8 + 2) + 6 = 10 + 6 = 16.',
+      si: 'පියවර පැහැදිලි කිරීම: 8 + 2 = 10. ඉතිරි 6 දැමූ විට 16 ලැබේ.',
     },
   },
   {
@@ -319,29 +318,29 @@ const PRACTICE_QUESTIONS: PracticeQuestion[] = [
     answer: 15,
     options: [14, 15, 16, 17],
     defaultGuidanceEn:
-      '"Turn 9 into 10 by borrowing 1 from 6! What is left of 6?"',
-    defaultGuidanceSi: '6 න් 1ක් ගෙන 9 ට එකතු කර 10 හදාගන්න. එවිට 6 න් ඉතිරි කීයද?',
+      '"Make 10 with 9 + 1, then add 5!"',
+    defaultGuidanceSi: '6 න් 1ක් 9 ට දීලා 10 හදමු. ඉතිරි 5 එකතු කරමු.',
     hints: {
       1: {
-        en: 'Hint 1: 9 + 1 = 10.',
-        si: 'හෝඩුවාව 1: 9 + 1 = 10 කි.',
+        en: 'Hint 1: 9 + 6 addition.',
+        si: 'හෝඩුවාව 1: 9 ට තව 6ක් එකතු කරමු.',
       },
       2: {
-        en: 'Hint 2: 6 minus 1 leaves 5.',
-        si: 'හෝඩුවාව 2: 6 න් 1ක් අඩු කළ විට 5ක් ඉතිරි වේ.',
+        en: 'Hint 2: Count the 9 blue dots, then count the 6 green dots!',
+        si: 'හෝඩුවාව 2: නිල් තිත් 9 ගණන් කර, එතැන් සිට කොළ තිත් 6 දිගටම ගණන් කරන්න!',
       },
       3: {
-        en: 'Hint 3: Combine 10 and 5.',
-        si: 'හෝඩුවාව 3: 10 සහ 5 එකතු කරන්න.',
+        en: 'Hint 3: 9 ට 1ක් දැම්මම 10යි. 6 න් ඉතිරි 5 එකතු කර (10 + 5) බලන්න!',
+        si: 'හෝඩුවාව 3: 9 ට 1ක් දැම්මම 10යි. 6 න් ඉතිරි 5 එකතු කර (10 + 5) බලන්න!',
       },
       4: {
-        en: 'Hint 4: 10 + 5 = 15!',
-        si: 'හෝඩුවාව 4: 10 + 5 = 15 වේ!',
+        en: 'Hint 4: 10 ට 5ක් දැම්මම 15 වෙනවා! නිවැරදි කාඩ් එක 15 වේ.',
+        si: 'හෝඩුවාව 4: 10 ට 5ක් දැම්මම 15 වෙනවා! නිවැරදි කාඩ් එක 15 වේ.',
       },
     },
     explainStep: {
-      en: 'Step Breakdown: 9 + 6 = (9 + 1) + 5 = 10 + 5 = 15.',
-      si: 'පියවර පැහැදිලි කිරීම: (9 + 1) + 5 = 10 + 5 = 15.',
+      en: 'Step Breakdown: (9 + 1) + 5 = 10 + 5 = 15.',
+      si: 'පියවර පැහැදිලි කිරීම: 9 + 1 = 10. ඉතිරි 5 දැමූ විට 15 ලැබේ.',
     },
   },
   {
@@ -356,29 +355,29 @@ const PRACTICE_QUESTIONS: PracticeQuestion[] = [
     answer: 16,
     options: [15, 16, 17, 18],
     defaultGuidanceEn:
-      '"Almost at the finish line! Make 10 with 9 + 1, then add what remains of 7."',
-    defaultGuidanceSi: 'අපි අවසානයට ළඟයි! 7 න් 1ක් 9 ට දීලා 10 හදාගමු.',
+      '"Almost there! Give 1 from 7 to 9 to make 10."',
+    defaultGuidanceSi: '7 න් 1ක් 9 ට දීලා 10 හදමු. ඉතිරි 6 එකතු කරමු.',
     hints: {
       1: {
-        en: 'Hint 1: Give 1 from 7 to 9 so 9 becomes 10.',
-        si: 'හෝඩුවාව 1: 7 න් 1ක් 9 ට දී 10 සාදාගන්න.',
+        en: 'Hint 1: 7 + 9 addition.',
+        si: 'හෝඩුවාව 1: 7 ට තව 9ක් එකතු කරමු.',
       },
       2: {
-        en: 'Hint 2: 7 minus 1 leaves 6.',
-        si: 'හෝඩුවාව 2: 7 න් 1ක් ගත් විට 6ක් ඉතිරි වේ.',
+        en: 'Hint 2: Count the 7 blue dots, then count the 9 green dots!',
+        si: 'හෝඩුවාව 2: නිල් තිත් 7 ගණන් කර, එතැන් සිට කොළ තිත් 9 දිගටම ගණන් කරන්න!',
       },
       3: {
-        en: 'Hint 3: 10 + 6 gives the total.',
-        si: 'හෝඩුවාව 3: දැන් 10 + 6 එකතු කරන්න.',
+        en: 'Hint 3: 9 ට 1ක් දුන්නම 10යි. 7 න් ඉතිරි 6 එකතු කර (10 + 6) බලන්න!',
+        si: 'හෝඩුවාව 3: 9 ට 1ක් දැම්මම 10යි. 7 න් ඉතිරි 6 එකතු කර (10 + 6) බලන්න!',
       },
       4: {
-        en: 'Hint 4: 10 + 6 = 16!',
-        si: 'හෝඩුවාව 4: නිවැරදි පිළිතුර 16 වේ!',
+        en: 'Hint 4: 10 ට 6ක් එකතු කළාම 16 වෙනවා! කාඩ් වලින් 16 තෝරන්න.',
+        si: 'හෝඩුවාව 4: 10 ට 6ක් එකතු කළාම 16 වෙනවා! කාඩ් වලින් 16 තෝරන්න.',
       },
     },
     explainStep: {
-      en: 'Step Breakdown: 7 + 9 = 6 + (1 + 9) = 6 + 10 = 16.',
-      si: 'පියවර පැහැදිලි කිරීම: 6 + (1 + 9) = 6 + 10 = 16.',
+      en: 'Step Breakdown: (9 + 1) + 6 = 10 + 6 = 16.',
+      si: 'පියවර පැහැදිලි කිරීම: 9 + 1 = 10. ඉතිරි 6 දැමූ විට 16 ලැබේ.',
     },
   },
   {
@@ -393,29 +392,29 @@ const PRACTICE_QUESTIONS: PracticeQuestion[] = [
     answer: 17,
     options: [15, 16, 17, 18],
     defaultGuidanceEn:
-      '"Final boss question of Level 01! Borrow 1 from 8 to turn 9 into 10!"',
-    defaultGuidanceSi: 'පළමු මට්ටමේ අවසාන ප්‍රශ්නය! 8 න් 1ක් ගෙන 9 ට එකතු කර 10 හදාගමු.',
+      '"Final question! Borrow 1 from 8 to make 10 with 9!"',
+    defaultGuidanceSi: 'අවසාන ප්‍රශ්නය! 8 න් 1ක් 9 ට දී 10 හදාගමු.',
     hints: {
       1: {
-        en: 'Hint 1: 9 needs 1 to become 10.',
-        si: 'හෝඩුවාව 1: 9 ට 1ක් එකතු කළ විට 10 වේ.',
+        en: 'Hint 1: Final challenge: 9 + 8.',
+        si: 'හෝඩුවාව 1: 9 ට තව 8ක් එකතු කරමු.',
       },
       2: {
-        en: 'Hint 2: Taking 1 from 8 leaves 7.',
-        si: 'හෝඩුවාව 2: 8 න් 1ක් ගත් විට ඉතිරි වන්නේ 7 කි.',
+        en: 'Hint 2: Count the 9 blue dots, then count the 8 green dots!',
+        si: 'හෝඩුවාව 2: නිල් තිත් 9 ගණන් කර, එතැන් සිට කොළ තිත් 8 දිගටම ගණන් කරන්න!',
       },
       3: {
-        en: 'Hint 3: Add 10 and 7 together.',
-        si: 'හෝඩුවාව 3: දැන් 10 සහ 7 එකතු කරන්න.',
+        en: 'Hint 3: 9 ට 1ක් දැම්මම 10යි. 8 න් ඉතිරි 7 එකතු කර (10 + 7) බලන්න!',
+        si: 'හෝඩුවාව 3: 9 ට 1ක් දැම්මම 10යි. 8 න් ඉතිරි 7 එකතු කර (10 + 7) බලන්න!',
       },
       4: {
-        en: 'Hint 4: 10 + 7 = 17! You completed Level 01!',
-        si: 'හෝඩුවාව 4: 10 + 7 = 17! ඔයා පළමු මට්ටම ජයගත්තා!',
+        en: 'Hint 4: 10 ට 7ක් දැම්මම 17යි! කාඩ් එකෙන් 17 තෝරන්න.',
+        si: 'හෝඩුවාව 4: 10 ට 7ක් දැම්මම 17යි! කාඩ් එකෙන් 17 තෝරන්න.',
       },
     },
     explainStep: {
-      en: 'Step Breakdown: 9 + 8 = (9 + 1) + 7 = 10 + 7 = 17.',
-      si: 'පියවර පැහැදිලි කිරීම: (9 + 1) + 7 = 10 + 7 = 17.',
+      en: 'Step Breakdown: (9 + 1) + 7 = 10 + 7 = 17.',
+      si: 'පියවර පැහැදිලි කිරීම: 9 + 1 = 10. ඉතිරි 7 දැමූ විට 17 ලැබේ.',
     },
   },
 ];
@@ -722,9 +721,9 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
 
   const activeHintBoardHints = {
     1: { title: 'පොඩි හෝඩුවාවක්', description: activeQuestion.hints[1].si },
-    2: { title: 'මඟපෙන්වීම', description: activeQuestion.hints[2].si },
+    2: { title: 'තිත් ගණන් කිරීම', description: activeQuestion.hints[2].si },
     3: { title: 'පියවරෙන් පියවර', description: activeQuestion.hints[3].si },
-    4: { title: 'විසඳුම', description: activeQuestion.hints[4].si },
+    4: { title: 'ගැටලුව විසඳන හැටි', description: activeQuestion.hints[4].si },
   };
 
   const bktConfidencePct =
@@ -964,21 +963,61 @@ export const PedagogicalPracticeArena: React.FC<PedagogicalPracticeArenaProps> =
                   </span>
                 </div>
 
-                {/* Visual Dots Aid when Hint Level >= 2 or Explanation is active */}
+                {/* Visual Dots Aid when Hint Level >= 2 or Explanation is active - Large, concrete & count-friendly for ADHD kids */}
                 {(currentHintLevel >= 2 || explanationActive) && (
-                  <div className="pt-1 flex flex-wrap items-center justify-center gap-2.5 text-sm font-bold text-mq-primary-dark animate-fade-in">
-                    <div className="flex items-center gap-1.5 bg-mq-surface-blue px-3.5 py-1.5 rounded-full border border-mq-primary/25">
-                      <span>{activeQuestion.num1}:</span>
-                      <span className="tracking-widest text-mq-primary">
-                        {'●'.repeat(activeQuestion.num1)}
-                      </span>
+                  <div className="pt-2 pb-1 flex flex-col items-center justify-center gap-2.5 animate-fade-in">
+                    {/* Visual Counting Container */}
+                    <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 bg-stone-50/90 p-3 sm:p-4 rounded-3xl border-2 border-dashed border-mq-border max-w-xl mx-auto shadow-2xs">
+                      {/* First Number Counters */}
+                      <div className="flex flex-col items-center gap-1.5 bg-white px-3.5 py-2 rounded-2xl border border-sky-200 shadow-2xs">
+                        <span className="text-xs font-black text-sky-800 flex items-center gap-1">
+                          <span>{activeQuestion.num1}</span>
+                          <span className="text-[11px] font-bold text-sky-600">(නිල් තිත්)</span>
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {Array.from({ length: activeQuestion.num1 }).map((_, i) => (
+                            <span
+                              key={`dot1-${i}`}
+                              className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-sky-500 text-white text-[11px] font-extrabold flex items-center justify-center shadow-xs transition-transform hover:scale-110 select-none animate-bounce"
+                              style={{ animationDelay: `${i * 70}ms`, animationDuration: '1.2s' }}
+                              title={`තිත ${i + 1}`}
+                            >
+                              {i + 1}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <span className="text-2xl font-black text-mq-primary select-none">+</span>
+
+                      {/* Second Number Counters */}
+                      <div className="flex flex-col items-center gap-1.5 bg-white px-3.5 py-2 rounded-2xl border border-emerald-200 shadow-2xs">
+                        <span className="text-xs font-black text-emerald-800 flex items-center gap-1">
+                          <span>{activeQuestion.num2}</span>
+                          <span className="text-[11px] font-bold text-emerald-600">(කොළ තිත්)</span>
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          {Array.from({ length: activeQuestion.num2 }).map((_, i) => {
+                            const totalCountIndex = activeQuestion.num1 + i + 1;
+                            return (
+                              <span
+                                key={`dot2-${i}`}
+                                className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 text-white text-[11px] font-extrabold flex items-center justify-center shadow-xs transition-transform hover:scale-110 select-none animate-bounce"
+                                style={{ animationDelay: `${(activeQuestion.num1 + i) * 70}ms`, animationDuration: '1.2s' }}
+                                title={`තිත ${totalCountIndex}`}
+                              >
+                                {totalCountIndex}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
-                    <span className="text-mq-text-muted">+</span>
-                    <div className="flex items-center gap-1.5 bg-mq-surface-green px-3.5 py-1.5 rounded-full border border-mq-secondary/35">
-                      <span>{activeQuestion.num2}:</span>
-                      <span className="tracking-widest text-mq-success">
-                        {'●'.repeat(activeQuestion.num2)}
-                      </span>
+
+                    {/* Simple Guidance text for child */}
+                    <div className="flex items-center gap-1.5 text-xs font-extrabold text-mq-primary-dark bg-sky-50 px-3.5 py-1 rounded-full border border-sky-200">
+                      <span>👉</span>
+                      <span>වමේ සිට දකුණට 1, 2, 3... ලෙස තිත් ටික එකතු කරලා ගණන් කරමු!</span>
                     </div>
                   </div>
                 )}

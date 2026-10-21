@@ -286,8 +286,8 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
           useAgentStore.getState().playAction('thinking', {
             message:
               lang === 'si'
-                ? 'කල්පනා කරනවද? උදව්වක් අවශ්‍ය නම් කියන්න! 💡'
-                : 'Thinking hard? Let me know if you need help! 💡',
+                ? 'කල්පනා කරනවද? හෝඩුවාවක් බලන්න මාව ඔබන්න! 💡'
+                : 'Thinking hard? Click me to see hints! 💡',
             duration: 4.5,
           });
         }
@@ -306,8 +306,8 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
       useAgentStore.getState().playAction('thinking', {
         message:
           lang === 'si'
-            ? 'උදව්වක් අවශ්‍යද? මම හෝඩුවාවක් දෙන්නද? 💡'
-            : 'Would you like some help? Shall I give a hint? 💡',
+            ? 'උදව්වක් අවශ්‍යද? හෝඩුවාවක් බලන්න මාව ඔබන්න! 💡'
+            : 'Need some help? Click me to see hints! 💡',
         duration: 4.5,
       });
     }
@@ -316,13 +316,17 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
   // Explicit Lightbulb Click by child
   const handleOpenSupport = () => {
     setIsSupportActive(true);
-    useAgentStore.getState().playAction('wave', {
-      message:
-        lang === 'si'
-          ? 'මම උදව් කරන්න සූදානම්! හෝඩුවාවක් ලබාගන්න පහත බොත්තම ඔබන්න. 💡'
-          : "I'm ready to help! Click the button below to get a hint. 💡",
-      duration: 4.0,
-    });
+    if (useAgentStore.getState().currentHintLevel === 0) {
+      handleHintRequest(1);
+    } else {
+      useAgentStore.getState().playAction('wave', {
+        message:
+          lang === 'si'
+            ? 'හෝඩුවාවන් බලාගන්න! 💡'
+            : 'Check out the hints! 💡',
+        duration: 3.5,
+      });
+    }
   };
 
   useEffect(() => {
@@ -985,7 +989,7 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
           {/* RIGHT COLUMN: PEDAGOGICAL SUPPORT ENGINE (MathBot - only emerges on hesitation/requests) */}
           {isSupportActive && (
             <div className="lg:col-span-4 sticky top-20 space-y-4 animate-fade-in">
-              <div className="min-h-[520px] rounded-3xl overflow-hidden shadow-md">
+              <div className="rounded-3xl overflow-hidden shadow-md transition-all duration-300">
                 <PedagogicalCompanion
                   hints={stepHints}
                   onHintRequest={handleHintRequest}

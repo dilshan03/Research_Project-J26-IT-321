@@ -92,7 +92,19 @@ function OptionCard({
   );
 }
 
-export function GamePlayer({ envelope, onExit, learnerId = 'local-demo-learner' }: { envelope: BlueprintEnvelope; onExit: () => void; learnerId?: string }) {
+export function GamePlayer({
+  envelope,
+  onExit,
+  learnerId = 'local-demo-learner',
+  totalStars,
+  totalCoins,
+}: {
+  envelope: BlueprintEnvelope;
+  onExit: () => void;
+  learnerId?: string;
+  totalStars?: number;
+  totalCoins?: number;
+}) {
   const { blueprint } = envelope;
   const settings = blueprint.adhd_game_settings;
   const theme = THEMES[blueprint.game_theme];
@@ -164,20 +176,62 @@ export function GamePlayer({ envelope, onExit, learnerId = 'local-demo-learner' 
       )}
 
       <header className="relative z-10 flex items-center justify-between px-6 py-4">
-        <button id="game-exit" onClick={() => void exitGame()} className="btn btn-secondary"><ArrowLeft size={18} /> {lang === 'si' ? 'ආපසු' : 'Back'}</button>
+        <button id="game-exit" onClick={() => void exitGame()} className="btn btn-secondary shadow-xs">
+          <ArrowLeft size={18} /> {lang === 'si' ? 'ආපසු' : 'Back'}
+        </button>
+
         <div className="text-center">
           <p className="text-xs uppercase tracking-widest text-mq-text-muted font-semibold">{blueprint.topic} · Grade {blueprint.grade}</p>
           <p className={`font-bold text-mq-text-strong ${lang === 'si' ? 'sinhala' : ''}`}>
             {theme.mascot} {lang === 'si' ? theme.name_si : theme.name_en}
           </p>
         </div>
-        <div className="flex rounded-full border border-mq-border bg-white p-1" role="group" aria-label="Language">
-          {(['si', 'en'] as Lang[]).map(l => (
-            <button key={l} id={`lang-${l}`} onClick={() => setLang(l)}
-              className={`px-3 py-1 rounded-full text-sm font-bold transition ${lang === l ? 'bg-mq-primary text-white' : 'text-mq-text-muted'}`}>
-              {l === 'si' ? 'සිං' : 'EN'}
-            </button>
-          ))}
+
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Top Corner Stars & Coins (Kid Rewards Pill) */}
+          {(totalStars !== undefined || totalCoins !== undefined) && (
+            <div className="flex items-center gap-2">
+              {totalStars !== undefined && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-50 border-2 border-amber-300/80 text-xs sm:text-sm font-black text-amber-950 shadow-2xs">
+                  <Star size={16} className="text-amber-500 fill-amber-400 shrink-0 animate-pulse" />
+                  <span>
+                    {totalStars.toLocaleString()}{' '}
+                    <span className="hidden sm:inline text-[10px] font-extrabold text-amber-800">
+                      {lang === 'si' ? 'තරු' : 'Stars'}
+                    </span>
+                  </span>
+                </div>
+              )}
+
+              {totalCoins !== undefined && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-yellow-50 border-2 border-yellow-300/80 text-xs sm:text-sm font-black text-yellow-950 shadow-2xs">
+                  <span className="text-yellow-600 text-sm">🪙</span>
+                  <span>
+                    {totalCoins.toLocaleString()}{' '}
+                    <span className="hidden sm:inline text-[10px] font-extrabold text-yellow-800">
+                      {lang === 'si' ? 'කාසි' : 'Coins'}
+                    </span>
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Language Toggle */}
+          <div className="flex rounded-full border border-mq-border bg-white p-1 shadow-2xs" role="group" aria-label="Language">
+            {(['si', 'en'] as Lang[]).map((l) => (
+              <button
+                key={l}
+                id={`lang-${l}`}
+                onClick={() => setLang(l)}
+                className={`px-3 py-1 rounded-full text-sm font-bold transition ${
+                  lang === l ? 'bg-mq-primary text-white' : 'text-mq-text-muted hover:text-mq-primary'
+                }`}
+              >
+                {l === 'si' ? 'සිං' : 'EN'}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 

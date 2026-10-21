@@ -581,6 +581,26 @@ export const StudentDashboardPage: React.FC = () => {
     );
   };
 
+  // Full-Screen Focus Mode for Teacher-Approved Adventure Games:
+  // When a game is started, the entire dashboard header and navigation sidebar
+  // are completely hidden, opening the game full-screen with only Stars & Coins in the top corner.
+  if (activeNav === 'adventure' && activeApprovedGame) {
+    return (
+      <div className="min-h-screen w-full bg-mq-bg overflow-x-hidden animate-fade-in">
+        <GamePlayer
+          envelope={activeApprovedGame}
+          learnerId={resolvedLearnerId}
+          totalStars={savedProgress.stars}
+          totalCoins={savedProgress.coins}
+          onExit={() => {
+            setActiveApprovedGame(null);
+            handleRewardEarned(3, 10);
+          }}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-mq-bg text-mq-text">
       {/* ========================================================= */}
@@ -1014,33 +1034,9 @@ export const StudentDashboardPage: React.FC = () => {
               </div>
             ) : activeNav === 'adventure' ? (
               /* ======================================================= */
-              /* LEARNING ADVENTURE TAB: Teacher-Approved Games          */
+              /* LEARNING ADVENTURE TAB: Teacher-Approved Games Hub      */
               /* ======================================================= */
-              activeApprovedGame ? (
-                <div className="w-full animate-fade-in -mt-2">
-                  <div className="mb-3 flex items-center justify-between">
-                    <button
-                      type="button"
-                      onClick={() => setActiveApprovedGame(null)}
-                      className="btn btn-secondary py-2 px-4 rounded-full text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs hover:bg-mq-surface-soft"
-                    >
-                      <span>← {isSinhala ? 'ක්‍රීඩා ලැයිස්තුවට ආපසු' : 'Back to Adventure Games'}</span>
-                    </button>
-                    <span className="text-xs font-extrabold text-mq-primary bg-blue-50 px-3.5 py-1.5 rounded-full border border-blue-200/80 shadow-2xs">
-                      {isSinhala ? '🎯 ගුරුතුමා අනුමත කළ ක්‍රීඩාව' : '🎯 Teacher-Approved Game'}
-                    </span>
-                  </div>
-                  <GamePlayer
-                    envelope={activeApprovedGame}
-                    learnerId={resolvedLearnerId}
-                    onExit={() => {
-                      setActiveApprovedGame(null);
-                      handleRewardEarned(3, 10);
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="space-y-6 py-2 animate-fade-in">
+              <div className="space-y-6 py-2 animate-fade-in">
                   {/* Hero Banner for Adventure (Calm, Soft Theme Matching MathQuest) */}
                   <div className="relative overflow-hidden rounded-3xl border border-mq-border bg-white shadow-xs p-6 sm:p-7">
                     {/* Top Accent Strip */}
@@ -1267,7 +1263,6 @@ export const StudentDashboardPage: React.FC = () => {
                     </div>
                   )}
                 </div>
-              )
             ) : (
               /* ======================================================= */
               /* OTHER SIDEBAR TABS: Clean Empty Placeholder             */

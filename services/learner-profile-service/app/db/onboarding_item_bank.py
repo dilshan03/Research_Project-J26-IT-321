@@ -74,6 +74,21 @@ ONBOARDING_V2_ITEMS: List[Dict[str, Any]] = [
         "correctAnswer": "group_5",
         "expertReview": "PENDING",
     },
+    # Independent quantity comparison (own family, outside the learn-and-transfer sequence). With the
+    # pre-probe and transfer item this gives number_comparison 3 independent items (ELP-X minimum).
+    {
+        "questionId": "g1v2_compare_independent_7_4",
+        "grade": 1, **_COMPARISON,
+        "activityId": "g1_compare_independent",
+        "conceptId": "compare_more",
+        "itemFamilyId": "g1_compare_independent",
+        "probeRole": None,
+        "representation": "pictorial",
+        "questionType": "multiple_choice",
+        "options": [{"id": "left"}, {"id": "right"}],
+        "correctAnswer": "left",
+        "expertReview": "PENDING",
+    },
     # Phase E: dynamic learning probe (pre -> guided support -> transfer)
     {
         "questionId": "g1v2_compare_pre",

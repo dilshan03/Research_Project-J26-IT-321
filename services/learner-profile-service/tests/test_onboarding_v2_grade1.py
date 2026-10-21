@@ -3,6 +3,9 @@ Database-free tests for the Grade 1 onboarding-v2 activity journey (ONBOARDING-V
 Payloads mirror what apps/web .../onboarding/journey sends. In-memory collections only.
 """
 
+from collections import Counter
+
+from app.core.elpx_engine import MINIMUM_EVIDENCE_QUESTIONS_PER_SKILL
 from app.db.onboarding_item_bank import get_onboarding_v2_items_for_grade
 from app.services import assessment_evidence as ev
 from tests.test_math_assessment_submission import G1_LEARNER, G2_LEARNER, _submit, db  # noqa: F401 (fixture)
@@ -26,13 +29,14 @@ def _item(qid, answer, first=None, role=None, support_before=False, support_even
     return item
 
 
-def _journey(pre_answer="right", transfer_answer="right", include_support=True):
+def _journey(pre_answer="right", transfer_answer="right", include_support=True, independent_compare="left"):
     answers = [
         _item("g1v2_calibration_move", "red_leaf", first="green_leaf", role="calibration", method="drag",
               dimensionTags=["IC", "IA"], missedDropCount=1),
         _item("g1v2_count_fruit_4", 4, method="drag", revisions=[{"priorResponse": 5, "newResponse": 4, "timestampSeconds": 9}]),
         _item("g1v2_match_objects_to_numeral_3", 3, revisions=[{"priorResponse": 4, "newResponse": 3, "timestampSeconds": 3}]),
         _item("g1v2_match_numeral_to_group_5", "group_5"),
+        _item("g1v2_compare_independent_7_4", independent_compare, revisions=[{"priorResponse": "right", "newResponse": "left", "timestampSeconds": 4}]),
         _item("g1v2_compare_pre", pre_answer, role="pre", itemFamilyId="g1_compare_more"),
     ]
     if include_support:
@@ -70,15 +74,45 @@ class TestGrade1Journey:
         assert items["g1v2_count_fruit_4"]["activityId"] == "g1_count_basket"  # server metadata
 
         elpx = res.json()["data"]["elpxProfile"]
-        assert elpx["totalDistinctQuestionsEvaluated"] == 5  # count, 2 representation, pre, transfer
-        assert elpx["totalCorrectFirstResponses"] == 4
+        assert elpx["totalDistinctQuestionsEvaluated"] == 6  # count, 2 representation, independent compare, pre, transfer
+        assert elpx["totalCorrectFirstResponses"] == 5
 
         # Provisional IMPSA and IMLR summaries
         impsa = res.json()["data"]["impsa"]
-        assert impsa is not None and impsa["eligibleUnassistedItems"] == 5
+        assert impsa is not None and impsa["eligibleUnassistedItems"] == 6
         imlr = res.json()["data"]["imlr"]
         assert imlr is not None and imlr["status"] == "TRANSFER_OBSERVED"
         assert imlr["preProbeCorrect"] is False and imlr["unassistedTransferCorrect"] is True
+
+    async def test_comparison_skill_reaches_the_unchanged_evidence_minimum(self, db):
+        assert MINIMUM_EVIDENCE_QUESTIONS_PER_SKILL == 3          # the requirement itself is not relaxed
+        res = await _submit(G1_LEARNER, _journey(), grade=1, assessmentProtocolVersion="onboarding-v2")
+        skills = {s["skillId"]: s for s in res.json()["data"]["elpxProfile"]["skillEstimates"]}
+        comparison = skills["number_comparison"]
+        assert comparison["distinctQuestionsAssessed"] == 3     # independent compare, pre, transfer (support excluded)
+        assert comparison["isEvidenceSufficient"] is True
+        assert comparison["provisionalSkillLevel"] != "INSUFFICIENT_EVIDENCE"
+        assert comparison["correctFirstResponses"] == 2          # pre answered wrongly in this journey
+        item = next(i for i in db["assessments"].inserted[0]["evaluatedItems"] if i["questionId"] == "g1v2_compare_independent_7_4")
+        assert item["includedInProficiencyEstimate"] is True and item["correctFirstResponse"] is True
+        assert item["revisionEvents"][0]["newResponse"] == "left"
+
+    async def test_help_before_the_independent_comparison_leaves_the_skill_insufficient(self, db):
+        answers = _journey()
+        compare = next(a for a in answers if a["questionId"] == "g1v2_compare_independent_7_4")
+        compare["supportBeforeFirstResponse"] = True
+        compare["supportEvents"] = [{"level": 1, "type": "clarification", "timestampSeconds": 2.0}]
+        res = await _submit(G1_LEARNER, answers, grade=1, assessmentProtocolVersion="onboarding-v2")
+        comparison = next(s for s in res.json()["data"]["elpxProfile"]["skillEstimates"] if s["skillId"] == "number_comparison")
+        assert comparison["distinctQuestionsAssessed"] == 2
+        assert comparison["provisionalSkillLevel"] == "INSUFFICIENT_EVIDENCE"   # not forced to pass
+
+    async def test_wrong_independent_comparison_is_scored_wrong_and_imlr_is_unchanged(self, db):
+        res = await _submit(G1_LEARNER, _journey(independent_compare="right"), grade=1, assessmentProtocolVersion="onboarding-v2")
+        item = next(i for i in db["assessments"].inserted[0]["evaluatedItems"] if i["questionId"] == "g1v2_compare_independent_7_4")
+        assert item["correctFirstResponse"] is False
+        imlr = res.json()["data"]["imlr"]                         # the learn-and-transfer sequence is evaluated alone
+        assert imlr["status"] == "TRANSFER_OBSERVED" and imlr["preProbeCorrect"] is False
 
     async def test_support_item_cannot_be_relabelled_as_independent(self, db):
         answers = _journey()
@@ -138,7 +172,7 @@ class TestGrade1Journey:
         math_sum = summary["mathSummary"]
         assert math_sum["assessmentProtocolVersion"] == "onboarding-v2"
         assert math_sum["childPreferences"]["theme"] == "animal_friends"
-        assert math_sum["impsa"]["eligibleUnassistedItems"] == 5
+        assert math_sum["impsa"]["eligibleUnassistedItems"] == 6
         assert math_sum["imlr"]["status"] == "TRANSFER_OBSERVED"
         assert len(math_sum["evaluatedItems"]) > 0
 
@@ -151,5 +185,10 @@ def test_item_bank_answer_keys_present_and_roles_valid():
         assert item["expertReview"] == "PENDING"
         if item.get("options"):
             assert item["correctAnswer"] in {o["id"] for o in item["options"]}
+    independent = Counter(i["skillId"] for i in items if i["probeRole"] in (None, "representation", "pre", "transfer"))
+    assert all(n >= MINIMUM_EVIDENCE_QUESTIONS_PER_SKILL for n in independent.values()), independent
+    new = next(i for i in items if i["questionId"] == "g1v2_compare_independent_7_4")
+    assert new["skillId"] == "number_comparison" and new["probeRole"] is None
+    assert new["itemFamilyId"] != "g1_compare_more"             # outside the pre -> support -> transfer family
     # Grades 2-5 have their own items and tests (test_onboarding_v2_grade2.py, _grade3.py, _grades4_5.py)
     assert not any(i["grade"] != 1 for i in items)

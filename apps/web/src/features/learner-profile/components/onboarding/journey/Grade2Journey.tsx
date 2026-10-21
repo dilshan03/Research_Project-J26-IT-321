@@ -121,6 +121,7 @@ export const Grade2Journey: React.FC<Props> = ({ onSubmit, isSubmitting }) => {
           helpText={item.helpText}
           stimulus={item.stimulus}
           options={item.options}
+          optionsLayout={phase === 'show_number' ? 'equal' : 'wrap'}
           ctx={ctx}
           onDone={(a) => record(a, phase === 'read_blocks' ? 'show_number' : 'add_blocks')}
         />

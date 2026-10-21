@@ -482,9 +482,11 @@ export const OnboardingPlaceholderPage: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/learners')}
+              title="The child activities are not saved part-way; they start again from the beginning next time."
               className="text-xs font-bold text-slate-500 hover:text-teal-700 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
             >
-              Pause & Exit (පසුවට සුරකින්න)
+              {/* Nothing is saved part-way: the child activities restart next time (no partial evidence is stored) */}
+              Pause & Exit (පසුව ආයෙත් පටන් ගන්න)
             </button>
           </div>
         </header>

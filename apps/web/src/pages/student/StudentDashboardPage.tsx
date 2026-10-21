@@ -26,6 +26,8 @@ import {
   Gamepad2,
   Play,
   RefreshCw,
+  CheckCircle2,
+  RotateCcw,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import { PedagogicalPracticeArena } from '../../features/pedagogical-agent';
@@ -216,6 +218,33 @@ export const StudentDashboardPage: React.FC = () => {
     )
   );
 
+  // Track completed activities for this specific learner
+  const [completedActivityIds, setCompletedActivityIds] = useState<string[]>(() => {
+    const local = getLocalStudentProgress(
+      resolvedParentId,
+      resolvedLearnerId,
+      studentDisplayName,
+      studentGrade
+    );
+    const backupKey = `mq_completed_acts_${resolvedLearnerId}`;
+    try {
+      const backupRaw = localStorage.getItem(backupKey);
+      const backupList = backupRaw ? JSON.parse(backupRaw) : [];
+      return Array.from(new Set([...(local.completedActivityIds || []), ...backupList]));
+    } catch {
+      return local.completedActivityIds || [];
+    }
+  });
+
+  // Keep completedActivityIds synced with savedProgress when it loads/updates
+  useEffect(() => {
+    if (savedProgress.completedActivityIds && savedProgress.completedActivityIds.length > 0) {
+      setCompletedActivityIds((prev) =>
+        Array.from(new Set([...prev, ...savedProgress.completedActivityIds!]))
+      );
+    }
+  }, [savedProgress.completedActivityIds]);
+
   const progressRef = useRef<StudentSavedProgress>(savedProgress);
   useEffect(() => {
     progressRef.current = savedProgress;
@@ -314,8 +343,59 @@ export const StudentDashboardPage: React.FC = () => {
         (!env.blueprint.target_learner_id || env.blueprint.target_learner_id === resolvedLearnerId)
     );
 
-    return [...childSpecific, ...gradeMatching, ...otherApproved];
-  }, [approvedGames, resolvedLearnerId, studentDisplayName, studentGrade]);
+    const allGames = [...childSpecific, ...gradeMatching, ...otherApproved];
+
+    // Move completed games to the very end of the cards list (agatama yana vidiyata)
+    return allGames.sort((a, b) => {
+      const aDone = completedActivityIds.includes(a.blueprint.activity_id);
+      const bDone = completedActivityIds.includes(b.blueprint.activity_id);
+      if (aDone && !bDone) return 1;  // a is completed -> push to end
+      if (!aDone && bDone) return -1; // b is completed -> a comes first
+      return 0;
+    });
+  }, [approvedGames, completedActivityIds, resolvedLearnerId, studentDisplayName, studentGrade]);
+
+  const handleGameComplete = useCallback(
+    ({
+      activityId,
+      starsEarned,
+      coinsEarned,
+    }: {
+      activityId: string;
+      starsEarned: number;
+      coinsEarned: number;
+    }) => {
+      // 1. Mark as completed in local state & backup
+      setCompletedActivityIds((prev) => {
+        if (prev.includes(activityId)) return prev;
+        const next = [...prev, activityId];
+        try {
+          localStorage.setItem(`mq_completed_acts_${resolvedLearnerId}`, JSON.stringify(next));
+        } catch {}
+        return next;
+      });
+
+      // 2. Add stars & coins to student progress and save
+      setSavedProgress((prev) => {
+        const existing = prev.completedActivityIds || [];
+        const nextActs = existing.includes(activityId) ? existing : [...existing, activityId];
+        const next: StudentSavedProgress = {
+          ...prev,
+          parentId: resolvedParentId,
+          learnerId: resolvedLearnerId,
+          studentName: studentDisplayName,
+          grade: studentGrade,
+          stars: (prev.stars || 0) + starsEarned,
+          coins: (prev.coins || 0) + coinsEarned,
+          completedActivityIds: nextActs,
+          updatedAt: new Date().toISOString(),
+        };
+        saveStudentProgress(next);
+        return next;
+      });
+    },
+    [resolvedParentId, resolvedLearnerId, studentDisplayName, studentGrade]
+  );
 
   const handleRewardEarned = useCallback(
     (starsDelta: number, coinsDelta: number) => {
@@ -592,9 +672,9 @@ export const StudentDashboardPage: React.FC = () => {
           learnerId={resolvedLearnerId}
           totalStars={savedProgress.stars}
           totalCoins={savedProgress.coins}
+          onComplete={handleGameComplete}
           onExit={() => {
             setActiveApprovedGame(null);
-            handleRewardEarned(3, 10);
           }}
         />
       </div>
@@ -1053,7 +1133,15 @@ export const StudentDashboardPage: React.FC = () => {
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-300/80 text-xs font-black text-amber-950">
                             <Sparkles size={12} className="text-amber-500 fill-amber-400" />
                             <span>
-                              {studentApprovedGames.length} {isSinhala ? 'ක්‍රීඩා සූදානම්' : 'Games Ready'}
+                              {studentApprovedGames.length} {isSinhala ? 'ක්‍රීඩා' : 'Games'}
+                              {studentApprovedGames.filter((env) =>
+                                completedActivityIds.includes(env.blueprint.activity_id)
+                              ).length > 0 &&
+                                ` · ${
+                                  studentApprovedGames.filter((env) =>
+                                    completedActivityIds.includes(env.blueprint.activity_id)
+                                  ).length
+                                } ක් ${isSinhala ? 'සම්පූර්ණයි ✓' : 'Completed ✓'}`}
                             </span>
                           </span>
                         </div>
@@ -1171,6 +1259,7 @@ export const StudentDashboardPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {studentApprovedGames.map((env, idx) => {
                           const bp = env.blueprint;
+                          const isCompleted = completedActivityIds.includes(bp.activity_id);
                           const themeKey = (bp.game_theme || 'VILLAGE_MARKET') as GameTheme;
                           const themeInfo =
                             ADAPTATION_THEMES[themeKey] || ADAPTATION_THEMES.VILLAGE_MARKET;
@@ -1190,23 +1279,44 @@ export const StudentDashboardPage: React.FC = () => {
                           return (
                             <div
                               key={bp.activity_id || idx}
-                              className={`group relative rounded-3xl bg-white border-2 border-mq-border ${themeInfo.cardHover} p-5 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between hover:-translate-y-1`}
+                              className={`group relative rounded-3xl p-5 shadow-xs transition-all duration-300 flex flex-col justify-between ${
+                                isCompleted
+                                  ? 'bg-gradient-to-b from-emerald-50/80 via-white to-emerald-50/40 border-2 border-emerald-400/80 shadow-emerald-50 hover:shadow-md hover:border-emerald-500'
+                                  : `bg-white border-2 border-mq-border ${themeInfo.cardHover} hover:shadow-md hover:-translate-y-1`
+                              }`}
                             >
                               {/* Top Row: Mascot + Badges */}
                               <div>
                                 <div className="flex items-start justify-between gap-2 mb-3">
-                                  <div
-                                    className={`w-13 h-13 rounded-2xl ${themeInfo.mascotBg} border ${themeInfo.mascotBorder} flex items-center justify-center text-3xl shadow-2xs group-hover:scale-105 transition-transform`}
-                                  >
-                                    {themeInfo.mascot}
+                                  <div className="relative">
+                                    <div
+                                      className={`w-13 h-13 rounded-2xl ${
+                                        isCompleted
+                                          ? 'bg-emerald-100 border-2 border-emerald-300'
+                                          : `${themeInfo.mascotBg} border ${themeInfo.mascotBorder}`
+                                      } flex items-center justify-center text-3xl shadow-2xs group-hover:scale-105 transition-transform`}
+                                    >
+                                      {themeInfo.mascot}
+                                    </div>
+                                    {isCompleted && (
+                                      <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[11px] font-black shadow-xs ring-2 ring-white">
+                                        ✓
+                                      </span>
+                                    )}
                                   </div>
 
                                   <div className="flex flex-col items-end gap-1">
-                                    {isTargetChild && (
+                                    {isCompleted ? (
+                                      <span className="inline-flex items-center gap-1 text-[11px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500 text-white shadow-2xs">
+                                        <CheckCircle2 size={12} className="stroke-[3]" />
+                                        <span>{isSinhala ? 'සම්පූර්ණයි ✓' : 'Completed ✓'}</span>
+                                      </span>
+                                    ) : isTargetChild ? (
                                       <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-400 text-amber-950 shadow-2xs">
                                         <Sparkles size={11} /> {isSinhala ? 'ඔබ වෙනුවෙන්මයි' : 'For You'}
                                       </span>
-                                    )}
+                                    ) : null}
+
                                     <div className="flex items-center gap-1">
                                       <span className="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-mq-surface-blue text-mq-primary-dark border border-mq-primary/25">
                                         {GRADE_SI_LABELS[bp.grade] || `Grade ${bp.grade}`}
@@ -1238,22 +1348,45 @@ export const StudentDashboardPage: React.FC = () => {
                                       {isSinhala ? 'සන්සුන් පරිසරය' : 'Calm view'}
                                     </span>
                                   )}
-                                  <span className="text-[11px] font-bold text-amber-900 bg-amber-50 border border-amber-200/90 px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1">
-                                    <Star size={11} className="fill-amber-400 text-amber-500" />
-                                    <span>3 {isSinhala ? 'තරු' : 'Stars'}</span>
+                                  <span
+                                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg inline-flex items-center gap-1 ${
+                                      isCompleted
+                                        ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                        : 'text-amber-900 bg-amber-50 border border-amber-200/90'
+                                    }`}
+                                  >
+                                    <Star size={11} className={`fill-amber-400 ${isCompleted ? 'text-amber-600' : 'text-amber-500'}`} />
+                                    <span>
+                                      {isCompleted
+                                        ? (isSinhala ? 'තරු 3ක් ලැබුණා ✓' : '3 Stars Earned ✓')
+                                        : `3 ${isSinhala ? 'තරු' : 'Stars'}`}
+                                    </span>
                                   </span>
                                 </div>
                               </div>
 
-                              {/* Play Button */}
+                              {/* Play / Replay Button */}
                               <div className="mt-4 pt-2">
                                 <button
                                   type="button"
                                   onClick={() => setActiveApprovedGame(env)}
-                                  className="w-full btn bg-mq-primary hover:bg-mq-primary-hover active:bg-mq-primary-dark text-white font-extrabold text-sm py-2.5 px-4 rounded-2xl shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                                  className={`w-full font-extrabold text-sm py-2.5 px-4 rounded-2xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                                    isCompleted
+                                      ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-emerald-200/50'
+                                      : 'btn bg-mq-primary hover:bg-mq-primary-hover active:bg-mq-primary-dark text-white hover:shadow-md'
+                                  }`}
                                 >
-                                  <Play size={16} className="fill-white" />
-                                  <span>{isSinhala ? 'සෙල්ලම් කරන්න' : 'Play Game'}</span>
+                                  {isCompleted ? (
+                                    <>
+                                      <RotateCcw size={15} className="stroke-[2.5]" />
+                                      <span>{isSinhala ? 'නැවත සෙල්ලම් කරන්න' : 'Play Again'}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Play size={16} className="fill-white" />
+                                      <span>{isSinhala ? 'සෙල්ලම් කරන්න' : 'Play Game'}</span>
+                                    </>
+                                  )}
                                 </button>
                               </div>
                             </div>

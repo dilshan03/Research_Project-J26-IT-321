@@ -98,12 +98,14 @@ export function GamePlayer({
   learnerId = 'local-demo-learner',
   totalStars,
   totalCoins,
+  onComplete,
 }: {
   envelope: BlueprintEnvelope;
   onExit: () => void;
   learnerId?: string;
   totalStars?: number;
   totalCoins?: number;
+  onComplete?: (result: { activityId: string; starsEarned: number; coinsEarned: number }) => void;
 }) {
   const { blueprint } = envelope;
   const settings = blueprint.adhd_game_settings;
@@ -121,22 +123,55 @@ export function GamePlayer({
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [feedback, setFeedback] = useState<'correct' | 'retry' | null>(null);
 
+  const [completedRewarded, setCompletedRewarded] = useState(false);
+  const [displayedStars, setDisplayedStars] = useState<number | undefined>(totalStars);
+  const [displayedCoins, setDisplayedCoins] = useState<number | undefined>(totalCoins);
+
+  useEffect(() => {
+    setDisplayedStars(totalStars);
+  }, [totalStars]);
+
+  useEffect(() => {
+    setDisplayedCoins(totalCoins);
+  }, [totalCoins]);
+
   const steps = blueprint.micro_steps;
   const finished = stepIndex >= steps.length;
   const step: GameMicroStep | undefined = steps[stepIndex];
+
+  const stars = useMemo(() => {
+    const mistakes = attempts.filter(a => !a.correct).length;
+    return mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
+  }, [attempts]);
+
+  useEffect(() => {
+    if (finished && !completedRewarded) {
+      setCompletedRewarded(true);
+      const earnedCoins = 15;
+      // Visually bump stars and coins immediately so child sees feedback
+      setDisplayedStars((prev) => (prev !== undefined ? prev + stars : prev));
+      setDisplayedCoins((prev) => (prev !== undefined ? prev + earnedCoins : prev));
+
+      if (onComplete) {
+        onComplete({
+          activityId: blueprint.activity_id,
+          starsEarned: stars,
+          coinsEarned: earnedCoins,
+        });
+      }
+    }
+  }, [finished, completedRewarded, stars, blueprint.activity_id, onComplete]);
+
   useEffect(() => {
     if (isTracking && step) {
       onStepStart(step.step_order, step.action_type);
     }
   }, [isTracking, stepIndex, step?.step_order]);
+
   const exitGame = async () => {
     try { await onGameExit(); } catch (error) { console.error('Failed to finish tracking session', error); }
     onExit();
   };
-  const stars = useMemo(() => {
-    const mistakes = attempts.filter(a => !a.correct).length;
-    return mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
-  }, [attempts]);
 
   const pick = (opt: GameChoiceOption) => {
     if (!step || solved) return;
@@ -189,13 +224,13 @@ export function GamePlayer({
 
         <div className="flex items-center gap-2.5 sm:gap-3">
           {/* Top Corner Stars & Coins (Kid Rewards Pill) */}
-          {(totalStars !== undefined || totalCoins !== undefined) && (
+          {(displayedStars !== undefined || displayedCoins !== undefined) && (
             <div className="flex items-center gap-2">
-              {totalStars !== undefined && (
+              {displayedStars !== undefined && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-50 border-2 border-amber-300/80 text-xs sm:text-sm font-black text-amber-950 shadow-2xs">
                   <Star size={16} className="text-amber-500 fill-amber-400 shrink-0 animate-pulse" />
                   <span>
-                    {totalStars.toLocaleString()}{' '}
+                    {displayedStars.toLocaleString()}{' '}
                     <span className="hidden sm:inline text-[10px] font-extrabold text-amber-800">
                       {lang === 'si' ? 'තරු' : 'Stars'}
                     </span>
@@ -203,11 +238,11 @@ export function GamePlayer({
                 </div>
               )}
 
-              {totalCoins !== undefined && (
+              {displayedCoins !== undefined && (
                 <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-yellow-50 border-2 border-yellow-300/80 text-xs sm:text-sm font-black text-yellow-950 shadow-2xs">
                   <span className="text-yellow-600 text-sm">🪙</span>
                   <span>
-                    {totalCoins.toLocaleString()}{' '}
+                    {displayedCoins.toLocaleString()}{' '}
                     <span className="hidden sm:inline text-[10px] font-extrabold text-yellow-800">
                       {lang === 'si' ? 'කාසි' : 'Coins'}
                     </span>
@@ -308,11 +343,22 @@ export function GamePlayer({
           <section className="rounded-[2rem] bg-white shadow-[var(--mq-shadow-md)] p-10 text-center animate-fade-in">
             <div className="text-6xl mb-3">{theme.mascot}</div>
             <h1 className={`text-3xl font-extrabold mb-4 ${lang === 'si' ? 'sinhala' : ''}`}>{FEEDBACK.done[lang]}</h1>
-            <div className="flex justify-center gap-2 mb-6">
+            <div className="flex justify-center gap-2 mb-4">
               {[1, 2, 3].map(n => (
                 <Star key={n} size={44} className={n <= stars ? 'text-mq-accent-yellow animate-float' : 'text-mq-border'}
                   fill="currentColor" style={{ animationDelay: `${n * 200}ms` }} />
               ))}
+            </div>
+
+            <div className="inline-flex items-center gap-4 bg-amber-50 border-2 border-amber-300/90 px-5 py-2.5 rounded-2xl mb-6 shadow-xs animate-bounce">
+              <span className="text-sm font-black text-amber-950 flex items-center gap-1.5">
+                <Star size={18} className="fill-amber-400 text-amber-500" />
+                <span>+{stars} {lang === 'si' ? 'තරු ලැබුණා!' : 'Stars Earned!'}</span>
+              </span>
+              <span className="text-sm font-black text-yellow-950 flex items-center gap-1.5">
+                <span className="text-base">🪙</span>
+                <span>+15 {lang === 'si' ? 'කාසි ලැබුණා!' : 'Coins Earned!'}</span>
+              </span>
             </div>
             <div className="flex justify-center gap-3">
               <button id="game-restart" onClick={restart} className="btn btn-secondary"><RotateCcw size={18} /> {lang === 'si' ? 'නැවත' : 'Play again'}</button>

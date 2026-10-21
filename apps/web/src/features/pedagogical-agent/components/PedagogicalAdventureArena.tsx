@@ -16,6 +16,7 @@ import type {
   VisualAssetTag,
 } from '../../content-adaptation/types';
 import { useGameplayTracker } from '../../behaviour-monitoring/useGameplayTracker';
+import { Gaja } from '../../content-adaptation/game/Gaja';
 import { PedagogicalCompanion } from './PedagogicalCompanion';
 import { useInteractionLogger } from '../hooks/useInteractionLogger';
 import { useLearnerState } from '../hooks/useLearnerState';
@@ -251,6 +252,10 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
   const [displayedStars, setDisplayedStars] = useState<number | undefined>(totalStars);
   const [displayedCoins, setDisplayedCoins] = useState<number | undefined>(totalCoins);
 
+  // Pedagogical Support Engine state (MathBot emerges on hesitation or lightbulb click)
+  const [isSupportActive, setIsSupportActive] = useState<boolean>(false);
+  const [idleSeconds, setIdleSeconds] = useState<number>(0);
+
   const steps = blueprint.micro_steps;
   const finished = stepIndex >= steps.length;
   const currentStep: GameMicroStep | undefined = steps[stepIndex];
@@ -261,6 +266,64 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
   // Guards to prevent repetitive speech re-triggering bugs
   const lastSpokenStepRef = useRef<number>(-1);
   const lastSpokenLangRef = useRef<Lang>(lang);
+
+  // Reset support visibility and idle timer when a step changes
+  useEffect(() => {
+    setIsSupportActive(false);
+    setIdleSeconds(0);
+  }, [stepIndex]);
+
+  // Idle timer: If child stays idle without answering for 18 seconds, Support Agent emerges
+  useEffect(() => {
+    if (finished || solved || isSupportActive) return;
+
+    const timer = setInterval(() => {
+      setIdleSeconds((prev) => {
+        const next = prev + 1;
+        if (next >= (calm ? 22 : 18)) {
+          setIsSupportActive(true);
+          // Gently asks if help is needed - does NOT reveal hint automatically
+          useAgentStore.getState().playAction('thinking', {
+            message:
+              lang === 'si'
+                ? 'කල්පනා කරනවද? උදව්වක් අවශ්‍ය නම් කියන්න! 💡'
+                : 'Thinking hard? Let me know if you need help! 💡',
+            duration: 4.5,
+          });
+        }
+        return next;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [stepIndex, finished, solved, isSupportActive, calm, lang]);
+
+  // Emerges on 2 wrong attempts (verdi answer 2k ebuvoth hri)
+  useEffect(() => {
+    if (wrongPicks.size >= 2 && !isSupportActive && !solved && !finished) {
+      setIsSupportActive(true);
+      // Asks if help is needed - does NOT force hint automatically
+      useAgentStore.getState().playAction('thinking', {
+        message:
+          lang === 'si'
+            ? 'උදව්වක් අවශ්‍යද? මම හෝඩුවාවක් දෙන්නද? 💡'
+            : 'Would you like some help? Shall I give a hint? 💡',
+        duration: 4.5,
+      });
+    }
+  }, [wrongPicks.size, isSupportActive, solved, finished, lang]);
+
+  // Explicit Lightbulb Click by child
+  const handleOpenSupport = () => {
+    setIsSupportActive(true);
+    useAgentStore.getState().playAction('wave', {
+      message:
+        lang === 'si'
+          ? 'මම උදව් කරන්න සූදානම්! හෝඩුවාවක් ලබාගන්න පහත බොත්තම ඔබන්න. 💡'
+          : "I'm ready to help! Click the button below to get a hint. 💡",
+      duration: 4.0,
+    });
+  };
 
   useEffect(() => {
     setDisplayedStars(totalStars);
@@ -354,28 +417,13 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
     if (finished) return;
 
     if (stepIndex === 0 && currentStep) {
-      // Game start: Introduce the specific game story and quest
-      const storyDialogue = blueprint.story_narrative?.gaja_dialogue?.intro?.[lang];
-      const backdrop = lang === 'si' ? blueprint.story_narrative?.backdrop_si : blueprint.story_narrative?.backdrop_en;
-      const quest = lang === 'si' ? blueprint.story_narrative?.quest_goal_si : blueprint.story_narrative?.quest_goal_en;
-
-      const introMsg =
-        storyDialogue ||
-        backdrop ||
-        quest ||
-        (lang === 'si'
-          ? `ආයුබෝවන්! මම ගජා. අද අපි '${theme.name_si}' හි '${blueprint.topic}' අභියෝගය විසඳමු!`
-          : `Hello! I'm Gaja. Let's solve the ${theme.name_en} quest in ${blueprint.topic}!`);
-
-      useAgentStore.getState().playAction('wave', { message: introMsg, duration: 4.5 });
-    } else if (currentStep) {
-      // Step advance: Guide the child on the current step
-      const stepGuide =
+      // Support Agent initial greeting (MathBot introduces itself as the helper)
+      const supportIntro =
         lang === 'si'
-          ? `පියවර ${currentStep.step_order}: ${currentStep.instruction_si}`
-          : `Step ${currentStep.step_order}: ${currentStep.instruction_en}`;
+          ? 'ආයුබෝවන්! මම ඔයාගේ AI සහයක (MathBot). ගණන හදන්න උදව් අවශ්‍ය නම් මම හෝඩුවාවක් දෙන්නම්! 💡'
+          : "Hello! I'm your AI support companion. Need help? Tap the bulb for a hint! 💡";
 
-      useAgentStore.getState().playAction('thinking', { message: stepGuide, duration: 4.0 });
+      useAgentStore.getState().playAction('wave', { message: supportIntro, duration: 4.0 });
     }
   }, [stepIndex, lang, finished, currentStep, blueprint, theme]);
 
@@ -402,6 +450,7 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
           ? `විශිෂ්ටයි! ඔයා '${theme.name_si}' හි සියලුම පියවර සාර්ථකව ජයගත්තා! 🎉`
           : `Splendid! You successfully completed all steps in ${theme.name_en}! 🎉`);
 
+      setIsSupportActive(true);
       useAgentStore.getState().playAction('correctCelebrate', { message: celebrationMsg, duration: 5.0 });
 
       if (onComplete) {
@@ -672,6 +721,22 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
               </button>
             ))}
           </div>
+
+          {/* Discreet Help Button (Toggles Pedagogical Support Agent) */}
+          <button
+            type="button"
+            id="bulb-header-trigger"
+            onClick={handleOpenSupport}
+            className={`px-3 py-1.5 rounded-full text-xs font-black inline-flex items-center gap-1.5 transition-all cursor-pointer border shadow-2xs ${
+              isSupportActive
+                ? 'bg-amber-100 text-amber-900 border-amber-300'
+                : 'bg-white hover:bg-amber-50 text-mq-text-muted hover:text-amber-800 border-mq-border hover:border-amber-300'
+            }`}
+            title={lang === 'si' ? 'AI සහයකයාගෙන් උදව් ලබාගන්න' : 'Get Help'}
+          >
+            <span className="text-sm">💡</span>
+            <span>{lang === 'si' ? 'උදව්' : 'Help'}</span>
+          </button>
         </div>
       </header>
 
@@ -679,9 +744,9 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
       {/* 2. MAIN WORKSPACE: GAME ARENA + SIDE PEDAGOGICAL COMPANION */}
       {/* ========================================================= */}
       <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-4 sm:py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* LEFT / CENTER: Active Game Microstep Card (8 Cols) */}
-          <div className="lg:col-span-8 space-y-4">
+        <div className={`grid grid-cols-1 ${isSupportActive ? 'lg:grid-cols-12' : 'max-w-4xl mx-auto'} gap-6 items-start transition-all duration-300`}>
+          {/* Active Game Microstep Card (8 Cols when support open, full centered width when closed) */}
+          <div className={`${isSupportActive ? 'lg:col-span-8' : 'w-full'} space-y-4`}>
             {/* Step Progress Dots */}
             <div className="flex items-center justify-center gap-2.5 sm:gap-3 py-2" aria-label="Progress">
               {steps.map((s, i) => (
@@ -729,18 +794,18 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
                   calm ? '' : 'animate-fade-in'
                 }`}
               >
-                {/* Step Instruction & Voice Button */}
-                <div className="flex items-center justify-center gap-3 mb-2 text-center">
-                  <span className="text-3xl sm:text-4xl" aria-hidden>
-                    {ASSET_ICON[currentStep.target_visual_asset]}
-                  </span>
-                  <h1
-                    className={`text-xl sm:text-2xl md:text-3xl font-black text-mq-text-strong ${
-                      lang === 'si' ? 'sinhala' : ''
-                    }`}
-                  >
-                    {lang === 'si' ? currentStep.instruction_si : currentStep.instruction_en}
-                  </h1>
+                {/* Gaja the Host Presenting the Step Question (Just like the original Content Adaptation game) */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+                  <Gaja
+                    mood={solved ? 'celebrate' : feedback === 'retry' ? 'encourage' : 'happy'}
+                    line={{
+                      si: currentStep.instruction_si,
+                      en: currentStep.instruction_en,
+                    }}
+                    lang={lang}
+                    calm={calm}
+                    size="md"
+                  />
                   <button
                     type="button"
                     id="speak-instruction"
@@ -751,9 +816,10 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
                         lang
                       )
                     }
-                    className="w-10 h-10 rounded-2xl bg-mq-surface-blue text-mq-primary border border-mq-primary/25 flex items-center justify-center hover:bg-mq-primary hover:text-white transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95 shrink-0"
+                    className="self-center sm:self-end mb-8 w-11 h-11 rounded-2xl bg-mq-surface-blue text-mq-primary border border-mq-primary/25 flex items-center justify-center hover:bg-mq-primary hover:text-white transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95 shrink-0"
+                    title={lang === 'si' ? 'ප්‍රශ්නය හඬ නගා කියවන්න' : 'Read question aloud'}
                   >
-                    <Volume2 size={18} />
+                    <Volume2 size={20} />
                   </button>
                 </div>
 
@@ -814,6 +880,20 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
                         className="btn bg-mq-primary hover:bg-mq-primary-hover active:bg-mq-primary-dark text-white font-extrabold text-base px-6 py-2.5 rounded-2xl shadow-xs hover:shadow-md transition-all cursor-pointer hover:scale-105 active:scale-95"
                       >
                         <span>{lang === 'si' ? 'ඊළඟ පියවර' : 'Next Step'}</span> →
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Discreet, non-distracting Hint prompt when support is hidden */}
+                  {!isSupportActive && !solved && (
+                    <div className="pt-2 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={handleOpenSupport}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold text-mq-text-muted hover:text-amber-800 hover:bg-amber-50/70 border border-mq-border/50 hover:border-amber-300 transition-all cursor-pointer shadow-2xs"
+                      >
+                        <span className="text-sm">💡</span>
+                        <span>{lang === 'si' ? 'උදව්වක් අවශ්‍යද? හෝඩුවාවක් බලන්න' : 'Need help? View a hint'}</span>
                       </button>
                     </div>
                   )}
@@ -902,17 +982,22 @@ export const PedagogicalAdventureArena: React.FC<PedagogicalAdventureArenaProps>
             )}
           </div>
 
-          {/* RIGHT COLUMN: 3D PEDAGOGICAL COMPANION & HINT BOARD (4 Cols) */}
-          <div className="lg:col-span-4 sticky top-20 space-y-4">
-            <div className="min-h-[520px] rounded-3xl overflow-hidden shadow-md">
-              <PedagogicalCompanion
-                hints={stepHints}
-                onHintRequest={handleHintRequest}
-                disabled={finished}
-                theme="light"
-              />
+          {/* RIGHT COLUMN: PEDAGOGICAL SUPPORT ENGINE (MathBot - only emerges on hesitation/requests) */}
+          {isSupportActive && (
+            <div className="lg:col-span-4 sticky top-20 space-y-4 animate-fade-in">
+              <div className="min-h-[520px] rounded-3xl overflow-hidden shadow-md">
+                <PedagogicalCompanion
+                  hints={stepHints}
+                  onHintRequest={handleHintRequest}
+                  disabled={finished}
+                  theme="light"
+                  defaultAvatar="3d"
+                  calm={calm}
+                  onClose={() => setIsSupportActive(false)}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
     </div>

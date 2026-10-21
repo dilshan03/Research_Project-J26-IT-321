@@ -5,6 +5,7 @@ import { ArrowLeft, CheckCircle2, RotateCcw, Sparkles, Star, Volume2 } from 'luc
 import type {
   BlueprintEnvelope, DistractorType, GameChoiceOption, GameMicroStep, GameTheme, VisualAssetTag,
 } from '../types';
+import { Gaja } from './Gaja';
 
 type Lang = 'si' | 'en';
 
@@ -366,6 +367,38 @@ export function GamePlayer({
             </div>
           </section>
         )}
+        {/* Gaja the Companion Mascot */}
+        <div className="fixed left-4 bottom-4 z-30 pointer-events-none md:pointer-events-auto">
+          <Gaja
+            mood={finished ? 'celebrate' : solved ? 'celebrate' : feedback === 'retry' ? 'encourage' : 'happy'}
+            line={
+              finished
+                ? blueprint.story_narrative?.gaja_dialogue?.celebrate || {
+                    si: 'විශිෂ්ටයි! ඔයා සියලුම පියවර සාර්ථකව අවසන් කළා!',
+                    en: 'Splendid! You completed all steps!',
+                  }
+                : solved
+                ? blueprint.story_narrative?.gaja_dialogue?.praise || {
+                    si: 'නියමයි! නිවැරදි පිළිතුර!',
+                    en: 'Great job! Correct answer!',
+                  }
+                : feedback === 'retry'
+                ? blueprint.story_narrative?.gaja_dialogue?.retry || {
+                    si: 'කමක් නෑ, නැවත උත්සාහ කරමු!',
+                    en: "That's okay, try again!",
+                  }
+                : stepIndex === 0
+                ? blueprint.story_narrative?.gaja_dialogue?.intro || {
+                    si: 'ආයුබෝවන්! මම ගජා. අපි එකතු වෙලා ගණිත ගැටලුව විසඳමු!',
+                    en: "Hello! I'm Gaja. Let's solve the math quest together!",
+                  }
+                : null
+            }
+            lang={lang}
+            calm={calm}
+            size="md"
+          />
+        </div>
       </main>
     </div>
   );

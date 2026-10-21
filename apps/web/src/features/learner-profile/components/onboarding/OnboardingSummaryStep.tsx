@@ -4,6 +4,7 @@ import { CheckCircle2, Compass, ClipboardList, Calculator, ArrowRight, Stethosco
 
 import type { OnboardingFullSummary } from '../../types/onboarding';
 import { ADHD_DIAGNOSIS_STATUS_OPTIONS, ADHD_PRESENTATION_OPTIONS } from '../../types/onboarding';
+import { mathResultCounts } from '../../utils/mathResultCounts';
 import { AnimatedCompanion } from './AnimatedCompanion';
 import { SkillEvidenceList } from '../parent/SkillEvidenceList';
 import { RecommendationList, RecommendationResearchRows } from '../parent/RecommendationList';
@@ -47,6 +48,8 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
   const snap = summary.snapIvSummary;
   const pref = summary.learningPreferences;
   const elpx = math?.elpxProfile;
+  // Independent first responses vs guided/helped activities, from the server's per-item flags
+  const counts = mathResultCounts(math?.evaluatedItems);
   const adhd = summary.adhdInformation;
   const adhdStatus = ADHD_DIAGNOSIS_STATUS_OPTIONS.find((o) => o.value === adhd?.diagnosisStatus);
   const adhdPresentation = ADHD_PRESENTATION_OPTIONS.find((o) => o.value === adhd?.reportedPresentation);
@@ -94,7 +97,16 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
               <Calculator size={18} className="text-mq-warning shrink-0" />
               <span>{t.mathTitle}</span>
             </h2>
-            <span className="text-sm text-mq-text">{t.mathCorrect(math.correctAnswers, math.totalQuestions)}</span>
+            {counts ? (
+              <span className="text-sm text-mq-text">
+                {t.mathIndependent(counts.independentCorrect, counts.independentTotal)}
+                {counts.notIndependent > 0 && (
+                  <span className="block text-xs text-mq-text-muted">{t.mathNotIndependent(counts.notIndependent)}</span>
+                )}
+              </span>
+            ) : (
+              <span className="text-sm text-mq-text">{t.mathCorrect(math.correctAnswers, math.totalQuestions)}</span>
+            )}
             <span
               className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
                 math.evidenceLevel === 'SUFFICIENT'

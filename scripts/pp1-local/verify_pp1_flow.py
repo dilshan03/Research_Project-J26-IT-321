@@ -3,7 +3,7 @@ PP1 live verification against the ISOLATED LOCAL stack (no mocks, no Atlas):
   web http://localhost:5174 -> auth http://127.0.0.1:5100 + learner-profile http://localhost:5101
   -> MongoDB container on 127.0.0.1:27018, database mathquest_pp1_demo (synthetic records only).
 
-Usage (after start-pp1-local.ps1):  python scripts\\pp1-local\\verify_pp1_flow.py
+Usage (after start-pp1-local.ps1):  python scripts\\pp1-local\\verify_pp1_flow.py [--record]
 Requires: playwright + pymongo in the local Python. Every browser request to a non-local host is blocked.
 """
 import json
@@ -71,7 +71,10 @@ teacher = f"pp1.teacher.{RUN}@example.test"
 
 with sync_playwright() as p:
     browser = p.chromium.launch()
-    ctx_a = browser.new_context(viewport={"width": 1366, "height": 900})
+    # --record: also save a video of parent A's browser (backup material if the live demo fails)
+    record = {"record_video_dir": str(OUT / "video"), "record_video_size": {"width": 1366, "height": 900}} \
+        if "--record" in sys.argv else {}
+    ctx_a = browser.new_context(viewport={"width": 1366, "height": 900}, **record)
     ctx_a.route("**/*", guard)
     ctx_b = browser.new_context()
     ctx_t = browser.new_context()

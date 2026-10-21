@@ -613,6 +613,9 @@ const si = {
     completeNow: 'දැන් සම්පූර්ණ කරන්න',
     mathTitle: 'ගණිත ක්‍රියාකාරකම',
     mathCorrect: (correct: number, total: number) => `ප්‍රශ්න ${total}න් ${correct}ක් නිවැරදියි`,
+    // Independent performance shown separately from guided or helped activities (pending wording review)
+    mathIndependent: (correct: number, total: number) => `තනිවම කළ ප්‍රශ්න ${total}න් ${correct}ක් පළමු වරම නිවැරදියි`,
+    mathNotIndependent: (n: number) => `මඟපෙන්වීම හෝ උදව් සහිත ක්‍රියාකාරකම් ${n}ක් මෙම ගණනට ඇතුළත් කර නැත.`,
     mathNote: 'මුල් ප්‍රතිඵලයක් පමණි. දරුවාගේ හැකියාව පිළිබඳ ස්ථිර නිගමනයක් නොවේ.',
     notAvailable: 'තොරතුරු නැත.',
   },

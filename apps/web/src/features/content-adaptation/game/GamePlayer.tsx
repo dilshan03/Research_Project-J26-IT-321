@@ -114,7 +114,8 @@ export function GamePlayer({
   const calm = settings.stimulus_density === 'LOW';
 
   const gameContainerRef = useRef<HTMLDivElement>(null);
-  const activityId = useMemo(() => `mathquest-${blueprint.game_theme}-${blueprint.grade}-${blueprint.topic}`, [blueprint.game_theme, blueprint.grade, blueprint.topic]);
+  // Use the same approved activity ID as the camera overlay and report.
+  const activityId = blueprint.activity_id;
   const tracker = useGameplayTracker({ learnerId, activityId, gameTheme: blueprint.game_theme, grade: blueprint.grade, containerRef: gameContainerRef });
   const { isTracking, onStepStart, onAnswerSelect, onAnswerSubmit, onGameExit } = tracker;
   const [lang, setLang] = useState<Lang>('si');

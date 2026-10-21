@@ -2,6 +2,17 @@ import { useEffect, useRef, useState } from 'react';
 import { FaceLandmarker, FilesetResolver } from '@mediapipe/tasks-vision';
 import { Camera, CheckCircle2, ArrowRight, RotateCcw } from 'lucide-react';
 
+type SavedGameplayEvent = { eventId: string; sessionId: string; timestamp: string; eventType: string; stepOrder?: number; isCorrect?: boolean; selectedOption?: string };
+type SavedGameplaySummary = { sessionId: string; activityId: string; updatedAt: number; events: SavedGameplayEvent[] };
+const GAMEPLAY_SUMMARY_KEY = 'mathquest:gameplay-summary:v1';
+function readGamePlayerSummary(): SavedGameplaySummary | null {
+  try {
+    const raw = sessionStorage.getItem(GAMEPLAY_SUMMARY_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw) as SavedGameplaySummary;
+    return data && typeof data.sessionId === 'string' && Array.isArray(data.events) ? data : null;
+  } catch { return null; }
+}
 type DeepFaceObservation = { at: number; dominant: string; scores: Record<string, number> };
 const DEEPFACE_API = 'http://127.0.0.1:8010';
 const deepfaceLabels: Record<string, string> = { happy: 'සතුටට සමාන ප්‍රකාශනය', angry: 'කෝපයට සමාන ප්‍රකාශනය', sad: 'දුකට සමාන ප්‍රකාශනය', surprise: 'පුදුමයට සමාන ප්‍රකාශනය', fear: 'බියට සමාන ප්‍රකාශනය', disgust: 'අප්‍රසාදයට සමාන ප්‍රකාශනය', neutral: 'මධ්‍යස්ථ ප්‍රකාශනය' };
@@ -49,6 +60,7 @@ const MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/face_landmark
 
 export default function BehaviourMonitoringPage() {
   const [stage, setStage] = useState<Stage>('welcome');
+  const [realGameplaySummary, setRealGameplaySummary] = useState<SavedGameplaySummary | null>(() => readGamePlayerSummary());
   const [deepfaceStatus, setDeepfaceStatus] = useState('ප්‍රකාශන විශ්ලේෂණය සම්බන්ධ කර නැත');
   const [deepfaceReport, setDeepfaceReport] = useState<DeepFaceObservation[]>([]);
   const [analysisRequests, setAnalysisRequests] = useState(0);
@@ -350,6 +362,10 @@ function reset() { deepfaceActiveRef.current = false; deepfaceRef.current = []; 
   const correctCount = answers.filter(a => a.correct).length;
   const averageResponse = answers.length ? Math.round(answers.reduce((sum, a) => sum + a.responseMs, 0) / answers.length / 1000) : 0;
   const totalChanges = answers.reduce((sum, a) => sum + a.changes, 0);
+  const realEvents = realGameplaySummary?.events ?? [];
+  const countReal = (kind: string) => realEvents.filter(e => e.eventType === kind).length;
+  const realSteps = [...new Set(realEvents.map(e => e.stepOrder).filter((n): n is number => typeof n === 'number'))].sort((a, b) => a - b);
+
   const sessionDuration = sessionEnd && sessionStartRef.current ? Math.round((sessionEnd - sessionStartRef.current) / 1000) : 0;
   return <div className="min-h-screen bg-mq-bg text-mq-text px-4 py-8">
     <div className="max-w-5xl mx-auto">
@@ -453,9 +469,50 @@ function reset() { deepfaceActiveRef.current = false; deepfaceRef.current = []; 
            </div>
            <div className="bg-white rounded-3xl border border-mq-border p-6 md:p-8">
              <h2 className="text-xl font-bold mb-4">ක්‍රීඩා අන්තර්ක්‍රියා</h2>
-             <p className="mb-3">මුළු පිළිතුරු වෙනස් කිරීම්: <strong>{totalChanges}</strong></p>
-             <div className="space-y-2">{answers.map(a => <div key={a.question} className="flex flex-wrap justify-between gap-3 bg-mq-surface-soft rounded-xl p-3 text-sm"><span>ප්‍රශ්නය {a.question}</span><span>{a.correct ? 'නිවැරදි' : 'වැරදි'}</span><span>{Math.round(a.responseMs / 1000)} තත්පර</span><span>වෙනස් කිරීම්: {a.changes}</span></div>)}</div>
+             <p className="text-sm text-mq-text-muted mb-4">පිළිතුරු විකල්ප තෝරාගැනීමේ ක්ලික් කිරීම් සහ පිළිතුරු යොමු කිරීම් පමණක් මෙහි ගණනය කර ඇත.</p>
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+               {[
+                 ['විකල්ප තේරීම් ක්ලික්', answers.reduce((sum, a) => sum + a.choices, 0)],
+                 ['පිළිතුරු යොමු කිරීම්', answers.length],
+                 ['මුළු පිළිතුරු අන්තර්ක්‍රියා', answers.reduce((sum, a) => sum + a.choices, 0) + answers.length],
+                 ['පිළිතුරු වෙනස් කිරීම්', totalChanges],
+               ].map(([label, value]) => <div key={label} className="bg-mq-surface-soft rounded-xl p-4"><p className="text-sm text-mq-text-muted">{label}</p><p className="text-xl font-bold mt-2">{value}</p></div>)}
+             </div>
+             <h3 className="font-semibold mb-3">ප්‍රශ්න අනුව ක්‍රීඩා අන්තර්ක්‍රියා</h3>
+             <div className="space-y-2">{answers.map(a => <div key={a.question} className="flex flex-wrap justify-between gap-3 bg-mq-surface-soft rounded-xl p-3 text-sm"><span>ප්‍රශ්නය {a.question}</span><span>{a.correct ? 'නිවැරදි' : 'වැරදි'}</span><span>විකල්ප ක්ලික්: {a.choices}</span><span>වෙනස් කිරීම්: {a.changes}</span><span>ප්‍රතිචාර කාලය: {(a.responseMs / 1000).toFixed(1)} තත්පර</span></div>)}</div>
            </div>
+            <div className="bg-white rounded-3xl border border-mq-border p-6 md:p-8">
+              <div className="flex flex-wrap justify-between items-center gap-3 mb-3">
+                <h2 className="text-xl font-bold">සැබෑ ක්‍රීඩා අන්තර්ක්‍රියා දත්ත</h2>
+                <button type="button" className="btn btn-secondary" onClick={() => setRealGameplaySummary(readGamePlayerSummary())}>දත්ත යාවත්කාලීන කරන්න</button>
+              </div>
+              <p className="text-sm text-mq-text-muted mb-4">මෙහි පෙන්වන්නේ GamePlayer තුළ පවතින gameplay tracker මගින් රැස් කළ වෙනම සැසියක දත්තයි. ඉහත ප්‍රශ්න 5ක ආදර්ශ ක්‍රීඩාවේ දත්ත සමඟ එකතු කර නැත.</p>
+              {realGameplaySummary && realEvents.length ? <>
+                <p className="text-xs text-mq-text-muted mb-4">ක්‍රියාකාරකම: {realGameplaySummary.activityId} | සැසි අංකය: {realGameplaySummary.sessionId}</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                  {([
+                    ['මුළු ක්ලික්', countReal('click')],
+                    ['පිළිතුරු තේරීම්', countReal('answer_select')],
+                    ['පිළිතුරු වෙනස් කිරීම්', countReal('answer_change')],
+                    ['පිළිතුරු යොමු කිරීම්', countReal('answer_submit')],
+                    ['වැරදි යොමු කිරීම්', realEvents.filter(e => e.eventType === 'answer_submit' && e.isCorrect === false).length],
+                    ['විරාම', countReal('pause_detected')],
+                    ['අක්‍රියතාව අවසන් වීම්', countReal('inactivity_end')],
+                    ['ස්පර්ශ', countReal('touch_start')],
+                  ] as [string, number][]).map(([label, value]) => <div key={label} className="bg-mq-surface-soft rounded-xl p-4"><p className="text-sm text-mq-text-muted">{label}</p><p className="text-xl font-bold mt-2">{value}</p></div>)}
+                </div>
+                <h3 className="font-semibold mb-3">පියවර අනුව ක්‍රීඩා අන්තර්ක්‍රියා</h3>
+                <div className="space-y-2">{realSteps.map(stepNo => {
+                  const events = realEvents.filter(e => e.stepOrder === stepNo);
+                  return <div key={stepNo} className="bg-mq-surface-soft rounded-xl p-3 text-sm flex flex-wrap gap-4">
+                    <strong>පියවර {stepNo}</strong><span>ක්ලික්: {events.filter(e => e.eventType === 'click').length}</span>
+                    <span>තේරීම්: {events.filter(e => e.eventType === 'answer_select').length}</span>
+                    <span>වෙනස් කිරීම්: {events.filter(e => e.eventType === 'answer_change').length}</span>
+                    <span>වැරදි උත්සාහ: {events.filter(e => e.eventType === 'answer_submit' && e.isCorrect === false).length}</span>
+                  </div>;
+                })}</div>
+              </> : <p className="text-sm text-amber-700">මෙම බ්‍රවුසර ටැබය තුළ GamePlayer දත්ත තවම නැත. පළමුව GamePlayer ක්‍රීඩාවක් කරන්න, ඉන්පසු මෙම පිටුවට පැමිණ දත්ත යාවත්කාලීන කරන්න.</p>}
+            </div>
            <div className="flex flex-wrap gap-3"><button className="btn btn-primary" type="button" onClick={exportReport}>CSV දත්ත බාගන්න</button><button className="btn btn-secondary" type="button" onClick={reset}><RotateCcw size={18}/> නැවත ක්‍රීඩා කරන්න</button></div>
            <p className="text-xs text-mq-text-muted">ක්‍රීඩා දත්ත මෙම පිටුවේ තාවකාලිකව පවතී. මුහුණේ ප්‍රකාශන විශ්ලේෂණ ලකුණු ප්‍රාදේශීය සේවාවේ JSONL ගොනුවක ගබඩා වේ. MongoDB තවම සම්බන්ධ කර නොමැත.</p>
          </section>

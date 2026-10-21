@@ -236,6 +236,32 @@ function SummaryCard({
 // MAIN DASHBOARD
 // ==========================================
 
+
+// Responsive SVG line chart: no additional charting dependency required.
+function TrendChart({ points, color = '#0f766e', unit = '%' }: {
+  points: { label: string; value: number | null }[];
+  color?: string;
+  unit?: string;
+}) {
+  const valid = points.filter((p): p is { label: string; value: number } => p.value !== null && Number.isFinite(p.value));
+  if (!valid.length) return <p className="py-10 text-center text-sm text-slate-500">දත්ත නොමැත</p>;
+  const w = 600, h = 200, left = 42, right = 15, top = 18, bottom = 42;
+  const max = Math.max(1, ...valid.map(p => p.value));
+  const min = Math.min(0, ...valid.map(p => p.value));
+  const range = Math.max(1, max - min);
+  const x = (i: number) => left + (valid.length === 1 ? (w-left-right)/2 : i * (w-left-right)/(valid.length-1));
+  const y = (v: number) => top + (max-v)*(h-top-bottom)/range;
+  return <div className="w-full overflow-x-auto"><svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="සැසි අනුව දත්ත ප්‍රවණතාව" className="w-full min-w-[380px]">
+    {[0,1,2,3,4].map(i => { const v=min+range*i/4; const yy=y(v); return <g key={i}><line x1={left} x2={w-right} y1={yy} y2={yy} stroke="#e2e8f0"/><text x={left-7} y={yy+4} fontSize="11" textAnchor="end" fill="#64748b">{v.toFixed(v%1?1:0)}</text></g>; })}
+    <polyline fill="none" stroke={color} strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" points={valid.map((p,i)=>`${x(i)},${y(p.value)}`).join(' ')}/>
+    {valid.map((p,i)=><g key={`${p.label}-${i}`}><circle cx={x(i)} cy={y(p.value)} r="5" fill={color}><title>{`${p.label}: ${p.value.toFixed(1)}${unit}`}</title></circle><text x={x(i)} y={h-17} fontSize="11" textAnchor="middle" fill="#475569">{p.label}</text></g>)}
+  </svg></div>;
+}
+
+function ChartPanel({ title, subtitle, children }: {title:string; subtitle?:string; children: import('react').ReactNode}) {
+  return <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 className="text-lg font-bold text-slate-800">{title}</h2>{subtitle && <p className="mt-1 mb-4 text-sm text-slate-500">{subtitle}</p>}{children}</section>;
+}
+
 export default function BehaviourDashboard({
   sessions,
   onBack,
@@ -337,6 +363,8 @@ export default function BehaviourDashboard({
             </button>
           )}
         </header>
+
+        {sessions.length === 0 && <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">නිරූපණ දත්ත: මෙහි පෙන්වන්නේ සැබෑ ශිෂ්‍ය දත්ත නොව අත්හදා බැලීමේ සැසි වේ.</p>}
 
         {/* STUDENT INFORMATION */}
 
@@ -456,6 +484,27 @@ export default function BehaviourDashboard({
             title="කැමරාව භාවිතා කළ සැසි"
             value={String(cameraSessions)}
           />
+        </section>
+
+        {/* VISUAL ANALYTICS — use selected sessions, never invented values */}
+        <section className="grid gap-4 lg:grid-cols-2">
+          <ChartPanel title="සැසි අනුව හැසිරීම් සංඥා" subtitle="පැරණි සැසියෙන් නවතම සැසිය දක්වා වාර්තා වූ මුළු සංඥා">
+            <TrendChart color="#6366f1" unit=" සංඥා" points={[...filteredSessions].reverse().map((s,i)=>({label:`${i+1}`,value:countSessionEvents(s)}))}/>
+          </ChartPanel>
+          <ChartPanel title="කැමරා භාවිතය" subtitle="තෝරාගත් සැසිවල කැමරා භාවිත කළ සහ නොකළ සැසි">
+            {filteredSessions.length > 0 ? <div className="flex flex-wrap items-center gap-6 py-4">
+              <div role="img" aria-label={`කැමරා භාවිත කළ සැසි ${cameraSessions}`} className="relative h-40 w-40 shrink-0 rounded-full" style={{background:`conic-gradient(#6366f1 0 ${100*cameraSessions/filteredSessions.length}%, #cbd5e1 ${100*cameraSessions/filteredSessions.length}% 100%)`}}>
+                <div className="absolute inset-5 flex items-center justify-center rounded-full bg-white text-2xl font-bold text-indigo-800">{Math.round(100*cameraSessions/filteredSessions.length)}%</div>
+              </div>
+              <div className="space-y-3 text-sm"><p><span className="mr-2 inline-block h-3 w-3 rounded bg-indigo-500"/>කැමරාව සමඟ: <strong>{cameraSessions}</strong></p><p><span className="mr-2 inline-block h-3 w-3 rounded bg-slate-300"/>කැමරාව නොමැතිව: <strong>{filteredSessions.length-cameraSessions}</strong></p></div>
+            </div> : <p className="py-12 text-center text-sm text-slate-500">සැසි දත්ත නොමැත</p>}
+          </ChartPanel>
+          <ChartPanel title="හැසිරීම් සංඥා සංසන්දනය" subtitle="සංඥා වර්ග හත සඳහා වාර්තා වූ වාර ගණන">
+            <div className="space-y-3 pt-2">{behaviourKeys.map(key=><div key={key}><div className="mb-1 flex justify-between gap-3 text-sm"><span>{behaviourLabels[key]}</span><strong>{key==='distraction'&&cameraSessions===0?'—':behaviourTotals[key]}</strong></div><div className="h-3 overflow-hidden rounded-full bg-slate-100"><div className="h-full rounded-full bg-indigo-500" style={{width:`${key==='distraction'&&cameraSessions===0?0:100*behaviourTotals[key]/maxCount}%`}}/></div></div>)}</div>
+          </ChartPanel>
+          <ChartPanel title="සැසි අනුව කැමරා දත්ත ලබාගැනීම" subtitle="කැමරාව භාවිත කළ සැසි සහ ක්‍රීඩා-පමණක් සැසි">
+            <div className="space-y-3 pt-2">{[...filteredSessions].reverse().map((s,i)=><div key={s.sessionId} className="flex items-center gap-3 text-sm"><span className="w-14 shrink-0 text-slate-500">සැසි {i+1}</span><div className="flex-1 rounded-full bg-slate-100"><div className={`h-5 rounded-full ${s.cameraUsed?'bg-indigo-500':'bg-slate-300'}`} style={{width:'100%'}}/></div><span className="w-28 text-right">{s.cameraUsed?'කැමරාව ඇත':'කැමරාව නැත'}</span></div>)}</div>
+          </ChartPanel>
         </section>
 
         {/* BEHAVIOUR CHART */}

@@ -300,6 +300,32 @@ function DetailRow({
 // MAIN DASHBOARD
 // ==========================================
 
+
+// Responsive SVG line chart: no additional charting dependency required.
+function TrendChart({ points, color = '#0f766e', unit = '%' }: {
+  points: { label: string; value: number | null }[];
+  color?: string;
+  unit?: string;
+}) {
+  const valid = points.filter((p): p is { label: string; value: number } => p.value !== null && Number.isFinite(p.value));
+  if (!valid.length) return <p className="py-10 text-center text-sm text-slate-500">දත්ත නොමැත</p>;
+  const w = 600, h = 200, left = 42, right = 15, top = 18, bottom = 42;
+  const max = Math.max(1, ...valid.map(p => p.value));
+  const min = Math.min(0, ...valid.map(p => p.value));
+  const range = Math.max(1, max - min);
+  const x = (i: number) => left + (valid.length === 1 ? (w-left-right)/2 : i * (w-left-right)/(valid.length-1));
+  const y = (v: number) => top + (max-v)*(h-top-bottom)/range;
+  return <div className="w-full overflow-x-auto"><svg viewBox={`0 0 ${w} ${h}`} role="img" aria-label="සැසි අනුව දත්ත ප්‍රවණතාව" className="w-full min-w-[380px]">
+    {[0,1,2,3,4].map(i => { const v=min+range*i/4; const yy=y(v); return <g key={i}><line x1={left} x2={w-right} y1={yy} y2={yy} stroke="#e2e8f0"/><text x={left-7} y={yy+4} fontSize="11" textAnchor="end" fill="#64748b">{v.toFixed(v%1?1:0)}</text></g>; })}
+    <polyline fill="none" stroke={color} strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" points={valid.map((p,i)=>`${x(i)},${y(p.value)}`).join(' ')}/>
+    {valid.map((p,i)=><g key={`${p.label}-${i}`}><circle cx={x(i)} cy={y(p.value)} r="5" fill={color}><title>{`${p.label}: ${p.value.toFixed(1)}${unit}`}</title></circle><text x={x(i)} y={h-17} fontSize="11" textAnchor="middle" fill="#475569">{p.label}</text></g>)}
+  </svg></div>;
+}
+
+function ChartPanel({ title, subtitle, children }: {title:string; subtitle?:string; children: import('react').ReactNode}) {
+  return <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h2 className="text-lg font-bold text-slate-800">{title}</h2>{subtitle && <p className="mt-1 mb-4 text-sm text-slate-500">{subtitle}</p>}{children}</section>;
+}
+
 export default function InteractionDashboard({
   learnerName,
   sessions,
@@ -475,6 +501,8 @@ export default function InteractionDashboard({
           )}
         </header>
 
+        {usingDemo && <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">නිරූපණ දත්ත: මෙහි පෙන්වන්නේ සැබෑ ශිෂ්‍ය දත්ත නොව අත්හදා බැලීමේ සැසි වේ.</p>}
+
         {/* STUDENT INFORMATION */}
 
         <section className="rounded-2xl border border-teal-100 bg-teal-50 p-5">
@@ -590,6 +618,32 @@ export default function InteractionDashboard({
             title="මුළු ක්‍රීඩා කාලය"
             value={formatDuration(sum('durationMs'))}
           />
+        </section>
+
+        {/* VISUAL ANALYTICS — driven by the same selected demo/real sessions */}
+        <section className="grid gap-4 lg:grid-cols-2">
+          <ChartPanel title="පිළිතුරු නිවැරදිභාවය" subtitle="තෝරාගත් සැසිවල නිවැරදි පිළිතුරු සහ අනෙකුත් පිළිතුරු">
+            {questionsAnswered > 0 ? <div className="flex flex-wrap items-center gap-6 py-4">
+              <div role="img" aria-label={`නිවැරදි පිළිතුරු ${accuracy}%`} className="relative h-40 w-40 shrink-0 rounded-full" style={{background:`conic-gradient(#0d9488 0 ${accuracy ?? 0}%, #fb7185 ${accuracy ?? 0}% 100%)`}}>
+                <div className="absolute inset-5 flex items-center justify-center rounded-full bg-white text-2xl font-bold text-teal-800">{accuracy}%</div>
+              </div>
+              <div className="space-y-3 text-sm"><p><span className="mr-2 inline-block h-3 w-3 rounded bg-teal-600"/>නිවැරදි: <strong>{correctAnswers}</strong></p><p><span className="mr-2 inline-block h-3 w-3 rounded bg-rose-400"/>අනෙකුත්: <strong>{incorrectAnswers}</strong></p></div>
+            </div> : <p className="py-12 text-center text-sm text-slate-500">පිළිතුරු දත්ත නොමැත</p>}
+          </ChartPanel>
+          <ChartPanel title="සැසි අනුව නිවැරදිභාවය" subtitle="පැරණි සැසියෙන් නවතම සැසිය දක්වා (%)">
+            <TrendChart points={[...selectedSessions].reverse().map((s,i)=>({label:`${i+1}`,value:s.questionsAnswered>0?100*s.correctAnswers/s.questionsAnswered:null}))}/>
+          </ChartPanel>
+          <ChartPanel title="ප්‍රතිචාර කාල ප්‍රවණතාව" subtitle="එක් එක් සැසියේ සාමාන්‍ය පිළිතුරු කාලය (තත්පර)">
+            <TrendChart color="#6366f1" unit=" තත්පර" points={[...selectedSessions].reverse().map((s,i)=>({label:`${i+1}`,value:s.responseTimesMs.length?s.responseTimesMs.reduce((a,b)=>a+b,0)/s.responseTimesMs.length/1000:null}))}/>
+          </ChartPanel>
+          <ChartPanel title="ක්‍රීඩා ක්‍රියාකාරකම් සංසන්දනය" subtitle="තෝරාගත් සැසිවල වාර්තා වූ අන්තර්ක්‍රියා">
+            <div className="space-y-4 pt-3">{[
+              {label:'ක්ලික්',value:sum('clickCount'),color:'bg-sky-500'},
+              {label:'පිළිතුරු උත්සාහ',value:sum('totalAttempts'),color:'bg-teal-500'},
+              {label:'පිළිතුරු වෙනස් කිරීම්',value:sum('answerChanges'),color:'bg-amber-500'},
+              {label:'නැවත වැරදි උත්සාහ',value:sum('repeatedMistakes'),color:'bg-rose-500'},
+            ].map(item=><div key={item.label}><div className="mb-1 flex justify-between text-sm"><span>{item.label}</span><strong>{item.value}</strong></div><div className="h-3 overflow-hidden rounded-full bg-slate-100"><div className={`h-full rounded-full ${item.color}`} style={{width:`${100*item.value/Math.max(1,sum('clickCount'),sum('totalAttempts'),sum('answerChanges'),sum('repeatedMistakes'))}%`}}/></div></div>)}</div>
+          </ChartPanel>
         </section>
 
         {/* SECTION 1 - ANSWERS */}

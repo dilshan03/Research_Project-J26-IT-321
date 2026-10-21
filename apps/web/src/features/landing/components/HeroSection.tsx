@@ -1,8 +1,16 @@
-import { Play, Brain, BookOpen, Gamepad2, LineChart, ArrowRight, Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Play, Brain, BookOpen, Gamepad2, LineChart, ArrowRight, Heart, Info, LayoutDashboard, Users } from 'lucide-react';
+import { useAuth } from '../../auth/hooks/useAuth';
+import { dashboardPathFor } from '../../auth/roleRoutes';
+import { STUDENT_ACCESS_NOTE } from '../../../shared/components/navConfig';
 
 import heroImage from '../../../assets/images/public-pages/home/section-1-hero/home-hero.png';
 
 export const HeroSection = () => {
+  const { user, isAuthenticated } = useAuth();
+  const signedIn = Boolean(isAuthenticated && user);
+  const childrenLink =
+    user?.role === 'teacher' ? { to: '/teacher/dashboard/learners', label: 'My Students' } : user?.role === 'parent' ? { to: '/learners', label: 'My Children' } : null;
   return (
     <section className="relative pt-4 sm:pt-6 pb-0 overflow-hidden bg-gradient-to-b from-mq-surface-soft to-mq-surface w-full max-w-full">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-center relative z-10 min-w-0">
@@ -33,16 +41,43 @@ export const HeroSection = () => {
 
           {/* Buttons */}
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 animate-fade-in delay-300">
-            <button className="btn btn-primary px-6 sm:px-8 py-3 sm:py-3.5 text-base sm:text-lg">
-              Start Learning <ArrowRight size={20} strokeWidth={3} />
-            </button>
-            <button className="btn btn-secondary px-6 sm:px-8 py-3 sm:py-3.5 text-base sm:text-lg gap-3 hover:scale-105 transition-transform duration-300">
-              <div className="bg-mq-primary p-1.5 rounded-full text-white">
-                <Play size={16} className="fill-white" />
-              </div>
-              See How It Works
-            </button>
+            {signedIn ? (
+              <>
+                <Link to={dashboardPathFor(user?.role)} className="btn btn-primary px-6 sm:px-8 py-3 sm:py-3.5 text-base sm:text-lg">
+                  <LayoutDashboard size={20} /> Go to Dashboard <ArrowRight size={20} strokeWidth={3} />
+                </Link>
+                {childrenLink && (
+                  <Link to={childrenLink.to} className="btn btn-secondary px-6 sm:px-8 py-3 sm:py-3.5 text-base sm:text-lg gap-2">
+                    <Users size={20} /> {childrenLink.label}
+                  </Link>
+                )}
+              </>
+            ) : (
+              <>
+                <Link to="/sign-up" className="btn btn-primary px-6 sm:px-8 py-3 sm:py-3.5 text-base sm:text-lg">
+                  Get Started <ArrowRight size={20} strokeWidth={3} />
+                </Link>
+                <Link
+                  to="/#how-it-works"
+                  className="btn btn-secondary px-6 sm:px-8 py-3 sm:py-3.5 text-base sm:text-lg gap-3 hover:scale-105 transition-transform duration-300"
+                >
+                  <div className="bg-mq-primary p-1.5 rounded-full text-white">
+                    <Play size={16} className="fill-white" />
+                  </div>
+                  See How It Works
+                </Link>
+              </>
+            )}
           </div>
+          {!signedIn && (
+            <p className="flex items-start gap-2 text-sm text-mq-text-muted max-w-xl animate-fade-in delay-300">
+              <Info size={16} className="shrink-0 mt-0.5 text-mq-primary" />
+              <span>
+                For parents and teachers. {STUDENT_ACCESS_NOTE}{' '}
+                <Link to="/sign-in" className="font-semibold text-mq-primary hover:underline">Sign in</Link>
+              </span>
+            </p>
+          )}
 
           {/* Features Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pt-4 sm:pt-5 border-t border-mq-border">

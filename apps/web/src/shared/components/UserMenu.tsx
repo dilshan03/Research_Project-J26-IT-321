@@ -8,9 +8,32 @@ import {
   BookOpen,
   Settings,
   Globe,
+  LineChart,
+  Lightbulb,
+  IdCard,
+  type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import { parentText } from '../i18n/parentText';
+import { PARENT_NAV, TEACHER_NAV, type NavIcon } from './navConfig';
+
+const MENU_ICONS: Partial<Record<NavIcon, LucideIcon>> = {
+  dashboard: LayoutDashboard,
+  children: Users,
+  progress: LineChart,
+  recommendations: Lightbulb,
+  profiles: IdCard,
+  profile: Settings,
+};
+
+/** Parents keep the Sinhala wording they already see in the dropdown and the portal. */
+const PARENT_MENU_LABELS: Partial<Record<NavIcon, string>> = {
+  dashboard: parentText.nav.portal,
+  children: parentText.nav.myChildren,
+  progress: parentText.nav.progress,
+  recommendations: parentText.nav.recommendations,
+  profile: parentText.nav.settings,
+};
 
 export interface UserMenuProps {
   className?: string;
@@ -129,68 +152,34 @@ export const UserMenu: React.FC<UserMenuProps> = ({ className = '' }) => {
 
           {/* Menu Options */}
           <div className="px-1.5 py-1 space-y-0.5">
-            {isParent && (
-              <>
-                <Link
-                  to="/parent/dashboard"
-                  role="menuitem"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
-                >
-                  <LayoutDashboard size={15} className="text-mq-primary shrink-0" />
-                  <span>{parentText.nav.portal}</span>
-                </Link>
-                <Link
-                  to="/learners"
-                  role="menuitem"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
-                >
-                  <Users size={15} className="text-mq-primary shrink-0" />
-                  <span>{parentText.nav.myChildren}</span>
-                </Link>
-                <Link
-                  to="/parent/dashboard/settings"
-                  role="menuitem"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
-                >
-                  <Settings size={15} className="text-mq-primary shrink-0" />
-                  <span>{parentText.nav.settings}</span>
-                </Link>
-              </>
-            )}
+            {/* Parent and teacher sections (same list as the navbar: navConfig.ts) */}
+            {(isParent || isTeacher) &&
+              (isParent ? PARENT_NAV : TEACHER_NAV).map((item) => {
+                const Icon = MENU_ICONS[item.icon] ?? LayoutDashboard;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    role="menuitem"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
+                  >
+                    <Icon size={15} className="text-mq-primary shrink-0" />
+                    <span>{isParent ? PARENT_MENU_LABELS[item.icon] ?? item.label : item.label}</span>
+                  </Link>
+                );
+              })}
 
             {isTeacher && (
-              <>
-                <Link
-                  to="/teacher/dashboard"
-                  role="menuitem"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
-                >
-                  <LayoutDashboard size={15} className="text-mq-primary shrink-0" />
-                  <span>Teacher Dashboard</span>
-                </Link>
-                <a
-                  href="#/adapt"
-                  role="menuitem"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
-                >
-                  <BookOpen size={15} className="text-mq-primary shrink-0" />
-                  <span>Teacher Studio</span>
-                </a>
-                <Link
-                  to="/teacher/dashboard/settings"
-                  role="menuitem"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
-                >
-                  <Settings size={15} className="text-mq-primary shrink-0" />
-                  <span>Account Settings</span>
-                </Link>
-              </>
+              <a
+                href="#/adapt"
+                role="menuitem"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-mq-text hover:bg-mq-surface-soft hover:text-mq-primary transition-colors"
+              >
+                <BookOpen size={15} className="text-mq-primary shrink-0" />
+                <span>Teacher Studio</span>
+              </a>
             )}
 
             {user.role === 'admin' && (

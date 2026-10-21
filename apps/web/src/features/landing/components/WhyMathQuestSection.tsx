@@ -5,7 +5,7 @@ import imgCorrectIncorrect from '../../../assets/images/public-pages/home/sectio
 
 export const WhyMathQuestSection = () => {
   return (
-    <section className="relative pt-8 pb-24 bg-white overflow-hidden">
+    <section id="features" className="relative pt-8 pb-24 bg-white overflow-hidden scroll-mt-16">
       
       {/* --- Floating Background Graphics (Decorations) --- */}
       {/* Left Blob Text */}

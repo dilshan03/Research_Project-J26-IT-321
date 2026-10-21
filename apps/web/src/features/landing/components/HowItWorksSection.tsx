@@ -7,7 +7,7 @@ import imgSupport from '../../../assets/images/public-pages/home/section-3-how-i
 
 export const HowItWorksSection = () => {
   return (
-    <section className="relative pt-12 pb-0 bg-gradient-to-b from-mq-surface-soft to-white overflow-hidden">
+    <section id="how-it-works" className="relative pt-12 pb-0 bg-gradient-to-b from-mq-surface-soft to-white overflow-hidden scroll-mt-16">
       
       {/* --- Floating Background Graphics --- */}
       {/* Left Blob Text */}

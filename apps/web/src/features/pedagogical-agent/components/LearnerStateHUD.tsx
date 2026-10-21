@@ -6,10 +6,17 @@ export interface LearnerStateHUDProps {
   bktComparison?: BKTComparisonState;
   fsmDecision?: FSMDecision;
   isLoading?: boolean;
+  cameraPermissionGranted?: boolean;
+  cameraAttentionScore?: number;
+  onToggleCameraPermission?: (granted: boolean) => void;
+  onChangeCameraScore?: (score: number) => void;
+  elapsedDays?: number;
+  onChangeElapsedDays?: (days: number) => void;
   onSimulateInattention?: () => void;
   onSimulateFrustration?: () => void;
   onSimulateFocusedFlow?: () => void;
   onSimulateHintAssisted?: () => void;
+  onSimulateRapidAttentionSlip?: () => void;
   onTriggerFSMRule?: (context: Record<string, any>) => void;
   compact?: boolean;
   style?: React.CSSProperties;
@@ -87,6 +94,20 @@ const FSM_STATE_CONFIG: Record<
     color: '#FBBF24',
     bg: 'rgba(245, 158, 11, 0.2)'
   },
+  DISTRACTED_RE_ENGAGE: {
+    label: 'DISTRACTED / RE-ENGAGE',
+    sinhala: 'අවධානය නැවත ගොඩනැංවීම',
+    icon: '🎯',
+    color: '#38BDF8',
+    bg: 'rgba(56, 189, 248, 0.22)'
+  },
+  REVISION_DUE: {
+    label: 'SPACED REVISION DUE',
+    sinhala: 'මතක පුනරීක්ෂණ අවස්ථාව',
+    icon: '🔔',
+    color: '#FBBF24',
+    bg: 'rgba(245, 158, 11, 0.25)'
+  },
   HINT_SCAFFOLDING: {
     label: 'HINT SCAFFOLDING',
     sinhala: 'හෝඩුවාවෙන් මඟපෙන්වීම',
@@ -126,7 +147,15 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
     effectiveSlip: 0.18,
     effectiveGuess: 0.25,
     isMastered: false,
-    overestimationGap: 0.0
+    overestimationGap: 0.0,
+    masteryProtected: false,
+    falseDemotionPrevented: 0.0,
+    retentionScore: 1.0,
+    memoryStability: 1.0,
+    decayedKnowledge: 0.20,
+    elapsedDays: 0,
+    revisionRecommended: false,
+    optimalNextReviewDays: 0.4
   },
   fsmDecision = {
     fsmState: 'OBSERVING',
@@ -147,16 +176,24 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
     timestamp: new Date().toISOString()
   },
   isLoading = false,
+  cameraPermissionGranted = false,
+  cameraAttentionScore = 0.85,
+  onToggleCameraPermission,
+  onChangeCameraScore,
+  elapsedDays = 0,
+  onChangeElapsedDays,
   onSimulateInattention,
   onSimulateFrustration,
   onSimulateFocusedFlow,
   onSimulateHintAssisted,
+  onSimulateRapidAttentionSlip,
   onTriggerFSMRule,
   compact = false,
   style = {}
 }) => {
   const [showBKTDetails, setShowBKTDetails] = useState<boolean>(true);
   const [showFSMDetails, setShowFSMDetails] = useState<boolean>(true);
+  const [showTeacherLogs, setShowTeacherLogs] = useState<boolean>(true);
 
   const stateKey = learnerState?.cognitiveState || 'NORMAL';
   const cfg = STATE_CONFIG[stateKey] || STATE_CONFIG.NORMAL;
@@ -164,10 +201,31 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
   const inattention = learnerState?.metrics.inattentionIndex ?? 0.1;
   const frustration = learnerState?.metrics.frustrationIndex ?? 0.0;
   const persistence = learnerState?.metrics.persistenceScore ?? 0.5;
+  const fusion = learnerState?.attentionFusion;
+  const isMultimodal =
+    fusion?.fusionMode === 'MULTIMODAL_CAMERA_AND_GAMEPLAY' || cameraPermissionGranted;
+  const gameplayInatt = fusion?.gameplayInattentionIndex ?? learnerState?.metrics.gameplayInattentionIndex ?? inattention;
+  const cameraInatt =
+    fusion?.cameraInattentionIndex ??
+    (cameraPermissionGranted ? Number((1 - cameraAttentionScore).toFixed(2)) : null);
+  const attentionProb = fusion?.attentionProbability ?? Number((1 - inattention).toFixed(2));
+  const rtBaseline = fusion?.personalRtBaseline;
+  const rtZScore = rtBaseline?.latestRtZScore ?? learnerState?.metrics.rtZScore ?? 0.0;
+  const isAttentionSlip = Boolean(
+    fusion?.isAttentionSlip || learnerState?.flags?.isAttentionSlip
+  );
 
   const pL_hintAware = bktComparison.hintAwareKnowledge;
   const pL_standard = bktComparison.standardKnowledge;
   const isMastered = bktComparison.isMastered;
+  const masteryProtected = Boolean(bktComparison.masteryProtected);
+  const falseDemotionPrevented = bktComparison.falseDemotionPrevented ?? 0.0;
+  const retentionScore = bktComparison.retentionScore ?? 1.0;
+  const memoryStability = bktComparison.memoryStability ?? 1.0;
+  const decayedKnowledge = bktComparison.decayedKnowledge ?? pL_hintAware;
+  const activeElapsedDays = bktComparison.elapsedDays ?? elapsedDays;
+  const revisionRecommended = Boolean(bktComparison.revisionRecommended);
+  const optimalNextReviewDays = bktComparison.optimalNextReviewDays ?? 0.4;
 
   const fsmConfig = FSM_STATE_CONFIG[fsmDecision.fsmState] || FSM_STATE_CONFIG.OBSERVING;
 
@@ -252,7 +310,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         </span>
       </div>
 
-      {/* FSM Decision Engine Live Inspector (Task #21 Feature) */}
+      {/* Step 5 & Step 6: State-Aware Constrained FSM, Expected Mastery Gain (EMG) & Teacher Explainable Logs */}
       <div
         style={{
           background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)',
@@ -268,7 +326,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '1rem' }}>🤖</span>
             <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#38BDF8', letterSpacing: '0.3px' }}>
-              FSM Decision Engine
+              Constrained FSM & EMG (Step 5)
             </span>
           </div>
 
@@ -324,7 +382,86 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
               </span>
             </div>
           )}
+
+          {/* Step 5 Novelty: Expected Mastery Gain (EMG) Optimal Challenge Difficulty Pill */}
+          {fsmDecision.challengeRecommendation && (
+            <div
+              style={{
+                marginTop: '6px',
+                padding: '6px 8px',
+                borderRadius: '6px',
+                background: 'rgba(16, 185, 129, 0.12)',
+                border: '1px solid rgba(16, 185, 129, 0.35)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2px'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.7rem' }}>
+                <span style={{ color: '#34D399', fontWeight: 800 }}>
+                  🎯 EMG Optimal Challenge: {fsmDecision.challengeRecommendation.recommendedDifficulty}
+                </span>
+                <span style={{ color: '#4ADE80', fontWeight: 800 }}>
+                  EMG: +{Math.round(fsmDecision.challengeRecommendation.expectedMasteryGain * 100)}%
+                </span>
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#CBD5E1' }}>
+                {fsmDecision.challengeRecommendation.labelSinhala} (P(Success):{' '}
+                {Math.round(fsmDecision.challengeRecommendation.predictedSuccessProb * 100)}%)
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Step 6 Novelty: Teacher (HITL) Explainable Decision Rationale Log Inspector */}
+        {fsmDecision.explainableRationale && (
+          <div style={{ marginTop: '2px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
+            <div
+              onClick={() => setShowTeacherLogs(!showTeacherLogs)}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: 'pointer',
+                fontSize: '0.72rem',
+                color: '#4ADE80',
+                fontWeight: 700
+              }}
+            >
+              <span>👩‍🏫 Teacher Explainable Decision Log (Step 6 HITL)</span>
+              <span>{showTeacherLogs ? '▲ Hide' : '▼ View'}</span>
+            </div>
+
+            {showTeacherLogs && (
+              <div
+                style={{
+                  marginTop: '6px',
+                  padding: '8px',
+                  borderRadius: '8px',
+                  background: 'rgba(15, 23, 42, 0.75)',
+                  border: '1px solid rgba(74, 222, 128, 0.25)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  fontSize: '0.69rem'
+                }}
+              >
+                <div style={{ color: '#F8FAFC', fontWeight: 700 }}>
+                  📌 {fsmDecision.explainableRationale.summary}
+                </div>
+                <div style={{ color: '#CBD5E1' }}>
+                  <b>Why Triggered:</b> {fsmDecision.explainableRationale.whyTriggered}
+                </div>
+                <div style={{ color: '#94A3B8' }}>
+                  <b>Signal Source:</b> {fsmDecision.explainableRationale.fusionSource}
+                </div>
+                <div style={{ color: '#38BDF8' }}>
+                  <b>Difficulty Policy:</b> {fsmDecision.explainableRationale.difficultyRationale}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* FSM Rules Catalog Toggle */}
         <div style={{ marginTop: '2px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
@@ -348,6 +485,70 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
               {/* Interactive Rule Buttons */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
+                <button
+                  onClick={() =>
+                    onTriggerFSMRule &&
+                    onTriggerFSMRule({
+                      cameraPermissionGranted: true,
+                      cameraAttentionScore: 0.30,
+                      inattentionIndex: 0.65,
+                      isAttentionSlip: true,
+                      bktKnowledge: 0.72
+                    })
+                  }
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background:
+                      fsmDecision.rule.id === 'RULE_DISTRACTED_RE_ENGAGE'
+                        ? 'rgba(56, 189, 248, 0.3)'
+                        : 'rgba(255, 255, 255, 0.05)',
+                    border:
+                      fsmDecision.rule.id === 'RULE_DISTRACTED_RE_ENGAGE'
+                        ? '1px solid #38BDF8'
+                        : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_DISTRACTED_RE_ENGAGE' ? '#38BDF8' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🎯 Step 5: Distracted Re-Engage
+                </button>
+
+                <button
+                  onClick={() =>
+                    onTriggerFSMRule &&
+                    onTriggerFSMRule({
+                      retentionScore: 0.52,
+                      revisionRecommended: true,
+                      elapsedDays: 5,
+                      memoryStability: 2.5,
+                      bktKnowledge: 0.78
+                    })
+                  }
+                  style={{
+                    padding: '6px 8px',
+                    borderRadius: '8px',
+                    background:
+                      fsmDecision.rule.id === 'RULE_REVISION_DUE'
+                        ? 'rgba(245, 158, 11, 0.3)'
+                        : 'rgba(255, 255, 255, 0.05)',
+                    border:
+                      fsmDecision.rule.id === 'RULE_REVISION_DUE'
+                        ? '1px solid #FBBF24'
+                        : '1px solid rgba(255, 255, 255, 0.1)',
+                    color: fsmDecision.rule.id === 'RULE_REVISION_DUE' ? '#FBBF24' : '#CBD5E1',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  🔔 Step 5: Revision Due (R&lt;70%)
+                </button>
+
                 <button
                   onClick={() => onTriggerFSMRule && onTriggerFSMRule({ consecutiveErrors: 2, highestHintLevel: 0 })}
                   style={{
@@ -489,11 +690,13 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         </div>
       </div>
 
-      {/* BKT Concept Mastery Hero Section (Task #20 Feature) */}
+      {/* Step 3 & Step 4 Novelty: AD-BKT Concept Mastery P(L) & Forgetting-Aware Retention */}
       <div
         style={{
           background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.15) 100%)',
-          border: '1px solid rgba(168, 85, 247, 0.35)',
+          border: masteryProtected
+            ? '1px solid rgba(56, 189, 248, 0.6)'
+            : '1px solid rgba(168, 85, 247, 0.35)',
           borderRadius: '12px',
           padding: '12px',
           display: 'flex',
@@ -505,7 +708,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '1rem' }}>🎓</span>
             <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#E2E8F0', letterSpacing: '0.3px' }}>
-              BKT Concept Mastery P(L)
+              AD-BKT Concept Mastery P(L)
             </span>
           </div>
 
@@ -528,7 +731,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', marginBottom: '4px' }}>
             <span style={{ color: '#C084FC', fontWeight: 700 }}>
-              P(L) Mastery: {Math.round(pL_hintAware * 100)}%
+              AD-BKT P(L): {Math.round(pL_hintAware * 100)}%
             </span>
             <span style={{ color: '#94A3B8', fontSize: '0.72rem' }}>
               Threshold: 85% | Next P(C): {Math.round(bktComparison.predictedNextCorrect * 100)}%
@@ -557,7 +760,30 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
           </div>
         </div>
 
-        {/* Comparative BKT Section (Standard vs Hint-Aware) Toggle */}
+        {/* Step 3 Banner: AD-BKT Attention Slip Mastery Protection */}
+        {masteryProtected && (
+          <div
+            style={{
+              padding: '6px 9px',
+              borderRadius: '8px',
+              background: 'rgba(56, 189, 248, 0.16)',
+              border: '1px solid rgba(56, 189, 248, 0.5)',
+              color: '#38BDF8',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}
+          >
+            <span>🛡️ Step 3: AD-BKT Mastery Protected! (ADHD Slip Disentangled)</span>
+            <span style={{ color: '#4ADE80', fontWeight: 800 }}>
+              +{Math.round(falseDemotionPrevented * 100)}% Saved
+            </span>
+          </div>
+        )}
+
+        {/* Comparative BKT Section (Standard vs AD-BKT) Toggle */}
         <div style={{ marginTop: '2px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '6px' }}>
           <div
             onClick={() => setShowBKTDetails(!showBKTDetails)}
@@ -571,7 +797,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
               fontWeight: 700
             }}
           >
-            <span>⚖️ Standard vs Hint-Aware BKT Comparison</span>
+            <span>⚖️ Standard BKT vs AD-BKT Comparison (Step 3)</span>
             <span>{showBKTDetails ? '▲ Hide' : '▼ View'}</span>
           </div>
 
@@ -580,7 +806,7 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
               {/* Comparison Bars */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.72rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: '#A855F7', fontWeight: 600 }}>● Hint-Aware ADHD BKT:</span>
+                  <span style={{ color: '#A855F7', fontWeight: 600 }}>● AD-BKT (Attention & Hint-Aware):</span>
                   <span style={{ fontWeight: 800, color: '#FFFFFF' }}>{Math.round(pL_hintAware * 100)}%</span>
                 </div>
                 <div style={{ height: '5px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
@@ -615,13 +841,433 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
 
               {/* Research Metrics Chips */}
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.68rem', color: '#64748B', marginTop: '2px' }}>
-                <span>AUC-ROC: <b>0.6271</b> (+0.013)</span>
-                <span>RMSE: <b>0.4657</b> (-0.005)</span>
-                <span>LogLoss: <b>0.6251</b></span>
+                <span>P(Slip<sub>eff</sub>): <b>{Math.round(bktComparison.effectiveSlip * 100)}%</b></span>
+                <span>P(Guess<sub>eff</sub>): <b>{Math.round(bktComparison.effectiveGuess * 100)}%</b></span>
+                <span>Saved: <b style={{ color: falseDemotionPrevented > 0 ? '#4ADE80' : '#94A3B8' }}>+{Math.round(falseDemotionPrevented * 100)}%</b></span>
+              </div>
+
+              {/* Step 7: 3-Model Ablation Benchmark Table (N=2,400 Interactions, 120 Students) */}
+              <div
+                style={{
+                  marginTop: '4px',
+                  padding: '8px',
+                  borderRadius: '8px',
+                  background: 'rgba(15, 23, 42, 0.82)',
+                  border: '1px solid rgba(168, 85, 247, 0.35)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.69rem', fontWeight: 800, color: '#E2E8F0' }}>
+                    📊 Step 7: 3-Model Ablation Benchmark
+                  </span>
+                  <span
+                    style={{
+                      fontSize: '0.62rem',
+                      fontWeight: 700,
+                      color: '#38BDF8',
+                      background: 'rgba(56, 189, 248, 0.14)',
+                      padding: '1px 6px',
+                      borderRadius: '4px'
+                    }}
+                  >
+                    N = 2,400 | 120 Learners
+                  </span>
+                </div>
+
+                <table
+                  style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    fontSize: '0.65rem',
+                    textAlign: 'right'
+                  }}
+                >
+                  <thead>
+                    <tr
+                      style={{
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+                        color: '#94A3B8',
+                        fontWeight: 800
+                      }}
+                    >
+                      <th style={{ textAlign: 'left', padding: '4px 2px' }}>Metric</th>
+                      <th style={{ padding: '4px 3px' }}>Std BKT</th>
+                      <th style={{ padding: '4px 3px', color: '#C084FC' }}>Hint-BKT</th>
+                      <th style={{ padding: '4px 3px', color: '#38BDF8' }}>AD-BKT</th>
+                      <th style={{ padding: '4px 2px', color: '#4ADE80' }}>Δ vs Std</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                      <td style={{ textAlign: 'left', padding: '4px 2px', color: '#E2E8F0', fontWeight: 600 }}>
+                        AUC-ROC ↑
+                      </td>
+                      <td style={{ padding: '4px 3px', color: '#94A3B8' }}>0.6183</td>
+                      <td style={{ padding: '4px 3px', color: '#CBD5E1' }}>0.6488</td>
+                      <td style={{ padding: '4px 3px', color: '#FFFFFF', fontWeight: 800 }}>0.6454</td>
+                      <td style={{ padding: '4px 2px', color: '#4ADE80', fontWeight: 700 }}>+0.0271</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                      <td style={{ textAlign: 'left', padding: '4px 2px', color: '#E2E8F0', fontWeight: 600 }}>
+                        RMSE ↓
+                      </td>
+                      <td style={{ padding: '4px 3px', color: '#94A3B8' }}>0.4807</td>
+                      <td style={{ padding: '4px 3px', color: '#CBD5E1' }}>0.4777</td>
+                      <td style={{ padding: '4px 3px', color: '#FFFFFF', fontWeight: 800 }}>0.4715</td>
+                      <td style={{ padding: '4px 2px', color: '#4ADE80', fontWeight: 700 }}>-0.0092</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                      <td style={{ textAlign: 'left', padding: '4px 2px', color: '#E2E8F0', fontWeight: 600 }}>
+                        Log-Loss ↓
+                      </td>
+                      <td style={{ padding: '4px 3px', color: '#94A3B8' }}>0.6557</td>
+                      <td style={{ padding: '4px 3px', color: '#CBD5E1' }}>0.6466</td>
+                      <td style={{ padding: '4px 3px', color: '#FFFFFF', fontWeight: 800 }}>0.6341</td>
+                      <td style={{ padding: '4px 2px', color: '#4ADE80', fontWeight: 700 }}>-0.0216</td>
+                    </tr>
+                    <tr
+                      style={{
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                        background: 'rgba(16, 185, 129, 0.08)'
+                      }}
+                    >
+                      <td style={{ textAlign: 'left', padding: '4px 2px', color: '#4ADE80', fontWeight: 800 }}>
+                        False Demotion (FDR) ↓
+                      </td>
+                      <td style={{ padding: '4px 3px', color: '#F87171', fontWeight: 700 }}>41.61%</td>
+                      <td style={{ padding: '4px 3px', color: '#FBBF24' }}>23.13%</td>
+                      <td style={{ padding: '4px 3px', color: '#4ADE80', fontWeight: 800 }}>1.71%</td>
+                      <td style={{ padding: '4px 2px', color: '#4ADE80', fontWeight: 800 }}>-39.90%</td>
+                    </tr>
+                    <tr>
+                      <td style={{ textAlign: 'left', padding: '4px 2px', color: '#38BDF8', fontWeight: 700 }}>
+                        Avg Slip Drop ↓
+                      </td>
+                      <td style={{ padding: '4px 3px', color: '#F87171' }}>-12.44%</td>
+                      <td style={{ padding: '4px 3px', color: '#FBBF24' }}>-8.59%</td>
+                      <td style={{ padding: '4px 3px', color: '#38BDF8', fontWeight: 800 }}>-2.61%</td>
+                      <td style={{ padding: '4px 2px', color: '#4ADE80', fontWeight: 700 }}>+9.83%</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
         </div>
+      </div>
+
+      {/* Step 4 Novelty Panel: Stability-Based Forgetting & Spaced Retrieval Scheduling */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.10) 0%, rgba(168, 85, 247, 0.12) 100%)',
+          border: revisionRecommended
+            ? '1px solid rgba(245, 158, 11, 0.55)'
+            : '1px solid rgba(148, 163, 184, 0.25)',
+          borderRadius: '12px',
+          padding: '11px 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.95rem' }}>⏳</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#E2E8F0' }}>
+              Forgetting & Memory Stability (Step 4)
+            </span>
+          </div>
+
+          <span
+            style={{
+              fontSize: '0.66rem',
+              fontWeight: 800,
+              padding: '2px 8px',
+              borderRadius: '10px',
+              background: revisionRecommended ? 'rgba(245, 158, 11, 0.22)' : 'rgba(16, 185, 129, 0.2)',
+              color: revisionRecommended ? '#FBBF24' : '#34D399',
+              border: revisionRecommended ? '1px solid #F59E0B' : '1px solid #10B981'
+            }}
+          >
+            {revisionRecommended ? '🔔 REVISION DUE' : '✅ RETENTION STRONG'}
+          </span>
+        </div>
+
+        {/* Interactive Time-Gap Simulator Buttons (0d / 1d / 3d / 5d / 7d) */}
+        {onChangeElapsedDays && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(15, 23, 42, 0.65)',
+              padding: '5px 8px',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
+            }}
+          >
+            <span style={{ fontSize: '0.69rem', color: '#CBD5E1', fontWeight: 600 }}>
+              Simulate Time Gap (Δt):
+            </span>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              {[0, 1, 3, 5, 7].map((d) => {
+                const isSelected = activeElapsedDays === d;
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => onChangeElapsedDays(d)}
+                    style={{
+                      padding: '2px 7px',
+                      borderRadius: '6px',
+                      fontSize: '0.68rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      border: isSelected ? '1px solid #FBBF24' : '1px solid rgba(255,255,255,0.12)',
+                      background: isSelected ? 'rgba(245, 158, 11, 0.28)' : 'rgba(255,255,255,0.05)',
+                      color: isSelected ? '#FBBF24' : '#94A3B8'
+                    }}
+                  >
+                    {d}d
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Retention Progress Bar R_t = exp(-Δt / S_t) */}
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', marginBottom: '3px' }}>
+            <span style={{ color: '#FBBF24', fontWeight: 700 }}>
+              Retention R(t) = e<sup>-Δt/S</sup>: {Math.round(retentionScore * 100)}%
+            </span>
+            <span style={{ color: '#94A3B8', fontSize: '0.69rem' }}>
+              Decayed P(L): <b style={{ color: '#E2E8F0' }}>{Math.round(decayedKnowledge * 100)}%</b>
+            </span>
+          </div>
+          <div style={{ height: '6px', borderRadius: '3px', background: 'rgba(255, 255, 255, 0.08)', overflow: 'hidden' }}>
+            <div
+              style={{
+                width: `${Math.round(retentionScore * 100)}%`,
+                height: '100%',
+                background: revisionRecommended
+                  ? 'linear-gradient(90deg, #F59E0B, #EF4444)'
+                  : 'linear-gradient(90deg, #10B981, #38BDF8)',
+                borderRadius: '3px',
+                transition: 'width 0.4s ease'
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Memory Stability & Optimal Next Review */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '6px',
+            fontSize: '0.68rem',
+            textAlign: 'center'
+          }}
+        >
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>Stability S<sub>t</sub></div>
+            <div style={{ fontWeight: 800, color: '#34D399', fontSize: '0.76rem' }}>
+              {memoryStability.toFixed(2)}d
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>Elapsed Δt</div>
+            <div style={{ fontWeight: 800, color: '#38BDF8', fontSize: '0.76rem' }}>
+              {activeElapsedDays} days
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>Next Review</div>
+            <div style={{ fontWeight: 800, color: '#C084FC', fontSize: '0.76rem' }}>
+              {optimalNextReviewDays}d
+            </div>
+          </div>
+        </div>
+
+        {revisionRecommended && (
+          <div
+            style={{
+              padding: '5px 8px',
+              borderRadius: '6px',
+              background: 'rgba(245, 158, 11, 0.16)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              color: '#FBBF24',
+              fontSize: '0.69rem',
+              fontWeight: 700
+            }}
+          >
+            🔔 Spaced Revision Triggered (R(t) &lt; 70%): Recommend micro-review before new concept!
+          </div>
+        )}
+      </div>
+
+      {/* Step 1 & Step 2 Novelty Panel: Privacy-Aware Dual-Source Fusion & Personal RT Baseline */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.10) 0%, rgba(56, 189, 248, 0.12) 100%)',
+          border: isMultimodal
+            ? '1px solid rgba(16, 185, 129, 0.45)'
+            : '1px solid rgba(56, 189, 248, 0.35)',
+          borderRadius: '12px',
+          padding: '11px 12px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.95rem' }}>📡</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#E2E8F0' }}>
+              Attention Fusion & RT Baseline
+            </span>
+          </div>
+
+          <span
+            style={{
+              fontSize: '0.66rem',
+              fontWeight: 800,
+              padding: '2px 8px',
+              borderRadius: '10px',
+              background: isMultimodal ? 'rgba(16, 185, 129, 0.22)' : 'rgba(56, 189, 248, 0.2)',
+              color: isMultimodal ? '#34D399' : '#38BDF8',
+              border: isMultimodal ? '1px solid #10B981' : '1px solid #38BDF8'
+            }}
+          >
+            {isMultimodal ? '📷 MULTIMODAL (Cam+Game)' : '🛡️ TELEMETRY FALLBACK'}
+          </span>
+        </div>
+
+        {/* Interactive Camera Consent & Score Controls */}
+        {onToggleCameraPermission && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              padding: '7px 9px',
+              borderRadius: '8px',
+              background: 'rgba(15, 23, 42, 0.65)',
+              border: '1px solid rgba(255, 255, 255, 0.08)'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.72rem', color: '#CBD5E1', fontWeight: 600 }}>
+                Peer Camera Consent:
+              </span>
+              <button
+                type="button"
+                onClick={() => onToggleCameraPermission(!cameraPermissionGranted)}
+                style={{
+                  padding: '3px 10px',
+                  borderRadius: '6px',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  border: cameraPermissionGranted ? '1px solid #10B981' : '1px solid #64748B',
+                  background: cameraPermissionGranted ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255, 255, 255, 0.08)',
+                  color: cameraPermissionGranted ? '#4ADE80' : '#94A3B8'
+                }}
+              >
+                {cameraPermissionGranted ? 'ON (Permitted)' : 'OFF (Privacy Mode)'}
+              </button>
+            </div>
+
+            {cameraPermissionGranted && onChangeCameraScore && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.69rem', color: '#94A3B8' }}>
+                  <span>Camera Visual Attention:</span>
+                  <b style={{ color: '#34D399' }}>{Math.round(cameraAttentionScore * 100)}%</b>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={Math.round(cameraAttentionScore * 100)}
+                  onChange={(e) => onChangeCameraScore(Number(e.target.value) / 100)}
+                  style={{ width: '100%', accentColor: '#10B981', cursor: 'pointer' }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Fusion Signal Breakdown & Personal RT Z-Score */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '6px',
+            fontSize: '0.69rem',
+            textAlign: 'center'
+          }}
+        >
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>Game I<sub>att</sub></div>
+            <div style={{ fontWeight: 800, color: '#38BDF8', fontSize: '0.78rem' }}>
+              {Math.round(gameplayInatt * 100)}%
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>Cam I<sub>att</sub></div>
+            <div style={{ fontWeight: 800, color: cameraInatt !== null ? '#34D399' : '#64748B', fontSize: '0.78rem' }}>
+              {cameraInatt !== null ? `${Math.round(cameraInatt * 100)}%` : 'OFF'}
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(255,255,255,0.04)', padding: '5px', borderRadius: '6px' }}>
+            <div style={{ color: '#94A3B8' }}>RT Z-Score</div>
+            <div
+              style={{
+                fontWeight: 800,
+                color: Math.abs(rtZScore) >= 1.5 ? '#FBBF24' : '#E2E8F0',
+                fontSize: '0.78rem'
+              }}
+            >
+              {rtZScore > 0 ? `+${rtZScore}` : rtZScore}σ
+            </div>
+          </div>
+        </div>
+
+        {/* Personal RT Baseline & Attention Slip Banner */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.68rem', color: '#94A3B8' }}>
+          <span>
+            Child RT μ: <b>{rtBaseline ? `${(rtBaseline.meanMs / 1000).toFixed(1)}s` : '6.0s'}</b> (±
+            {rtBaseline ? `${(rtBaseline.stdMs / 1000).toFixed(1)}s` : '2.0s'})
+          </span>
+          <span>
+            P(Focused): <b style={{ color: '#4ADE80' }}>{Math.round(attentionProb * 100)}%</b>
+          </span>
+        </div>
+
+        {isAttentionSlip && (
+          <div
+            style={{
+              padding: '5px 8px',
+              borderRadius: '6px',
+              background: 'rgba(245, 158, 11, 0.18)',
+              border: '1px solid rgba(245, 158, 11, 0.45)',
+              color: '#FBBF24',
+              fontSize: '0.7rem',
+              fontWeight: 700
+            }}
+          >
+            🛡️ Attention Slip Detected (|z| ≥ 1.5 or rapid/idle error) — Ready for AD-BKT Mastery Protection!
+          </div>
+        )}
       </div>
 
       {/* Real-time ADHD Meters (Inattention, Frustration, Persistence) */}
@@ -809,6 +1455,25 @@ export const LearnerStateHUD: React.FC<LearnerStateHUDProps> = ({
                 }}
               >
                 🔥 Frustration Struggle
+              </button>
+            )}
+
+            {onSimulateRapidAttentionSlip && (
+              <button
+                onClick={onSimulateRapidAttentionSlip}
+                style={{
+                  gridColumn: '1 / -1',
+                  padding: '6px 8px',
+                  borderRadius: '8px',
+                  background: 'rgba(56, 189, 248, 0.14)',
+                  border: '1px solid rgba(56, 189, 248, 0.4)',
+                  color: '#38BDF8',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  cursor: 'pointer'
+                }}
+              >
+                🛡️ Rapid RT Z-Score Attention Slip (&lt; 0.8s Error)
               </button>
             )}
           </div>

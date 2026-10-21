@@ -13,6 +13,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { DetailsForTeacher } from '../../features/pedagogical-agent';
 
 export const TeacherOverviewPage: React.FC = () => {
   const { user } = useAuth();
@@ -147,6 +148,9 @@ export const TeacherOverviewPage: React.FC = () => {
           </a>
         </div>
       </div>
+
+      {/* 3. Pedagogical Agent & AD-BKT Educator Analytics (DetailsForTeacher) */}
+      <DetailsForTeacher />
 
       {/* 4. Quick Actions for Teachers */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

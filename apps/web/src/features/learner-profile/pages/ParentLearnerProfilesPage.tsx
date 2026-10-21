@@ -13,6 +13,7 @@ import { ChildSwitcher } from '../components/parent/ChildSwitcher';
 import { SkillEvidenceList } from '../components/parent/SkillEvidenceList';
 import { deletionStatusLabel, optionTitle } from '../components/parent/labels';
 import { parentText } from '../../../shared/i18n/parentText';
+import { DetailsForParent } from '../../pedagogical-agent';
 
 const t = parentText.profiles;
 const prefText = parentText.preferences;
@@ -247,6 +248,14 @@ export const ParentLearnerProfilesPage: React.FC = () => {
                   <section className="bg-white rounded-3xl border border-mq-border p-5 shadow-xs">
                     <SkillEvidenceList profile={profile} />
                   </section>
+
+                  {/* Pedagogical Agent & AD-BKT Parent Friendly Insights for Selected Child */}
+                  <DetailsForParent
+                    parentId={selectedChild.parentId}
+                    learnerId={selectedChild.learnerId}
+                    studentName={selectedChild.preferredName || selectedChild.firstName}
+                    grade={selectedChild.grade}
+                  />
 
                   {summary && (
                     <details className="group bg-white rounded-3xl border border-mq-border shadow-xs">

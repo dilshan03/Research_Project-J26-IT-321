@@ -51,5 +51,26 @@
     "updatedAt": "2026-10-20T00:40:19.670Z",
     "lastFsmState": "OBSERVING",
     "studentId": "student_default"
+  },
+  {
+    "parentId": "6acb27e594049997a510aca0",
+    "learnerId": "lrn_4f49baea62",
+    "studentName": "Sasa",
+    "grade": 2,
+    "stars": 129,
+    "coins": 85,
+    "learningProgressPct": 0,
+    "completedSteps": [],
+    "completedActivityIds": [
+      "act_fb798a0695"
+    ],
+    "hintAwareKnowledge": 0.2,
+    "standardKnowledge": 0.2,
+    "totalHintsUsed": 0,
+    "sessionsCompleted": 1,
+    "updatedAt": "2026-10-21T09:44:19.475Z",
+    "lastFsmState": "OBSERVING",
+    "studentId": "lrn_4f49baea62",
+    "lastCognitiveState": "NORMAL"
   }
 ]

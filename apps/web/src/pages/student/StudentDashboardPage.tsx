@@ -30,10 +30,12 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/hooks/useAuth';
-import { PedagogicalPracticeArena } from '../../features/pedagogical-agent';
+import {
+  PedagogicalPracticeArena,
+  PedagogicalAdventureArena,
+} from '../../features/pedagogical-agent';
 import { contentAdaptationApi } from '../../features/content-adaptation/api';
 import type { BlueprintEnvelope, GameTheme } from '../../features/content-adaptation/types';
-import { GamePlayer } from '../../features/content-adaptation/game/GamePlayer';
 import {
   learnerApi,
   getActiveStudentProfile,
@@ -319,8 +321,13 @@ export const StudentDashboardPage: React.FC = () => {
   const studentApprovedGames = React.useMemo(() => {
     if (!approvedGames || approvedGames.length === 0) return [];
 
+    // Filter out any corrupted or incomplete blueprint envelopes
+    const validGames = approvedGames.filter(
+      (env): env is BlueprintEnvelope => Boolean(env && env.blueprint && env.blueprint.activity_id)
+    );
+
     // 1. Specifically targeted to this child (target_learner_id or matching name)
-    const childSpecific = approvedGames.filter(
+    const childSpecific = validGames.filter(
       (env) =>
         (env.blueprint.target_learner_id && env.blueprint.target_learner_id === resolvedLearnerId) ||
         (env.blueprint.student_name &&
@@ -328,7 +335,7 @@ export const StudentDashboardPage: React.FC = () => {
     );
 
     // 2. Approved for this student's grade (without a target_learner_id reserved for another child)
-    const gradeMatching = approvedGames.filter(
+    const gradeMatching = validGames.filter(
       (env) =>
         Number(env.blueprint.grade) === Number(studentGrade) &&
         !childSpecific.some((cs) => cs.blueprint.activity_id === env.blueprint.activity_id) &&
@@ -336,7 +343,7 @@ export const StudentDashboardPage: React.FC = () => {
     );
 
     // 3. Any other teacher-approved games available for exploration
-    const otherApproved = approvedGames.filter(
+    const otherApproved = validGames.filter(
       (env) =>
         !childSpecific.some((cs) => cs.blueprint.activity_id === env.blueprint.activity_id) &&
         !gradeMatching.some((gm) => gm.blueprint.activity_id === env.blueprint.activity_id) &&
@@ -347,8 +354,10 @@ export const StudentDashboardPage: React.FC = () => {
 
     // Move completed games to the very end of the cards list (agatama yana vidiyata)
     return allGames.sort((a, b) => {
-      const aDone = completedActivityIds.includes(a.blueprint.activity_id);
-      const bDone = completedActivityIds.includes(b.blueprint.activity_id);
+      const aId = a.blueprint.activity_id;
+      const bId = b.blueprint.activity_id;
+      const aDone = Boolean(aId && completedActivityIds.includes(aId));
+      const bDone = Boolean(bId && completedActivityIds.includes(bId));
       if (aDone && !bDone) return 1;  // a is completed -> push to end
       if (!aDone && bDone) return -1; // b is completed -> a comes first
       return 0;
@@ -406,8 +415,8 @@ export const StudentDashboardPage: React.FC = () => {
           learnerId: resolvedLearnerId,
           studentName: studentDisplayName,
           grade: studentGrade,
-          stars: prev.stars + starsDelta,
-          coins: prev.coins + coinsDelta,
+          stars: (prev.stars || 0) + starsDelta,
+          coins: (prev.coins || 0) + coinsDelta,
           updatedAt: new Date().toISOString(),
         };
         saveStudentProgress(next);
@@ -461,8 +470,8 @@ export const StudentDashboardPage: React.FC = () => {
           lastCognitiveState: summary.cognitiveState,
           lastFsmState: summary.fsmState,
           sessionsCompleted: summary.sessionComplete
-            ? Math.max(prev.sessionsCompleted, 1)
-            : prev.sessionsCompleted,
+            ? Math.max(prev.sessionsCompleted || 0, 1)
+            : (prev.sessionsCompleted || 0),
           updatedAt: new Date().toISOString(),
         };
         saveStudentProgress(next);
@@ -662,20 +671,28 @@ export const StudentDashboardPage: React.FC = () => {
   };
 
   // Full-Screen Focus Mode for Teacher-Approved Adventure Games:
-  // When a game is started, the entire dashboard header and navigation sidebar
-  // are completely hidden, opening the game full-screen with only Stars & Coins in the top corner.
+  // Integrated with the 3D Pedagogical Agent (MathBot 3000 / Gaja) side companion,
+  // Progressive Hint Board, and real-time BKT Mastery Calculation.
   if (activeNav === 'adventure' && activeApprovedGame) {
     return (
       <div className="min-h-screen w-full bg-mq-bg overflow-x-hidden animate-fade-in">
-        <GamePlayer
+        <PedagogicalAdventureArena
           envelope={activeApprovedGame}
-          learnerId={resolvedLearnerId}
+          studentId={resolvedLearnerId}
+          parentId={resolvedParentId}
+          studentName={studentDisplayName}
+          studentGrade={studentGrade}
+          studentAvatar={avatar.icon}
           totalStars={savedProgress.stars}
           totalCoins={savedProgress.coins}
-          onComplete={handleGameComplete}
+          showResearchHUD={showResearchHUD}
           onExit={() => {
             setActiveApprovedGame(null);
           }}
+          onComplete={handleGameComplete}
+          onRewardEarned={handleRewardEarned}
+          onProgressUpdate={handleProgressUpdate}
+          onSessionDataSync={handleSessionDataSync}
         />
       </div>
     );
@@ -721,13 +738,13 @@ export const StudentDashboardPage: React.FC = () => {
             {/* Stars Pill */}
             <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-amber-50 border-2 border-amber-300/80 text-sm sm:text-base font-black text-amber-950 shadow-2xs">
               <Star size={18} className="text-amber-500 fill-amber-400 shrink-0 animate-pulse" />
-              <span>{savedProgress.stars.toLocaleString()} <span className="hidden sm:inline text-xs font-extrabold text-amber-800">{isSinhala ? 'තරු' : 'Stars'}</span></span>
+              <span>{(savedProgress?.stars ?? 0).toLocaleString()} <span className="hidden sm:inline text-xs font-extrabold text-amber-800">{isSinhala ? 'තරු' : 'Stars'}</span></span>
             </div>
 
             {/* Coins Pill */}
             <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-yellow-50 border-2 border-yellow-300/80 text-sm sm:text-base font-black text-yellow-950 shadow-2xs">
               <Coins size={18} className="text-yellow-600 shrink-0" />
-              <span>{savedProgress.coins} <span className="hidden sm:inline text-xs font-extrabold text-yellow-800">{isSinhala ? 'කාසි' : 'Coins'}</span></span>
+              <span>{(savedProgress?.coins ?? 0).toLocaleString()} <span className="hidden sm:inline text-xs font-extrabold text-yellow-800">{isSinhala ? 'කාසි' : 'Coins'}</span></span>
             </div>
           </div>
 
@@ -1070,7 +1087,7 @@ export const StudentDashboardPage: React.FC = () => {
                       {isSinhala ? 'මුළු තරු' : 'Treasury Stars'}
                     </p>
                     <p className="text-3xl font-black text-amber-950 mt-1">
-                      {savedProgress.stars.toLocaleString()}
+                      {(savedProgress?.stars ?? 0).toLocaleString()}
                     </p>
                     <p className="text-xs text-mq-text-muted mt-1">
                       {isSinhala ? 'එකතු කළ මුළු තරු ප්‍රමාණය' : 'Total stars collected'}
@@ -1086,7 +1103,7 @@ export const StudentDashboardPage: React.FC = () => {
                       {isSinhala ? 'රන් කාසි' : 'Kingdom Gold'}
                     </p>
                     <p className="text-3xl font-black text-yellow-950 mt-1">
-                      {savedProgress.coins.toLocaleString()}
+                      {(savedProgress?.coins ?? 0).toLocaleString()}
                     </p>
                     <p className="text-xs text-mq-text-muted mt-1">
                       {isSinhala ? 'මාළිගාවේ ඇති රන් කාසි' : 'Gold coins in the castle'}
@@ -1135,11 +1152,11 @@ export const StudentDashboardPage: React.FC = () => {
                             <span>
                               {studentApprovedGames.length} {isSinhala ? 'ක්‍රීඩා' : 'Games'}
                               {studentApprovedGames.filter((env) =>
-                                completedActivityIds.includes(env.blueprint.activity_id)
+                                Boolean(env?.blueprint?.activity_id && completedActivityIds.includes(env.blueprint.activity_id))
                               ).length > 0 &&
                                 ` · ${
                                   studentApprovedGames.filter((env) =>
-                                    completedActivityIds.includes(env.blueprint.activity_id)
+                                    Boolean(env?.blueprint?.activity_id && completedActivityIds.includes(env.blueprint.activity_id))
                                   ).length
                                 } ක් ${isSinhala ? 'සම්පූර්ණයි ✓' : 'Completed ✓'}`}
                             </span>
@@ -1259,7 +1276,8 @@ export const StudentDashboardPage: React.FC = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {studentApprovedGames.map((env, idx) => {
                           const bp = env.blueprint;
-                          const isCompleted = completedActivityIds.includes(bp.activity_id);
+                          if (!bp) return null;
+                          const isCompleted = Boolean(bp.activity_id && completedActivityIds.includes(bp.activity_id));
                           const themeKey = (bp.game_theme || 'VILLAGE_MARKET') as GameTheme;
                           const themeInfo =
                             ADAPTATION_THEMES[themeKey] || ADAPTATION_THEMES.VILLAGE_MARKET;

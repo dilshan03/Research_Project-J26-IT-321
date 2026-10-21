@@ -3,6 +3,7 @@ export { AgentSpeechBubble } from './components/AgentSpeechBubble';
 export { HintBoard } from './components/HintBoard';
 export { PedagogicalCompanion } from './components/PedagogicalCompanion';
 export { PedagogicalPracticeArena } from './components/PedagogicalPracticeArena';
+export { PedagogicalAdventureArena } from './components/PedagogicalAdventureArena';
 export { LearnerStateHUD } from './components/LearnerStateHUD';
 export { DetailsForParent } from './components/DetailsForParent';
 export { DetailsForTeacher } from './components/DetailsForTeacher';

@@ -49,8 +49,10 @@ const MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/face_landmark
 
 export default function BehaviourMonitoringPage() {
   const [stage, setStage] = useState<Stage>('welcome');
-  const [deepfaceStatus, setDeepfaceStatus] = useState('DeepFace සම්බන්ධ කර නැත');
+  const [deepfaceStatus, setDeepfaceStatus] = useState('ප්‍රකාශන විශ්ලේෂණය සම්බන්ධ කර නැත');
   const [deepfaceReport, setDeepfaceReport] = useState<DeepFaceObservation[]>([]);
+  const [analysisRequests, setAnalysisRequests] = useState(0);
+  const [analysisFailures, setAnalysisFailures] = useState(0);
   const deepfaceRef = useRef<DeepFaceObservation[]>([]);
   const deepfacePendingRef = useRef(false);
   const deepfaceLastRef = useRef(0);
@@ -128,25 +130,27 @@ export default function BehaviourMonitoringPage() {
     const encoded = canvas.toDataURL('image/jpeg', 0.65).split(',')[1];
     const currentSession = deepfaceSessionRef.current;
     deepfacePendingRef.current = true;
+    setAnalysisRequests(n => n + 1);
     try {
       const response = await fetch(`${DEEPFACE_API}/analyze`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId: currentSession, imageBase64: encoded }),
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) { const details = await response.text(); throw new Error(`HTTP ${response.status}: ${details.slice(0, 180)}`); }
       const data: { faceDetected: boolean; dominant: string | null; scores: Record<string, number> | null } = await response.json();
       if (data.faceDetected && data.dominant && data.scores && deepfaceSessionRef.current === currentSession) {
         const observation = { at: Date.now(), dominant: data.dominant, scores: data.scores };
         deepfaceRef.current.push(observation);
         setDeepfaceReport([...deepfaceRef.current]);
-        setDeepfaceStatus('DeepFace දත්ත රැස් කරමින් පවතී');
+        setDeepfaceStatus('ප්‍රකාශන දත්ත රැස් කරමින් පවතී');
       } else if (!data.faceDetected) {
-        setDeepfaceStatus('DeepFace: මුහුණ හඳුනාගෙන නැත');
+        setDeepfaceStatus('ප්‍රකාශන විශ්ලේෂණයට මුහුණ හඳුනාගෙන නැත');
       }
     } catch (error) {
       if (!deepfaceErrorShownRef.current) console.warn('DeepFace API unavailable', error);
+      setAnalysisFailures(n => n + 1);
       deepfaceErrorShownRef.current = true;
-      setDeepfaceStatus('DeepFace සේවාව සම්බන්ධ නොවේ (8010)');
+      setDeepfaceStatus(`ප්‍රකාශන සේවා දෝෂය: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       deepfacePendingRef.current = false;
     }
@@ -251,10 +255,11 @@ export default function BehaviourMonitoringPage() {
     deepfaceSessionRef.current = `mq_${start}`;
     deepfaceRef.current = [];
     setDeepfaceReport([]);
+    setAnalysisRequests(0); setAnalysisFailures(0);
     deepfaceLastRef.current = 0;
     deepfaceErrorShownRef.current = false;
     deepfaceActiveRef.current = cameraRef.current;
-    setDeepfaceStatus(cameraRef.current ? 'DeepFace ආරම්භ කරමින්...' : 'කැමරාව භාවිතා නොකෙරේ');
+    setDeepfaceStatus(cameraRef.current ? 'ප්‍රකාශන විශ්ලේෂණය ආරම්භ කරමින්...' : 'කැමරාව භාවිතා නොකෙරේ');
     sessionStartRef.current = start;
     setQuestionIndex(0); setSelected(null); setSelectionCount(0); setSelectionChanges(0); setAnswers([]);
     eventsRef.current = []; questionRef.current = 0;
@@ -310,6 +315,33 @@ function reset() { deepfaceActiveRef.current = false; deepfaceRef.current = []; 
     key, label: expressionLabels[key], count: visibleObservations.filter(o => o.expression === key).length,
     percentage: visibleObservations.length ? Math.round(visibleObservations.filter(o => o.expression === key).length / visibleObservations.length * 100) : 0,
   }));
+  // Experimental task-engagement proxies, not emotion or attention diagnoses.
+  // These are session-level evidence flags, not per-frame emotion classifications.
+  const distractionEvents = reportEvents.filter(e => e.type === 'distraction').length;
+  const inactivityEvents = reportEvents.filter(e => e.type === 'inactivity').length;
+  const hesitationEvents = reportEvents.filter(e => e.type === 'hesitation').length;
+  const offscreenSamples = visibleObservations.filter(o => o.yaw > 0.065).length;
+  const offscreenRatio = visibleObservations.length ? offscreenSamples / visibleObservations.length : 0;
+  const taskEngagementIndicators = [
+    {
+      key: 'distraction_like', label: 'අවධානය වෙනතකට යොමුවීමේ සංඥා',
+      detected: distractionEvents > 0 || (offscreenRatio >= 0.30 && inactivityEvents > 0),
+      evidence: `දිගු හිස හැරීම්: ${distractionEvents} | තිරයෙන් ඉවතට හැරුණු නියැදි: ${offscreenSamples}/${visibleObservations.length}`,
+      available: visibleObservations.length > 0,
+    },
+    {
+      key: 'boredom_like', label: 'කම්මැලිකමට සමාන හැසිරීම් රටාව (පරීක්ෂණාත්මක)',
+      detected: inactivityEvents > 0 && (distractionEvents > 0 || offscreenRatio >= 0.30),
+      evidence: `ක්‍රීඩා අක්‍රියතා සිදුවීම්: ${inactivityEvents} | දිගු හිස හැරීම්: ${distractionEvents}`,
+      available: visibleObservations.length > 0,
+    },
+    {
+      key: 'concentration_like', label: 'කාර්යයට යොමු වූ හැසිරීම් රටාව (පරීක්ෂණාත්මක)',
+      detected: visibleObservations.length >= 10 && offscreenRatio <= 0.20 && inactivityEvents === 0 && answers.length >= 2,
+      evidence: `තිරයට මුහුණලා සිටි නියැදි: ${visibleObservations.length - offscreenSamples}/${visibleObservations.length} | පිළිතුරු: ${answers.length} | ප්‍රමාද සංඥා: ${hesitationEvents}`,
+      available: visibleObservations.length >= 10 && answers.length >= 2,
+    },
+  ];
   const behaviourKeys: BehaviourEvent['type'][] = ['distraction', 'hesitation', 'impulsive', 'inactivity', 'fast', 'repeated_wrong', 'answer_changes'];
   const behaviourNames: Record<BehaviourEvent['type'], string> = {
     distraction: 'හිස හැරීමේ සංඥා', hesitation: 'පිළිතුරු ප්‍රමාදය', impulsive: 'ඉතා ඉක්මන් වැරදි පිළිතුරු',
@@ -322,7 +354,7 @@ function reset() { deepfaceActiveRef.current = false; deepfaceRef.current = []; 
   return <div className="min-h-screen bg-mq-bg text-mq-text px-4 py-8">
     <div className="max-w-5xl mx-auto">
       <header className="flex justify-between items-center mb-8"><div><div className="text-2xl font-extrabold"><span className="text-mq-primary-dark">Math</span><span className="text-mq-secondary">Quest</span></div><p className="text-sm text-mq-text-muted sinhala">ගණිත ක්‍රීඩා</p></div><span className="badge">{stage === 'welcome' ? '1 / 5' : stage === 'camera' ? '2 / 5' : stage === 'game' ? '3 / 5' : stage === 'summary' ? '4 / 5' : '5 / 5'}</span></header>
-      {stage === 'welcome' && <section className="bg-white rounded-3xl border border-mq-border p-8 md:p-12 text-center shadow-[var(--mq-shadow-md)]"><div className="text-6xl mb-5">🌟</div><h1 className="sinhala text-3xl mb-4">MathQuest වෙත සාදරයෙන් පිළිගනිමු!</h1><p className="sinhala text-mq-text-muted mb-5">අපි ගණිත ප්‍රශ්න කිහිපයක් විසඳමු. පළමුව කැමරාව සූදානම් කරගනිමු.</p><p className="text-sm text-mq-text-muted mb-8">Camera use is optional. With camera permission, selected JPEG frames are sent to the local DeepFace service for analysis. Frames are processed in memory and not saved; numeric scores are saved locally. Camera use is optional.</p><button className="btn btn-primary" onClick={() => setStage('camera')}>ඉදිරියට <ArrowRight size={18}/></button></section>}
+      {stage === 'welcome' && <section className="bg-white rounded-3xl border border-mq-border p-8 md:p-12 text-center shadow-[var(--mq-shadow-md)]"><div className="text-6xl mb-5">🌟</div><h1 className="sinhala text-3xl mb-4">MathQuest වෙත සාදරයෙන් පිළිගනිමු!</h1><p className="sinhala text-mq-text-muted mb-5">අපි ගණිත ප්‍රශ්න කිහිපයක් විසඳමු. පළමුව කැමරාව සූදානම් කරගනිමු.</p><p className="text-sm text-mq-text-muted mb-8">Camera use is optional. With permission, selected camera frames are processed by a local facial-expression analysis service. Frames are not saved; numerical analysis results are stored locally.</p><button className="btn btn-primary" onClick={() => setStage('camera')}>ඉදිරියට <ArrowRight size={18}/></button></section>}
       {(stage === 'camera' || stage === 'game') && <div className={stage === 'camera' ? 'max-w-3xl mx-auto' : 'hidden'}><section className="bg-white rounded-3xl border border-mq-border p-7 shadow-[var(--mq-shadow-sm)]"><h1 className="sinhala text-2xl mb-2">📷 කැමරාව සූදානම් කරමු</h1><p className="sinhala text-mq-text-muted mb-4">මුහුණ කැමරාවට පෙනෙන ලෙස වාඩිවන්න. කැමරාව භාවිතා කිරීමට අවසර දෙන්න.</p><div className="bg-mq-surface-soft rounded-2xl overflow-hidden relative aspect-video mb-4"><video ref={videoRef} muted playsInline autoPlay className="w-full h-full object-cover scale-x-[-1]"/><span className="absolute bottom-3 left-3 badge">{cameraEnabled ? (faceVisible ? 'මුහුණ හඳුනාගෙන ඇත ✓' : 'මුහුණ හමු නොවීය') : 'Camera off'}</span></div><p role="status" className="text-sm text-mq-text-muted mb-4">{cameraStatus}</p><div className="flex flex-wrap gap-3"><button className="btn btn-primary" onClick={() => void startCamera()} disabled={cameraEnabled}><Camera size={18}/> කැමරාව ක්‍රියාත්මක කරන්න</button><button className="btn btn-secondary" onClick={begin}> {cameraEnabled ? 'ක්‍රීඩාව ආරම්භ කරන්න' : 'කැමරාව නොමැතිව ඉදිරියට'} <ArrowRight size={18}/></button></div><p className="text-xs text-mq-text-muted mt-4">This is face positioning, not validated gaze calibration. No identity recognition is performed.</p></section></div>}
              {stage === 'game' && (
          <section className="max-w-3xl mx-auto">
@@ -380,32 +412,39 @@ function reset() { deepfaceActiveRef.current = false; deepfaceRef.current = []; 
              </div>
            </div>
            <div className="bg-white rounded-3xl border border-mq-border p-6 md:p-8">
-             <h2 className="text-xl font-bold mb-4">මුහුණේ ප්‍රකාශන නිරීක්ෂණ</h2>
-             <p className="text-sm text-mq-text-muted mb-4">කැමරා මිනුම්: {reportObservations.length} | මුහුණ හඳුනාගත් මිනුම්: {visibleObservations.length}</p>
-             {visibleObservations.length === 0 ? <p className="text-mq-text-muted">කැමරා දත්ත නොමැත. ක්‍රීඩා අන්තර්ක්‍රියා දත්ත පමණක් ලබාගත හැක.</p> : (
-               <div className="space-y-4">{expressionCounts.map(item => <div key={item.key}>
-                 <div className="flex justify-between text-sm mb-1"><span>{item.label}</span><span>{item.percentage}% ({item.count})</span></div>
-                 <div className="h-3 rounded-full bg-slate-100 overflow-hidden"><div className="h-full bg-indigo-500" style={{ width: `${item.percentage}%` }}/></div>
-               </div>)}</div>
-             )}
-             <p className="text-xs text-mq-text-muted mt-4">කෝපයට සමාන දර්ශකය ඇහිබැම පහළට චලනය සහ තොල් තද කිරීම/පහළට හැරීම මත පදනම් වේ. කම්මැලිකමට සමාන දර්ශකය ක්‍රීඩා අක්‍රියතාව සහ හිස හැරීම එකවර පැවතීම මත පදනම් වේ. මේවා පරීක්ෂණාත්මක සංඥා පමණක් වන අතර සැබෑ කෝපය හෝ කම්මැලිකම තහවුරු නොකරයි.</p>
-           </div>
-           <div className="bg-white rounded-3xl border border-mq-border p-6 md:p-8">
-             <h2 className="text-xl font-bold mb-3">DeepFace මුහුණේ ප්‍රකාශන විශ්ලේෂණය</h2>
-             <p className="text-sm text-mq-text-muted mb-3">මෙය පෙර පුහුණු කළ පරිගණක දෘශ්‍ය ආකෘතියක අනුමානයකි. සැබෑ හැඟීම් තහවුරු නොකරයි. කම්මැලිකම DeepFace මඟින් හඳුනා නොගනී.</p>
-             <p className="text-sm text-mq-text-muted mb-4">{deepfaceStatus} | සාර්ථක නියැදි: {deepfaceReport.length}</p>
-             {deepfaceReport.length === 0 ? <p className="text-mq-text-muted">DeepFace මිනුම් නොමැත. සේවාව ක්‍රියාත්මකදැයි සහ කැමරාව ක්‍රියාත්මකදැයි පරීක්ෂා කරන්න.</p> : (
-               <div className="space-y-4">{Object.entries(deepfaceLabels).map(([key, label]) => {
+             <h2 className="text-xl font-bold mb-4">මුහුණේ ප්‍රකාශන සාරාංශය</h2>
+             <p className="text-sm text-mq-text-muted mb-4">කැමරා මිනුම්: {reportObservations.length} | මුහුණ හඳුනාගත් මිනුම්: {visibleObservations.length} | සාර්ථක ප්‍රකාශන වර්ගීකරණ නියැදි: {deepfaceReport.length}</p>
+             {deepfaceReport.length === 0 && <p className="text-sm text-amber-700 mb-4">ප්‍රකාශන වර්ගීකරණ දත්ත නොමැත. {deepfaceStatus} — ප්‍රකාශන සඳහා 0% යනු ප්‍රකාශනය නොතිබුණු බව නොවේ.</p>}
+             <p className="text-xs text-mq-text-muted mb-4">ප්‍රකාශන විශ්ලේෂණ ඉල්ලීම්: {analysisRequests} | දෝෂ: {analysisFailures} | සාර්ථක නියැදි: {deepfaceReport.length}</p>
+             <h3 className="font-semibold mb-2">ප්‍රකාශන වර්ගීකරණය</h3>
+             <p className="text-xs text-mq-text-muted mb-3">සමස්ත මුහුණේ ප්‍රකාශන පිළිබඳ ආකෘති අනාවැකි (නියැදි: {deepfaceReport.length})</p>
+             <div className="space-y-3 mb-6">
+               {Object.entries(deepfaceLabels).map(([key, label]) => {
                  const count = deepfaceReport.filter(o => o.dominant === key).length;
-                 const percentage = Math.round(count / deepfaceReport.length * 100);
-                 const meanScore = Math.round(deepfaceReport.reduce((n, o) => n + (o.scores[key] ?? 0), 0) / deepfaceReport.length);
+                 const percentage = deepfaceReport.length ? Math.round(count / deepfaceReport.length * 100) : 0;
                  return <div key={key}>
-                   <div className="flex justify-between text-sm mb-1"><span>{label}</span><span>{percentage}% ({count}) · සාමාන්‍ය ආකෘති ලකුණ {meanScore}%</span></div>
+                   <div className="flex justify-between gap-2 text-sm mb-1"><span>{label}</span><span>{deepfaceReport.length ? `${percentage}% (${count})` : 'දත්ත නොමැත'}</span></div>
                    <div className="h-3 rounded-full bg-slate-100 overflow-hidden"><div className="h-full bg-teal-500" style={{ width: `${percentage}%` }}/></div>
                  </div>;
-               })}</div>
-             )}
-             <p className="text-xs text-mq-text-muted mt-4">ප්‍රතිශතය යනු එක් එක් ප්‍රකාශනය ප්‍රමුඛ වූ සාර්ථක නියැදිවල අනුපාතයයි. එය දරුවා එම හැඟීමෙන් සිටි කාලය හෝ හැඟීමක සම්භාවිතාව නොවේ.</p>
+               })}
+             </div>
+             <h3 className="font-semibold mb-2">මුහුණේ චලන නිරීක්ෂණ</h3>
+             <p className="text-xs text-mq-text-muted mb-3">සිනහව, ඇහිබැම, ඇස් සහ මුඛ චලන (නියැදි: {visibleObservations.length})</p>
+             <div className="space-y-3 mb-6">
+               {expressionCounts.filter(item => ['smile', 'brow_down', 'brow_up', 'eyes_closed', 'mouth_open', 'other'].includes(item.key)).map(item => <div key={item.key}>
+                 <div className="flex justify-between gap-2 text-sm mb-1"><span>{item.label}</span><span>{visibleObservations.length ? `${item.percentage}% (${item.count})` : 'දත්ත නොමැත'}</span></div>
+                 <div className="h-3 rounded-full bg-slate-100 overflow-hidden"><div className="h-full bg-indigo-500" style={{ width: `${item.percentage}%` }}/></div>
+               </div>)}
+             </div>
+             <h3 className="font-semibold mb-2">ඉගෙනුම් හැසිරීම් සංඥා</h3>
+             <p className="text-xs text-mq-text-muted mb-3">මුහුණේ දිශාව සහ ක්‍රීඩා අන්තර්ක්‍රියා එකට සලකා බැලූ පරීක්ෂණාත්මක දර්ශක</p>
+             <div className="grid grid-cols-1 gap-3">
+               {taskEngagementIndicators.map(item => <div key={item.key} className="rounded-xl bg-mq-surface-soft p-4">
+                 <div className="flex flex-wrap items-center justify-between gap-2 text-sm"><strong>{item.label}</strong><span className="font-semibold">{!item.available ? 'ප්‍රමාණවත් දත්ත නොමැත' : item.detected ? 'සංඥා හමු විය' : 'සංඥා හමු නොවීය'}</span></div>
+                 <p className="text-xs text-mq-text-muted mt-2">{item.evidence}</p>
+               </div>)}
+             </div>
+             <p className="text-xs text-mq-text-muted mt-4">ප්‍රකාශන වර්ගීකරණ ප්‍රතිශත සාර්ථක ආකෘති නියැදි මත ගණනය වේ. මුහුණේ චලන ප්‍රතිශත මුහුණ හඳුනාගත් කැමරා මිනුම් මත ගණනය වේ. ඒවා වෙනස් මිනුම් වර්ග බැවින් එකතු කර 100% නොවිය හැක. මෙම ප්‍රතිඵල සැබෑ හැඟීම් තහවුරු නොකරයි. කම්මැලිකම, අවධානය වෙනතකට යොමුවීම සහ කාර්යයට යොමුවීම පිළිබඳ දර්ශක පරීක්ෂණාත්මකය. ඒවා දරුවාගේ සැබෑ මානසික තත්ත්වය හෝ ADHD තහවුරු නොකරයි.</p>
            </div>
            <div className="bg-white rounded-3xl border border-mq-border p-6 md:p-8">
              <h2 className="text-xl font-bold mb-4">හැසිරීම් සංඥා</h2>
@@ -418,7 +457,7 @@ function reset() { deepfaceActiveRef.current = false; deepfaceRef.current = []; 
              <div className="space-y-2">{answers.map(a => <div key={a.question} className="flex flex-wrap justify-between gap-3 bg-mq-surface-soft rounded-xl p-3 text-sm"><span>ප්‍රශ්නය {a.question}</span><span>{a.correct ? 'නිවැරදි' : 'වැරදි'}</span><span>{Math.round(a.responseMs / 1000)} තත්පර</span><span>වෙනස් කිරීම්: {a.changes}</span></div>)}</div>
            </div>
            <div className="flex flex-wrap gap-3"><button className="btn btn-primary" type="button" onClick={exportReport}>CSV දත්ත බාගන්න</button><button className="btn btn-secondary" type="button" onClick={reset}><RotateCcw size={18}/> නැවත ක්‍රීඩා කරන්න</button></div>
-           <p className="text-xs text-mq-text-muted">ක්‍රීඩා දත්ත මෙම පිටුවේ තාවකාලිකව පවතී. DeepFace ලකුණු ප්‍රාදේශීය Python සේවාවේ JSONL ගොනුවක ගබඩා වේ. MongoDB තවම සම්බන්ධ කර නොමැත.</p>
+           <p className="text-xs text-mq-text-muted">ක්‍රීඩා දත්ත මෙම පිටුවේ තාවකාලිකව පවතී. මුහුණේ ප්‍රකාශන විශ්ලේෂණ ලකුණු ප්‍රාදේශීය සේවාවේ JSONL ගොනුවක ගබඩා වේ. MongoDB තවම සම්බන්ධ කර නොමැත.</p>
          </section>
        )}
      </div>

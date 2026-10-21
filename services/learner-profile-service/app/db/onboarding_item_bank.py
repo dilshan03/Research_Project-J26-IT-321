@@ -8,9 +8,11 @@ activities; correctness is always derived here on the server.
 Probe roles and item families are authoritative on the server: a client cannot turn a
 guided (support) item into independent evidence by relabelling it.
 
-All items are proposals pending Sri Lankan Grade 1 curriculum/teacher review
+All items are proposals pending Sri Lankan curriculum/teacher review
 (expertReview = "PENDING"); they are not a validated assessment instrument.
-Only Grade 1 is defined so far; other grades keep using MATH-QB-v1.0.
+Grades 1 and 2 are defined; Grades 3-5 keep using MATH-QB-v1.0 until implemented.
+Each Grade 2 skill has at least 3 independent items (ELP-X needs >= 3 distinct items per skill);
+the guided `support` item never counts.
 """
 
 from typing import Any, Dict, List, Optional
@@ -19,6 +21,12 @@ ONBOARDING_ITEM_BANK_VERSION = "ONBOARDING-V2-ITEMS-v1.0"
 
 _NUMBER_SENSE = {"skillId": "number_sense", "skillName": "Counting & Number Sense", "skillNameSi": "ගණන් කිරීම හා සංඛ්‍යා සංකල්ප"}
 _COMPARISON = {"skillId": "number_comparison", "skillName": "Comparing Quantities", "skillNameSi": "ප්‍රමාණ සංසන්දනය"}
+_PLACE_VALUE = {"skillId": "place_value", "skillName": "Place Value (Tens & Ones)", "skillNameSi": "ස්ථානීය අගය (දහය හා එක)"}
+_ADDITION = {"skillId": "addition", "skillName": "2-Digit Addition (no regrouping)", "skillNameSi": "දෙඅංක සංඛ්‍යා එකතු කිරීම"}
+
+
+def _numeric_choices(*values: int):
+    return [{"id": str(v)} for v in values]
 
 ONBOARDING_V2_ITEMS: List[Dict[str, Any]] = [
     # Phase C: independent exploration (no probe role = independent evidence)
@@ -98,6 +106,100 @@ ONBOARDING_V2_ITEMS: List[Dict[str, Any]] = [
         "questionType": "multiple_choice",
         "options": [{"id": "left"}, {"id": "right"}],
         "correctAnswer": "right",
+        "expertReview": "PENDING",
+    },
+
+    # ============================ GRADE 2 ============================
+    # Skill place_value: 3 independent items (build, blocks -> numeral, numeral -> blocks)
+    {
+        "questionId": "g2v2_build_tens_ones_34",
+        "grade": 2, **_PLACE_VALUE,
+        "activityId": "g2_build_number",
+        "conceptId": "tens_and_ones",
+        "itemFamilyId": "g2_place_value",
+        "probeRole": None,
+        "representation": "concrete",
+        "questionType": "numeric",
+        "correctAnswer": 34,
+        "expertReview": "PENDING",
+    },
+    {
+        "questionId": "g2v2_match_blocks_to_numeral_47",
+        "grade": 2, **_PLACE_VALUE,
+        "activityId": "g2_read_blocks",
+        "conceptId": "tens_and_ones",
+        "itemFamilyId": "g2_place_value",
+        "probeRole": "representation",
+        "representation": "pictorial",
+        "questionType": "numeric",
+        "options": _numeric_choices(74, 47, 11, 407),
+        "correctAnswer": 47,
+        "expertReview": "PENDING",
+    },
+    {
+        "questionId": "g2v2_match_numeral_to_blocks_52",
+        "grade": 2, **_PLACE_VALUE,
+        "activityId": "g2_show_number",
+        "conceptId": "tens_and_ones",
+        "itemFamilyId": "g2_place_value",
+        "probeRole": "representation",
+        "representation": "symbolic",
+        "questionType": "multiple_choice",
+        "options": [{"id": "blocks_2_5"}, {"id": "blocks_0_7"}, {"id": "blocks_5_2"}],
+        "correctAnswer": "blocks_5_2",
+        "expertReview": "PENDING",
+    },
+    # Skill addition: independent item + pre -> guided support -> new transfer (pre and transfer are independent)
+    {
+        "questionId": "g2v2_add_blocks_21_14",
+        "grade": 2, **_ADDITION,
+        "activityId": "g2_add_blocks",
+        "conceptId": "add_2digit_no_regroup",
+        "itemFamilyId": "g2_add_no_regroup_blocks",
+        "probeRole": None,
+        "representation": "pictorial",
+        "questionType": "numeric",
+        "options": _numeric_choices(53, 35, 25, 45),
+        "correctAnswer": 35,
+        "expertReview": "PENDING",
+    },
+    {
+        "questionId": "g2v2_add_pre_32_15",
+        "grade": 2, **_ADDITION,
+        "activityId": "g2_add_sequence",
+        "conceptId": "add_2digit_no_regroup",
+        "itemFamilyId": "g2_add_no_regroup",
+        "probeRole": "pre",
+        "representation": "symbolic",
+        "questionType": "numeric",
+        "options": _numeric_choices(74, 46, 47, 57),
+        "correctAnswer": 47,
+        "expertReview": "PENDING",
+    },
+    {
+        "questionId": "g2v2_add_support_24_33",
+        "grade": 2, **_ADDITION,
+        "activityId": "g2_add_sequence",
+        "conceptId": "add_2digit_no_regroup",
+        "itemFamilyId": "g2_add_no_regroup",
+        "probeRole": "support",
+        "representation": "symbolic",
+        "questionType": "numeric",
+        "options": _numeric_choices(56, 57, 66, 75),
+        "correctAnswer": 57,
+        "expertReview": "PENDING",
+    },
+    {
+        "questionId": "g2v2_add_transfer_41_26",
+        "grade": 2, **_ADDITION,
+        "activityId": "g2_add_sequence",
+        "conceptId": "add_2digit_no_regroup",
+        "itemFamilyId": "g2_add_no_regroup",
+        "probeRole": "transfer",
+        "representation": "symbolic",
+        "questionType": "numeric",
+        "options": _numeric_choices(67, 76, 65, 57),
+        "correctAnswer": 67,
         "expertReview": "PENDING",
     },
 ]

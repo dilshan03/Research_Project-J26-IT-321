@@ -72,6 +72,35 @@ const si = {
     transferIntro: 'දැන් ඔයාම කරන්න!',
   },
 
+  // Grade 2 (onboarding-v2). Proposed wording, pending review by Sinhala-medium Grade 2 teachers.
+  placeValue: {
+    build: (n: number) => `දහයේ කූරු සහ එකේ කැට යොදාගෙන ${n} හදන්න.`,
+    ten: 'දහයේ කූර',
+    one: 'එකේ කැටය',
+    tray: 'තැටිය',
+    takeBack: 'අයින් කරන්න තට්ටු කරන්න',
+    helpClarify: 'එක කූරක 10ක් තියෙනවා. එක කැටයක 1ක් තියෙනවා.',
+    helpCue: (tens: number, ones: number) => `දැන් තැටියේ: දහයේ කූරු ${tens}යි, එකේ කැට ${ones}යි.`,
+    readBlocks: 'මේ කූරු සහ කැට වලින් පෙන්වන සංඛ්‍යාව කීයද? හරි අංකය තෝරන්න.',
+    readHelp: 'කූරු දහය බැගින් ගණන් කරන්න. ඊට පස්සේ කැට එක බැගින් ගණන් කරන්න.',
+    showNumber: (n: number) => `${n} පෙන්වන පින්තූරය තෝරන්න.`,
+    showHelp: 'මුල් ඉලක්කම කූරු ගණනයි. දෙවෙනි ඉලක්කම කැට ගණනයි.',
+  },
+  add2: {
+    blocks: 'කූරු සහ කැට ඔක්කොම එකතු කළොත් කීයද? හරි අංකය තෝරන්න.',
+    sum: 'එකතුව කීයද? හරි පිළිතුර තෝරන්න.',
+    helpClarify: 'මුලින් දහ එකතු කරන්න. ඊට පස්සේ එක එකතු කරන්න.',
+    supportIntro: 'අපි එකට බලමු.',
+    supportL1: 'දහ එකතු කරමු, ඊට පස්සේ එක එකතු කරමු.',
+    supportL2: 'කූරු සහ කැට බලන්න. දහ කීයද? එක කීයද?',
+    supportL3: (a: number, b: number) => {
+      const tens = Math.floor(a / 10) * 10 + Math.floor(b / 10) * 10;
+      const ones = (a % 10) + (b % 10);
+      return `${Math.floor(a / 10) * 10} + ${Math.floor(b / 10) * 10} = ${tens}. ${a % 10} + ${b % 10} = ${ones}. ${tens} + ${ones} = ${tens + ones}.`;
+    },
+    transferIntro: 'දැන් ඔයාම කරන්න!',
+  },
+
   ending: {
     title: 'ඔයා හරිම හොඳට ගවේෂණය කළා!',
     text: 'ස්තුතියි. දැන් උපාංගය අම්මාට හෝ තාත්තාට දෙන්න.',

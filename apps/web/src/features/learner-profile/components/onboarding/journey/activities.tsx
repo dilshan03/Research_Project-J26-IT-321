@@ -18,7 +18,7 @@ export interface ActivityContext {
 }
 
 /** Creates the item recorder once per mounted activity and wires instruction replay. */
-const useActivity = (meta: ItemMeta, instructionText: string, ctx: ActivityContext) => {
+export const useActivity =(meta: ItemMeta, instructionText: string, ctx: ActivityContext) => {
   const [recorder] = useState(() => new ItemRecorder(meta));
   useEffect(() => recorder.observe(), [recorder]);
   const [instructionKey, setInstructionKey] = useState(0);
@@ -30,7 +30,7 @@ const useActivity = (meta: ItemMeta, instructionText: string, ctx: ActivityConte
   return { recorder, instructionKey, replay };
 };
 
-const frameProps = (ctx: ActivityContext, instructionKey: number, replay: () => void) => ({
+export const frameProps = (ctx: ActivityContext, instructionKey: number, replay: () => void) => ({
   instructionKey,
   onReplay: replay,
   replayIsAudio: ctx.speechEnabled,

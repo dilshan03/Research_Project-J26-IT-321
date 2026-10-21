@@ -6,6 +6,11 @@ import {
   RefreshCw,
   Award,
   Sparkles,
+  Brain,
+  Zap,
+  Smile,
+  ShieldCheck,
+  Heart,
 } from 'lucide-react';
 import type { InteractionEvent } from '../types/telemetry.types';
 
@@ -17,6 +22,12 @@ export interface DetailsForParentProps {
   className?: string;
 }
 
+interface ParentConceptSummary {
+  nameSi: string;
+  accuracyPct: number;
+  badgeSi: string;
+}
+
 interface SimpleParentData {
   hasData: boolean;
   totalQuestions: number;
@@ -26,10 +37,25 @@ interface SimpleParentData {
   solvedWithHints: number;
   totalHintsUsed: number;
   carelessMistakesCount: number;
+  completedAdventuresCount: number;
   skillScorePct: number;
+  attentionFocusPct: number;
+  focusToneSi: string;
+  focusMessageSi: string;
   avgTimeSec: number;
   starsEarned: number;
   coinsEarned: number;
+  topConcepts: ParentConceptSummary[];
+}
+
+function translateParentConcept(concept?: string): string {
+  if (!concept) return 'මූලික ගණිතය';
+  const lower = concept.toLowerCase();
+  if (lower.includes('money') || lower.includes('කාසි') || lower.includes('මුදල්')) return 'කාසි සහ මුදල් භාවිතය';
+  if (lower.includes('count') || lower.includes('ගණන්')) return 'වස්තු නිවැරදිව ගණන් කිරීම';
+  if (lower.includes('add') || lower.includes('එකතු')) return 'එකතු කිරීමේ සංකල්ප';
+  if (lower.includes('sub') || lower.includes('අඩු')) return 'අඩු කිරීමේ සංකල්ප';
+  return concept;
 }
 
 function summarizeForParent(
@@ -38,9 +64,13 @@ function summarizeForParent(
 ): SimpleParentData {
   const answers = logs.filter((e) => e.eventType === 'ANSWER_SUBMIT');
   const hasLogs = answers.length > 0;
+  const completedAdventures = Array.isArray(savedProgress?.completedActivityIds)
+    ? savedProgress!.completedActivityIds.length
+    : 0;
   const hasProgress =
     savedProgress &&
     ((Array.isArray(savedProgress.completedSteps) && savedProgress.completedSteps.length > 0) ||
+      completedAdventures > 0 ||
       (typeof savedProgress.hintAwareKnowledge === 'number' && savedProgress.hintAwareKnowledge > 0.21));
 
   if (!hasLogs && !hasProgress) {
@@ -53,10 +83,15 @@ function summarizeForParent(
       solvedWithHints: 0,
       totalHintsUsed: 0,
       carelessMistakesCount: 0,
+      completedAdventuresCount: 0,
       skillScorePct: 0,
+      attentionFocusPct: 0,
+      focusToneSi: 'දත්ත නොමැත',
+      focusMessageSi: 'දරුවා තවමත් ක්‍රීඩාව ආරම්භ කර නැත.',
       avgTimeSec: 0,
       starsEarned: savedProgress?.stars ?? 0,
       coinsEarned: savedProgress?.coins ?? 0,
+      topConcepts: [],
     };
   }
 
@@ -67,11 +102,18 @@ function summarizeForParent(
   let totalHintsUsed = 0;
   let carelessMistakesCount = 0;
   const rts: number[] = [];
+  const conceptMap = new Map<string, { total: number; correct: number }>();
 
   for (const ev of answers) {
     const isCorrect = ev.isCorrect === true;
     const hintLvl = ev.hintLevelReached || 0;
     totalHintsUsed += ev.totalHintsRequested || (hintLvl > 0 ? 1 : 0);
+
+    const cKey = ev.concept || 'General Math';
+    const cur = conceptMap.get(cKey) || { total: 0, correct: 0 };
+    cur.total++;
+    if (isCorrect) cur.correct++;
+    conceptMap.set(cKey, cur);
 
     const rtMs =
       typeof ev.responseTimeMs === 'number' && ev.responseTimeMs > 0
@@ -94,9 +136,9 @@ function summarizeForParent(
   }
 
   if (!hasLogs && savedProgress) {
-    const completed = Array.isArray(savedProgress.completedSteps)
-      ? savedProgress.completedSteps.length
-      : 0;
+    const completed =
+      (Array.isArray(savedProgress.completedSteps) ? savedProgress.completedSteps.length : 0) +
+      completedAdventures * 3;
     correctAnswers = completed;
     totalHintsUsed = savedProgress.totalHintsUsed || 0;
     solvedWithHints = Math.min(completed, totalHintsUsed > 0 ? Math.ceil(totalHintsUsed / 2) : 0);
@@ -114,6 +156,33 @@ function summarizeForParent(
   const avgTimeSec =
     rts.length > 0 ? Number((rts.reduce((a, b) => a + b, 0) / rts.length / 1000).toFixed(1)) : 0;
 
+  // ADHD Parent Friendly Attention Metrics
+  const impulsiveRate = totalQuestions > 0 ? carelessMistakesCount / totalQuestions : 0;
+  const attentionFocusPct = Math.max(35, Math.min(100, Math.round(100 - impulsiveRate * 85)));
+
+  let focusToneSi = 'ඉතා හොඳයි 🌟';
+  let focusMessageSi = 'දරුවා ඉතා ඉවසිලිවන්තව සහ සතුටින් ප්‍රශ්න විසඳීමට අවධානය යොමු කර ඇත.';
+  if (impulsiveRate > 0.28) {
+    focusToneSi = 'කලබලකාරී බවක් පෙනේ ⏳';
+    focusMessageSi = 'දරුවා ඉක්මනින් පිළිතුරක් තේරීමට උත්සාහ කර ඇත. හෝඩුවාවන් බැලීමට කියාදීමෙන් දරුවාගේ සන්සුන්බව තවත් වැඩි කළ හැක.';
+  } else if (attentionFocusPct < 60) {
+    focusToneSi = 'මධ්‍යස්ථ අවධානයක් 💡';
+    focusMessageSi = 'දරුවා වරින් වර විරාම ගනිමින් ප්‍රශ්න විසඳා ඇත. කෙටි විවේකයන් ලබාදීම සුදුසුය.';
+  }
+
+  const topConcepts: ParentConceptSummary[] = Array.from(conceptMap.entries()).map(([k, v]) => {
+    const acc = v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0;
+    let badge = 'හොඳින් තේරුම් ගෙන ඇත ✓';
+    if (acc < 50) badge = 'තව පුරුදු කරවන්න';
+    else if (acc < 75) badge = 'දැනුම වර්ධනය වෙමින් පවතී';
+
+    return {
+      nameSi: translateParentConcept(k),
+      accuracyPct: acc,
+      badgeSi: badge,
+    };
+  });
+
   return {
     hasData: true,
     totalQuestions,
@@ -123,10 +192,15 @@ function summarizeForParent(
     solvedWithHints,
     totalHintsUsed,
     carelessMistakesCount,
+    completedAdventuresCount: completedAdventures,
     skillScorePct: rawMastery,
+    attentionFocusPct,
+    focusToneSi,
+    focusMessageSi,
     avgTimeSec,
     starsEarned: savedProgress?.stars ?? 100,
     coinsEarned: savedProgress?.coins ?? 50,
+    topConcepts,
   };
 }
 
@@ -146,7 +220,7 @@ export const DetailsForParent: React.FC<DetailsForParentProps> = ({
       const params = new URLSearchParams({
         studentId: learnerId,
         learnerId,
-        limit: '60',
+        limit: '250',
       });
       if (parentId) params.set('parentId', parentId);
 
@@ -289,8 +363,81 @@ export const DetailsForParent: React.FC<DetailsForParentProps> = ({
           </div>
         </div>
 
-        {/* Simple 3-row breakdown table */}
+        {/* Positive ADHD Insights Cards for Parents */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          {/* Attention & Focus Card */}
+          <div className="rounded-2xl border border-sky-200 bg-sky-50/70 p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-extrabold text-sky-900">
+                <Zap size={16} className="text-sky-600" />
+                දරුවාගේ අවධානය සහ සන්සුන් බව (Focus Index)
+              </span>
+              <span className="text-xs font-extrabold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full">
+                {data.focusToneSi}
+              </span>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-extrabold text-sky-950">{data.attentionFocusPct}%</span>
+              <span className="text-xs text-sky-800">ක්‍රීඩාව තුළ පවත්වාගත් අවධානය</span>
+            </div>
+            <p className="text-xs text-sky-900 leading-relaxed">
+              {data.focusMessageSi}
+            </p>
+          </div>
+
+          {/* Emotional & Encouragement Card */}
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-extrabold text-emerald-900">
+                <Smile size={16} className="text-emerald-600" />
+                ධනාත්මක ඉගෙනුම් දිරිගැන්වීම (Support & Motivation)
+              </span>
+              <span className="text-xs font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                තරු {data.starsEarned} ★
+              </span>
+            </div>
+            <p className="text-xs text-emerald-950 leading-relaxed pt-1">
+              දරුවා හෝඩුවාවන් <b>{data.totalHintsUsed}ක්</b> භාවිතා කරමින් උත්සාහය අත්නොහැර ගැටලු විසඳීමට උත්සාහ කර ඇත. මෙය ADHD දරුවන්ගේ ගැටලු විසඳීමේ (Resilience) හැකියාව වර්ධනය වන බව පෙන්වයි.
+            </p>
+            <div className="flex items-center gap-2 pt-1 text-[11px] font-bold text-emerald-800">
+              <ShieldCheck size={14} className="text-emerald-600" />
+              <span>කලබලකාරී වැරදි සඳහා ලකුණු කපා නැත.</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Mastered Math Concepts for Parents */}
+        {data.topConcepts.length > 0 && (
+          <div className="rounded-2xl border border-mq-border bg-mq-surface-soft/40 p-4 space-y-2.5">
+            <h4 className="text-xs sm:text-sm font-extrabold text-mq-text-strong flex items-center gap-1.5">
+              <Brain size={16} className="text-mq-primary" />
+              <span>දරුවා ඉගෙනගත් සහ පුහුණු වූ ගණිත හැකියාවන් (Skills Practiced)</span>
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              {data.topConcepts.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white rounded-xl border border-mq-border p-3 space-y-1"
+                >
+                  <p className="text-xs font-extrabold text-mq-text-strong truncate">
+                    {item.nameSi}
+                  </p>
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <span className="font-extrabold text-emerald-700">{item.accuracyPct}% සාර්ථකයි</span>
+                    <span className="text-[11px] font-bold text-mq-text-muted">{item.badgeSi}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Simple 4-row breakdown table */}
         <div className="rounded-2xl border border-mq-border divide-y divide-mq-border/70 text-sm">
+          <div className="flex items-center justify-between px-4 py-2.5">
+            <span className="text-mq-text">සම්පූර්ණ කළ ඉගෙනුම් චාරිකා ක්‍රීඩා (Learning Adventures)</span>
+            <span className="font-extrabold text-blue-700">{data.completedAdventuresCount}</span>
+          </div>
           <div className="flex items-center justify-between px-4 py-2.5">
             <span className="text-mq-text">උදව් (Hints) නොමැතිව තනිවම හරි උත්තර දුන් ප්‍රශ්න</span>
             <span className="font-extrabold text-emerald-700">{data.solvedWithoutHelp}</span>

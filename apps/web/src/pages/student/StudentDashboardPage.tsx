@@ -36,6 +36,8 @@ import {
 } from '../../features/pedagogical-agent';
 import { contentAdaptationApi } from '../../features/content-adaptation/api';
 import type { BlueprintEnvelope, GameTheme } from '../../features/content-adaptation/types';
+import { SCENES } from '../../features/content-adaptation/game/gameKit';
+import studentDashboardBg from '../../assets/student-dashboard-bg.png';
 import {
   learnerApi,
   getActiveStudentProfile,
@@ -699,7 +701,20 @@ export const StudentDashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-mq-bg text-mq-text">
+    <div className="min-h-screen flex flex-col bg-mq-bg text-mq-text relative">
+      {/* Friendly Robots in Futuristic Village Theme Backdrop */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none select-none overflow-hidden"
+        aria-hidden="true"
+      >
+        <img
+          src={studentDashboardBg}
+          alt=""
+          className="w-full h-full object-cover object-center opacity-70 md:opacity-100 scale-100"
+        />
+        {/* Soft gradient wash over backdrop to ensure high contrast, readability, and ADHD calm focus */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/60 to-white/80 backdrop-blur-[1px]" />
+      </div>
       {/* ========================================================= */}
       {/* 1. TOP PORTAL HEADER (Simple, High-Contrast & Kid-Attractive) */}
       {/* ========================================================= */}
@@ -1297,14 +1312,24 @@ export const StudentDashboardPage: React.FC = () => {
                           return (
                             <div
                               key={bp.activity_id || idx}
-                              className={`group relative rounded-3xl p-5 shadow-xs transition-all duration-300 flex flex-col justify-between ${
+                              className={`group relative rounded-3xl p-5 shadow-xs transition-all duration-300 flex flex-col justify-between overflow-hidden ${
                                 isCompleted
                                   ? 'bg-gradient-to-b from-emerald-50/80 via-white to-emerald-50/40 border-2 border-emerald-400/80 shadow-emerald-50 hover:shadow-md hover:border-emerald-500'
                                   : `bg-white border-2 border-mq-border ${themeInfo.cardHover} hover:shadow-md hover:-translate-y-1`
                               }`}
                             >
+                              {/* Top Banner Theme Scene Preview */}
+                              <div className="absolute top-0 left-0 right-0 h-24 overflow-hidden pointer-events-none rounded-t-3xl opacity-20 group-hover:opacity-35 transition-opacity">
+                                <img
+                                  src={SCENES[themeKey] || SCENES.VILLAGE_MARKET}
+                                  alt=""
+                                  className="w-full h-full object-cover object-center"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white" />
+                              </div>
+
                               {/* Top Row: Mascot + Badges */}
-                              <div>
+                              <div className="relative z-10">
                                 <div className="flex items-start justify-between gap-2 mb-3">
                                   <div className="relative">
                                     <div

@@ -6,6 +6,7 @@ import type {
   BlueprintEnvelope, DistractorType, GameChoiceOption, GameMicroStep, GameTheme, VisualAssetTag,
 } from '../types';
 import { Gaja } from './Gaja';
+import { SCENES } from './gameKit';
 
 type Lang = 'si' | 'en';
 
@@ -202,13 +203,39 @@ export function GamePlayer({
     setStepIndex(0); setWrongPicks(new Set()); setSolved(false); setFeedback(null); setAttempts([]);
   };
 
+  const sceneBg = SCENES[blueprint.game_theme] || SCENES.VILLAGE_MARKET;
+
   return (
     <div ref={gameContainerRef} className={`min-h-screen bg-gradient-to-br ${theme.bg} relative overflow-hidden`}>
+      {/* Immersive Theme Scene Background Image */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none select-none overflow-hidden"
+        aria-hidden="true"
+      >
+        <img
+          src={sceneBg}
+          alt={theme.name_en}
+          className={`w-full h-full object-cover object-center transition-all duration-700 scale-100 ${
+            calm ? 'opacity-20 blur-[1px]' : 'opacity-35 md:opacity-40'
+          }`}
+        />
+        {/* Soft, calming theme-tinted overlay for optimal contrast & ADHD focus */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-br ${
+            blueprint.game_theme === 'SPACE_QUEST'
+              ? 'from-indigo-950/35 via-slate-900/20 to-sky-950/40'
+              : blueprint.game_theme === 'JUNGLE_ADVENTURE'
+              ? 'from-emerald-900/15 via-white/55 to-teal-900/25'
+              : 'from-amber-900/15 via-white/60 to-orange-900/25'
+          } backdrop-blur-[0.5px]`}
+        />
+      </div>
+
       {/* Decorative background is removed when the visual-clutter filter + low density are on */}
       {!(settings.visual_clutter_filter && calm) && (
         <>
-          <div className="absolute -top-24 -left-24 w-72 h-72 bg-mq-secondary/15 animate-morph" />
-          <div className="absolute -bottom-24 -right-16 w-80 h-80 bg-mq-accent-yellow/15 animate-morph-square" />
+          <div className="absolute -top-24 -left-24 w-72 h-72 bg-mq-secondary/15 animate-morph pointer-events-none z-0" />
+          <div className="absolute -bottom-24 -right-16 w-80 h-80 bg-mq-accent-yellow/15 animate-morph-square pointer-events-none z-0" />
         </>
       )}
 

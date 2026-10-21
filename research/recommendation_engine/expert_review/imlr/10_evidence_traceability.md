@@ -17,7 +17,7 @@
 | Title | *Guided Self-Management Tools for ADHD: Children 6-12*, Version 1.1 | Cover, PDF p. 1 |
 | Authors | Erica Lee, PhD, and Keneisha Sinclair-McBride, PhD (equal authors), Boston Children's Hospital / Harvard Medical School | Credits page, PDF p. 41 |
 | Other contributors | Clinicians listed under a "Reviewers" heading on PDF p. 41 (incl. David R. DeMaso, Jonas Bromberg, Eugene D'Angelo, Louis Vernacchio, Betsy Brooks, Bhavana Arora, Heather J. Walter); graphic designer Zoë Judd | PDF p. 41. Roles read from extracted text, so the exact layout grouping should be confirmed visually. |
-| Year | **2020, from the PDF file metadata only** (creation date 2020-01-03). No year is printed in the document text. | `pypdf` metadata; full-text search found no printed year or copyright line |
+| Year | **Not printed; cite as n.d.** The PDF file metadata shows a creation date of 2020-01-03. That is not a confirmed publication date. | `pypdf` metadata; full-text search found no printed year or copyright line |
 | File | `research/recommendation_engine/evidence_base/sources/Guided Self-Management Tools for ADHD - Children 6-12.pdf` (44 PDF pages) | — |
 | Page numbering | **The PDF has no printed page numbers.** All references below use **PDF page numbers** (page 1 = cover). | Text extraction plus a scan of the top and bottom margins of every page found no page-number text |
 | Intended use | Home strategies for parents and children with ADHD, ages 6–12 (PDF p. 2, Introduction) | PDF p. 2 |
@@ -28,12 +28,12 @@ letters and quotation marks inside a quotation are shown as single quotes. Every
 below was checked by script against the extracted text of its cited PDF page (12 quotations, 13 headings, all
 found). The extraction cannot show images or layout, so the reviewer may wish to confirm each passage in the PDF.
 
-**Notes for the research team (no changes made):**
-- `evidence_base/references.json` (`REF-BCH-2020`) lists several reviewers as co-authors. The PDF credits page
-  lists them under "Reviewers".
-- Existing project documents cite this guide as "printed pp. …". Because the PDF has no printed page numbers, those
-  numbers are in practice PDF page numbers. The specific pages cited for Skill 2 (p. 8), Skill 6 (pp. 26–30) and
-  Skill 8 (p. 34) match the PDF pages below.
+**Evidence-base metadata (corrected 2026-10-21):**
+- `evidence_base/references.json` (`REF-BCH-2020`) now separates the two authors from the reviewers and graphic
+  designer, records Version 1.1, sets `publicationYear` to null, and explains that 2020 is file metadata only.
+- Project documents that described this guide's pages as "printed pp." now give PDF page numbers, with the same page
+  values.
+- The citation is now "Lee & Sinclair-McBride, n.d.". The sourceId `REF-BCH-2020` is kept as a legacy identifier.
 
 ## 10.2 Verified sections
 

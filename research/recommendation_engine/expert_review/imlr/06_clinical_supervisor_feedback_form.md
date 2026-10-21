@@ -33,7 +33,7 @@
 | A3 (D-C02) | Could any visual feature (scattered layouts, varied spacing) be unnecessarily distracting? | ☐ Yes ☐ No ☐ Unsure | Which: |
 
 > **Supporting background for section A (not validation of IMLR):** Lee & Sinclair-McBride, *Guided
-> Self-Management Tools for ADHD: Children 6-12*, v1.1, Boston Children's Hospital (year 2020 from file metadata).
+> Self-Management Tools for ADHD: Children 6-12*, v1.1, Boston Children's Hospital (n.d.; the PDF file metadata shows 2020, but no publication date is printed).
 > - Skill 2, PDF p. 9: schoolwork can be challenging because it needs several skills at once, including working
 >   memory.
 > - Skill 6, PDF p. 30: getting started, knowing what to focus on and staying on track can be hard.

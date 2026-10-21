@@ -70,8 +70,8 @@
 | E5 (D-E11) | Is the Sinhala wording in document 4 suitable for Grade 1? *(Mark items in the ED column there.)* | ☐ Agree ☐ Agree with changes ☐ Disagree ☐ Unsure | |
 
 > **Supporting background for E1–E3 (not validation of IMLR; not a mathematics-teaching source):** Lee &
-> Sinclair-McBride, *Guided Self-Management Tools for ADHD: Children 6-12*, v1.1, Boston Children's Hospital (year
-> 2020 from file metadata).
+> Sinclair-McBride, *Guided Self-Management Tools for ADHD: Children 6-12*, v1.1, Boston Children's Hospital (n.d.;
+> the PDF file metadata shows 2020, but no publication date is printed).
 > - Skill 6, PDF p. 26: tasks can feel less overwhelming when broken into small "mini tasks" done one step at a
 >   time, in a decided order. The same page states that this skill is "most useful for older children".
 > - Skill 2, PDF p. 8: check that the child understands and "walk through it with them"; younger children may need

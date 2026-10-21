@@ -233,7 +233,9 @@ export const ParentSupportInfoPage: React.FC = () => {
                 {t.snapHistoryEmpty}
               </p>
             )}
-            <p className="text-sm text-mq-text-muted leading-relaxed">{t.snapHistoryNotice}</p>
+            {!(snap && snap.history.length > 0) && (
+              <p className="text-sm text-mq-text-muted leading-relaxed">{t.snapHistoryNotice}</p>
+            )}
           </Card>
         </>
       )}

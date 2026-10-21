@@ -371,6 +371,19 @@ const si = {
     // SNAP-IV history over time (SNAPIV-PROGRESS). Proposed wording, pending review.
     progress: {
       title: 'කාලයත් සමඟ ඔබ වාර්තා කළ දේ',
+      // Simple view
+      simpleNotice: 'මෙහි ඇත්තේ ඔබ නිවසේදී දුටු දේ ගැන ඔබේම පිළිතුරු පමණි. මෙය රෝග විනිශ්චයක් හෝ ප්‍රතිකාර ප්‍රගතියක් නොවේ.',
+      nowWords: 'දැන් සාමාන්‍යයෙන්:',
+      changeShort: {
+        LOWER: 'පෙර වාරයට වඩා අඩුවෙන් වාර්තා කර ඇත',
+        HIGHER: 'පෙර වාරයට වඩා වැඩියෙන් වාර්තා කර ඇත',
+        SIMILAR: 'පෙර වාරයට බොහෝ දුරට සමානයි',
+        NOT_COMPARABLE: 'පෙර වාරය සමඟ සැසඳිය නොහැක',
+      },
+      comparedWith: (from: string, to: string) => `${to} දින පිළිතුරු, ${from} දින පිළිතුරු සමඟ සසඳමින්`,
+      lastFilled: (date: string) => `අවසන් වරට පුරවූයේ: ${date}`,
+      fillAgainHint: 'වෙනස්කම් බැලීමට මාස කිහිපයකට පසු නැවත පුරවන්න.',
+      details: 'සම්පූර්ණ විස්තර බලන්න',
       intro: 'සෑම වාරයකදීම ඔබ දුන් පිළිතුරුවල සාමාන්‍යය (0 = කිසිසේත් නැත, 3 = ඉතා වැඩියෙන් ඇත).',
       inattention: 'අවධානය',
       inattentionItems: 'ප්‍රශ්න 1–9',

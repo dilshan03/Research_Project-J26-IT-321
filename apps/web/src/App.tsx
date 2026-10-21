@@ -17,6 +17,7 @@ import { ProfilePage } from './pages/profile/ProfilePage';
 
 import StandaloneDataCollection from './features/behaviour-monitoring/StandaloneDataCollection';
 import BehaviourMonitoringPage from './features/behaviour-monitoring/BehaviourMonitoringPage';
+import FacialExpressionDemo from './features/behaviour-monitoring/FacialExpressionDemo';
 
 // Parent / Teacher dashboards
 import BehaviourDashboard from './features/behaviour-monitoring/BehaviourDashboard';
@@ -245,6 +246,7 @@ function App() {
 
             {/* 8. Behaviour Insights (Behaviour Monitoring) */}
             <Route path="behaviour" element={<ParentComingSoonPage feature="behaviour" />} />
+            
 
             {/* Parent-reported ADHD information and SNAP-IV history */}
             <Route path="support-info" element={<ParentSupportInfoPage />} />
@@ -339,6 +341,9 @@ function App() {
 
           {/* Catch-all Wildcard Route */}
           <Route path="*" element={<Navigate to="/" replace />} />
+
+          {/*facial expressions tracker*/}
+          <Route path="/facial-expression-demo"  element={<FacialExpressionDemo />}/>
         </Routes>
       </BrowserRouter>
     </AuthProvider>

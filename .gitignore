@@ -38,3 +38,11 @@ services/pedagogical-engine/decision-api/data/*.json
 # NSCH datasets (local ML research data)
 research/recommendation_engine/ml_experiments/data/raw/
 
+# Python virtual environments
+.venv/
+.venv-*/
+venv/
+
+
+# DeepFace generated data
+deepface_observations.jsonl

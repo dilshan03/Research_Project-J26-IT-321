@@ -151,5 +151,5 @@ def test_item_bank_answer_keys_present_and_roles_valid():
         assert item["expertReview"] == "PENDING"
         if item.get("options"):
             assert item["correctAnswer"] in {o["id"] for o in item["options"]}
-    # Grade 2 has its own items (tests/test_onboarding_v2_grade2.py); Grades 3-5 are not built yet
-    assert all(get_onboarding_v2_items_for_grade(g) == [] for g in (3, 4, 5))
+    # Grades 2-5 have their own items and tests (test_onboarding_v2_grade2.py, _grade3.py, _grades4_5.py)
+    assert not any(i["grade"] != 1 for i in items)

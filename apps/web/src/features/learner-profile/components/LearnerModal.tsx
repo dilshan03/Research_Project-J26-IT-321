@@ -96,7 +96,8 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
       setPrimaryInstructionLanguage(
         (editingLearner.primaryInstructionLanguage as PrimaryInstructionLanguage) || 'Sinhala'
       );
-      setAvatarId(editingLearner.avatarId || 'avatar_lion');
+      // Edit the parent's own selection; the child's choice (if any) is stored separately and is not changed here.
+      setAvatarId(editingLearner.parentAvatarId || editingLearner.avatarId || 'avatar_lion');
     } else {
       setFirstName('');
       setPreferredName('');
@@ -254,6 +255,14 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
         {/* Avatar */}
         <fieldset>
           <legend className="text-sm font-semibold text-mq-text-strong mb-2">{t.avatar}</legend>
+          {editingLearner?.avatarSource === 'child' && (
+            <p className="mb-2.5 text-xs text-mq-text bg-mq-surface-soft border border-mq-border rounded-xl px-3 py-2 flex items-center gap-2">
+              <span className="text-2xl leading-none" aria-hidden="true">
+                {AVATAR_OPTIONS.find((a) => a.id === editingLearner.avatarId)?.icon}
+              </span>
+              <span>{t.childChoseAvatar(AVATAR_OPTIONS.find((a) => a.id === editingLearner.avatarId)?.nameSi ?? '')}</span>
+            </p>
+          )}
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
             {AVATAR_OPTIONS.map((item) => {
               const isSelected = avatarId === item.id;

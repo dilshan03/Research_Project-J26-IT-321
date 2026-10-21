@@ -20,7 +20,7 @@ from app.db.question_bank import (
     get_question_by_id,
     QUESTION_BANK_VERSION,
 )
-from app.services.learner_service import get_learner_by_id
+from app.services.learner_service import CHILD_SELECTABLE_AVATAR_IDS, get_learner_by_id
 from app.core.thresholds import (
     determine_proficiency_category,
     generate_pedagogical_recommendations,
@@ -847,10 +847,16 @@ async def submit_math_assessment(
         upsert=True
     )
 
-    # Update child profile onboardingStatus in learners collection
+    # Update child profile onboardingStatus in learners collection. A companion the child chose is kept
+    # separately from the parent's avatarId and takes precedence everywhere until the child chooses again.
+    learner_update: Dict[str, Any] = {"onboardingStatus": "COMPLETED", "updatedAt": now}
+    child_avatar = (child_prefs or {}).get("avatarId")
+    if child_avatar in CHILD_SELECTABLE_AVATAR_IDS:
+        learner_update["childAvatarId"] = child_avatar
+        learner_update["childAvatarChosenAt"] = (child_prefs or {}).get("chosenAt") or now
     await learners_col.update_one(
         {"learnerId": learner_id},
-        {"$set": {"onboardingStatus": "COMPLETED", "updatedAt": now}}
+        {"$set": learner_update}
     )
 
     logger.info("Completed math baseline assessment for learner %s with accuracy %s%%",

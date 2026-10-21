@@ -3,7 +3,9 @@
 **Component:** Learner Profile & Prediction Engine (Component 1)
 **Status:**
 - **Grade 2:** implemented and feature-flagged (`GRADE2_JOURNEY_ENABLED`).
-- **Grades 3–5:** planned only; they stay on the existing v1 flow.
+- **Grade 3:** implemented and feature-flagged (`GRADE3_JOURNEY_ENABLED`).
+- **Grades 4–5:** implemented and feature-flagged (`GRADE4_JOURNEY_ENABLED`, `GRADE5_JOURNEY_ENABLED`); one shared
+  journey component (`UpperGradeJourney.tsx`) with per-grade content (`grade4.tsx`, `grade5.tsx`).
 
 **Content status:** every concept, item, number and Sinhala sentence is a proposal pending Sri Lankan Grades 2–5
 teacher review (`expertReview: PENDING`). Alignment with the national primary mathematics syllabus must be confirmed
@@ -33,12 +35,12 @@ by Sinhala-medium educators; it is not assumed here.
 |---|---|---|---|---|
 | **2 (built)** | Place value, tens & ones (`place_value`) | Build 34 with tens sticks and ones cubes (concrete); blocks → numeral 47 (pictorial); numeral 52 → blocks (symbolic) | — | Build-base-ten (new), Choice |
 | | 2-digit addition, no regrouping (`addition`) | Blocks 21 + 14 (pictorial) **+ pre + transfer** | 32 + 15 → *guided 24 + 33* → 41 + 26 | Step-choice (new) |
-| 3 | Place value to 1000 (`place_value`) | Build 347 (hundreds, tens, ones); blocks → numeral; numeral → blocks | — | Build-base-ten extended with hundreds |
-| | Multiplication as equal groups (`multiplication`) | Groups picture → product **+ pre + transfer** | 4 groups of 3 → *guided repeated addition* → 5 groups of 2 | Step-choice + equal-groups picture |
-| 4 | Equivalent fractions (`fractions`) | Strip → fraction; fraction → strip; choose the equivalent strip | — | Fraction-strip template (new) |
-| | Perimeter with unit tiles (`measurement_geometry`) | Count edges of a shape **+ pre + transfer** | 3 × 2 rectangle → *guided edge counting* → new shape | Unit-tile template (new) |
-| 5 | Decimal place value, tenths (`decimals`) | Tiles → decimal; decimal → tiles; compare two decimals | — | Tenths-tiles template (new) |
-| | Number patterns (`number_patterns`) | Next term **+ pre + transfer** | +4 rule → *guided rule finding* → +3 rule with different numbers | Step-choice |
+| **3 (built)** | Place value to 1000 (`place_value`) | Build 347 (hundreds, tens, ones; concrete); blocks → numeral 258 (pictorial); numeral 406 → blocks, zero tens (symbolic) | — | Build-base-ten with hundreds flats, Choice |
+| | Multiplication as equal groups (`multiplication`) | 2 plates of 4 mangoes (pictorial) **+ pre + transfer** | 4 × 3 → *guided 3 × 5 (repeated addition, groups picture)* → 5 × 2 | Step-choice + equal-groups picture |
+| **4 (built)** | Fractions & equivalent fractions (`fractions`) | Shade 3/4 of a strip (concrete); strip → fraction 2/3 (pictorial); strip equal to 1/2 (symbolic) | — | Shade-parts template (new), Choice |
+| | Perimeter with unit lengths (`measurement_geometry`) | 2 × 2 square garden (pictorial) **+ pre + transfer** | 3 × 2 → *guided 4 × 2 (numbered edges)* → 5 × 2 | Step-choice + unit-grid picture |
+| **5 (built)** | Decimals, tenths (`decimals`) | Shade 0.6 of a tenths strip (concrete); tiles → decimal 0.4 (pictorial); larger of 0.7 and 0.45 (symbolic) | — | Shade-parts template, Choice |
+| | Number patterns (`number_patterns`) | Towers 1, 3, 5, ? (pictorial) **+ pre + transfer** | 5, 9, 13, 17, ? (+4) → *guided 2, 6, 10, ? (jumps shown)* → 4, 7, 10, 13, ? (+3) | Step-choice + sequence/tower pictures |
 
 Every grade also uses the shared welcome (CP), calibration (IC/IA) and ending steps (`JourneyShell.tsx`).
 
@@ -52,8 +54,16 @@ Every grade also uses the shared welcome (CP), calibration (IC/IA) and ending st
   2. assess one skill at onboarding and collect the second through early gameplay (once the gameplay-evidence
      link exists);
   3. split onboarding across two sessions.
-- **Grades 3–5:** similar length expected. The new templates (fraction strips, unit tiles, tenths tiles) are the main
-  build cost.
+- **Grade 3:** the same 7 activities plus welcome and ending (8 with guided support); also not piloted.
+- **Grade 3 content decisions for teacher review:**
+  - Reading `a × b` as "a groups of b".
+  - Distractors: digit reversal 852 for 258; place swap 285; piece count 15; the zero-tens confusions 460 and 604
+    for 406; adding instead of multiplying (6, 7); concatenation (24, 43, 52); one group too many (12, 15).
+- **Grades 4–5:** the same 7 activities plus welcome and ending (8 with guided support); not piloted.
+- **Grade 4–5 content decisions for teacher review:** using a 3/4 shading task for fractions and a tenths strip
+  (two rows of five on phones) for decimals; the Grade 5 transfer item changes the rule (+3 after +4), so it tests
+  finding a rule, not reusing one; distractors include area instead of perimeter, half the perimeter, 0.04/4/40
+  for 0.4, "longer is larger" (0.45 > 0.7) and +1 / adding the last jump twice for patterns.
 
 ## Known limitations
 - The transfer item counts as independent ELP-X evidence, as in Grade 1. This is existing behaviour; see

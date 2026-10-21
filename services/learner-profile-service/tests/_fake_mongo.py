@@ -78,6 +78,13 @@ class FakeCollection:
         self.inserted.append(stored)
         return _InsertResult(stored["_id"])
 
+    async def find_one_and_update(self, query: Dict[str, Any], update: Dict[str, Any], **kwargs: Any):
+        """$set only; returns the updated document (PyMongo ReturnDocument.AFTER)."""
+        target = next((d for d in self.docs if _matches(d, query)), None)
+        if target is not None:
+            target.update(update.get("$set", {}))
+        return dict(target) if target is not None else None
+
     async def update_one(self, query: Dict[str, Any], update: Dict[str, Any], upsert: bool = False) -> None:
         target = next((d for d in self.docs if _matches(d, query)), None)
         if target is None:

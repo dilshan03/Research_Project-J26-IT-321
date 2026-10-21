@@ -438,6 +438,8 @@ export const OnboardingPlaceholderPage: React.FC = () => {
         const sumRes = await onboardingApi.getSummary(learnerId);
         if (sumRes.success && sumRes.data) {
           setFullSummary(sumRes.data);
+          // The child's own avatar choice is now the learner's displayed avatar.
+          if (sumRes.data.learner) setLearner(sumRes.data.learner);
         }
         setCurrentStep('summary');
         showToast('ගණිත ඇගයීම සාර්ථකව සම්පූර්ණ කරන ලදී!');

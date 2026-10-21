@@ -29,6 +29,46 @@ export const OneCube: React.FC<{ highlight?: boolean }> = ({ highlight }) => (
   <span aria-hidden="true" className={`inline-block w-4 h-4 rounded-[3px] border-2 ${highlight ? 'border-amber-500 bg-amber-300' : 'border-sky-700 bg-sky-400'}`} />
 );
 
+/** A hundred as a 10 × 10 flat. */
+export const HundredFlat: React.FC = () => (
+  <span
+    aria-hidden="true"
+    className="inline-block w-11 h-11 rounded-md border-2 border-orange-700 bg-orange-300"
+    style={{
+      backgroundImage:
+        'linear-gradient(to right, rgb(194 65 12 / 0.45) 1px, transparent 1px), linear-gradient(to bottom, rgb(194 65 12 / 0.45) 1px, transparent 1px)',
+      backgroundSize: '10% 10%',
+    }}
+  />
+);
+
+/** Grade 3+: hundreds, tens and ones each kept together, so a narrow card wraps whole groups, never a group. */
+export const HundredsTensOnesPicture: React.FC<{ hundreds: number; tens: number; ones: number; label?: string }> = ({ hundreds, tens, ones, label }) => (
+  <span role="img" aria-label={label ?? `${hundreds} × 100, ${tens} × 10, ${ones} × 1`} className="inline-flex flex-wrap items-end justify-center gap-3">
+    {hundreds > 0 && (
+      <span className="inline-flex flex-wrap justify-center gap-1.5">
+        {Array.from({ length: hundreds }).map((_, i) => (
+          <HundredFlat key={i} />
+        ))}
+      </span>
+    )}
+    {tens > 0 && (
+      <span className="inline-flex items-end gap-1">
+        {Array.from({ length: tens }).map((_, i) => (
+          <TenRod key={i} />
+        ))}
+      </span>
+    )}
+    {ones > 0 && (
+      <span className="inline-grid grid-cols-3 gap-[3px]">
+        {Array.from({ length: ones }).map((_, i) => (
+          <OneCube key={i} />
+        ))}
+      </span>
+    )}
+  </span>
+);
+
 /** Tens as vertical rods, ones as loose cubes. */
 export const BaseTenPicture: React.FC<{ tens: number; ones: number; label?: string }> = ({ tens, ones, label }) => (
   <span role="img" aria-label={label ?? `${tens} × 10, ${ones} × 1`} className="inline-flex items-end gap-1.5">
@@ -46,44 +86,55 @@ export const BaseTenPicture: React.FC<{ tens: number; ones: number; label?: stri
 );
 
 /* ------------------------------------------------------------------ */
-/* Template 5: build a number with tens and ones                       */
+/* Template 5: build a number with (hundreds,) tens and ones           */
 /* ------------------------------------------------------------------ */
 
 interface BuildProps {
   meta: ItemMeta;
   scene: SceneId;
   target: number;
+  /** Grade 3+: adds hundreds flats as a third piece. */
+  withHundreds?: boolean;
   ctx: ActivityContext;
   onDone: (answer: MathItemAnswer) => void;
 }
 
+type Piece = 'hundred' | 'ten' | 'one';
+
 const MAX_PIECES = 9;
+const PIECE_VALUE: Record<Piece, number> = { hundred: 100, ten: 10, one: 1 };
+const PIECE_LABEL: Record<Piece, string> = {
+  hundred: childText.placeValue3.hundred,
+  ten: childText.placeValue.ten,
+  one: childText.placeValue.one,
+};
+const PIECE_ICON: Record<Piece, string> = { hundred: '🟧', ten: '🟩', one: '🟦' };
+const PIECE_PICTURE: Record<Piece, React.ReactNode> = { hundred: <HundredFlat />, ten: <TenRod />, one: <OneCube /> };
 
 /**
  * Concrete place-value construction. Adding pieces is building; taking a piece back out before
- * confirming is a recorded revision. The confirmed total (10 × tens + ones) is the answer.
+ * confirming is a recorded revision. The confirmed total (100 × hundreds + 10 × tens + ones) is the answer.
  */
-export const BuildBaseTenActivity: React.FC<BuildProps> = ({ meta, scene, target, ctx, onDone }) => {
-  const instruction = childText.placeValue.build(target);
+export const BuildBaseTenActivity: React.FC<BuildProps> = ({ meta, scene, target, withHundreds = false, ctx, onDone }) => {
+  const instruction = withHundreds ? childText.placeValue3.build(target) : childText.placeValue.build(target);
   const { recorder, instructionKey, replay } = useActivity(meta, instruction, ctx);
-  const [tens, setTens] = useState(0);
-  const [ones, setOnes] = useState(0);
-  const [selected, setSelected] = useState<'ten' | 'one' | null>(null);
+  const pieces: Piece[] = withHundreds ? ['hundred', 'ten', 'one'] : ['ten', 'one'];
+  const [counts, setCounts] = useState<Record<Piece, number>>({ hundred: 0, ten: 0, one: 0 });
+  const [selected, setSelected] = useState<Piece | null>(null);
   const [helpLevel, setHelpLevel] = useState(0);
   const [lastInput, setLastInput] = useState<InputDetail | null>(null);
-  const total = tens * 10 + ones;
+  const { hundred: hundreds, ten: tens, one: ones } = counts;
+  const total = hundreds * 100 + tens * 10 + ones;
 
-  const add = (piece: 'ten' | 'one', input: InputDetail) => {
-    if (piece === 'ten' && tens < MAX_PIECES) setTens((n) => n + 1);
-    if (piece === 'one' && ones < MAX_PIECES) setOnes((n) => n + 1);
+  const add = (piece: Piece, input: InputDetail) => {
+    if (counts[piece] < MAX_PIECES) setCounts((c) => ({ ...c, [piece]: c[piece] + 1 }));
     setSelected(null);
     setLastInput(input);
   };
 
-  const remove = (piece: 'ten' | 'one', mode: InteractionMode) => {
-    recorder.revise(total, total - (piece === 'ten' ? 10 : 1));
-    if (piece === 'ten') setTens((n) => n - 1);
-    else setOnes((n) => n - 1);
+  const remove = (piece: Piece, mode: InteractionMode) => {
+    recorder.revise(total, total - PIECE_VALUE[piece]);
+    setCounts((c) => ({ ...c, [piece]: c[piece] - 1 }));
     setLastInput({ inputMethod: 'tap', interactionMode: mode });
   };
 
@@ -102,20 +153,20 @@ export const BuildBaseTenActivity: React.FC<BuildProps> = ({ meta, scene, target
     onDone(recorder.toAnswer());
   };
 
-  const source = (piece: 'ten' | 'one') => (
-    <div className="flex flex-col items-center gap-2">
+  const source = (piece: Piece) => (
+    <div key={piece} className="flex flex-col items-center gap-2">
       <DragTapToken
-        icon={piece === 'ten' ? '🟩' : '🟦'}
-        label={piece === 'ten' ? childText.placeValue.ten : childText.placeValue.one}
+        icon={PIECE_ICON[piece]}
+        label={PIECE_LABEL[piece]}
         selected={selected === piece}
-        disabled={(piece === 'ten' ? tens : ones) >= MAX_PIECES}
+        disabled={counts[piece] >= MAX_PIECES}
         onTap={() => setSelected((prev) => (prev === piece ? null : piece))}
         onDrop={(t, mode) => (t === 'tray' ? add(piece, { inputMethod: 'drag', interactionMode: mode }) : recorder.missedDrop())}
         onMiss={() => recorder.missedDrop()}
       />
       <span className="flex items-center gap-1.5 rounded-xl bg-white/85 px-2 py-1 text-sm font-semibold text-mq-text-strong">
-        {piece === 'ten' ? <TenRod /> : <OneCube />}
-        <span>{piece === 'ten' ? childText.placeValue.ten : childText.placeValue.one}</span>
+        {PIECE_PICTURE[piece]}
+        <span>{PIECE_LABEL[piece]}</span>
       </span>
     </div>
   );
@@ -126,7 +177,17 @@ export const BuildBaseTenActivity: React.FC<BuildProps> = ({ meta, scene, target
       instruction={instruction}
       {...frameProps(ctx, instructionKey, replay)}
       onHelp={helpLevel < 2 ? help : undefined}
-      helpMessage={helpLevel === 1 ? childText.placeValue.helpClarify : helpLevel === 2 ? childText.placeValue.helpCue(tens, ones) : null}
+      helpMessage={
+        helpLevel === 1
+          ? withHundreds
+            ? childText.placeValue3.helpClarify
+            : childText.placeValue.helpClarify
+          : helpLevel === 2
+            ? withHundreds
+              ? childText.placeValue3.helpCue(hundreds, tens, ones)
+              : childText.placeValue.helpCue(tens, ones)
+            : null
+      }
       footer={
         <PrimaryAction onClick={confirm} disabled={total === 0}>
           <Check size={22} />
@@ -135,10 +196,7 @@ export const BuildBaseTenActivity: React.FC<BuildProps> = ({ meta, scene, target
       }
     >
       <div className="flex-1 grid grid-cols-1 md:grid-cols-[auto_1fr] gap-4 items-center">
-        <div className="flex md:flex-col justify-center gap-6">
-          {source('ten')}
-          {source('one')}
-        </div>
+        <div className="flex md:flex-col justify-center gap-6">{pieces.map(source)}</div>
         <DropTarget
           id="tray"
           label={childText.placeValue.tray}
@@ -148,34 +206,28 @@ export const BuildBaseTenActivity: React.FC<BuildProps> = ({ meta, scene, target
         >
           <span aria-hidden="true" className="text-4xl">🧺</span>
           <div className="flex flex-wrap items-end justify-center gap-2 max-w-[440px]">
-            {Array.from({ length: tens }).map((_, i) => (
-              <button
-                key={`t${i}`}
-                type="button"
-                aria-label={`${childText.placeValue.ten} ${childText.placeValue.takeBack}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  remove('ten', interactionModeOf(e));
-                }}
-                className="rounded-lg p-1 hover:bg-amber-100 cursor-pointer"
-              >
-                <TenRod />
-              </button>
-            ))}
-            {Array.from({ length: ones }).map((_, i) => (
-              <button
-                key={`o${i}`}
-                type="button"
-                aria-label={`${childText.placeValue.one} ${childText.placeValue.takeBack}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  remove('one', interactionModeOf(e));
-                }}
-                className="rounded-lg p-2 hover:bg-amber-100 cursor-pointer"
-              >
-                <OneCube />
-              </button>
-            ))}
+            {/* Each piece type stays together, so wrapping never splits the hundreds, tens or ones. */}
+            {pieces.map(
+              (piece) =>
+                counts[piece] > 0 && (
+                  <span key={piece} className="inline-flex flex-wrap items-end justify-center gap-2">
+                    {Array.from({ length: counts[piece] }).map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        aria-label={`${PIECE_LABEL[piece]} ${childText.placeValue.takeBack}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          remove(piece, interactionModeOf(e));
+                        }}
+                        className={`rounded-lg ${piece === 'one' ? 'p-2' : 'p-1'} hover:bg-amber-100 cursor-pointer`}
+                      >
+                        {PIECE_PICTURE[piece]}
+                      </button>
+                    ))}
+                  </span>
+                )
+            )}
           </div>
           {total > 0 && <span className="text-xs text-mq-text-muted">{childText.placeValue.takeBack}</span>}
         </DropTarget>
@@ -199,6 +251,8 @@ export interface StepChoiceItem {
   /** Guided mode: level-2 visual cue and level-3 worked demonstration. */
   visualCue?: React.ReactNode;
   worked?: string;
+  /** Guided mode: level-1 and level-2 wording (defaults to the Grade 2 addition wording). */
+  guidance?: { l1: string; l2: string };
 }
 
 interface StepChoiceProps {
@@ -258,7 +312,11 @@ export const StepChoiceActivity: React.FC<StepChoiceProps> = ({ item, scene, mod
 
   const guidedMessage = [
     intro,
-    supportLevel === 1 ? childText.add2.supportL1 : supportLevel === 2 ? childText.add2.supportL2 : item.worked,
+    supportLevel === 1
+      ? (item.guidance?.l1 ?? childText.add2.supportL1)
+      : supportLevel === 2
+        ? (item.guidance?.l2 ?? childText.add2.supportL2)
+        : item.worked,
   ]
     .filter(Boolean)
     .join(' ');
@@ -307,3 +365,26 @@ export const StepChoiceActivity: React.FC<StepChoiceProps> = ({ item, scene, mod
     </ActivityFrame>
   );
 };
+
+/* ------------------------------------------------------------------ */
+/* Equal-groups picture (Grade 3 multiplication)                       */
+/* ------------------------------------------------------------------ */
+
+/** `groups` plates with `each` objects on every plate. */
+export const EqualGroupsPicture: React.FC<{ groups: number; each: number; icon: string; label: string }> = ({ groups, each, icon, label }) => (
+  <span role="img" aria-label={label} className="inline-flex flex-wrap items-center justify-center gap-3">
+    {Array.from({ length: groups }).map((_, g) => (
+      <span
+        key={g}
+        aria-hidden="true"
+        className="inline-grid gap-1 rounded-full border-4 border-slate-300 bg-white px-4 py-3 text-2xl leading-none shadow-xs"
+        // 4 as a 2 × 2 square; otherwise rows of up to 3, so each plate can be counted at a glance.
+        style={{ gridTemplateColumns: `repeat(${each === 4 ? 2 : Math.min(each, 3)}, auto)` }}
+      >
+        {Array.from({ length: each }).map((_, i) => (
+          <span key={i}>{icon}</span>
+        ))}
+      </span>
+    ))}
+  </span>
+);

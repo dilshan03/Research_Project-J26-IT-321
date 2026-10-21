@@ -76,7 +76,27 @@ services:
     restart: unless-stopped
 
   # =========================================================================
-  # 5. MathQuest Web Frontend (React + Vite — Port 5173)
+  # 5. Behaviour Signal Service (Python / FastAPI — Port 8004)
+  # =========================================================================
+  behaviour-signal-service:
+    build:
+      context: ./services/behaviour-signal-service
+      dockerfile: Dockerfile
+    container_name: mathquest-behaviour-signal
+    ports:
+      - "8004:8004"
+    env_file:
+      - .env
+    environment:
+      - PORT=8004
+      - DEV_ALLOW_UNAUTHENTICATED=true
+      - WATCHFILES_FORCE_POLLING=true
+    volumes:
+      - ./services/behaviour-signal-service/app:/app/app
+    restart: unless-stopped
+
+  # =========================================================================
+  # 6. MathQuest Web Frontend (React + Vite — Port 5173)
   # =========================================================================
   web:
     build:
@@ -89,6 +109,7 @@ services:
       - AUTH_API_URL=http://auth-service:5000
       - DECISION_API_URL=http://decision-api:5002
       - VITE_LEARNER_PROFILE_API_URL=http://localhost:5001
+      - VITE_BEHAVIOUR_API_URL=http://localhost:8004
       - CHOKIDAR_USEPOLLING=true
     volumes:
       - ./apps/web/src:/app/src
@@ -98,4 +119,5 @@ services:
       - learner-profile-service
       - decision-api
       - content-adaptation-service
+      - behaviour-signal-service
     restart: unless-stopped

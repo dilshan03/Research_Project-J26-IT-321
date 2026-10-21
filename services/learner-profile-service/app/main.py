@@ -8,6 +8,7 @@ from app.api.v1.learners import router as learners_router
 from app.api.v1.onboarding import router as onboarding_router
 from app.api.v1.profile import router as profile_router
 from app.api.v1.admin import router as admin_router
+from app.api.v1.research_analytics import router as research_analytics_router
 from app.api.v1.support_information import router as support_information_router
 
 logging.basicConfig(
@@ -53,6 +54,7 @@ app.include_router(learners_router, prefix="/api/v1")
 app.include_router(onboarding_router, prefix="/api/v1")
 app.include_router(profile_router, prefix="/api/v1")
 app.include_router(admin_router, prefix="/api/v1")
+app.include_router(research_analytics_router, prefix="/api/v1")
 app.include_router(support_information_router, prefix="/api/v1")
 
 

@@ -32,6 +32,8 @@ PARENT_INVOLVEMENT = {"guided_together", "check_in_after", "child_independent"}
 CHALLENGING_TASK_SUPPORT = {"take_a_break", "break_down_step", "parent_hug_reassurance"}
 SKILL_LEVELS = {"PROFICIENT", "DEVELOPING", "EMERGING", "INSUFFICIENT_EVIDENCE"}
 INPUT_METHODS = {"drag", "tap", "select"}
+CONCEPT_STAGES = {"introduction", "practice", "review"}
+CONCEPT_INTRODUCTION_SOURCES = {"assessment", "system"}  # item-bank probe role or curriculum sequence
 DIAGNOSIS_STATUS = {"yes", "no", "not_sure", "prefer_not_to_say"}
 REPORTED_PRESENTATION = {
     "predominantly_inattentive", "predominantly_hyperactive_impulsive", "combined", "not_specified",
@@ -95,6 +97,28 @@ class MathEvidence:
 
 
 @dataclass(frozen=True)
+class ConceptStage:
+    """Explicit statement of where a concept is in the learning sequence, with its basis."""
+
+    skillId: str
+    stage: str
+    basis: str
+    conceptId: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class ConceptIntroductionEvidence:
+    """
+    Provenance-backed indication that concepts are being introduced (e.g. an item-bank probe role
+    or a curriculum sequence position). A missing ELP-X estimate is NOT such evidence: it only
+    means the learner's knowledge of the concept is unknown.
+    """
+
+    provenance: Provenance
+    concepts: Tuple[ConceptStage, ...] = ()
+
+
+@dataclass(frozen=True)
 class InteractionObservations:
     """Interface observations. Recorded only; never treated as maths or attention evidence."""
 
@@ -139,6 +163,7 @@ class LearnerContext:
     learningPreferences: Optional[ParentLearningPreferences] = None
     socialContext: Optional[SocialContext] = None
     mathEvidence: Optional[MathEvidence] = None
+    conceptIntroduction: Optional[ConceptIntroductionEvidence] = None
     interactionObservations: Optional[InteractionObservations] = None
     parentReportedAdhdContext: Optional[ParentReportedAdhdContext] = None
     snapIvSummary: Optional[SnapIvSummary] = None
@@ -252,6 +277,24 @@ def _parse_context(data: Dict[str, Any]) -> LearnerContext:
             skills=tuple(skills),
         )
 
+    intro = None
+    if (raw := _group(data, "conceptIntroduction")) is not None:
+        prov = _provenance(raw.get("provenance"), "conceptIntroduction", CONCEPT_INTRODUCTION_SOURCES)
+        _require(isinstance(prov.instrument, str) and prov.instrument.strip() != "",
+                 "conceptIntroduction.provenance.instrument is required (e.g. item bank or curriculum sequence)")
+        concepts = []
+        for c in raw.get("concepts") or []:
+            _require(isinstance(c, dict) and isinstance(c.get("skillId"), str), "each concept needs a skillId")
+            _require(isinstance(c.get("basis"), str) and c["basis"].strip() != "",
+                     f"concept {c.get('skillId')!r} needs an explicit basis for its stage")
+            concepts.append(ConceptStage(
+                skillId=c["skillId"],
+                stage=_enum(c.get("stage"), CONCEPT_STAGES, "conceptIntroduction.stage") or _missing_stage(c["skillId"]),
+                basis=c["basis"],
+                conceptId=c.get("conceptId"),
+            ))
+        intro = ConceptIntroductionEvidence(provenance=prov, concepts=tuple(concepts))
+
     obs = None
     if (raw := _group(data, "interactionObservations")) is not None:
         drops = raw.get("missedDropCount")
@@ -304,6 +347,7 @@ def _parse_context(data: Dict[str, Any]) -> LearnerContext:
         learningPreferences=prefs,
         socialContext=social,
         mathEvidence=math,
+        conceptIntroduction=intro,
         interactionObservations=obs,
         parentReportedAdhdContext=adhd,
         snapIvSummary=snap,
@@ -314,6 +358,10 @@ def _parse_context(data: Dict[str, Any]) -> LearnerContext:
 
 def _missing_level(skill_id: str) -> str:
     raise ContextValidationError(f"skill {skill_id!r} needs a provisionalSkillLevel from ELP-X")
+
+
+def _missing_stage(skill_id: str) -> str:
+    raise ContextValidationError(f"concept {skill_id!r} needs a stage ({sorted(CONCEPT_STAGES)})")
 
 
 def load_context(path: Path | str) -> Tuple[LearnerContext, Dict[str, Any]]:

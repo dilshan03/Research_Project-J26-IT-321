@@ -186,26 +186,29 @@ This document specifies sixteen candidate rules across six functional categories
 ### Rule `MQ-RS2-04`: Concept Introduction with Accessible Small Numbers
 - **Rule Name**: Accessible Number Magnitude During Conceptual Introduction
 - **Research Purpose**: Restrict arithmetic operands to single-digit or familiar quantities when introducing new mathematical procedures to minimize calculation burden.
-- **Required Inputs**: `conceptId` (`str`), `probeRole` (`ProbeRole`), `grade` (`int`)
-- **Optional Inputs**: `estimatedProficiency` (`float`)
-- **Trigger Condition**:
+- **Required Inputs**: `conceptIntroduction` — an explicit, provenance-backed record (source `assessment` item-bank probe role or `system` curriculum sequence, with an instrument and a stated basis) that the concept's stage is `introduction`
+- **Optional Inputs**: `provisionalSkillLevel` from ELP-X (`str`), `conceptId` (`str`)
+- **Trigger Condition** (revised in MQ-REC v0.1):
   ```python
-  if probeRole in [ProbeRole.CALIBRATION, ProbeRole.PRE] and estimatedProficiency is None:
+  # A missing or INSUFFICIENT_EVIDENCE ELP-X estimate means the learner's knowledge is UNKNOWN.
+  # It is never, on its own, evidence that the concept is being introduced.
+  if conceptIntroduction is not None and concept.stage == "introduction" \
+          and elpxLevel in (None, "INSUFFICIENT_EVIDENCE"):
       trigger_rule = True
   ```
-- **Recommended Action**: Recommend `ACCESSIBLE_NUMBERS`: bound arithmetic operands to small quantities ($n \le 10$ for Grade 1–2; $n \le 20$ for Grade 3–5) until conceptual structure is demonstrated.
+- **Recommended Action**: Recommend `ACCESSIBLE_NUMBERS`: use small, familiar numbers while the concept is being introduced. **No grade-specific number limits are applied**; the earlier draft bounds ($n \le 10$ for Grades 1–2, $n \le 20$ for Grades 3–5) were withdrawn because they lack reviewed justification.
 - **Parent/Teacher Explanation (EN)**: "When introducing this new math concept, small, friendly numbers are used so your child can master the mathematical idea before tackling larger calculations."
 - **Parent/Teacher Explanation (SI)**: "නව ගණිත සංකල්පයක් හඳුන්වා දීමේදී සරල සංඛ්‍යා භාවිත කෙරේ. එමගින් ගණනය කිරීමේ බරකින් තොරව සංකල්පය තේරුම් ගැනීමට හැකි වේ."
 - **Evidence Reference**: IES WWC 2021 Practice Guide, Recommendation 1, Step 2 (printed p. 6 / PDF p. 13; supported by 43 studies).
 - **Relationship to R1–R8**: Aligns with Rule R2 (smaller steps on struggle; accepted).
-- **Status**: Literature-informed proposal (strong WWC evidence base).
-- **Missing-Data Behaviour**: Defaults to grade-level standard numbers if concept stage is unknown.
+- **Status**: Literature-informed proposal (strong WWC evidence base). **Input-gated**: no MathQuest source currently produces explicit concept-introduction records, so the rule is inactive in practice until one does.
+- **Missing-Data Behaviour**: If no explicit concept-introduction evidence is provided, the rule is not applied and reports `CONCEPT_INTRODUCTION_EVIDENCE_MISSING`. If a concept is marked as introduced but ELP-X already holds an established estimate for it, no recommendation is made and `CONCEPT_ALREADY_ESTIMATED` is reported.
 - **Conflict & Priority**: Priority 3 (Scaffolding).
 - **Examples**:
-  - *Positive*: Introducing "Equal Groups" multiplication to Grade 2; operands restricted to $2 \times 3$ or $3 \times 4$.
-  - *Negative*: Practicing already-mastered multiplication facts; larger numbers permitted.
-  - *Insufficient Evidence*: Concept stage undefined; rule applies conservative single-digit bounding.
-- **Evaluation Feasibility**: Evaluated with `probeRole` and `conceptId` in Onboarding v2 schema.
+  - *Positive*: Curriculum sequence records "Equal Groups" multiplication as being introduced and ELP-X has no estimate for it; `ACCESSIBLE_NUMBERS` recommended (no numeric bound imposed).
+  - *Negative*: Concept stage is `practice`/`review`, or ELP-X already reports DEVELOPING/PROFICIENT; rule does not trigger.
+  - *Insufficient Evidence*: ELP-X estimate missing but no introduction record; learner knowledge is unknown, rule not applied (missing-evidence notice).
+- **Evaluation Feasibility**: Requires a concept-introduction record (planned input; see `rule_input_mapping.md`). `probeRole` and `conceptId` from the Onboarding v2 schema could supply it in future, but are not yet mapped.
 
 ---
 

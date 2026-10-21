@@ -6,6 +6,7 @@ import { AuthInput } from '../components/AuthInput';
 import { PasswordInput } from '../components/PasswordInput';
 import { authService } from '../services/authService';
 import { useAuth } from '../hooks/useAuth';
+import { dashboardPathFor } from '../roleRoutes';
 
 export const SignInPage: React.FC = () => {
   const navigate = useNavigate();
@@ -55,23 +56,24 @@ export const SignInPage: React.FC = () => {
 
     if (response.success && response.data?.user) {
       login(response.data.user);
-      setSuccessMessage(response.message || 'Sign in successful! Redirecting...');
+      setSuccessMessage('Sign in successful. Redirecting...');
       setTimeout(() => {
         navigate('/');
-      }, 1000);
+      }, 700);
     } else if (response.success) {
       const userEmail = email.trim();
       const userName = userEmail.split('@')[0];
-      login({
+      const fallbackUser = {
         id: '',
         fullName: userName.charAt(0).toUpperCase() + userName.slice(1),
         email: userEmail,
-        role: 'parent',
-      });
-      setSuccessMessage(response.message || 'Sign in successful! Redirecting...');
+        role: 'parent' as const,
+      };
+      login(fallbackUser);
+      setSuccessMessage('Sign in successful. Redirecting...');
       setTimeout(() => {
         navigate('/');
-      }, 1000);
+      }, 700);
     } else {
       setGlobalError(
         response.error?.message || response.message || 'Sign in failed. Please try again.'
@@ -84,24 +86,25 @@ export const SignInPage: React.FC = () => {
       title="Welcome Back"
       subtitle="Sign in to continue your child's math journey"
     >
-      {successMessage && (
-        <div className="mb-5 p-3.5 bg-mq-success-bg border border-mq-success/30 rounded-2xl flex items-start gap-3 text-xs text-mq-success font-medium animate-fade-in">
-          <CheckCircle2 size={18} className="shrink-0 mt-0.5" />
-          <div>
-            <p className="font-bold">Sign In Successful</p>
-            <p className="mt-0.5 text-mq-text">{successMessage}</p>
-          </div>
+      {/* A single message: success or failure, never both and never repeated */}
+      {successMessage ? (
+        <div
+          role="status"
+          className="mb-5 p-3.5 bg-mq-success-bg border border-mq-success/30 rounded-2xl flex items-center gap-3 text-sm text-mq-success font-semibold animate-fade-in"
+        >
+          <CheckCircle2 size={18} className="shrink-0" />
+          <p>{successMessage}</p>
         </div>
-      )}
-
-      {globalError && (
-        <div className="mb-5 p-3.5 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-start gap-3 text-xs text-mq-danger font-medium animate-fade-in">
-          <AlertCircle size={18} className="shrink-0 mt-0.5" />
-          <div>
-            <p className="font-bold">Authentication Notice</p>
-            <p className="mt-0.5 text-mq-text">{globalError}</p>
+      ) : (
+        globalError && (
+          <div
+            role="alert"
+            className="mb-5 p-3.5 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-center gap-3 text-sm text-mq-danger font-semibold animate-fade-in"
+          >
+            <AlertCircle size={18} className="shrink-0" />
+            <p>{globalError}</p>
           </div>
-        </div>
+        )
       )}
 
       <form onSubmit={handleSubmit} noValidate className="space-y-4">

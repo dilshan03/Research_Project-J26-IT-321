@@ -166,4 +166,53 @@ const fsm = new FSMDecisionEngine();
   console.log('✅ Test 11 Passed: Passive idle reminder throttled by cooldown guard (no nagging spam).');
 }
 
-console.log('\nAll 11 FSM Decision Engine Tests Passed! 🎯');
+// Test 12 (Step 5): Multimodal Distraction Re-engagement (Peer Camera / Attention Slip)
+{
+  const res = fsm.evaluate({
+    cameraPermissionGranted: true,
+    cameraAttentionScore: 0.30,
+    inattentionIndex: 0.65,
+    bktKnowledge: 0.72
+  });
+
+  assert.strictEqual(res.fsmState, FSM_STATES.DISTRACTED_RE_ENGAGE);
+  assert.strictEqual(res.rule.id, 'RULE_DISTRACTED_RE_ENGAGE');
+  assert.strictEqual(res.decision.action, 'RE_ENGAGE_BRAIN_BREAK');
+  console.log('✅ Test 12 Passed: Step 5 Multimodal Distraction Re-engagement triggered on low peer camera attention.');
+}
+
+// Test 13 (Step 5): Spaced Memory Revision Trigger (REVISION_DUE when R(t) < 0.70)
+{
+  const res = fsm.evaluate({
+    retentionScore: 0.52,
+    revisionRecommended: true,
+    elapsedDays: 5,
+    memoryStability: 2.5,
+    bktKnowledge: 0.78
+  });
+
+  assert.strictEqual(res.fsmState, FSM_STATES.REVISION_DUE);
+  assert.strictEqual(res.rule.id, 'RULE_REVISION_DUE');
+  assert.strictEqual(res.decision.action, 'SCHEDULE_SPACED_REVIEW');
+  assert.strictEqual(res.challengeRecommendation.recommendedDifficulty, 'EASY_SCAFFOLD');
+  console.log('✅ Test 13 Passed: Step 5 Spaced Memory Revision triggered REVISION_DUE & selected EASY_SCAFFOLD warmup.');
+}
+
+// Test 14 (Step 5 & Step 6): Expected Mastery Gain (EMG) Difficulty Selector & Teacher Explainable Rationale
+{
+  const res = fsm.evaluate({
+    bktKnowledge: 0.88,
+    consecutiveCorrect: 3,
+    retentionScore: 0.96,
+    frustrationIndex: 0.1,
+    inattentionIndex: 0.1
+  });
+
+  assert.strictEqual(res.challengeRecommendation.recommendedDifficulty, 'CHALLENGE_MASTERY');
+  assert.ok(res.challengeRecommendation.expectedMasteryGain > 0);
+  assert.ok(res.explainableRationale.summary.includes('RULE_4'));
+  assert.ok(res.recentDecisionLogs.length > 0);
+  console.log('✅ Test 14 Passed: Step 5 EMG selected CHALLENGE_MASTERY & Step 6 generated Teacher Explainable Logs.');
+}
+
+console.log('\nAll 14 FSM Decision Engine Tests Passed! 🎯');

@@ -29,6 +29,7 @@ import type {
   OnboardingFullSummary,
 } from '../types/onboarding';
 import { isAdhdTypeReported } from '../types/onboarding';
+import { useScrollToTopOnChange } from '../../../shared/hooks/useScrollToTopOnChange';
 
 import { OnboardingStepper } from '../components/onboarding/OnboardingStepper';
 import { languageLabel } from '../components/parent/labels';
@@ -75,6 +76,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
   const [learner, setLearner] = useState<Learner | null>(null);
   const [progress, setProgress] = useState<OnboardingProgress | null>(null);
   const [currentStep, setCurrentStep] = useState<OnboardingStepKey>('adhd_information');
+  useScrollToTopOnChange(currentStep);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   // Set when a parent opens ADHD information or SNAP-IV from the completed profile summary
   const [returnToSummary, setReturnToSummary] = useState(false);

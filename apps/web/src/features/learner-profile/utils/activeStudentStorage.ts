@@ -13,6 +13,7 @@ export interface StudentSavedProgress {
   coins: number;
   learningProgressPct: number;
   completedSteps: number[];
+  completedActivityIds?: string[];
   hintAwareKnowledge: number;
   standardKnowledge: number;
   totalHintsUsed: number;
@@ -88,6 +89,7 @@ export function getLocalStudentProgress(
     coins: 50,
     learningProgressPct: 0,
     completedSteps: [],
+    completedActivityIds: [],
     hintAwareKnowledge: 0.2,
     standardKnowledge: 0.2,
     totalHintsUsed: 0,
@@ -148,36 +150,50 @@ export async function fetchBackendStudentProgress(
     if (!res.ok) return null;
     const data = await res.json();
     if (data.success && data.progress) {
+      const existingLocal = getLocalStudentProgress(parentId, learnerId);
       const merged: StudentSavedProgress = {
         parentId: data.progress.parentId || parentId,
         learnerId: data.progress.learnerId || data.progress.studentId || learnerId,
         studentName: data.progress.studentName || 'Student',
         grade: data.progress.grade || 1,
-        stars: typeof data.progress.stars === 'number' ? data.progress.stars : 100,
-        coins: typeof data.progress.coins === 'number' ? data.progress.coins : 50,
+        // Never allow stars or coins to decrease due to an outdated backend snapshot
+        stars: Math.max(
+          existingLocal.stars,
+          typeof data.progress.stars === 'number' ? data.progress.stars : 100
+        ),
+        coins: Math.max(
+          existingLocal.coins,
+          typeof data.progress.coins === 'number' ? data.progress.coins : 50
+        ),
         learningProgressPct:
           typeof data.progress.learningProgressPct === 'number'
             ? data.progress.learningProgressPct
-            : 0,
-        completedSteps: Array.isArray(data.progress.completedSteps)
+            : existingLocal.learningProgressPct || 0,
+        completedSteps: Array.isArray(data.progress.completedSteps) && data.progress.completedSteps.length > 0
           ? data.progress.completedSteps
-          : [],
+          : existingLocal.completedSteps || [],
+        completedActivityIds: Array.from(new Set([
+          ...(existingLocal.completedActivityIds || []),
+          ...(Array.isArray(data.progress.completedActivityIds) ? data.progress.completedActivityIds : [])
+        ])),
         hintAwareKnowledge:
           typeof data.progress.hintAwareKnowledge === 'number'
             ? data.progress.hintAwareKnowledge
-            : 0.2,
+            : existingLocal.hintAwareKnowledge || 0.2,
         standardKnowledge:
           typeof data.progress.standardKnowledge === 'number'
             ? data.progress.standardKnowledge
-            : 0.2,
+            : existingLocal.standardKnowledge || 0.2,
         totalHintsUsed:
-          typeof data.progress.totalHintsUsed === 'number' ? data.progress.totalHintsUsed : 0,
-        sessionsCompleted:
-          typeof data.progress.sessionsCompleted === 'number'
-            ? data.progress.sessionsCompleted
-            : 0,
-        lastCognitiveState: data.progress.lastCognitiveState,
-        lastFsmState: data.progress.lastFsmState,
+          typeof data.progress.totalHintsUsed === 'number'
+            ? data.progress.totalHintsUsed
+            : existingLocal.totalHintsUsed || 0,
+        sessionsCompleted: Math.max(
+          existingLocal.sessionsCompleted || 0,
+          typeof data.progress.sessionsCompleted === 'number' ? data.progress.sessionsCompleted : 0
+        ),
+        lastCognitiveState: data.progress.lastCognitiveState || existingLocal.lastCognitiveState,
+        lastFsmState: data.progress.lastFsmState || existingLocal.lastFsmState,
         updatedAt: data.progress.updatedAt || new Date().toISOString(),
       };
       // Sync local cache

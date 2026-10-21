@@ -176,7 +176,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
         {/* Page Header when embedded in Dashboard shell */}
         {hideNavbar && (
           <PageHeader
-            role={user.role}
+            role={user.role === 'admin' ? undefined : user.role}
             title="Account Settings"
             titleSi="ගිණුම් සැකසුම්"
             description="Manage your verified account profile, identity credentials, security settings, and notifications."

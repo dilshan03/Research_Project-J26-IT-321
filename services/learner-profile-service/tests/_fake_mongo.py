@@ -61,6 +61,9 @@ class FakeCollection:
     def find(self, query: Dict[str, Any], *args: Any, **kwargs: Any) -> _FakeCursor:
         return _FakeCursor([dict(d) for d in self.docs if _matches(d, query)])
 
+    async def count_documents(self, query: Dict[str, Any]) -> int:
+        return sum(1 for d in self.docs if _matches(d, query))
+
     async def insert_one(self, doc: Dict[str, Any]) -> None:
         doc.setdefault("_id", ObjectId())
         stored = dict(doc)
@@ -80,3 +83,6 @@ class FakeCollection:
             values = target.setdefault(key, [])
             if value not in values:
                 values.append(value)
+        for key, value in update.get("$push", {}).items():
+            values = target.setdefault(key, [])
+            values.extend(value["$each"] if isinstance(value, dict) and "$each" in value else [value])

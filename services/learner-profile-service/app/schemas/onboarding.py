@@ -271,6 +271,67 @@ class RevisionEvent(BaseModel):
     revisedAt: Optional[datetime] = None
 
 
+# --- 5b. Raw interaction observations (ONBOARDING-INTERACTION-OBS-v1.0) ---
+# Transparent counts and timestamps recorded during one onboarding item. They are stored as
+# observations only: never used for mathematical correctness, IMPSA, IMLR or ELP-X, and never
+# interpreted as attention, impulsivity or ADHD indicators. Times are milliseconds from item display.
+
+INTERACTION_OBSERVATION_VERSION = "ONBOARDING-INTERACTION-OBS-v1.0"
+MAX_OBSERVATION_EVENTS = 50
+
+
+class ObservationParameters(BaseModel):
+    burstMaxGapMs: float = Field(..., gt=0, description="Max gap between taps counted in one burst")
+    burstMinTaps: int = Field(..., ge=2, description="Minimum taps for a burst to be recorded")
+    idleThresholdMs: float = Field(..., gt=0, description="Minimum gap without interaction recorded as idle")
+    maxEventsPerList: int = Field(..., ge=1)
+
+
+class TapBurst(BaseModel):
+    startMs: float = Field(..., ge=0)
+    endMs: float = Field(..., ge=0)
+    tapCount: int = Field(..., ge=2)
+
+
+class IdleInterval(BaseModel):
+    startMs: float = Field(..., ge=0)
+    durationMs: float = Field(..., ge=0)
+
+
+class PageEventType(str, Enum):
+    HIDDEN = "hidden"
+    VISIBLE = "visible"
+    BLUR = "blur"
+    FOCUS = "focus"
+
+
+class PageEvent(BaseModel):
+    type: PageEventType
+    atMs: float = Field(..., ge=0)
+
+
+class InvalidTap(BaseModel):
+    atMs: float = Field(..., ge=0)
+
+
+class InteractionObservations(BaseModel):
+    version: str = Field(default=INTERACTION_OBSERVATION_VERSION)
+    parameters: Optional[ObservationParameters] = None
+    observedDurationMs: Optional[float] = Field(default=None, ge=0)
+    idleTimeBeforeFirstActionMs: Optional[float] = Field(
+        default=None, ge=0, description="Item display to first pointer/key interaction; null if none occurred"
+    )
+    pointerDownCount: int = Field(default=0, ge=0)
+    keyDownCount: int = Field(default=0, ge=0)
+    tapBursts: List[TapBurst] = Field(default_factory=list, max_length=MAX_OBSERVATION_EVENTS)
+    idleIntervals: List[IdleInterval] = Field(default_factory=list, max_length=MAX_OBSERVATION_EVENTS)
+    pageEvents: List[PageEvent] = Field(default_factory=list, max_length=MAX_OBSERVATION_EVENTS)
+    hiddenDurationMs: Optional[float] = Field(default=None, ge=0)
+    invalidTapCount: Optional[int] = Field(default=None, ge=0, description="Null when not measurable")
+    invalidTaps: List[InvalidTap] = Field(default_factory=list, max_length=MAX_OBSERVATION_EVENTS)
+    truncated: bool = Field(default=False, description="True if any event list hit the client cap")
+
+
 # --- 6. Mathematics Question & Assessment ---
 
 class QuestionType(str, Enum):
@@ -368,6 +429,10 @@ class MathItemAnswerSubmission(BaseModel):
     missedDropCount: Optional[int] = Field(
         default=None, ge=0,
         description="Objects released outside a target (interface usability evidence, not a maths or attention measure)"
+    )
+    interactionObservations: Optional[InteractionObservations] = Field(
+        default=None,
+        description="Raw interaction observations (ONBOARDING-INTERACTION-OBS-v1.0); stored only, never scored"
     )
 
 

@@ -25,10 +25,12 @@ import { parentText } from '../../../../shared/i18n/parentText';
 interface Props {
   initialData?: AdhdInformationRecord | null;
   onSave: (data: AdhdInformationData) => Promise<void>;
-  onSaveAndExit: (data: AdhdInformationData) => Promise<void>;
+  onSaveAndExit?: (data: AdhdInformationData) => Promise<void>;
   /** Shown when editing from the profile summary; the first onboarding step has no Back. */
   onBack?: () => void;
   isSaving: boolean;
+  /** Edited from the ADHD & support information page (no step badge or save-and-exit). */
+  standalone?: boolean;
 }
 
 const t = parentText.adhd;
@@ -56,6 +58,7 @@ export const AdhdInformationStep: React.FC<Props> = ({
   onSaveAndExit,
   onBack,
   isSaving,
+  standalone = false,
 }) => {
   const [diagnosisStatus, setDiagnosisStatus] = useState<AdhdDiagnosisStatus | null>(
     initialData?.diagnosisStatus ?? null
@@ -109,16 +112,18 @@ export const AdhdInformationStep: React.FC<Props> = ({
 
   const handleSaveAndExit = () => {
     const payload = buildPayload();
-    if (payload) onSaveAndExit(payload);
+    if (payload && onSaveAndExit) onSaveAndExit(payload);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-3xl border border-mq-border p-6 sm:p-8 shadow-xs space-y-4">
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-mq-surface-blue text-mq-primary">
-          {parentText.onboarding.stepOf(1)}
-        </span>
+        {!standalone && (
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-mq-surface-blue text-mq-primary">
+            {parentText.onboarding.stepOf(1)}
+          </span>
+        )}
         <h2 className="text-xl sm:text-2xl font-bold text-mq-text-strong">{t.title}</h2>
         <p className="text-base text-mq-text-muted leading-relaxed">{t.intro}</p>
 
@@ -248,16 +253,18 @@ export const AdhdInformationStep: React.FC<Props> = ({
               <span>{parentText.common.back}</span>
             </motion.button>
           )}
-          <motion.button
-            type="button"
-            whileTap={{ scale: 0.98 }}
-            disabled={isSaving}
-            onClick={handleSaveAndExit}
-            className="btn btn-secondary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center justify-center gap-2"
-          >
-            <Save size={16} />
-            <span>{parentText.common.saveAndExit}</span>
-          </motion.button>
+          {onSaveAndExit && !standalone && (
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.98 }}
+              disabled={isSaving}
+              onClick={handleSaveAndExit}
+              className="btn btn-secondary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center justify-center gap-2"
+            >
+              <Save size={16} />
+              <span>{parentText.common.saveAndExit}</span>
+            </motion.button>
+          )}
         </div>
 
         <motion.button

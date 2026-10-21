@@ -1,10 +1,10 @@
 import React from 'react';
-import type { UserRole } from '../types';
+import type { RegistrableRole } from '../types';
 import { User, School, Check } from 'lucide-react';
 
 interface RoleSelectorProps {
-  selectedRole: UserRole;
-  onSelectRole: (role: UserRole) => void;
+  selectedRole: RegistrableRole;
+  onSelectRole: (role: RegistrableRole) => void;
 }
 
 export const RoleSelector: React.FC<RoleSelectorProps> = ({ selectedRole, onSelectRole }) => {

@@ -10,18 +10,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "^1.1.1",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.1",
     "@rive-app/react-canvas": "^4.36.0",
     "@tailwindcss/vite": "^4.3.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
     "framer-motion": "^14.1.0",
     "lucide-react": "^1.47.0",
+    "mongodb": "^7.7.0",
     "motion": "^14.3.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.4",
     "three": "^0.186.1",
     "three-stdlib": "^2.36.1",
+    "webgazer": "^3.5.3",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

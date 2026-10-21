@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Check, ArrowRight } from 'lucide-react';
 import type { InteractionMode, MathItemAnswer } from '../../../types/onboarding';
 import { childText } from '../../../../../shared/i18n/childText';
@@ -20,6 +20,7 @@ export interface ActivityContext {
 /** Creates the item recorder once per mounted activity and wires instruction replay. */
 const useActivity = (meta: ItemMeta, instructionText: string, ctx: ActivityContext) => {
   const [recorder] = useState(() => new ItemRecorder(meta));
+  useEffect(() => recorder.observe(), [recorder]);
   const [instructionKey, setInstructionKey] = useState(0);
   const replay = () => {
     recorder.instruction('replayed');

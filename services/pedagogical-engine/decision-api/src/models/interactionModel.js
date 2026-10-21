@@ -13,8 +13,27 @@ export async function saveInteractionLog(logData) {
   const normalizedStudentId = logData.studentId || logData.learnerId || 'student_unknown';
   const normalizedParentId = logData.parentId || 'parent_unknown';
 
+  // Normalize optional remainingTimeMs -> responseTimeMs if responseTimeMs is not explicitly set
+  const computedResponseTimeMs =
+    typeof logData.responseTimeMs === 'number'
+      ? logData.responseTimeMs
+      : typeof logData.timeLimitMs === 'number' && typeof logData.remainingTimeMs === 'number'
+        ? Math.max(0, logData.timeLimitMs - logData.remainingTimeMs)
+        : undefined;
+
+  const cameraPermissionGranted = Boolean(
+    logData.cameraPermissionGranted ?? logData.cameraPermission ?? false
+  );
+  const cameraAttentionScore =
+    cameraPermissionGranted && typeof logData.cameraAttentionScore === 'number'
+      ? Math.max(0, Math.min(1, logData.cameraAttentionScore))
+      : null;
+
   const document = {
     ...logData,
+    ...(computedResponseTimeMs !== undefined ? { responseTimeMs: computedResponseTimeMs } : {}),
+    cameraPermissionGranted,
+    cameraAttentionScore,
     studentId: normalizedStudentId,
     learnerId: logData.learnerId || normalizedStudentId,
     parentId: normalizedParentId,

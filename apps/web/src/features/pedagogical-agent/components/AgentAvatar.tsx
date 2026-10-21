@@ -22,7 +22,7 @@ export function AgentAvatar({
       {/* 2D Speech Bubble Cloud Overlay */}
       {showSpeechBubble && <AgentSpeechBubble />}
 
-      <Canvas shadows>
+      <Canvas shadows style={{ pointerEvents: interactive ? 'auto' : 'none' }}>
         <PerspectiveCamera makeDefault position={[0, 0.1, 3.2]} fov={45} />
         <ambientLight intensity={0.7} />
         <directionalLight position={[5, 8, 5]} intensity={1.2} castShadow />

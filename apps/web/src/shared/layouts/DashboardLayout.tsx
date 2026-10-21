@@ -5,6 +5,7 @@ import { PortalHeader } from '../components/portal/PortalHeader';
 import { DashboardSidebar } from '../components/DashboardSidebar';
 import { ParentBottomNav } from '../components/portal/ParentBottomNav';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { dashboardNameFor, dashboardPathFor } from '../../features/auth/roleRoutes';
 import { parentText } from '../i18n/parentText';
 
 export interface DashboardLayoutProps {
@@ -76,8 +77,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
 
   // 3. Access Denied State: Role Mismatch
   if (user.role !== role) {
-    const targetDashboard = user.role === 'parent' ? '/parent/dashboard' : '/teacher/dashboard';
-    const targetRoleName = user.role === 'parent' ? 'Parent' : 'Teacher';
+    const targetDashboard = dashboardPathFor(user.role);
+    const targetRoleName = dashboardNameFor(user.role);
 
     return (
       <div className="min-h-screen flex flex-col bg-mq-bg">

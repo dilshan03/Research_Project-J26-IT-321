@@ -73,12 +73,12 @@ export const ForgotPasswordPage: React.FC = () => {
       ) : (
         <>
           {globalError && (
-            <div className="mb-5 p-3.5 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-start gap-3 text-xs text-mq-danger font-medium animate-fade-in">
-              <AlertCircle size={18} className="shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold">Reset Password Notice</p>
-                <p className="mt-0.5 text-mq-text">{globalError}</p>
-              </div>
+            <div
+              role="alert"
+              className="mb-5 p-3.5 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-center gap-3 text-sm text-mq-danger font-semibold animate-fade-in"
+            >
+              <AlertCircle size={18} className="shrink-0" />
+              <p>{globalError}</p>
             </div>
           )}
 

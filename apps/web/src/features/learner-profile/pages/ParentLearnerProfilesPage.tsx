@@ -11,9 +11,9 @@ import { PageHeader } from '../../../shared/components/PageHeader';
 import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
 import { ChildSwitcher } from '../components/parent/ChildSwitcher';
 import { SkillEvidenceList } from '../components/parent/SkillEvidenceList';
-import { Grade1V2EvidenceView } from '../components/parent/Grade1V2EvidenceView';
 import { deletionStatusLabel, optionTitle } from '../components/parent/labels';
 import { parentText } from '../../../shared/i18n/parentText';
+import { DetailsForParent } from '../../pedagogical-agent';
 
 const t = parentText.profiles;
 const prefText = parentText.preferences;
@@ -82,7 +82,9 @@ export const ParentLearnerProfilesPage: React.FC = () => {
     }
 
     const child = learners.find((l) => l.learnerId === selectedLearnerId);
-    if (!child || child.onboardingStatus === 'NOT_STARTED') {
+    // The consolidated summary only exists after onboarding is completed (the API returns 400
+    // before that), and profile details are only shown for completed children.
+    if (!child || child.onboardingStatus !== 'COMPLETED') {
       setProfile(null);
       setSummary(null);
       return;
@@ -242,18 +244,18 @@ export const ParentLearnerProfilesPage: React.FC = () => {
 
               {!isLoadingProfile && profile && (
                 <div className="space-y-4">
-                  {summary?.mathSummary?.assessmentProtocolVersion === 'onboarding-v2' && (
-                    <section className="bg-white rounded-3xl border border-mq-border p-5 shadow-xs">
-                      <Grade1V2EvidenceView
-                        mathSummary={summary.mathSummary}
-                        childPreferences={summary.progress?.childPreferences || summary.mathSummary.childPreferences}
-                      />
-                    </section>
-                  )}
-
+                  {/* Research-level Grade 1 evidence (dimensions, probes, IMPSA/IMLR) is admin-only */}
                   <section className="bg-white rounded-3xl border border-mq-border p-5 shadow-xs">
                     <SkillEvidenceList profile={profile} />
                   </section>
+
+                  {/* Pedagogical Agent & AD-BKT Parent Friendly Insights for Selected Child */}
+                  <DetailsForParent
+                    parentId={selectedChild.parentId}
+                    learnerId={selectedChild.learnerId}
+                    studentName={selectedChild.preferredName || selectedChild.firstName}
+                    grade={selectedChild.grade}
+                  />
 
                   {summary && (
                     <details className="group bg-white rounded-3xl border border-mq-border shadow-xs">

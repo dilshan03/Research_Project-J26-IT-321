@@ -122,4 +122,9 @@ def get_deletion_requests_collection() -> AsyncCollection:
     return get_database()["learner_deletion_requests"]
 
 
+def get_admin_audit_collection() -> AsyncCollection:
+    """Append-only log of administrator data access."""
+    return get_database()["admin_audit_log"]
+
+
 

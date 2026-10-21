@@ -127,4 +127,55 @@ const bkt = new HintAwareBKT({
   console.log(`✅ Test 6 Passed: Error at Level 4 hint safely decreased P(L) from ${prior} to ${errorWithMaxHint.updatedKnowledge}`);
 }
 
-console.log('\nAll 6 HintAwareBKT Tests Passed! 🎯');
+// Test 7 (Step 3): AD-BKT Attention Slip Mastery Protection (Mitigating False Demotion)
+{
+  const prior = 0.75;
+  const slipProtected = bkt.updateStep({
+    p_prior: prior,
+    isCorrect: false,
+    hintLevel: 0,
+    inattentionIndex: 0.72,
+    isAttentionSlip: true,
+    rtZScore: -2.1
+  });
+
+  assert.strictEqual(slipProtected.masteryProtected, true);
+  assert(slipProtected.updatedKnowledge >= prior * 0.96,
+    `AD-BKT must protect mastery during an attention slip (got ${slipProtected.updatedKnowledge})`
+  );
+  assert(slipProtected.falseDemotionPrevented > 0.25,
+    `Expected significant false demotion prevention over Standard BKT, got ${slipProtected.falseDemotionPrevented}`
+  );
+  console.log(
+    `✅ Test 7 Passed: AD-BKT protected P(L) at ${slipProtected.updatedKnowledge} vs Standard BKT ${slipProtected.standardUpdatedKnowledge} (+${Math.round(slipProtected.falseDemotionPrevented * 100)}% protected)`
+  );
+}
+
+// Test 8 (Step 4): Stability-Based Forgetting & Spaced Retrieval Stability Growth
+{
+  // Unassisted focused recall increases stability S_t from 3.0 days
+  const recallStep = bkt.updateStep({
+    p_prior: 0.80,
+    isCorrect: true,
+    hintLevel: 0,
+    inattentionIndex: 0.05,
+    memoryStability: 3.0,
+    elapsedDays: 0.0
+  });
+  assert(recallStep.memoryStability > 3.8, `Expected stability growth > 3.8d, got ${recallStep.memoryStability}d`);
+
+  // After 5 days elapsed without practice, retention drops and triggers revision recommendation
+  const delayedStep = bkt.computeRetentionState({
+    p_prior: 0.85,
+    memoryStability: 3.5,
+    elapsedDays: 5.0
+  });
+  assert(delayedStep.retentionScore < 0.30, `Expected retention decay after 5 days, got ${delayedStep.retentionScore}`);
+  assert.strictEqual(delayedStep.revisionRecommended, true);
+  assert(delayedStep.decayedPrior < 0.85, 'Decayed prior must reflect forgetting over time');
+  console.log(
+    `✅ Test 8 Passed: Stability grew to ${recallStep.memoryStability}d on recall; 5-day gap decayed retention to ${Math.round(delayedStep.retentionScore * 100)}% (Revision Recommended: ${delayedStep.revisionRecommended})`
+  );
+}
+
+console.log('\nAll 8 AD-BKT & Retention Engine Tests Passed! 🎯');

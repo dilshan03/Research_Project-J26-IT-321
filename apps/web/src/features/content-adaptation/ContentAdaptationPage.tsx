@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Play } from 'lucide-react';
 import { contentAdaptationApi } from './api';
 import type { BlueprintEnvelope } from './types';
 import { AdaptationStudio } from './components/AdaptationStudio';
 import { GamePlayer } from './game/GamePlayer';
+import { MathQuestCameraSetup } from '../behaviour-monitoring/MathQuestCameraSetup';
+import { BehaviourMonitorOverlay } from '../behaviour-monitoring/BehaviourMonitorOverlay';
+import { captureSessionSnapshot, RealGameSessionReport } from '../behaviour-monitoring/RealGameSessionReport';
+import type { SessionSnapshot } from '../behaviour-monitoring/RealGameSessionReport';
 
-/** Learner view: only teacher-approved blueprints are playable. */
 function ApprovedActivities({ onPlay }: { onPlay: (env: BlueprintEnvelope) => void }) {
   const [items, setItems] = useState<BlueprintEnvelope[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +39,66 @@ function ApprovedActivities({ onPlay }: { onPlay: (env: BlueprintEnvelope) => vo
 
 export function ContentAdaptationPage({ mode }: { mode: 'studio' | 'play' }) {
   const [playing, setPlaying] = useState<BlueprintEnvelope | null>(null);
-  if (playing) return <GamePlayer envelope={playing} onExit={() => setPlaying(null)} />;
+  const [stage, setStage] = useState<'setup' | 'game' | 'report'>('setup');
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [snapshot, setSnapshot] = useState<SessionSnapshot | null>(null);
+  const startedAtRef = useRef(0);
+
+  function chooseGame(env: BlueprintEnvelope) {
+    setPlaying(env);
+    setStage('setup');
+    setSnapshot(null);
+    setCameraStream(null);
+  }
+
+  function stopCamera() {
+    cameraStream?.getTracks().forEach(track => track.stop());
+    setCameraStream(null);
+  }
+
+  function returnToGames() {
+    stopCamera();
+    setPlaying(null);
+    setSnapshot(null);
+    setStage('setup');
+  }
+
+  function finishGame() {
+    if (!playing) return;
+    // Capture data before the overlay unmounts. The tracker may write its final
+    // batch asynchronously, so a missing final event is possible until flush completes.
+    const captured = captureSessionSnapshot(playing.blueprint.activity_id, startedAtRef.current);
+    setSnapshot(captured);
+    stopCamera();
+    setStage('report');
+  }
+
+  if (playing) {
+    if (stage === 'setup') {
+      return <MathQuestCameraSetup onBack={returnToGames} onStart={(stream) => {
+        // Clear previous-session records so this report never uses stale data.
+        sessionStorage.removeItem('mathquest:camera-session:v1');
+        sessionStorage.removeItem('mathquest:gameplay-summary:v1');
+        startedAtRef.current = Date.now();
+        setCameraStream(stream);
+        setStage('game');
+      }} />;
+    }
+    if (stage === 'report' && snapshot) {
+      return <RealGameSessionReport snapshot={snapshot} onBack={returnToGames} onPlayAgain={() => {
+        stopCamera();
+        setSnapshot(null);
+        setStage('setup');
+      }} />;
+    }
+    return (
+      <>
+        {/* The existing GamePlayer is unchanged. onExit opens the report. */}
+        <GamePlayer envelope={playing} onExit={finishGame} />
+        <BehaviourMonitorOverlay activityId={playing.blueprint.activity_id} initialStream={cameraStream} />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-mq-bg">
@@ -48,7 +110,7 @@ export function ContentAdaptationPage({ mode }: { mode: 'studio' | 'play' }) {
           <a href="#/play" className={`px-4 py-2 rounded-full ${mode === 'play' ? 'bg-mq-primary text-white' : 'text-mq-text-muted hover:bg-mq-surface-soft'}`}>Learner games</a>
         </div>
       </nav>
-      {mode === 'studio' ? <AdaptationStudio onPlay={setPlaying} /> : <ApprovedActivities onPlay={setPlaying} />}
+      {mode === 'studio' ? <AdaptationStudio onPlay={chooseGame} /> : <ApprovedActivities onPlay={chooseGame} />}
     </div>
   );
 }

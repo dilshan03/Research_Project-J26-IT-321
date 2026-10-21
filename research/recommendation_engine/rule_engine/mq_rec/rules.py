@@ -247,39 +247,64 @@ def rule_rs2_02(ctx: LearnerContext) -> Outcome:
 
 
 # --------------------------------------------------------------------------------------------
-# MQ-RS2-04  Accessible numbers while a concept has no established estimate
+# MQ-RS2-04  Accessible numbers when a concept is explicitly being introduced
 # --------------------------------------------------------------------------------------------
 
 def rule_rs2_04(ctx: LearnerContext) -> Outcome:
-    if ctx.mathEvidence is None or not ctx.mathEvidence.skills:
-        return Outcome(MISSING_INPUT, [Condition("mathEvidence.skills", None, None, "present", None)])
+    """
+    Requires explicit, provenance-backed evidence that a concept is being introduced. A missing or
+    insufficient ELP-X estimate only means the learner's knowledge is unknown; on its own it never
+    triggers this rule. No grade-specific number limits are applied.
+    """
+    intro = ctx.conceptIntroduction
+    if intro is None or not intro.concepts:
+        return Outcome(MISSING_INPUT, [
+            Condition("conceptIntroduction.concepts[].stage", None, None,
+                      "== 'introduction' (explicit, provenance-backed)", None),
+        ], notices=[_notice(
+            "CONCEPT_INTRODUCTION_EVIDENCE_MISSING",
+            "No explicit, provenance-backed evidence that a concept is being introduced was provided, so the "
+            "accessible-numbers rule (MQ-RS2-04) was not applied. A missing ELP-X estimate only means the learner's "
+            "knowledge is unknown; it is not treated as a new concept.",
+        )])
 
-    conds, recs = [], []
-    draft_bound = "≤ 10" if ctx.grade <= 2 else "≤ 20"
-    for s in ctx.mathEvidence.skills:
-        no_estimate = s.provisionalSkillLevel == "INSUFFICIENT_EVIDENCE"
-        conds.append(Condition(f"skills[{s.skillId}].provisionalSkillLevel", "assessment", s.provisionalSkillLevel,
-                               "== 'INSUFFICIENT_EVIDENCE' (no established estimate: concept-introduction phase)",
-                               no_estimate))
-        if not no_estimate:
+    levels = {s.skillId: s.provisionalSkillLevel for s in ctx.mathEvidence.skills} if ctx.mathEvidence else {}
+    source = f"{intro.provenance.source}:{intro.provenance.instrument}"
+    conds, recs, notices = [], [], []
+    for c in intro.concepts:
+        introducing = c.stage == "introduction"
+        level = levels.get(c.skillId)
+        no_established_estimate = level in (None, "INSUFFICIENT_EVIDENCE")
+        conds.append(Condition(f"conceptIntroduction[{c.skillId}].stage", intro.provenance.source, c.stage,
+                               "== 'introduction'", introducing))
+        conds.append(Condition(f"skills[{c.skillId}].provisionalSkillLevel", "assessment" if level else None, level,
+                               "no established ELP-X estimate (absent or INSUFFICIENT_EVIDENCE)", no_established_estimate))
+        if not introducing:
+            continue
+        if not no_established_estimate:
+            notices.append(_notice(
+                "CONCEPT_ALREADY_ESTIMATED",
+                f"Concept '{c.skillId}' is marked as being introduced, but ELP-X already has a {level} estimate for this "
+                "learner; accessible numbers were not recommended. Please check the introduction record.",
+            ))
             continue
         recs.append(_rec(
-            "MQ-RS2-04", 3, "ACCESSIBLE_NUMBERS", s.skillId,
+            "MQ-RS2-04", 3, "ACCESSIBLE_NUMBERS", c.skillId,
             ["CONCEPT_INTRODUCTION_PHASE", "CALCULATION_LOAD_REDUCTION"],
-            {"skillId": s.skillId, "provisionalSkillLevel": s.provisionalSkillLevel,
-             "distinctQuestionsAssessed": s.distinctQuestionsAssessed, "grade": ctx.grade},
-            f"Practice with familiar, accessible numbers: {_skill_label(s)}", "හුරුපුරුදු සරල සංඛ්‍යා භාවිතය",
-            "When introducing this concept, use small, familiar numbers before larger values.",
+            {"skillId": c.skillId, "conceptId": c.conceptId, "stage": c.stage, "stageBasis": c.basis,
+             "stageSource": source, "provisionalSkillLevel": level},
+            f"Practice with familiar, accessible numbers: {c.conceptId or c.skillId}", "හුරුපුරුදු සරල සංඛ්‍යා භාවිතය",
+            "While this concept is being introduced, use small, familiar numbers before larger values.",
             "When introducing this new math concept, small, friendly numbers are used so your child can master the "
             "mathematical idea before tackling larger calculations.",
             "නව ගණිත සංකල්පයක් හඳුන්වා දීමේදී සරල සංඛ්‍යා භාවිත කෙරේ. එමගින් ගණනය කිරීමේ බරකින් තොරව සංකල්පය තේරුම් ගැනීමට හැකි වේ.",
-            f"There is no established estimate yet for skill '{s.skillId}', so it is treated as being introduced.",
+            f"Concept '{c.conceptId or c.skillId}' is recorded as being introduced ({c.basis}; source {source}) and "
+            "there is no established ELP-X estimate for it.",
             interacts_with_elpx={"code": "ASSESSMENT_EXPANSION",
-                                 "relation": "complements ELP-X: keeps numbers small while more evidence is gathered"},
-            expert_review=(f"Draft operand bound for grade {ctx.grade} ({draft_bound}) is not applied as a number "
-                           "until calibrated with the curriculum.",),
+                                 "relation": "complements ELP-X while evidence for the concept is gathered"},
+            expert_review=("Specific number ranges are not defined here; any limits need reviewed curriculum justification.",),
         ))
-    return Outcome(TRIGGERED if recs else NOT_TRIGGERED, conds, recommendations=recs)
+    return Outcome(TRIGGERED if recs else NOT_TRIGGERED, conds, recommendations=recs, notices=notices)
 
 
 # --------------------------------------------------------------------------------------------
@@ -317,9 +342,10 @@ def rule_rs3_03(ctx: LearnerContext) -> Outcome:
             n = s.distinctQuestionsAssessed
             notices.append(_notice(
                 "SKILL_EVIDENCE_INSUFFICIENT",
-                f"Skill '{s.skillId}': ELP-X reports insufficient evidence (n={n if n is not None else 'unknown'}). "
-                "Proficiency-based scaffolding is suppressed; ELP-X ASSESSMENT_EXPANSION already covers gathering more "
-                "evidence. The n < 3 cut-off is an ELP-X engineering heuristic, not a validated threshold.",
+                f"Skill '{s.skillId}': ELP-X reports insufficient evidence (n={n if n is not None else 'unknown'}), so the "
+                "learner's knowledge of it is unknown (not assumed to be new). Proficiency-based scaffolding is "
+                "suppressed; ELP-X ASSESSMENT_EXPANSION already covers gathering more evidence. The n < 3 cut-off is an "
+                "ELP-X engineering heuristic, not a validated threshold.",
             ))
     return Outcome(INSUFFICIENT_EVIDENCE if notices else NOT_TRIGGERED, conds, notices=notices)
 
@@ -351,7 +377,9 @@ REGISTRY: Tuple[RuleSpec, ...] = (
                             "check-in that does not exist yet; expert log R6 = revision required. Breaks are never imposed.",
              expertReviewPending=("Non-intrusive fatigue observables", "Break modality")),
     RuleSpec("MQ-RS2-04", "Accessible number magnitude during conceptual introduction", "RS2", 3,
-             "Literature-informed proposal (strong WWC evidence)", True, rule_rs2_04),
+             "Literature-informed proposal (strong WWC evidence); input-gated", True, rule_rs2_04,
+             expertReviewPending=("Explicit concept-introduction evidence is not yet produced by any MathQuest source",
+                                  "Number ranges for introduction need reviewed curriculum justification")),
     RuleSpec("MQ-RS3-01", "Unassisted mathematical independence isolation", "RS3", 2,
              "Supervisor-accepted concept", False,
              disabledReason="Unassisted first-response isolation and Beta-Binomial scoring already run in the "

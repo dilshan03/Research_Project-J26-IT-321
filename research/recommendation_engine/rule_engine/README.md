@@ -42,8 +42,8 @@ literature/expert evidence, missing-evidence and uncertainty notices, and a trac
 | `mq_rec/guardrails.py` | MQ-RS6-01 non-diagnostic language check and the optional-support check (raise on violation). |
 | `mq_rec/evidence.py` | Rule → evidence references (`references.json` IDs + expert log). |
 | `mq_rec/report.py`, `mq_rec/demo.py` | Text/JSON output and the CLI. |
-| `../test_scenarios/scenarios/*.json` | 7 synthetic, anonymised learners (`SYN-L00x`). |
-| `../test_scenarios/test_mq_rec.py` | 38 unit tests. |
+| `../test_scenarios/scenarios/*.json` | 8 synthetic, anonymised learners (`SYN-L00x`); S8 shows explicit concept introduction. |
+| `../test_scenarios/test_mq_rec.py` | 44 unit tests. |
 
 ### Rule status in v0.1
 
@@ -52,7 +52,7 @@ literature/expert evidence, missing-evidence and uncertainty notices, and a trac
 | MQ-RS1-01 child sensory comfort | **Enabled** | Available child/parent inputs; resolves child quiet choice vs parent automatic audio (catalogue Conflict Rule 2). |
 | MQ-RS2-01 CRA scaffolding | **Enabled** | Consumes ELP-X `EMERGING` level as given (no recalculation); IES Rec 3. |
 | MQ-RS2-02 task chunking | **Enabled — pace-preference branch only** | Hint-count branch (>= 2) is an unvalidated threshold and overlaps ELP-X `ADAPTIVE_HINT_PACING`. |
-| MQ-RS2-04 accessible numbers | **Enabled** | For skills with no established ELP-X estimate; draft operand bounds (<= 10 / <= 20) are reported, not applied. |
+| MQ-RS2-04 accessible numbers | **Enabled, input-gated** | Needs an explicit, provenance-backed `conceptIntroduction` record (stage `introduction`, with basis). A missing ELP-X estimate means "unknown", never "new concept". No producer exists yet, so the rule reports `CONCEPT_INTRODUCTION_EVIDENCE_MISSING` in practice. No grade-specific number limits. |
 | MQ-RS3-02 latency safeguard | **Safeguard** | Response time is never a rule input; the 45 s threshold is not used. |
 | MQ-RS3-03 sparse evidence | **Consumes ELP-X** | Notices only; ELP-X already emits `ASSESSMENT_EXPANSION`. |
 | MQ-RS6-01 / MQ-RS6-03 | **Always applied** | Guardrail and provenance. |
@@ -66,7 +66,8 @@ literature/expert evidence, missing-evidence and uncertainty notices, and a trac
 - No SNAP-IV cutoffs, no response-time penalties, no mandatory breaks or time limits; every
   recommendation is `optional: true`.
 - No ELP-X Bayesian calculations and no ELP-X-REC baseline codes are re-emitted.
-- `CHILD_SENSORY_PREFERENCE` is a new strategy code introduced by MQ-RS1-01 and is not yet listed in
-  `recommendation_catalogue.md`; it should be added there after review.
+- `CHILD_SENSORY_PREFERENCE` (from MQ-RS1-01) is listed in `recommendation_catalogue.md` as a proposed
+  educational preference strategy, pending expert review.
+- The output `summary.blockedByMissingInput` lists enabled rules that could not run for lack of input.
 - Rule traces list conditions and contributing features per rule, so they can later be shown next to
   SHAP attributions from offline ML experiments.

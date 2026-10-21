@@ -3,7 +3,6 @@ export { OnboardingPlaceholderPage } from './pages/OnboardingPlaceholderPage';
 export { ParentOverviewPage } from './pages/ParentOverviewPage';
 export { ParentSnapIvPage } from './pages/ParentSnapIvPage';
 export { ParentSupportInfoPage } from './pages/ParentSupportInfoPage';
-export { ParentChildrenPage } from './pages/ParentChildrenPage';
 export { ParentLearnerProfilesPage } from './pages/ParentLearnerProfilesPage';
 export { ParentAssessmentsPage } from './pages/ParentAssessmentsPage';
 export { ParentRecommendationsPage } from './pages/ParentRecommendationsPage';

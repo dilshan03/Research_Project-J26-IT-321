@@ -14,7 +14,7 @@ from typing import Any, Dict, List
 from . import guardrails
 from .context import SCHEMA_VERSION, LearnerContext
 from .evidence import evidence_for
-from .rules import DISABLED, REGISTRY, SAFEGUARD_APPLIED, TRIGGERED
+from .rules import DISABLED, MISSING_INPUT, REGISTRY, SAFEGUARD_APPLIED, TRIGGERED
 
 RULESET_VERSION = "MQ-REC-v0.1"
 
@@ -96,8 +96,11 @@ def evaluate(ctx: LearnerContext) -> Dict[str, Any]:
             for rec in outcome.recommendations:
                 rec["rulesetVersion"] = RULESET_VERSION
                 rec["evidence"] = evidence_for(spec.ruleId)
-                rec["trace"] = {"ruleId": spec.ruleId, "status": outcome.status,
-                                "contributingFeatures": trace["contributingFeatures"]}
+                # Skill-specific recommendations list only the features about their own skill
+                features = trace["contributingFeatures"]
+                if rec.get("skillId"):
+                    features = [f for f in features if f"[{rec['skillId']}]" in f] or features
+                rec["trace"] = {"ruleId": spec.ruleId, "status": outcome.status, "contributingFeatures": features}
                 recommendations.append(rec)
             notices.extend(outcome.notices)
         traces.append(trace)
@@ -131,6 +134,7 @@ def evaluate(ctx: LearnerContext) -> Dict[str, Any]:
         "summary": {
             "triggered": sorted({t["ruleId"] for t in traces if t["status"] == TRIGGERED}),
             "disabled": [t["ruleId"] for t in traces if t["status"] == DISABLED],
+            "blockedByMissingInput": [t["ruleId"] for t in traces if t["enabled"] and t["status"] == MISSING_INPUT],
             "recommendationCount": len(recommendations),
         },
     }

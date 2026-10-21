@@ -1,0 +1,10 @@
+# Keep host virtualenvs, caches and secrets out of the image.
+.venv
+venv
+env
+__pycache__
+**/__pycache__
+*.pyc
+.pytest_cache
+.env
+*.log

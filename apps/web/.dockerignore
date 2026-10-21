@@ -1,0 +1,5 @@
+# Host (Windows) installs must not overwrite the Linux node_modules built in the image.
+node_modules
+dist
+.env
+*.log

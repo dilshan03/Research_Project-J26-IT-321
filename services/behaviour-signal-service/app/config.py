@@ -1,9 +1,12 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-ROOT = Path(__file__).resolve().parents[3]
-load_dotenv(ROOT / '.env')
-load_dotenv(Path(__file__).resolve().parents[1] / '.env', override=False)
+_HERE = Path(__file__).resolve()
+# The repo-root .env only exists in the monorepo; in Docker (/app/app) there is no
+# third parent and compose injects the env vars instead.
+if len(_HERE.parents) > 3:
+    load_dotenv(_HERE.parents[3] / '.env')
+load_dotenv(_HERE.parents[1] / '.env', override=False)
 MONGODB_URI = os.getenv('MONGODB_URI', '')
 MONGODB_DB_NAME = os.getenv('MONGODB_DB_NAME', 'mathquest_db')
 CORS_ORIGINS = [x.strip() for x in os.getenv('CORS_ORIGINS','http://localhost:5173,http://127.0.0.1:5173').split(',') if x.strip()]

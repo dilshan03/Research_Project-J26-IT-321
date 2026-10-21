@@ -65,6 +65,33 @@ Every grade also uses the shared welcome (CP), calibration (IC/IA) and ending st
   finding a rule, not reusing one; distractors include area instead of perimeter, half the perimeter, 0.04/4/40
   for 0.4, "longer is larger" (0.45 > 0.7) and +1 / adding the last jump twice for patterns.
 
+## Descriptive dimension summaries (RU, SC, IC, IA)
+**What exists:**
+- **Where computed:** `app/services/dimension_summaries.py` (`DIM-DESCRIPTIVE-v0.1`) turns the stored evidence of each
+  onboarding-v2 assessment into counts. No new evidence is collected.
+- **Where stored and shown:** stored as `dimensionSummaries` next to IMPSA/IMLR, and shown only in the admin learner
+  view.
+- **What it doesn't do:** no thresholds, levels, labels, scores or models. Nothing feeds ELP-X, IMPSA, IMLR or the
+  recommendations.
+
+| Dimension | Counted from |
+|---|---|
+| RU | Independent first responses by representation (concrete / pictorial / symbolic): items and correct |
+| SC | Items with revisions before confirming, total revisions, and whether the confirmed answer was correct |
+| IC | Instruction check: first attempt on target, attempts and replays. All items: instruction replays, clarifications, help requested before answering |
+| IA | Items presented / answered / skipped, input methods and modes, missed drops, page-hidden events, invalid taps (null when not measured) |
+
+**Questions for educator review (before any parent-facing wording or interpretation):**
+1. Is one to three items per representation enough to say anything about RU, or should it be reported only after
+   gameplay adds evidence?
+2. Should a revision that ends in a correct answer be read as self-correction or as uncertainty? Should taking back
+   a block or un-shading a part count the same as changing a choice?
+3. Do instruction replays mean the child needs instruction support, or is replaying simply a preference? How should
+   the language of instruction be taken into account?
+4. Which IA counts (missed drops, invalid taps, leaving the page) should change the interface, such as tap-only
+   input, bigger targets or shorter sessions, and which should only be noted as context?
+5. What wording, if any, is appropriate for parents?
+
 ## Known limitations
 - The transfer item counts as independent ELP-X evidence, as in Grade 1. This is existing behaviour; see
   `IMLR_ML_FEASIBILITY.md` for the leakage note relevant to future machine learning.

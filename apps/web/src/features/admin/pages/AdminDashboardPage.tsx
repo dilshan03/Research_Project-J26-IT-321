@@ -67,6 +67,7 @@ const AssessmentView: React.FC<{ a: Json; index: number }> = ({ a, index }) => {
       <div className="grid gap-2 md:grid-cols-2">
         <JsonBlock label="Evidence summary" value={a.evidenceSummary} />
         <JsonBlock label="IMPSA / IMLR (provisional)" value={{ impsa: a.impsaSummary, imlr: a.imlrSummary }} />
+        <JsonBlock label="RU / SC / IC / IA descriptive counts (pending educator review)" value={a.dimensionSummaries} />
         <JsonBlock label="Child preferences" value={a.childPreferences} />
         <JsonBlock label="Stored ELP-X snapshot" value={a.elpxProfile} />
       </div>

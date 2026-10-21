@@ -508,6 +508,11 @@ ONBOARDING_V2_ITEMS: List[Dict[str, Any]] = [
 
 _BY_ID = {item["questionId"]: item for item in ONBOARDING_V2_ITEMS}
 
+# Non-mathematical instruction check: the object the child is asked to move in each world
+# (mirrors `calibration.targetObject.id` in apps/web .../journey/themes.ts). Never scored; used only
+# for the descriptive Instruction Comprehension summary.
+CALIBRATION_TARGET_OBJECT_IDS = frozenset({"red_leaf", "red_apple", "red_ball"})
+
 
 def get_onboarding_v2_items_for_grade(grade: int) -> List[Dict[str, Any]]:
     return [item for item in ONBOARDING_V2_ITEMS if item["grade"] == grade]

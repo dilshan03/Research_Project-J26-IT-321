@@ -229,6 +229,54 @@ export interface ImlrSummary {
   uncertaintyNote?: string;
 }
 
+/**
+ * Descriptive RU / SC / IC / IA counts (DIM-DESCRIPTIVE-v0.1) computed on the server from onboarding-v2
+ * evidence. Counts only: no thresholds, levels or labels; interpretation is pending educator review.
+ */
+export interface DimensionSummaries {
+  version: string;
+  status: 'DESCRIPTIVE_PENDING_EDUCATOR_REVIEW';
+  note: string;
+  representationUnderstanding: {
+    byRepresentation: Record<'concrete' | 'pictorial' | 'symbolic', { independentItems: number; correctFirstResponses: number }>;
+    representationsObserved: string[];
+    independentItemsWithoutRepresentation: number;
+    itemsNotIndependent: number;
+    sampleNote: string;
+  };
+  selfCorrection: {
+    itemsObserved: number;
+    itemsWithRevisions: number;
+    totalRevisions: number;
+    revisedItemsFirstConfirmedCorrect: number;
+    revisedItemsFirstConfirmedIncorrect: number;
+    revisionNote: string;
+  };
+  instructionComprehension: {
+    calibration: { presented: boolean; firstAttemptOnTarget?: boolean | null; attempts?: number | null; instructionReplays?: number; missedDrops?: number | null };
+    itemsObserved: number;
+    itemsWithInstructionReplay: number;
+    totalInstructionReplays: number;
+    totalClarifications: number;
+    helpRequestedBeforeFirstResponse: number;
+  };
+  interactionAccessibility: {
+    itemsPresented: number;
+    itemsAnswered: number;
+    itemsSkipped: number;
+    inputMethods: Record<string, number>;
+    interactionModes: Record<string, number>;
+    /** null when not measured (not zero) */
+    missedDrops: number | null;
+    itemsWithMissedDrops: number;
+    itemsWithInteractionObservations: number;
+    pageHiddenEvents: number;
+    invalidTaps: number | null;
+    observationsTruncated: boolean;
+    observationNote: string;
+  };
+}
+
 export interface MathItemAnswer {
   questionId: string;
   userAnswer: string | number;
@@ -389,6 +437,7 @@ export interface MathAssessmentSummary {
   // Protocol v2 Additive Fields (Optional)
   impsa?: ImpsaSummary;
   imlr?: ImlrSummary;
+  dimensionSummaries?: DimensionSummaries | null;
   childPreferences?: ChildPreferenceChoices;
   evaluatedItems?: any[];
   excludedItems?: any[];
@@ -419,6 +468,7 @@ export interface OnboardingProgress {
   childPreferences?: ChildPreferenceChoices;
   impsaSummary?: ImpsaSummary;
   imlrSummary?: ImlrSummary;
+  dimensionSummaries?: DimensionSummaries | null;
   // Parent-reported ADHD information and optional SNAP-IV status (Optional)
   adhdInformationCompleted?: boolean;
   adhdInformation?: AdhdInformationRecord | null;

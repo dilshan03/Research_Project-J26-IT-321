@@ -1,7 +1,5 @@
-fastapi
-uvicorn[standard]
-python-multipart
-numpy
-opencv-python
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
 deepface
 tf-keras
+werkzeug

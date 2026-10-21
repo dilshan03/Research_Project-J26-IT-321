@@ -13,6 +13,7 @@ import { setActiveStudentProfile } from '../utils/activeStudentStorage';
 import { readRememberedChild, rememberChild } from '../utils/rememberedChild';
 import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
 import { parentText } from '../../../shared/i18n/parentText';
+import { DetailsForParent } from '../../pedagogical-agent';
 
 const t = parentText.overview;
 const levelText = parentText.skills.level;
@@ -416,6 +417,15 @@ export const ParentOverviewPage: React.FC = () => {
             )}
           </aside>
         </div>
+      )}
+
+      {!isLoadingLearners && selectedChild && (
+        <DetailsForParent
+          parentId={selectedChild.parentId || user?.id}
+          learnerId={selectedChild.learnerId}
+          studentName={nameOf(selectedChild)}
+          grade={selectedChild.grade}
+        />
       )}
 
       <LearnerModal

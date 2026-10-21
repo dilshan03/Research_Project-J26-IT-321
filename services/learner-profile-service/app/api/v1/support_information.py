@@ -13,7 +13,7 @@ router = APIRouter(prefix="/learners/{learnerId}/support-information", tags=["AD
     "",
     response_model=OnboardingApiResponse,
     summary="Get parent-reported ADHD & support information",
-    description="ADHD information and SNAP-IV completion history (dates only). Read-only.",
+    description="ADHD information and SNAP-IV history with subscale scores and a descriptive, non-diagnostic comparison over time. Read-only.",
 )
 async def get_support_information_endpoint(learnerId: str, current_parent: Dict[str, Any] = Depends(require_parent)):
     data = await get_support_information(learner_id=learnerId, parent_id=current_parent["id"])

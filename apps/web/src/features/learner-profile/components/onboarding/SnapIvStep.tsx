@@ -67,6 +67,16 @@ export const SnapIvStep: React.FC<Props> = ({
   const answeredCount = Object.keys(answers).length;
   const isComplete = answeredCount === 18;
 
+  // A partly answered questionnaire is never saved: unanswered items would otherwise be stored as 0
+  // ("not at all") and appear as real answers in the SNAP-IV history.
+  const handleSaveAndExit = () => {
+    if (!isComplete) {
+      setValidationError(t.errorIncompleteExit(answeredCount));
+      return;
+    }
+    onSaveAndExit(getResponsesArray());
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isComplete) {
@@ -189,7 +199,7 @@ export const SnapIvStep: React.FC<Props> = ({
             type="button"
             whileTap={{ scale: 0.98 }}
             disabled={isSaving}
-            onClick={() => onSaveAndExit(getResponsesArray())}
+            onClick={handleSaveAndExit}
             className="btn btn-secondary min-h-[44px] px-5 rounded-full text-sm inline-flex items-center justify-center gap-2"
           >
             <Save size={16} />

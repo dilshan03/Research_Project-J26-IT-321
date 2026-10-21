@@ -63,14 +63,67 @@ export const isAdhdTypeReported = (adhd: AdhdInformationRecord | null | undefine
 
 export type SnapIvStatus = 'COMPLETED' | 'SKIPPED' | 'NOT_STARTED';
 
-/** Parent view of ADHD & support information. SNAP-IV history carries dates only, never scores. */
+/** One SNAP-IV subscale result: total of 9 answers (0–27) and their average (0–3). */
+export interface SnapIvSubscaleScore {
+  total: number;
+  average: number;
+}
+
+/** One completed SNAP-IV questionnaire (parent-reported). Subscales are null for old records without answers. */
+export interface SnapIvHistoryEntry {
+  completedAt: string | null;
+  version?: string | null;
+  respondentRelation?: string | null;
+  inattention: SnapIvSubscaleScore | null;
+  hyperactivity: SnapIvSubscaleScore | null;
+}
+
+export type SnapIvChangeDirection = 'LOWER' | 'HIGHER' | 'SIMILAR' | 'NOT_COMPARABLE';
+export type SnapIvChangeFlag = 'SHORT_INTERVAL' | 'DIFFERENT_RESPONDENT' | 'DIFFERENT_VERSION' | 'SCORES_UNAVAILABLE';
+
+export interface SnapIvSubscaleChange {
+  direction: SnapIvChangeDirection;
+  before: number | null;
+  after: number | null;
+  change: number | null;
+  itemsRatedLower: number | null;
+  itemsRatedHigher: number | null;
+  itemsUnchanged: number | null;
+}
+
+export interface SnapIvComparison {
+  from: string | null;
+  to: string | null;
+  daysBetween: number | null;
+  inattention: SnapIvSubscaleChange;
+  hyperactivity: SnapIvSubscaleChange;
+  flags: SnapIvChangeFlag[];
+}
+
+/** Descriptive comparison of repeated SNAP-IV entries (SNAPIV-PROGRESS). Not a diagnosis or clinical change. */
+export interface SnapIvProgress {
+  version: string;
+  entryCount: number;
+  latestChange: SnapIvComparison | null;
+  overallChange: SnapIvComparison | null;
+  similarBand: number;
+  scale: { min: number; max: number; meaning: string };
+  notice: string;
+}
+
+/**
+ * Parent view of ADHD & support information. SNAP-IV history carries the parent's own subscale scores
+ * over time (never individual item answers) with a descriptive, non-diagnostic comparison.
+ */
 export interface SupportInformation {
   learnerId: string;
   onboardingStatus: string;
   adhdInformation: AdhdInformationRecord | null;
   snapIv: {
     status: SnapIvStatus;
-    history: Array<{ completedAt: string | null; version?: string }>;
+    /** Newest first. */
+    history: SnapIvHistoryEntry[];
+    progress?: SnapIvProgress;
     notice: string;
   };
 }

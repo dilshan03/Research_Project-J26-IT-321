@@ -11,7 +11,7 @@ The platform primarily supports Sinhala-medium learners and follows the Sri Lank
 - Learner Profile and Prediction Engine
 - Attention-Friendly Content Adaptation Engine
 - Gameplay Interaction and Behaviour Signal Engine
-- Intelligent Pedagogical Agent and Adaptive Progress Engine
+- [Intelligent Pedagogical Agent and Adaptive Progress Engine](./PEDAGOGICAL_AGENT_README.md) (Research Component 4 — Student ID: IT23185470)
 
 ## Target Users
 

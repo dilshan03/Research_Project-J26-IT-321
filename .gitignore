@@ -4,8 +4,6 @@ node_modules/
 **/node_modules/
 
 # Environment variables and secrets
-.env
-.env.*
 !.env.example
 
 # Build output
@@ -38,3 +36,4 @@ services/pedagogical-engine/decision-api/data/*
 # NSCH datasets (local ML research data)
 research/recommendation_engine/ml_experiments/data/raw/
 
+config.bat

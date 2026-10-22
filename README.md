@@ -67,7 +67,7 @@ These are the intended data flows. Each component works on its own today. **End-
 | Layer | Technologies |
 |---|---|
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS, Framer Motion, Three.js |
-| Backend services | Python + FastAPI (components 1, 2, 3), Node.js + Express (auth service, component 4) |
+| Backend services | Python + FastAPI (components 1, 2, 3,4), Node.js + Express (auth service) |
 | Database | MongoDB, plus GridFS for syllabus PDFs |
 | AI / ML | scikit-learn, SHAP, Bayesian models, Google Gemini, SinLLaMA, MediaPipe, WebGazer.js, DeepFace |
 | Testing | pytest, Node test runner, Playwright |

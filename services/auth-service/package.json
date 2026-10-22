@@ -1,20 +1,20 @@
 {
-    "name": "mathquest-auth-service",
-    "version": "1.0.0",
-    "private": true,
-    "type": "module",
-    "description": "Authentication backend for MathQuest",
-    "scripts": {
-        "dev": "node --watch src/server.js",
-        "start": "node src/server.js"
-    },
-    "dependencies": {
-        "@mathquest/db": "file:../../packages/db",
-        "bcryptjs": "^3.0.3",
-        "cookie-parser": "^1.4.7",
-        "cors": "^2.8.6",
-        "dotenv": "^18.0.7",
-        "express": "^5.3.0",
-        "mongodb": "^7.7.0"
-    }
+  "name": "mathquest-auth-service",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Authentication backend for MathQuest",
+  "scripts": {
+    "dev": "node init && node --watch src/server.js",
+    "start": "node init && node src/server.js"
+  },
+  "dependencies": {
+    "@mathquest/db": "file:../../packages/db",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.7",
+    "express": "^5.3.0",
+    "mongodb": "^7.7.0"
+  }
 }

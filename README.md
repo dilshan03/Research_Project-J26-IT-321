@@ -25,13 +25,6 @@ MathQuest brings four pieces together:
 | 3 | **Gameplay Interaction & Behaviour Signal Engine** | Monitors gameplay interactions and optional webcam signals to detect seven behavioural states through multimodal behaviour analysis and provide personalised re-engagement support. | Core Model and Algorithm	- Random Forest (Gameplay-only Baseline), Confidence-aware Multimodal Signal Fusion (MediaPipe, WebGazer.js & DeepFace), and Proposed Adaptive Confidence-based Behaviour and Re-engagement (ACBR) Algorithm. | IT23176324 |
 | 4 | **Intelligent Pedagogical Agent & Adaptive Student Progress Engine** | Tracks knowledge during play and gives scaffolding through the 3D companion MathBot and 4-tier visual hints | **AD-BKT**, Attention-Disentangled Bayesian Knowledge Tracing, plus an FSM decision engine | IT23185470 |
 
-Each component's README gives full details:
-- `apps/web/src/features/learner-profile/README_Learner_Profile_Engine.md`
-- `apps/web/src/features/content-adaptation/README.md`
-- `apps/web/src/features/gameplay/README.md`
-- `apps/web/src/features/behaviour-monitoring/README.md`
-
-
 ## How the Components Work Together
 
 ```

@@ -20,7 +20,8 @@ from app.db.question_bank import (
     get_question_by_id,
     QUESTION_BANK_VERSION,
 )
-from app.services.learner_service import get_learner_by_id
+from app.services.learner_service import CHILD_SELECTABLE_AVATAR_IDS, get_learner_by_id
+from app.services.dimension_summaries import compute_dimension_summaries, dimension_summaries_for
 from app.core.thresholds import (
     determine_proficiency_category,
     generate_pedagogical_recommendations,
@@ -240,6 +241,7 @@ async def get_or_create_onboarding_progress(
             "childPreferences": assessment_doc.get("childPreferences"),
             "impsa": assessment_doc.get("impsaSummary"),
             "imlr": assessment_doc.get("imlrSummary"),
+            "dimensionSummaries": dimension_summaries_for(assessment_doc),
             "evaluatedItems": assessment_doc.get("evaluatedItems", []),
             "excludedItems": assessment_doc.get("excludedItems", []),
             "sessionStartedAt": assessment_doc.get("sessionStartedAt"),
@@ -277,6 +279,7 @@ async def get_or_create_onboarding_progress(
         "childPreferences": assessment_doc.get("childPreferences") if assessment_doc else None,
         "impsaSummary": assessment_doc.get("impsaSummary") if assessment_doc else None,
         "imlrSummary": assessment_doc.get("imlrSummary") if assessment_doc else None,
+        "dimensionSummaries": dimension_summaries_for(assessment_doc),
         "adhdInformationCompleted": bool(adhd_information),
         "adhdInformation": adhd_information,
         "snapIvStatus": snap_iv_status(quest_doc, progress_doc),
@@ -462,7 +465,15 @@ async def save_snap_iv_questionnaire(
         "savedAt": now,
     }
 
-    # Store in questionnaires collection separately from main profile
+    # `snapIv` keeps the latest submission (unchanged contract); `snapIvHistory` keeps every
+    # submission so repeated questionnaires are never overwritten. A record saved before history
+    # existed is copied into the history first, so nothing is lost.
+    existing = await questionnaires_col.find_one({"learnerId": learner_id}) or {}
+    history_entries = []
+    if existing.get("snapIv") and not existing.get("snapIvHistory"):
+        history_entries.append(existing["snapIv"])
+    history_entries.append(payload)
+
     await questionnaires_col.update_one(
         {"learnerId": learner_id},
         {
@@ -472,6 +483,7 @@ async def save_snap_iv_questionnaire(
                 "snapIv": payload,
                 "updatedAt": now,
             },
+            "$push": {"snapIvHistory": {"$each": history_entries}},
             "$setOnInsert": {"createdAt": now},
         },
         upsert=True
@@ -626,6 +638,7 @@ async def submit_math_assessment(
                     "childPreferences": existing_assessment.get("childPreferences"),
                     "impsa": existing_assessment.get("impsaSummary"),
                     "imlr": existing_assessment.get("imlrSummary"),
+                    "dimensionSummaries": dimension_summaries_for(existing_assessment),
                     "evidenceRulesetVersion": existing_assessment.get("evidenceRulesetVersion"),
                     "evidenceSummary": existing_assessment.get("evidenceSummary"),
                 },
@@ -735,7 +748,10 @@ async def submit_math_assessment(
 
     impsa_summary = None
     imlr_summary = None
+    dimension_summaries = None
     if protocol_version == "onboarding-v2":
+        # Descriptive RU / SC / IC / IA counts (no thresholds or labels; pending educator review)
+        dimension_summaries = compute_dimension_summaries(evaluated_items, excluded_items)
         prof_items = select_proficiency_items(evaluated_items)
         unassisted_count = len(prof_items)
         impsa_status = "PROVISIONAL" if unassisted_count >= 3 else "INSUFFICIENT_EVIDENCE"
@@ -810,6 +826,7 @@ async def submit_math_assessment(
         "childPreferences": child_prefs,
         "impsaSummary": impsa_summary,
         "imlrSummary": imlr_summary,
+        "dimensionSummaries": dimension_summaries,
         "sessionStartedAt": data.sessionStartedAt,
         "sessionEndedAt": data.sessionEndedAt,
         "mlPredictionNotice": (
@@ -838,10 +855,16 @@ async def submit_math_assessment(
         upsert=True
     )
 
-    # Update child profile onboardingStatus in learners collection
+    # Update child profile onboardingStatus in learners collection. A companion the child chose is kept
+    # separately from the parent's avatarId and takes precedence everywhere until the child chooses again.
+    learner_update: Dict[str, Any] = {"onboardingStatus": "COMPLETED", "updatedAt": now}
+    child_avatar = (child_prefs or {}).get("avatarId")
+    if child_avatar in CHILD_SELECTABLE_AVATAR_IDS:
+        learner_update["childAvatarId"] = child_avatar
+        learner_update["childAvatarChosenAt"] = (child_prefs or {}).get("chosenAt") or now
     await learners_col.update_one(
         {"learnerId": learner_id},
-        {"$set": {"onboardingStatus": "COMPLETED", "updatedAt": now}}
+        {"$set": learner_update}
     )
 
     logger.info("Completed math baseline assessment for learner %s with accuracy %s%%",
@@ -865,6 +888,7 @@ async def submit_math_assessment(
         "childPreferences": child_prefs,
         "impsa": impsa_summary,
         "imlr": imlr_summary,
+        "dimensionSummaries": dimension_summaries,
         "evaluatedItems": evaluated_items,
         "excludedItems": excluded_items,
         "sessionStartedAt": data.sessionStartedAt,

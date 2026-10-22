@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Sparkles } from 'lucide-react';
+import { publicText } from '../../../shared/i18n/publicText';
+import { LanguageSwitch } from '../../../shared/components/LanguageSwitch';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -20,17 +22,20 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitl
             <span className="text-mq-accent-yellow ml-1 text-3xl sm:text-4xl leading-none -mt-3">*</span>
           </h1>
           <span className="text-mq-text-muted text-[10px] sm:text-xs font-semibold tracking-widest uppercase mt-0.5">
-            Small Steps Big Progress
+            {publicText.nav.tagline}
           </span>
         </Link>
 
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-mq-primary hover:text-mq-primary-hover bg-mq-surface hover:bg-mq-surface-soft px-4 py-2 rounded-full border border-mq-border shadow-sm transition-all hover:-translate-x-0.5"
-        >
-          <ArrowLeft size={16} />
-          <span>Back to Home</span>
-        </Link>
+        <div className="flex items-center gap-2">
+          <LanguageSwitch compact />
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-mq-primary hover:text-mq-primary-hover bg-mq-surface hover:bg-mq-surface-soft px-4 py-2 rounded-full border border-mq-border shadow-sm transition-all hover:-translate-x-0.5"
+          >
+            <ArrowLeft size={16} />
+            <span className="hidden sm:inline">{publicText.auth.backToHome}</span>
+          </Link>
+        </div>
       </header>
 
       {/* Main Form Container */}
@@ -62,8 +67,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitl
 
       {/* Footer Disclaimer */}
       <footer className="max-w-md mx-auto w-full text-center text-xs text-mq-text-muted">
-        <p>MathQuest is an educational platform for Sinhala-medium primary mathematics learning.</p>
-        <p className="mt-1">© {new Date().getFullYear()} SLIIT Research Project J26-IT-321</p>
+        <p>{publicText.auth.footer}</p>
+        <p className="mt-1">© {new Date().getFullYear()} {publicText.auth.footerProject}</p>
       </footer>
     </div>
   );

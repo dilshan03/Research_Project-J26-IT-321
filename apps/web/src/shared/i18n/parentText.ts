@@ -1,10 +1,12 @@
 /**
- * Parent portal wording (Sinhala).
+ * Parent portal wording: Sinhala here, English in parentText.en.ts (same `ParentDictionary` shape).
  *
- * Single source of parent-facing text. A future English dictionary should provide an object of
- * the same `ParentDictionary` shape; the planned language toggle can then choose between them
- * without touching components. Data values (API fields, option keys) are never translated here.
+ * Single source of parent-facing text. The global language switch (shared/i18n/language.ts) chooses
+ * between the two at read time, so components keep using `parentText.section.key` unchanged.
+ * Data values (API fields, option keys) are never translated here.
  */
+import { localized } from './language';
+import { en } from './parentText.en';
 
 type TextValue = string | ((...args: never[]) => string);
 interface TextTree {
@@ -76,6 +78,7 @@ const si = {
     recommendations: 'ඉගෙනීමට උපදෙස්',
     activities: 'ඉගෙනුම් ක්‍රියාකාරකම්',
     behaviour: 'හැසිරීම් නිරීක්ෂණ',
+    supportInfo: 'ADHD සහ සහාය තොරතුරු',
     settings: 'ගිණුම් සැකසුම්',
     onboarding: 'ආරම්භක ඇගයීම',
     more: 'තවත්',
@@ -114,7 +117,26 @@ const si = {
   },
 
   overview: {
-    // Redesigned home page
+    // Home page: one focused card per child
+    homeSubtitle: 'ඔබේ දරුවාගේ ගණිත ඉගෙනීම එක බැල්මකින්.',
+    needsStart: 'ආරම්භ කළ යුතුයි',
+    heroNotStarted: (name: string) => `${name} සමඟ කෙටි ගණිත ක්‍රීඩාවකින් පටන් ගනිමු. විනාඩි කිහිපයක් පමණයි.`,
+    heroInProgress: (name: string) => `${name} ආරම්භක ක්‍රියාකාරකම් අතරමැද නතර කළා. ඉතිරි ටික අවසන් කරමු.`,
+    heroCompleted: (name: string) => `${name}ගේ ආරම්භක ගණිත ක්‍රියාකාරකම් අවසන්! මෙන්න මුල් ප්‍රතිඵල.`,
+    heroEarly: 'මේවා මුල් ප්‍රතිඵල පමණි. දරුවා තව ක්‍රීඩා කරන විට වඩාත් පැහැදිලි වේ.',
+    ctaPlay: (name: string) => `${name}ගේ ඉගෙනුම් ලෝකයට යන්න`,
+    moreSkills: (count: number) => `තවත් කුසලතා ${count}ක් බලන්න`,
+    linkProgress: 'සම්පූර්ණ ප්‍රගතිය',
+    linkTips: 'දෙමාපියන්ට උපදෙස්',
+    linkSnap: 'SNAP-IV ප්‍රශ්නාවලිය (විකල්ප)',
+    rewardsTitle: (name: string) => `${name}ගේ ත්‍යාග`,
+    stars: 'තරු',
+    coins: 'කාසි',
+    sessions: 'ක්‍රීඩා වාර',
+    rewardsEmpty: (name: string) => `${name} ඉගෙනුම් ලෝකයේ ක්‍රීඩා කරන විට ලැබෙන තරු සහ කාසි මෙහි පෙන්වයි.`,
+    rewardsLocked: 'ආරම්භක ක්‍රියාකාරකම් අවසන් කළ පසු, දරුවාට ඉගෙනුම් ලෝකයේ ක්‍රීඩා කර ත්‍යාග දිනාගත හැක.',
+    openWorld: 'ඉගෙනුම් ලෝකය විවෘත කරන්න',
+    // Redesigned home page (previous version)
     alertOtherChild: (name: string) => `${name}ගේ ආරම්භක ඇගයීම තවම සම්පූර්ණ කර නැත.`,
     alertOtherChildAction: 'අරඹන්න',
     switcherLabel: 'දරුවා තෝරන්න',
@@ -206,6 +228,7 @@ const si = {
     actionCompleted: 'ප්‍රතිඵල බලන්න',
     actionInProgress: 'ඇගයීම ඉදිරියට කරන්න',
     actionNotStarted: 'ආරම්භක ඇගයීම අරඹන්න',
+    gameProfile: 'ක්‍රීඩා පැතිකඩ',
   },
 
   childForm: {
@@ -214,6 +237,8 @@ const si = {
     createSubtitle: 'ඔබේ දරුවා ගැන මූලික තොරතුරු කිහිපයක් පමණයි.',
     editSubtitle: 'අවශ්‍ය වෙනස්කම් කර සුරකින්න.',
     avatar: 'දරුවාට කැමති චරිතයක් තෝරන්න',
+    childChoseAvatar: (name: string) =>
+      `දරුවා තමන්ම "${name}" චරිතය තෝරාගෙන ඇත. දරුවා වෙනත් එකක් තෝරන තුරු සෑම තැනකම පෙන්වන්නේ එයයි. ඔබ මෙහි තෝරන චරිතය සුරැකෙන්නේ විකල්පයක් ලෙස පමණි.`,
     firstName: 'දරුවාගේ නම',
     firstNamePlaceholder: 'උදා: කසුන්',
     preferredName: 'දරුවාට ඇමතීමට කැමති නම',
@@ -312,6 +337,95 @@ const si = {
     activitiesDone: (count: number) => `ප්‍රශ්න ${count}ක් සලකා බැලුවා`,
   },
 
+  support: {
+    title: 'ADHD සහ සහාය තොරතුරු',
+    intro:
+      'ඔබ ලබා දුන් ADHD තොරතුරු සහ SNAP-IV ප්‍රශ්නාවලිය එක තැනකින් බලන්න සහ යාවත්කාලීන කරන්න. මේ සියල්ල විකල්පයි.',
+    privacy:
+      'මෙම තොරතුරු ඔබට සහ පර්යේෂණ පරිපාලකයින්ට පමණක් පෙනේ. දරුවාගේ ඉගෙනුම් ක්‍රියාකාරකම් හෝ උපදෙස් තෝරා ගැනීමට භාවිත නොකෙරේ. MathQuest කිසිදු රෝග විනිශ්චයක් නොකරයි.',
+    loadError: 'තොරතුරු ලබාගත නොහැකි විය.',
+    notStartedTitle: 'පළමුව ආරම්භක ඇගයීම අරඹන්න',
+    notStartedText: (name: string) => `${name}ගේ ආරම්භක ඇගයීම ඇරඹූ පසු මෙම තොරතුරු මෙහි එක් කළ හැක.`,
+    edit: 'යාවත්කාලීන කරන්න',
+    add: 'එක් කරන්න',
+    cancel: 'අවලංගු කරන්න',
+    save: 'සුරකින්න',
+    saved: 'තොරතුරු සුරකින ලදී.',
+    saveError: 'සුරැකීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.',
+    notProvided: 'තවම ලබා දී නැත.',
+    // ADHD information
+    adhdTitle: 'ADHD පිළිබඳ තොරතුරු',
+    adhdDiagnosed: 'සෞඛ්‍ය වෘත්තිකයෙකු හඳුනාගෙන ඇත්ද',
+    adhdType: 'වාර්තා කළ ADHD වර්ගය',
+    adhdMonth: 'හඳුනාගත් මාසය',
+    // SNAP-IV
+    snapTitle: 'SNAP-IV ප්‍රශ්නාවලිය (විකල්පයි)',
+    snapStatus: {
+      COMPLETED: 'සම්පූර්ණ කර ඇත',
+      SKIPPED: 'මඟ හැර ඇත',
+      NOT_STARTED: 'තවම පුරවා නැත',
+    },
+    snapFill: 'පුරවන්න',
+    snapFillAgain: 'නැවත පුරවන්න',
+    snapHistory: 'පුරවූ දින',
+    snapHistoryEmpty: 'තවම කිසිදු වාරයක් නැත.',
+    snapHistoryNotice:
+      'සෑම වාරයක්ම එම කාලයේ ඔබ නිවසේදී දුටු දේ පමණක් සටහන් කරයි. වාර අතර වෙනස්කම් වෛද්‍යමය වෙනසක්, රෝග විනිශ්චයක් හෝ MathQuest නිසා ඇති වූ වෙනසක් නොවේ.',
+    // SNAP-IV history over time (SNAPIV-PROGRESS). Proposed wording, pending review.
+    progress: {
+      title: 'කාලයත් සමඟ ඔබ වාර්තා කළ දේ',
+      // Simple view
+      simpleNotice: 'මෙහි ඇත්තේ ඔබ නිවසේදී දුටු දේ ගැන ඔබේම පිළිතුරු පමණි. මෙය රෝග විනිශ්චයක් හෝ ප්‍රතිකාර ප්‍රගතියක් නොවේ.',
+      nowWords: 'දැන් සාමාන්‍යයෙන්:',
+      changeShort: {
+        LOWER: 'පෙර වාරයට වඩා අඩුවෙන් වාර්තා කර ඇත',
+        HIGHER: 'පෙර වාරයට වඩා වැඩියෙන් වාර්තා කර ඇත',
+        SIMILAR: 'පෙර වාරයට බොහෝ දුරට සමානයි',
+        NOT_COMPARABLE: 'පෙර වාරය සමඟ සැසඳිය නොහැක',
+      },
+      comparedWith: (from: string, to: string) => `${to} දින පිළිතුරු, ${from} දින පිළිතුරු සමඟ සසඳමින්`,
+      lastFilled: (date: string) => `අවසන් වරට පුරවූයේ: ${date}`,
+      fillAgainHint: 'වෙනස්කම් බැලීමට මාස කිහිපයකට පසු නැවත පුරවන්න.',
+      details: 'සම්පූර්ණ විස්තර බලන්න',
+      intro: 'සෑම වාරයකදීම ඔබ දුන් පිළිතුරුවල සාමාන්‍යය (0 = කිසිසේත් නැත, 3 = ඉතා වැඩියෙන් ඇත).',
+      inattention: 'අවධානය',
+      inattentionItems: 'ප්‍රශ්න 1–9',
+      hyperactivity: 'ක්‍රියාශීලී බව සහ ආවේගශීලී බව',
+      hyperactivityItems: 'ප්‍රශ්න 10–18',
+      chartLabel: 'SNAP-IV සාමාන්‍ය ලකුණු කාලයත් සමඟ',
+      oneEntry: 'ඔබ තවම පුරවා ඇත්තේ එක් වාරයක් පමණි. මාස කිහිපයකට පසු නැවත පුරවූ විට වෙනස්කම් මෙහි පෙන්වයි.',
+      latestTitle: 'අවසන් වාර දෙක සසඳමින්',
+      overallTitle: 'පළමු වාරයේ සිට අවසන් වාරය දක්වා',
+      period: (from: string, to: string, days: number | null) =>
+        `${from} → ${to}${days === null ? '' : ` (දින ${days}ක පරතරය)`}`,
+      before: 'පෙර',
+      now: 'දැන්',
+      direction: {
+        LOWER: 'ඔබ මෙම ලක්ෂණ වාර්තා කළේ පෙරට වඩා අඩුවෙන්',
+        HIGHER: 'ඔබ මෙම ලක්ෂණ වාර්තා කළේ පෙරට වඩා වැඩියෙන්',
+        SIMILAR: 'පෙර වාරයට බොහෝ දුරට සමානයි',
+        NOT_COMPARABLE: 'සංසන්දනය කළ නොහැක (පැරණි වාරයක ලකුණු නැත)',
+      },
+      items: (lower: number, higher: number, same: number) =>
+        `ප්‍රශ්න ${lower}ක පිළිතුර අඩු විය • ${higher}ක වැඩි විය • ${same}ක් වෙනස් නොවීය`,
+      flags: {
+        SHORT_INTERVAL: 'වාර දෙක අතර දින 30කට අඩු කාලයක් ඇත. දිනෙන් දින සිදුවන වෙනස්කම් නිසාද වෙනසක් පෙනිය හැක.',
+        DIFFERENT_RESPONDENT: 'වාර දෙක පුරවා ඇත්තේ එකම පුද්ගලයා නොවේ.',
+        DIFFERENT_VERSION: 'ප්‍රශ්නාවලියේ වෙනස් අනුවාද භාවිත කර ඇත.',
+        SCORES_UNAVAILABLE: 'පැරණි වාරයක ලකුණු නොමැති බැවින් සම්පූර්ණයෙන් සැසඳිය නොහැක.',
+      },
+      similarNote:
+        'සාමාන්‍යයේ වෙනස 0.25ට අඩු නම් "බොහෝ දුරට සමානයි" ලෙස පෙන්වයි. මෙය පෙන්වීමේ පහසුව සඳහා පමණක් වන අතර වෛද්‍යමය සීමාවක් නොවේ.',
+      notDiagnosisTitle: 'මෙය රෝග විනිශ්චයක් හෝ ප්‍රතිකාර ප්‍රගතියක් නොවේ',
+      notDiagnosisText:
+        'මෙහි ඇත්තේ ඔබ විවිධ දිනවලදී නිවසේදී දුටු දේ පිළිබඳ ඔබේම වාර්තා පමණි. ලකුණු අඩු වීම ADHD සුව වීමක් හෝ වැඩිදියුණුවක් නොවන අතර, ලකුණු වැඩි වීම තත්ත්වය නරක අතට හැරීමක් ද නොවේ. MathQuest නිසා වෙනසක් ඇති වූ බවට සාක්ෂියක් ද නොවේ. දරුවාගේ සෞඛ්‍යය ගැන කනස්සල්ලක් ඇත්නම් සෞඛ්‍ය වෘත්තිකයෙකු හමුවන්න.',
+      historyTitle: 'පුරවූ සියලු වාර',
+      date: 'දිනය',
+      averageOf: (avg: string) => `සාමාන්‍යය ${avg} / 3`,
+      noScores: 'ලකුණු නැත',
+    },
+  },
+
   research: {
     toggle: 'පර්යේෂණ විස්තර (තාක්ෂණික)',
     note: 'පර්යේෂණ කණ්ඩායම සඳහා පමණි. මෙහි ඇති ගණනය කිරීම් වෙනස් කර නැත.',
@@ -383,6 +497,10 @@ const si = {
     toastSocialSaved: 'ඉගෙනුම් පරිසරය සුරැකුවා.',
     toastMathDone: 'ගණිත ක්‍රියාකාරකම අවසන්!',
     toastSkipFailed: 'මඟ හැරීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.',
+    headerTitle: 'The Living Canvas • ඔබේ පුංචි ලෝකය',
+    headerSubtitle: 'සන්සුන් ගවේෂණ පරිසරය',
+    pauseExit: 'නවත්වා පසුව නැවත පටන් ගන්න',
+    pauseExitTitle: 'දරුවාගේ ක්‍රියාකාරකම් අතරමැදදී සුරැකෙන්නේ නැත; ඊළඟ වතාවේ මුල සිට පටන් ගනී.',
   },
 
   stepper: {
@@ -443,6 +561,10 @@ const si = {
     sectionB: 'ක්‍රියාශීලී බව සහ ආවේගශීලී බව',
     itemsRange: (from: number, to: number) => `ප්‍රශ්න ${from} – ${to}`,
     errorIncomplete: (count: number) => `කරුණාකර ප්‍රශ්න 18ටම පිළිතුරු දෙන්න. දැනට පිළිතුරු දී ඇත්තේ: ${count} / 18`,
+    errorIncompleteExit: (count: number) =>
+      `අර්ධ වශයෙන් පිරවූ ප්‍රශ්නාවලියක් සුරැකිය නොහැක (${count} / 18). ප්‍රශ්න 18ටම පිළිතුරු දෙන්න, නැතහොත් "ආපසු" ඔබා පසුව පුරවන්න.`,
+    previousKept: (date: string) =>
+      `ඔබ ${date} දින පුරවූ පිළිතුරු සුරැකී ඇත. මෙම නව වාරය සඳහා, දැන් ඔබ දකින දේ අනුව සෑම ප්‍රශ්නයකටම නැවත පිළිතුරු දෙන්න.`,
   },
 
   preferences: {
@@ -551,11 +673,15 @@ const si = {
     snapHyperactivity: 'ක්‍රියාශීලී බව / ආවේගශීලී බව',
     snapScore: (score: number) => `${score} / 27`,
     snapNote: 'මෙය ඔබගේ නිරීක්ෂණවල සාරාංශයකි. රෝග විනිශ්චයක් නොවේ.',
+    snapCompleted: 'ඔබ මෙම ප්‍රශ්නාවලිය සම්පූර්ණ කර ඇත. ස්තූතියි!',
     snapSkipped: 'මඟ හැර ඇත. මෙය විකල්පයි.',
     snapNotDone: 'සම්පූර්ණ කර නැත. මෙය විකල්පයි.',
     completeNow: 'දැන් සම්පූර්ණ කරන්න',
     mathTitle: 'ගණිත ක්‍රියාකාරකම',
     mathCorrect: (correct: number, total: number) => `ප්‍රශ්න ${total}න් ${correct}ක් නිවැරදියි`,
+    // Independent performance shown separately from guided or helped activities (pending wording review)
+    mathIndependent: (correct: number, total: number) => `තනිවම කළ ප්‍රශ්න ${total}න් ${correct}ක් පළමු වරම නිවැරදියි`,
+    mathNotIndependent: (n: number) => `මඟපෙන්වීම හෝ උදව් සහිත ක්‍රියාකාරකම් ${n}ක් මෙම ගණනට ඇතුළත් කර නැත.`,
     mathNote: 'මුල් ප්‍රතිඵලයක් පමණි. දරුවාගේ හැකියාව පිළිබඳ ස්ථිර නිගමනයක් නොවේ.',
     notAvailable: 'තොරතුරු නැත.',
   },
@@ -573,5 +699,5 @@ type Widen<T> = {
 /** Shape every parent-portal dictionary (Sinhala now, English later) must provide. */
 export type ParentDictionary = Widen<typeof si>;
 
-/** Active parent-portal dictionary. Replace with a language-aware selector when the toggle is added. */
-export const parentText: ParentDictionary = si;
+/** Active parent-portal dictionary: Sinhala or English, following the global language switch. */
+export const parentText: ParentDictionary = localized<ParentDictionary>({ si, en });

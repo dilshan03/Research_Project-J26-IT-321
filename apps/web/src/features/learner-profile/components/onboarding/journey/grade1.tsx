@@ -85,6 +85,27 @@ export const G1_MATCH_GROUP = {
   ),
 };
 
+/**
+ * Independent comparison (own family, not part of the learn-and-transfer sequence): new animals and
+ * numbers; the larger group is packed close together, so the longer-looking row is not the answer.
+ * Help only if the child asks; help before the first answer makes it non-independent on the server.
+ */
+export const G1_COMPARE_INDEPENDENT: CompareGroupsItem = {
+  meta: {
+    questionId: 'g1v2_compare_independent_7_4',
+    activityId: 'g1_compare_independent',
+    conceptId: 'compare_more',
+    itemFamilyId: 'g1_compare_independent',
+    representation: 'pictorial',
+    dimensionTags: ['MP', 'SC'],
+  },
+  left: { icon: '🐟', count: 7, label: 'මාළුවෝ' },
+  right: { icon: '🐌', count: 4, label: 'ගොළුබෙල්ලෝ' },
+  leftLayout: 'cluster',
+  rightLayout: 'spread',
+  more: 'left',
+};
+
 const compareMeta = (questionId: string, probeRole: 'pre' | 'support' | 'transfer', dimensionTags: string[]): ItemMeta => ({
   questionId,
   activityId: 'g1_compare_groups',

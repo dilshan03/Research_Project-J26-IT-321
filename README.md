@@ -20,14 +20,17 @@ MathQuest brings four pieces together:
 
 | # | Component | What it does | Core model / algorithm | Student |
 |---|---|---|---|---|
-| 1 | **Learner Profile & Prediction Engine** | Parent onboarding, optional SNAP-IV, and Sinhala maths activities for Grades 1–5. Builds an initial learner profile across 7 dimensions and gives parents learning tips. | **ELP-X**, a Bayesian Beta-Binomial skill estimate with a credible interval and a minimum-evidence rule, plus **ELP-X-REC** rule-based recommendations | IT23168954 |
+| 1 | **Learner Profile & Prediction Engine** | Parent onboarding, optional SNAP-IV, and Sinhala maths activities for Grades 1–5. Builds an initial learner profile across 7 dimensions and gives parents learning tips and tracks the ADHD traits progress | **ELP-X**, a Bayesian Beta-Binomial skill estimate with a credible interval and a minimum-evidence rule, plus **ELP-X-REC** rule-based recommendations | IT23168954 |
 | 2 | **Attention-Friendly Content Adaptation Engine** | Turns NIE teacher's-guide PDFs into a validated Sinhala problem bank, scores the cognitive load of each problem, and generates step-by-step game blueprints that teachers review | **Bayesian trait tracker** (inattention, impulsivity, working memory) plus the **Cognitive Load Index** | IT23182332 |
-| 3 | **Gameplay Interaction & Behaviour Signal Engine** | Tracks gameplay behaviour, with optional webcam gaze and face signals, to detect 7 behavioural states and trigger re-engagement | **ACBR**, Adaptive Confidence-based Behaviour and Re-engagement, plus a Random Forest baseline | IT23176324 |
+| 3 | **Gameplay Interaction & Behaviour Signal Engine** | Monitors gameplay interactions and optional webcam signals to detect seven behavioural states through multimodal behaviour analysis and provide personalised re-engagement support. | Core Model and Algorithm	- Random Forest (Gameplay-only Baseline), Confidence-aware Multimodal Signal Fusion (MediaPipe, WebGazer.js & DeepFace), and Proposed Adaptive Confidence-based Behaviour and Re-engagement (ACBR) Algorithm. | IT23176324 |
 | 4 | **Intelligent Pedagogical Agent & Adaptive Student Progress Engine** | Tracks knowledge during play and gives scaffolding through the 3D companion MathBot and 4-tier visual hints | **AD-BKT**, Attention-Disentangled Bayesian Knowledge Tracing, plus an FSM decision engine | IT23185470 |
 
 Each component's README gives full details:
 - `apps/web/src/features/learner-profile/README_Learner_Profile_Engine.md`
-- the README files in `services/*`
+- `apps/web/src/features/content-adaptation/README.md`
+- `apps/web/src/features/gameplay/README.md`
+- `apps/web/src/features/behaviour-monitoring/README.md`
+
 
 ## How the Components Work Together
 

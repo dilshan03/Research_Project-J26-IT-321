@@ -2,13 +2,21 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import path from 'path';
+import dns from 'dns';
+
+// Fix for Node.js DNS SRV query ECONNREFUSED on local ISP resolvers
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 import { connectToDatabase } from '@mathquest/db';
 import authRoutes from './routes/authRoutes.js';
 import { initDatabaseIndexes } from './models/userModel.js';
 
 // Load environment variables from project root
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({
-    path: new URL('../../../.env', import.meta.url),
+    path: path.resolve(__dirname, '../../../.env'),
 });
 
 const app = express();

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "MQ-LEARNER-CONTEXT-v0.1",
+  "learnerRef": "SYN-L005",
+  "grade": 2,
+  "notes": {"description": "Individual differences B: same parent-reported presentation as S4, but proficient skills, flexible pace and a quiet sound choice", "synthetic": true},
+  "childPreferences": {
+    "provenance": {"source": "child", "instrument": "ONBOARDING-V2-CHILD-CHOICES"},
+    "soundMode": "off", "theme": "toy_room", "avatarId": "avatar_rabbit"
+  },
+  "learningPreferences": {
+    "provenance": {"source": "parent", "instrument": "LEARNING-PREF-v1.0"},
+    "visualAssistance": "sometimes", "audioAssistance": "read_everything", "activityPace": "flexible",
+    "hintStyle": "audio_hint", "celebrationStyle": "badge_sound"
+  },
+  "mathEvidence": {
+    "provenance": {"source": "assessment", "instrument": "ELP-X-v1.0"},
+    "skills": [
+      {"skillId": "subtraction", "provisionalSkillLevel": "PROFICIENT", "distinctQuestionsAssessed": 5, "isEvidenceSufficient": true}
+    ]
+  },
+  "parentReportedAdhdContext": {
+    "provenance": {"source": "parent", "instrument": "ADHD-INFO-v1.0", "verificationStatus": "NOT_VERIFIED"},
+    "diagnosisStatus": "yes", "reportedPresentation": "predominantly_inattentive"
+  }
+}

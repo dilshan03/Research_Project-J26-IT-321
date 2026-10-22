@@ -14,3 +14,35 @@ dist/
 
 # Logs
 *.log
+
+# MathQuest gameplay interaction training datasets
+services/behaviour-signal-service/model_training/data/student_log_*.csv
+
+# Python cache files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Database storage
+**/db_store/gridfs/
+
+# NIE Grade 4/5 teacher guides exceed GitHub limits
+# Their page transcripts are committed in data/syllabi/_cache
+services/content-adaptation-service/data/syllabi/Grade 4.pdf
+services/content-adaptation-service/data/syllabi/Grade 5.pdf
+
+# Pedagogical Decision API local runtime telemetry logs
+services/pedagogical-engine/decision-api/data/
+services/pedagogical-engine/decision-api/data/*.json
+
+# NSCH datasets (local ML research data)
+research/recommendation_engine/ml_experiments/data/raw/
+
+# Python virtual environments
+.venv/
+.venv-*/
+venv/
+
+
+# DeepFace generated data
+deepface_observations.jsonl

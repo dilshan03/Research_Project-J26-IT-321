@@ -1,0 +1,573 @@
+/**
+ * MathQuest Learner Onboarding Types
+ */
+
+export type OnboardingStepKey =
+  | 'adhd_information'
+  | 'preferences'
+  | 'snap_iv'
+  | 'social_context'
+  | 'handover'
+  | 'math_assessment'
+  | 'summary';
+
+export interface LearningPreferencesData {
+  version: string;
+  visualAssistance: 'always' | 'sometimes' | 'minimal';
+  audioAssistance: 'read_everything' | 'read_on_click' | 'off';
+  activityPace: 'calm_step_by_step' | 'regular' | 'flexible';
+  hintStyle: 'visual_clue' | 'step_guide' | 'audio_hint';
+  celebrationStyle: 'gentle_star' | 'badge_sound' | 'minimal';
+  additionalNotes?: string;
+}
+
+/**
+ * Parent-reported ADHD information.
+ * A parent's report of a professional diagnosis: never verified by MathQuest, never inferred
+ * from SNAP-IV or gameplay, and kept separate from screening and mathematics evidence.
+ */
+export type AdhdDiagnosisStatus = 'yes' | 'no' | 'not_sure' | 'prefer_not_to_say';
+
+export type AdhdReportedPresentation =
+  | 'predominantly_inattentive'
+  | 'predominantly_hyperactive_impulsive'
+  | 'combined'
+  | 'not_specified';
+
+export interface AdhdInformationData {
+  version: string;
+  diagnosisStatus: AdhdDiagnosisStatus;
+  reportedPresentation?: AdhdReportedPresentation;
+  diagnosisReportedMonth?: string; // YYYY-MM
+}
+
+export interface AdhdInformationRecord {
+  version: string;
+  diagnosisStatus: AdhdDiagnosisStatus;
+  reportedPresentation: AdhdReportedPresentation | null;
+  diagnosisReportedMonth: string | null;
+  informationType: 'PARENT_REPORTED_PROFESSIONAL_DIAGNOSIS' | 'PARENT_REPORTED_DIAGNOSIS_STATUS';
+  source: 'parent';
+  verificationStatus: 'NOT_VERIFIED';
+  disclaimer: string;
+  savedAt: string;
+}
+
+/**
+ * True when the parent reported a professional diagnosis with a specific ADHD type.
+ * SNAP-IV is then not asked during onboarding (mirrors the backend resolver); it stays
+ * optional from the parent dashboard.
+ */
+export const isAdhdTypeReported = (adhd: AdhdInformationRecord | null | undefined): boolean =>
+  Boolean(adhd && adhd.diagnosisStatus === 'yes' && adhd.reportedPresentation && adhd.reportedPresentation !== 'not_specified');
+
+export type SnapIvStatus = 'COMPLETED' | 'SKIPPED' | 'NOT_STARTED';
+
+/** Parent view of ADHD & support information. SNAP-IV history carries dates only, never scores. */
+export interface SupportInformation {
+  learnerId: string;
+  onboardingStatus: string;
+  adhdInformation: AdhdInformationRecord | null;
+  snapIv: {
+    status: SnapIvStatus;
+    history: Array<{ completedAt: string | null; version?: string }>;
+    notice: string;
+  };
+}
+
+export const ADHD_DIAGNOSIS_STATUS_OPTIONS: Array<{
+  value: AdhdDiagnosisStatus;
+  labelEn: string;
+  labelSi: string;
+}> = [
+  { value: 'yes', labelEn: 'Yes', labelSi: 'ඔව්' },
+  { value: 'no', labelEn: 'No', labelSi: 'නැත' },
+  { value: 'not_sure', labelEn: 'Not sure', labelSi: 'විශ්වාස නැත' },
+  { value: 'prefer_not_to_say', labelEn: 'Prefer not to say', labelSi: 'පැවසීමට අකමැතියි' },
+];
+
+export const ADHD_PRESENTATION_OPTIONS: Array<{
+  value: AdhdReportedPresentation;
+  labelEn: string;
+  labelSi: string;
+}> = [
+  {
+    value: 'predominantly_inattentive',
+    labelEn: 'Predominantly inattentive',
+    labelSi: 'ප්‍රධාන වශයෙන් අවධානය අඩු වීම',
+  },
+  {
+    value: 'predominantly_hyperactive_impulsive',
+    labelEn: 'Predominantly hyperactive-impulsive',
+    labelSi: 'ප්‍රධාන වශයෙන් අධික ක්‍රියාශීලී බව සහ ආවේගශීලී බව',
+  },
+  { value: 'combined', labelEn: 'Combined', labelSi: 'දෙකම (ඒකාබද්ධ)' },
+  {
+    value: 'not_specified',
+    labelEn: 'Not sure / Not specified',
+    labelSi: 'විශ්වාස නැත / සඳහන් කර නැත',
+  },
+];
+
+export interface SnapIvItemAnswer {
+  itemId: number;
+  score: number; // 0, 1, 2, 3
+}
+
+export interface SnapIvScoreSummary {
+  inattentionTotal: number;
+  inattentionAverage: number;
+  hyperactivityTotal: number;
+  hyperactivityAverage: number;
+  totalScore: number;
+  overallAverage: number;
+  disclaimer: string;
+}
+
+export interface SocialContextData {
+  version: string;
+  learningEnvironment: string;
+  peerCollaboration: string;
+  parentInvolvement: string;
+  challengingTaskSupport: string;
+  optionalNotes?: string;
+}
+
+export interface MathQuestionOption {
+  id: string;
+  textEn: string;
+  textSi: string;
+  visualIcon?: string;
+}
+
+export interface MathQuestion {
+  questionId: string;
+  grade: number;
+  skillId: string;
+  skillName: string;
+  skillNameSi: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  questionType: 'multiple_choice' | 'numeric' | 'visual';
+  promptEn: string;
+  promptSi: string;
+  visualRepresentation?: {
+    type: string;
+    [key: string]: any;
+  };
+  options?: MathQuestionOption[];
+  hintEn: string;
+  hintSi: string;
+}
+
+export type AssessmentProtocolVersion = 'onboarding-v1' | 'onboarding-v2';
+
+export type ProbeRole =
+  | 'calibration'
+  | 'pre'
+  | 'support'
+  | 'transfer'
+  | 'representation';
+
+export type RepresentationType =
+  | 'concrete'
+  | 'pictorial'
+  | 'visual'
+  | 'symbolic'
+  | 'verbal';
+
+export type InteractionMode = 'touch' | 'mouse' | 'keyboard';
+
+export interface SupportEvent {
+  level: number; // 1, 2, 3
+  type: string;
+  timestampSeconds?: number;
+  deliveredAt?: string;
+}
+
+export interface InstructionEvent {
+  action: string;
+  timestampSeconds?: number;
+  occurredAt?: string;
+}
+
+export interface RevisionEvent {
+  priorResponse?: string | number;
+  newResponse?: string | number;
+  timestampSeconds?: number;
+  revisedAt?: string;
+}
+
+export interface ChildPreferenceChoices {
+  source: 'child';
+  avatarId?: string;
+  soundMode?: string;
+  theme?: string;
+  chosenAt?: string;
+}
+
+export interface ImpsaSummary {
+  status: 'PROVISIONAL' | 'INSUFFICIENT_EVIDENCE';
+  eligibleUnassistedItems: number;
+  skillEvidence?: Array<Record<string, any>>;
+  estimatedProficiency?: number;
+  credibleInterval?: { lower: number; upper: number };
+  uncertaintyNote?: string;
+  evidenceSufficiency: 'SUFFICIENT' | 'INSUFFICIENT';
+}
+
+export interface ImlrSummary {
+  status:
+    | 'TRANSFER_OBSERVED'
+    | 'TRANSFER_NOT_YET_OBSERVED'
+    | 'ALREADY_DEMONSTRATED'
+    | 'INSUFFICIENT_EVIDENCE';
+  conceptId?: string;
+  preProbeCorrect?: boolean;
+  supportDelivered?: string[];
+  unassistedTransferCorrect?: boolean;
+  evidenceLevel: string;
+  uncertaintyNote?: string;
+}
+
+export interface MathItemAnswer {
+  questionId: string;
+  userAnswer: string | number;
+  attempts: number;
+  /** Measured time to the first confirmed response; omitted when not measured (never estimated). */
+  responseTimeSeconds?: number;
+  hintUsed: boolean;
+  firstConfirmedResponse?: string | number;
+  isFirstResponseCorrect?: boolean;
+  demonstrationUsed?: boolean;
+  selfCorrectionsCount?: number;
+
+  // Protocol v2 Additive Fields (Optional, backward-compatible)
+  probeRole?: ProbeRole;
+  itemFamilyId?: string;
+  representation?: RepresentationType;
+  supportBeforeFirstResponse?: boolean;
+  supportEvents?: SupportEvent[];
+  instructionEvents?: InstructionEvent[];
+  revisionEvents?: RevisionEvent[];
+  interactionMode?: InteractionMode;
+  dimensionTags?: string[];
+  responseStatus?: 'answered' | 'skipped' | 'not_presented';
+
+  // Interactive onboarding activity metadata (Optional, additive)
+  activityId?: string;
+  conceptId?: string;
+  inputMethod?: 'drag' | 'tap' | 'select';
+  missedDropCount?: number;
+  /** Raw interaction observations (stored only; never scored or interpreted). */
+  interactionObservations?: InteractionObservations;
+}
+
+/**
+ * ONBOARDING-INTERACTION-OBS-v1.0: transparent counts and timestamps for one item, in
+ * milliseconds from item display. Not a measure of attention, impulsivity or ADHD.
+ */
+export interface InteractionObservations {
+  version: string;
+  parameters: { burstMaxGapMs: number; burstMinTaps: number; idleThresholdMs: number; maxEventsPerList: number };
+  observedDurationMs: number;
+  idleTimeBeforeFirstActionMs: number | null;
+  pointerDownCount: number;
+  keyDownCount: number;
+  tapBursts: Array<{ startMs: number; endMs: number; tapCount: number }>;
+  idleIntervals: Array<{ startMs: number; durationMs: number }>;
+  pageEvents: Array<{ type: 'hidden' | 'visible' | 'blur' | 'focus'; atMs: number }>;
+  hiddenDurationMs: number;
+  invalidTapCount: number | null;
+  invalidTaps: Array<{ atMs: number }>;
+  truncated: boolean;
+}
+
+/** Request-level fields sent alongside answers by the interactive onboarding journey. */
+export interface MathSubmissionExtras {
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
+  childPreferences?: ChildPreferenceChoices;
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
+}
+
+export interface MathAssessmentSubmission {
+  version: string;
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
+  grade: number;
+  answers: MathItemAnswer[];
+  childPreferences?: ChildPreferenceChoices;
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
+}
+
+export interface SkillScore {
+  skillId: string;
+  skillName: string;
+  skillNameSi: string;
+  totalQuestions: number;
+  correctQuestions: number;
+  accuracyPercentage: number;
+  proficiencyCategory: 'Emerging' | 'Developing' | 'Proficient' | 'INSUFFICIENT_EVIDENCE';
+}
+
+export interface ElpxCredibleInterval {
+  lower: number;
+  upper: number;
+  confidenceLevel: number;
+}
+
+export interface ElpxSkillEstimate {
+  skillId: string;
+  skillName: string;
+  skillNameSi: string;
+  distinctQuestionsAssessed: number;
+  correctFirstResponses: number;
+  rawAccuracy: number;
+  rawAccuracyPercentage: number;
+  posteriorAlpha: number;
+  posteriorBeta: number;
+  estimatedProficiency: number;
+  estimatedProficiencyPercentage: number;
+  credibleInterval: ElpxCredibleInterval;
+  credibleIntervalWidth: number;
+  posteriorVariance: number;
+  evidenceSufficiency: 'SUFFICIENT' | 'INSUFFICIENT';
+  isEvidenceSufficient: boolean;
+  provisionalSkillLevel: 'INSUFFICIENT_EVIDENCE' | 'EMERGING' | 'DEVELOPING' | 'PROFICIENT';
+  isProvisional: boolean;
+}
+
+export interface ElpxStructuredRecommendation {
+  recommendationId: string;
+  skillId?: string | null;
+  strategyCode: string;
+  reasonCodes: string[];
+  inputEvidenceSummary: Record<string, any>;
+  recommendationRulesetVersion: string;
+  titleEn: string;
+  titleSi: string;
+  descriptionEn: string;
+  descriptionSi: string;
+}
+
+export interface ElpxProfile {
+  learnerId: string;
+  grade: number;
+  profileVersion: string;
+  algorithmVersion: string;
+  recommendationRulesetVersion: string;
+  evidenceStatus: 'SUFFICIENT' | 'INSUFFICIENT';
+  isOverallEvidenceSufficient: boolean;
+  totalDistinctQuestionsEvaluated: number;
+  totalCorrectFirstResponses: number;
+  rawOverallAccuracy: number;
+  skillEstimates: ElpxSkillEstimate[];
+  structuredRecommendations: ElpxStructuredRecommendation[];
+  explanationReasonCodes: string[];
+  learningPreferences?: Record<string, any>;
+  disclaimer: string;
+  lastUpdated: string;
+  mlPrediction?: any;
+  shapValues?: any;
+}
+
+export interface MathAssessmentSummary {
+  grade: number;
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
+  totalQuestions: number;
+  correctAnswers: number;
+  accuracyPercentage: number;
+  evidenceLevel: 'INSUFFICIENT' | 'SUFFICIENT';
+  skills: SkillScore[];
+  strengths: string[];
+  areasForGrowth: string[];
+  recommendations: string[];
+  thresholdVersion?: string;
+  disclaimer?: string;
+  mlPredictionNotice: string;
+  elpxProfile?: ElpxProfile;
+  // Protocol v2 Additive Fields (Optional)
+  impsa?: ImpsaSummary;
+  imlr?: ImlrSummary;
+  childPreferences?: ChildPreferenceChoices;
+  evaluatedItems?: any[];
+  excludedItems?: any[];
+  sessionStartedAt?: string;
+  sessionEndedAt?: string;
+  evidenceRulesetVersion?: string;
+  evidenceSummary?: any;
+}
+
+
+export interface OnboardingProgress {
+  learnerId: string;
+  parentId: string;
+  status: 'IN_PROGRESS' | 'COMPLETED';
+  currentStep: OnboardingStepKey;
+  completedSteps: string[];
+  preferencesCompleted: boolean;
+  snapIvCompleted: boolean;
+  socialContextCompleted: boolean;
+  mathAssessmentCompleted: boolean;
+  learningPreferences?: LearningPreferencesData;
+  snapIvResponses?: SnapIvItemAnswer[];
+  socialContext?: SocialContextData;
+  snapIvSummary?: SnapIvScoreSummary;
+  mathSummary?: MathAssessmentSummary;
+  // Protocol v2 Additive Fields (Optional)
+  assessmentProtocolVersion?: AssessmentProtocolVersion;
+  childPreferences?: ChildPreferenceChoices;
+  impsaSummary?: ImpsaSummary;
+  imlrSummary?: ImlrSummary;
+  // Parent-reported ADHD information and optional SNAP-IV status (Optional)
+  adhdInformationCompleted?: boolean;
+  adhdInformation?: AdhdInformationRecord | null;
+  snapIvStatus?: SnapIvStatus;
+  updatedAt: string;
+}
+
+export interface OnboardingFullSummary {
+  learner: any;
+  progress: OnboardingProgress;
+  learningPreferences?: LearningPreferencesData;
+  snapIvSummary?: SnapIvScoreSummary;
+  snapIvStatus?: SnapIvStatus;
+  adhdInformation?: AdhdInformationRecord | null;
+  socialContext?: SocialContextData;
+  mathSummary?: MathAssessmentSummary;
+}
+
+/**
+ * Standard SNAP-IV 18-item questionnaire template
+ * Items 1-9: Inattention subscale
+ * Items 10-18: Hyperactivity/Impulsivity subscale
+ * Scale: 0 = Not at all, 1 = Just a little, 2 = Quite a bit, 3 = Very much
+ * Note: Uses verified standard English text with provisional research translation template.
+ */
+export interface SnapIvItemDefinition {
+  id: number;
+  subscale: 'inattention' | 'hyperactivity';
+  textEn: string;
+  textSi: string;
+}
+
+export const SNAP_IV_ITEMS: SnapIvItemDefinition[] = [
+  // Inattention Subscale (Items 1 - 9)
+  {
+    id: 1,
+    subscale: 'inattention',
+    textEn: 'Often fails to give close attention to details or makes careless mistakes in schoolwork or tasks',
+    textSi: 'පාසල් වැඩ හෝ පැවරුම්වලදී විස්තර කෙරෙහි අවධානය නොදැක්වීම හෝ නොසැලකිලිමත් වැරදි සිදු කිරීම',
+  },
+  {
+    id: 2,
+    subscale: 'inattention',
+    textEn: 'Often has difficulty sustaining attention in tasks or play activities',
+    textSi: 'ක්‍රියාකාරකම්වල හෝ ක්‍රීඩාවල යෙදෙන විට එකදිගට අවධානය රඳවා ගැනීමට අපහසු වීම',
+  },
+  {
+    id: 3,
+    subscale: 'inattention',
+    textEn: 'Often does not seem to listen when spoken to directly',
+    textSi: 'සෘජුව කතා කරන විට සවන් නොදෙන බවක් බොහෝවිට පෙනෙන්නට තිබීම',
+  },
+  {
+    id: 4,
+    subscale: 'inattention',
+    textEn: 'Often does not follow through on instructions and fails to finish schoolwork or chores',
+    textSi: 'උපදෙස් අනුව ක්‍රියා කිරීම මගහැරීම සහ පැවරුම් අතරමග අත්හැර දැමීම',
+  },
+  {
+    id: 5,
+    subscale: 'inattention',
+    textEn: 'Often has difficulty organizing tasks and activities',
+    textSi: 'වැඩකටයුතු සහ ක්‍රියාකාරකම් පිළිවෙළකට සංවිධානය කරගැනීමට අපහසු වීම',
+  },
+  {
+    id: 6,
+    subscale: 'inattention',
+    textEn: 'Often avoids, dislikes, or is reluctant to engage in tasks that require sustained mental effort',
+    textSi: 'වැඩි මානසික වෙහෙසක් අවශ්‍ය වන කාර්යයන්වල යෙදීමට අකමැති වීම හෝ ඒවා මගහැරීම',
+  },
+  {
+    id: 7,
+    subscale: 'inattention',
+    textEn: 'Often loses things necessary for tasks or activities (e.g., pencils, books, toys)',
+    textSi: 'පාසල් වැඩට හෝ සෙල්ලම් කිරීමට අවශ්‍ය දෑ (පැන්සල්, පොත්පත්) නිතර අමතක වීම හෝ නැති කරගැනීම',
+  },
+  {
+    id: 8,
+    subscale: 'inattention',
+    textEn: 'Is often easily distracted by extraneous stimuli',
+    textSi: 'බාහිර පරිසරයේ ශබ්ද හෝ වෙනස්වීම් නිසා පහසුවෙන් අවධානය වෙනතකට යොමු වීම',
+  },
+  {
+    id: 9,
+    subscale: 'inattention',
+    textEn: 'Is often forgetful in daily activities',
+    textSi: 'දෛනික කටයුතුවලදී සහ පුරුදු වැඩවලදී නිතර අමතක වීම් සිදු වීම',
+  },
+
+  // Hyperactivity / Impulsivity Subscale (Items 10 - 18)
+  {
+    id: 10,
+    subscale: 'hyperactivity',
+    textEn: 'Often fidgets with hands or feet or squirms in seat',
+    textSi: 'වාඩිවී සිටින විට අත් පා නිතර චලනය කිරීම හෝ එක තැන නොසන්සුන්ව සිටීම',
+  },
+  {
+    id: 11,
+    subscale: 'hyperactivity',
+    textEn: 'Often leaves seat in classroom or in other situations in which remaining seated is expected',
+    textSi: 'වාඩිවී සිටිය යුතු අවස්ථාවලදී (පන්ති කාමරයේදී හෝ කෑම මේසයේදී) නිතර ආසනයෙන් නැගිට යාම',
+  },
+  {
+    id: 12,
+    subscale: 'hyperactivity',
+    textEn: 'Often runs about or climbs excessively in situations in which it is inappropriate',
+    textSi: 'නුසුදුසු හෝ අන්තරායකර අවස්ථාවලදී පවා නොනවත්වා දිවීම හෝ උඩ නැගීම',
+  },
+  {
+    id: 13,
+    subscale: 'hyperactivity',
+    textEn: 'Often has difficulty playing or engaging in leisure activities quietly',
+    textSi: 'නිහඬව හෝ සන්සුන්ව ක්‍රීඩාවක හෝ විවේකී කටයුත්තක යෙදීමට අපහසු වීම',
+  },
+  {
+    id: 14,
+    subscale: 'hyperactivity',
+    textEn: 'Is often "on the go" or often acts as if "driven by a motor"',
+    textSi: 'නිතරම නොනවත්වා ක්‍රියාශීලීව සිටීම (මෝටරයකින් ක්‍රියාකරනවාක් මෙන් හැසිරීම)',
+  },
+  {
+    id: 15,
+    subscale: 'hyperactivity',
+    textEn: 'Often talks excessively',
+    textSi: 'නිතරම වැඩිපුර සහ නොනවත්වා කතා කිරීම',
+  },
+  {
+    id: 16,
+    subscale: 'hyperactivity',
+    textEn: 'Often blurts out answers before questions have been completed',
+    textSi: 'ප්‍රශ්නය සම්පූර්ණයෙන් අසා අවසන් වීමට පෙර පිළිතුරු කීමට ඉක්මන් වීම',
+  },
+  {
+    id: 17,
+    subscale: 'hyperactivity',
+    textEn: 'Often has difficulty awaiting turn',
+    textSi: 'ක්‍රීඩා හෝ පෝලිම්වලදී තම වාරය එනතුරු ඉවසීමෙන් බලා සිටීමට අපහසු වීම',
+  },
+  {
+    id: 18,
+    subscale: 'hyperactivity',
+    textEn: 'Often interrupts or intrudes on others (e.g., butts into conversations or games)',
+    textSi: 'අනුන්ගේ කතාබස් හෝ ක්‍රීඩාවලට මැදින් පැන බාධා කිරීම',
+  },
+];
+
+export const SNAP_IV_SCALE_OPTIONS = [
+  { value: 0, labelEn: 'Not at all', labelSi: 'කිසිසේත් නැත' },
+  { value: 1, labelEn: 'Just a little', labelSi: 'මදක් ඇත' },
+  { value: 2, labelEn: 'Quite a bit', labelSi: 'සැලකිය යුතු ලෙස ඇත' },
+  { value: 3, labelEn: 'Very much', labelSi: 'ඉතා වැඩියෙන් ඇත' },
+];

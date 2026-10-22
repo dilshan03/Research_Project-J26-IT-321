@@ -37,7 +37,7 @@ def analyze(req: GenerateBlueprintRequest):
 
 
 @router.post("/blueprints", response_model=BlueprintEnvelope, status_code=201)
-def create_blueprint(req: GenerateBlueprintRequest):
+async def create_blueprint(req: GenerateBlueprintRequest):
     try:
         blueprint, cli, _ = generate_blueprint(
             source_question_id=req.source_question_id,
@@ -50,27 +50,31 @@ def create_blueprint(req: GenerateBlueprintRequest):
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc))
-    env = BlueprintEnvelope(cli_score=round(cli, 2), raw_sinhala_question=req.raw_sinhala_question,
-                            blueprint=blueprint)
-    return repository.save(env)
+    env = BlueprintEnvelope(
+        cli_score=round(cli, 2),
+        raw_sinhala_question=req.raw_sinhala_question,
+        raw_english_question=blueprint.raw_english_question,
+        blueprint=blueprint,
+    )
+    return await repository.save(env)
 
 
 @router.get("/blueprints", response_model=List[BlueprintEnvelope])
-def list_blueprints(status: Optional[str] = Query(None, pattern="^(draft|approved|rejected)$")):
-    return repository.list(status)
+async def list_blueprints(status: Optional[str] = Query(None, pattern="^(draft|approved|rejected)$")):
+    return await repository.list(status)
 
 
 @router.get("/blueprints/{activity_id}", response_model=BlueprintEnvelope)
-def get_blueprint(activity_id: str):
-    env = repository.get(activity_id)
+async def get_blueprint(activity_id: str):
+    env = await repository.get(activity_id)
     if env is None:
         raise HTTPException(status_code=404, detail="Blueprint not found")
     return env
 
 
 @router.patch("/blueprints/{activity_id}/status", response_model=BlueprintEnvelope)
-def update_status(activity_id: str, body: StatusUpdate):
-    env = repository.set_status(activity_id, body.status)
+async def update_status(activity_id: str, body: StatusUpdate):
+    env = await repository.set_status(activity_id, body.status)
     if env is None:
         raise HTTPException(status_code=404, detail="Blueprint not found")
     return env

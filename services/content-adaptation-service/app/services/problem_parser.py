@@ -50,6 +50,9 @@ def parse_problem(raw_sinhala_text: str, operation_hint: Optional[str] = None) -
     parsed = ParsedProblem(numbers=numbers, is_money=is_money)
 
     if len(numbers) < 2:
+        if len(numbers) == 1:
+            parsed.final_answer = numbers[0]
+            parsed.operations = ["COUNT"]
         return parsed
 
     # Multi-step "balance" pattern: buy items, pay with a larger note -> sum then subtract.

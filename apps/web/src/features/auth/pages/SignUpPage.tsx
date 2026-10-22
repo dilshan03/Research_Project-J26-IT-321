@@ -5,12 +5,12 @@ import { AuthLayout } from '../components/AuthLayout';
 import { AuthInput } from '../components/AuthInput';
 import { PasswordInput } from '../components/PasswordInput';
 import { RoleSelector } from '../components/RoleSelector';
-import type { UserRole } from '../types';
+import type { RegistrableRole } from '../types';
 import { authService } from '../services/authService';
 
 export const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
-  const [role, setRole] = useState<UserRole>('parent');
+  const [role, setRole] = useState<RegistrableRole>('parent');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -80,7 +80,7 @@ export const SignUpPage: React.FC = () => {
     setIsLoading(false);
 
     if (response.success) {
-      setSuccessMessage(response.message || 'Account created successfully! Redirecting to Sign In...');
+      setSuccessMessage('Account created successfully. Redirecting to Sign In...');
       setTimeout(() => {
         navigate('/sign-in');
       }, 1500);
@@ -96,24 +96,25 @@ export const SignUpPage: React.FC = () => {
       title="Create Account"
       subtitle="Join MathQuest to empower your child's math journey"
     >
-      {successMessage && (
-        <div className="mb-5 p-3.5 bg-mq-success-bg border border-mq-success/30 rounded-2xl flex items-start gap-3 text-xs text-mq-success font-medium animate-fade-in">
-          <CheckCircle2 size={18} className="shrink-0 mt-0.5" />
-          <div>
-            <p className="font-bold">Account Created</p>
-            <p className="mt-0.5 text-mq-text">{successMessage}</p>
-          </div>
+      {/* A single message: success or failure, never both and never repeated */}
+      {successMessage ? (
+        <div
+          role="status"
+          className="mb-5 p-3.5 bg-mq-success-bg border border-mq-success/30 rounded-2xl flex items-center gap-3 text-sm text-mq-success font-semibold animate-fade-in"
+        >
+          <CheckCircle2 size={18} className="shrink-0" />
+          <p>{successMessage}</p>
         </div>
-      )}
-
-      {globalError && (
-        <div className="mb-5 p-3.5 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-start gap-3 text-xs text-mq-danger font-medium animate-fade-in">
-          <AlertCircle size={18} className="shrink-0 mt-0.5" />
-          <div>
-            <p className="font-bold">Registration Notice</p>
-            <p className="mt-0.5 text-mq-text">{globalError}</p>
+      ) : (
+        globalError && (
+          <div
+            role="alert"
+            className="mb-5 p-3.5 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-center gap-3 text-sm text-mq-danger font-semibold animate-fade-in"
+          >
+            <AlertCircle size={18} className="shrink-0" />
+            <p>{globalError}</p>
           </div>
-        </div>
+        )
       )}
 
       <form onSubmit={handleSubmit} noValidate className="space-y-4">

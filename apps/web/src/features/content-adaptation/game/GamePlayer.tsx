@@ -1,8 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+// If this file is in a different folder, adjust this relative import.
+import { useGameplayTracker } from '../../behaviour-monitoring/useGameplayTracker';
 import { ArrowLeft, CheckCircle2, RotateCcw, Sparkles, Star, Volume2 } from 'lucide-react';
 import type {
   BlueprintEnvelope, DistractorType, GameChoiceOption, GameMicroStep, GameTheme, VisualAssetTag,
 } from '../types';
+import { Gaja } from './Gaja';
 
 type Lang = 'si' | 'en';
 
@@ -30,6 +33,9 @@ const THEMES: Record<GameTheme, { name_si: string; name_en: string; bg: string; 
 
 const ASSET_ICON: Record<VisualAssetTag, string> = {
   COIN_BAG: '🪙', FRUIT_BASKET: '🍎', OPERATOR_CHEST: '🧰', NUMBER_BLOCK: '🔢', CHARACTER_AVATAR: '🧒',
+  SHAPE_CARD: '',
+  PATTERN_TRAIN: '',
+  COMPARISON_SCALE: ''
 };
 
 const FEEDBACK = {
@@ -87,12 +93,31 @@ function OptionCard({
   );
 }
 
-export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; onExit: () => void }) {
+export function GamePlayer({
+  envelope,
+  onExit,
+  learnerId = 'local-demo-learner',
+  totalStars,
+  totalCoins,
+  onComplete,
+}: {
+  envelope: BlueprintEnvelope;
+  onExit: () => void;
+  learnerId?: string;
+  totalStars?: number;
+  totalCoins?: number;
+  onComplete?: (result: { activityId: string; starsEarned: number; coinsEarned: number }) => void;
+}) {
   const { blueprint } = envelope;
   const settings = blueprint.adhd_game_settings;
   const theme = THEMES[blueprint.game_theme];
   const calm = settings.stimulus_density === 'LOW';
 
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+  // Use the same approved activity ID as the camera overlay and report.
+  const activityId = blueprint.activity_id;
+  const tracker = useGameplayTracker({ learnerId, activityId, gameTheme: blueprint.game_theme, grade: blueprint.grade, containerRef: gameContainerRef });
+  const { isTracking, onStepStart, onAnswerSelect, onAnswerSubmit, onGameExit } = tracker;
   const [lang, setLang] = useState<Lang>('si');
   const [stepIndex, setStepIndex] = useState(0);
   const [wrongPicks, setWrongPicks] = useState<Set<string>>(new Set());
@@ -100,16 +125,60 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [feedback, setFeedback] = useState<'correct' | 'retry' | null>(null);
 
+  const [completedRewarded, setCompletedRewarded] = useState(false);
+  const [displayedStars, setDisplayedStars] = useState<number | undefined>(totalStars);
+  const [displayedCoins, setDisplayedCoins] = useState<number | undefined>(totalCoins);
+
+  useEffect(() => {
+    setDisplayedStars(totalStars);
+  }, [totalStars]);
+
+  useEffect(() => {
+    setDisplayedCoins(totalCoins);
+  }, [totalCoins]);
+
   const steps = blueprint.micro_steps;
   const finished = stepIndex >= steps.length;
   const step: GameMicroStep | undefined = steps[stepIndex];
+
   const stars = useMemo(() => {
     const mistakes = attempts.filter(a => !a.correct).length;
     return mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
   }, [attempts]);
 
+  useEffect(() => {
+    if (finished && !completedRewarded) {
+      setCompletedRewarded(true);
+      const earnedCoins = 15;
+      // Visually bump stars and coins immediately so child sees feedback
+      setDisplayedStars((prev) => (prev !== undefined ? prev + stars : prev));
+      setDisplayedCoins((prev) => (prev !== undefined ? prev + earnedCoins : prev));
+
+      if (onComplete) {
+        onComplete({
+          activityId: blueprint.activity_id,
+          starsEarned: stars,
+          coinsEarned: earnedCoins,
+        });
+      }
+    }
+  }, [finished, completedRewarded, stars, blueprint.activity_id, onComplete]);
+
+  useEffect(() => {
+    if (isTracking && step) {
+      onStepStart(step.step_order, step.action_type);
+    }
+  }, [isTracking, stepIndex, step?.step_order]);
+
+  const exitGame = async () => {
+    try { await onGameExit(); } catch (error) { console.error('Failed to finish tracking session', error); }
+    onExit();
+  };
+
   const pick = (opt: GameChoiceOption) => {
     if (!step || solved) return;
+    onAnswerSelect(opt.text_en);
+    onAnswerSubmit(opt.text_en, opt.is_correct);
     setAttempts(a => [...a, {
       step_order: step.step_order, option: opt.text_en, correct: opt.is_correct, distractor_type: opt.distractor_type,
     }]);
@@ -134,7 +203,7 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${theme.bg} relative overflow-hidden`}>
+    <div ref={gameContainerRef} className={`min-h-screen bg-gradient-to-br ${theme.bg} relative overflow-hidden`}>
       {/* Decorative background is removed when the visual-clutter filter + low density are on */}
       {!(settings.visual_clutter_filter && calm) && (
         <>
@@ -144,20 +213,62 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
       )}
 
       <header className="relative z-10 flex items-center justify-between px-6 py-4">
-        <button id="game-exit" onClick={onExit} className="btn btn-secondary"><ArrowLeft size={18} /> {lang === 'si' ? 'ආපසු' : 'Back'}</button>
+        <button id="game-exit" onClick={() => void exitGame()} className="btn btn-secondary shadow-xs">
+          <ArrowLeft size={18} /> {lang === 'si' ? 'ආපසු' : 'Back'}
+        </button>
+
         <div className="text-center">
           <p className="text-xs uppercase tracking-widest text-mq-text-muted font-semibold">{blueprint.topic} · Grade {blueprint.grade}</p>
           <p className={`font-bold text-mq-text-strong ${lang === 'si' ? 'sinhala' : ''}`}>
             {theme.mascot} {lang === 'si' ? theme.name_si : theme.name_en}
           </p>
         </div>
-        <div className="flex rounded-full border border-mq-border bg-white p-1" role="group" aria-label="Language">
-          {(['si', 'en'] as Lang[]).map(l => (
-            <button key={l} id={`lang-${l}`} onClick={() => setLang(l)}
-              className={`px-3 py-1 rounded-full text-sm font-bold transition ${lang === l ? 'bg-mq-primary text-white' : 'text-mq-text-muted'}`}>
-              {l === 'si' ? 'සිං' : 'EN'}
-            </button>
-          ))}
+
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          {/* Top Corner Stars & Coins (Kid Rewards Pill) */}
+          {(displayedStars !== undefined || displayedCoins !== undefined) && (
+            <div className="flex items-center gap-2">
+              {displayedStars !== undefined && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-amber-50 border-2 border-amber-300/80 text-xs sm:text-sm font-black text-amber-950 shadow-2xs">
+                  <Star size={16} className="text-amber-500 fill-amber-400 shrink-0 animate-pulse" />
+                  <span>
+                    {displayedStars.toLocaleString()}{' '}
+                    <span className="hidden sm:inline text-[10px] font-extrabold text-amber-800">
+                      {lang === 'si' ? 'තරු' : 'Stars'}
+                    </span>
+                  </span>
+                </div>
+              )}
+
+              {displayedCoins !== undefined && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-yellow-50 border-2 border-yellow-300/80 text-xs sm:text-sm font-black text-yellow-950 shadow-2xs">
+                  <span className="text-yellow-600 text-sm">🪙</span>
+                  <span>
+                    {displayedCoins.toLocaleString()}{' '}
+                    <span className="hidden sm:inline text-[10px] font-extrabold text-yellow-800">
+                      {lang === 'si' ? 'කාසි' : 'Coins'}
+                    </span>
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Language Toggle */}
+          <div className="flex rounded-full border border-mq-border bg-white p-1 shadow-2xs" role="group" aria-label="Language">
+            {(['si', 'en'] as Lang[]).map((l) => (
+              <button
+                key={l}
+                id={`lang-${l}`}
+                onClick={() => setLang(l)}
+                className={`px-3 py-1 rounded-full text-sm font-bold transition ${
+                  lang === l ? 'bg-mq-primary text-white' : 'text-mq-text-muted hover:text-mq-primary'
+                }`}
+              >
+                {l === 'si' ? 'සිං' : 'EN'}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
@@ -234,18 +345,61 @@ export function GamePlayer({ envelope, onExit }: { envelope: BlueprintEnvelope; 
           <section className="rounded-[2rem] bg-white shadow-[var(--mq-shadow-md)] p-10 text-center animate-fade-in">
             <div className="text-6xl mb-3">{theme.mascot}</div>
             <h1 className={`text-3xl font-extrabold mb-4 ${lang === 'si' ? 'sinhala' : ''}`}>{FEEDBACK.done[lang]}</h1>
-            <div className="flex justify-center gap-2 mb-6">
+            <div className="flex justify-center gap-2 mb-4">
               {[1, 2, 3].map(n => (
                 <Star key={n} size={44} className={n <= stars ? 'text-mq-accent-yellow animate-float' : 'text-mq-border'}
                   fill="currentColor" style={{ animationDelay: `${n * 200}ms` }} />
               ))}
             </div>
+
+            <div className="inline-flex items-center gap-4 bg-amber-50 border-2 border-amber-300/90 px-5 py-2.5 rounded-2xl mb-6 shadow-xs animate-bounce">
+              <span className="text-sm font-black text-amber-950 flex items-center gap-1.5">
+                <Star size={18} className="fill-amber-400 text-amber-500" />
+                <span>+{stars} {lang === 'si' ? 'තරු ලැබුණා!' : 'Stars Earned!'}</span>
+              </span>
+              <span className="text-sm font-black text-yellow-950 flex items-center gap-1.5">
+                <span className="text-base">🪙</span>
+                <span>+15 {lang === 'si' ? 'කාසි ලැබුණා!' : 'Coins Earned!'}</span>
+              </span>
+            </div>
             <div className="flex justify-center gap-3">
               <button id="game-restart" onClick={restart} className="btn btn-secondary"><RotateCcw size={18} /> {lang === 'si' ? 'නැවත' : 'Play again'}</button>
-              <button id="game-finish" onClick={onExit} className="btn btn-primary">{lang === 'si' ? 'අවසන්' : 'Finish'}</button>
+              <button id="game-finish" onClick={() => void exitGame()} className="btn btn-primary">{lang === 'si' ? 'අවසන්' : 'Finish'}</button>
             </div>
           </section>
         )}
+        {/* Gaja the Companion Mascot */}
+        <div className="fixed left-4 bottom-4 z-30 pointer-events-none md:pointer-events-auto">
+          <Gaja
+            mood={finished ? 'celebrate' : solved ? 'celebrate' : feedback === 'retry' ? 'encourage' : 'happy'}
+            line={
+              finished
+                ? blueprint.story_narrative?.gaja_dialogue?.celebrate || {
+                    si: 'විශිෂ්ටයි! ඔයා සියලුම පියවර සාර්ථකව අවසන් කළා!',
+                    en: 'Splendid! You completed all steps!',
+                  }
+                : solved
+                ? blueprint.story_narrative?.gaja_dialogue?.praise || {
+                    si: 'නියමයි! නිවැරදි පිළිතුර!',
+                    en: 'Great job! Correct answer!',
+                  }
+                : feedback === 'retry'
+                ? blueprint.story_narrative?.gaja_dialogue?.retry || {
+                    si: 'කමක් නෑ, නැවත උත්සාහ කරමු!',
+                    en: "That's okay, try again!",
+                  }
+                : stepIndex === 0
+                ? blueprint.story_narrative?.gaja_dialogue?.intro || {
+                    si: 'ආයුබෝවන්! මම ගජා. අපි එකතු වෙලා ගණිත ගැටලුව විසඳමු!',
+                    en: "Hello! I'm Gaja. Let's solve the math quest together!",
+                  }
+                : null
+            }
+            lang={lang}
+            calm={calm}
+            size="md"
+          />
+        </div>
       </main>
     </div>
   );

@@ -1,0 +1,4312 @@
+[
+  {
+    "activity_id": "act_2f793afe97",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "blueprint": {
+      "activity_id": "act_2f793afe97",
+      "source_question_id": "G1-NUM-001",
+      "grade": 1,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා දෙක සොයන්න",
+          "instruction_en": "Find the two quantities in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "5, 3",
+          "game_options": [
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both."
+            },
+            {
+              "text_si": "5, 3",
+              "text_en": "5, 3",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "5, 8",
+              "text_en": "5, 8",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses an intermediate sum with original numbers."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": null
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?"
+    },
+    "_id": "a28826dfb87e40f1b9751dcbcfc7e7b0"
+  },
+  {
+    "activity_id": "act_c320a163d7",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "blueprint": {
+      "activity_id": "act_c320a163d7",
+      "source_question_id": "G1-NUM-001",
+      "grade": 1,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා දෙක සොයන්න",
+          "instruction_en": "Find the two quantities in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "5, 3",
+          "game_options": [
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both."
+            },
+            {
+              "text_si": "5, 3",
+              "text_en": "5, 3",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "5, 8",
+              "text_en": "5, 8",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses an intermediate sum with original numbers."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": null
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?"
+    },
+    "_id": "fe57e2038f374c23904694d463c16f17"
+  },
+  {
+    "activity_id": "act_484e66320c",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "blueprint": {
+      "activity_id": "act_484e66320c",
+      "source_question_id": "G1-NUM-001",
+      "grade": 1,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා දෙක සොයන්න",
+          "instruction_en": "Find the two quantities in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "5, 3",
+          "game_options": [
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both."
+            },
+            {
+              "text_si": "5, 3",
+              "text_en": "5, 3",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "5, 8",
+              "text_en": "5, 8",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses an intermediate sum with original numbers."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": null
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?"
+    },
+    "_id": "c9ffa7e6ce06435c8060287ed645e496"
+  },
+  {
+    "activity_id": "act_89702f5f73",
+    "cli_score": 2.4,
+    "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
+    "blueprint": {
+      "activity_id": "act_89702f5f73",
+      "source_question_id": "G3-MON-001",
+      "grade": 3,
+      "topic": "Money",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා දෙක සොයන්න",
+          "instruction_en": "Find the two quantities in the problem",
+          "target_visual_asset": "COIN_BAG",
+          "correct_target_value": "50, 20",
+          "game_options": [
+            {
+              "text_si": "50, 70",
+              "text_en": "50, 70",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses an intermediate sum with original numbers."
+            },
+            {
+              "text_si": "20",
+              "text_en": "20",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both."
+            },
+            {
+              "text_si": "50, 20",
+              "text_en": "50, 20",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": null
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "70",
+          "game_options": [
+            {
+              "text_si": "70",
+              "text_en": "70",
+              "numeric_value": 70.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "30",
+              "text_en": "30",
+              "numeric_value": 30.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "50",
+              "text_en": "50",
+              "numeric_value": 50.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 2.4,
+      "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?"
+    },
+    "_id": "66a1a476ba51467086f7b3b97b3371c8"
+  },
+  {
+    "activity_id": "act_b422ab88f3",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "blueprint": {
+      "activity_id": "act_b422ab88f3",
+      "source_question_id": "G1-NUM-001",
+      "grade": 1,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා දෙක සොයන්න",
+          "instruction_en": "Find the two quantities in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "5, 3",
+          "game_options": [
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both."
+            },
+            {
+              "text_si": "5, 3",
+              "text_en": "5, 3",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "5, 8",
+              "text_en": "5, 8",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses an intermediate sum with original numbers."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": null
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?"
+    },
+    "_id": "df1bdc8ae1a24b66bf05ddce1a3813de"
+  },
+  {
+    "activity_id": "act_768bb91239",
+    "cli_score": 2.4,
+    "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
+    "blueprint": {
+      "activity_id": "act_768bb91239",
+      "source_question_id": "G3-MON-001",
+      "grade": 3,
+      "topic": "Money",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා දෙක සොයන්න",
+          "instruction_en": "Find the two quantities in the problem",
+          "target_visual_asset": "COIN_BAG",
+          "correct_target_value": "50, 20",
+          "game_options": [
+            {
+              "text_si": "50, 70",
+              "text_en": "50, 70",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses an intermediate sum with original numbers."
+            },
+            {
+              "text_si": "20",
+              "text_en": "20",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both."
+            },
+            {
+              "text_si": "50, 20",
+              "text_en": "50, 20",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": null
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "70",
+          "game_options": [
+            {
+              "text_si": "70",
+              "text_en": "70",
+              "numeric_value": 70.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "30",
+              "text_en": "30",
+              "numeric_value": 30.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "50",
+              "text_en": "50",
+              "numeric_value": 50.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 2.4,
+      "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?"
+    },
+    "_id": "e80a217e41de47df8183cb547a409db1"
+  },
+  {
+    "activity_id": "act_16fb0c9e3d",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "blueprint": {
+      "activity_id": "act_16fb0c9e3d",
+      "source_question_id": "G1-NUM-001",
+      "grade": 1,
+      "topic": "Addition",
+      "game_theme": "SPACE_QUEST",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා දෙක සොයන්න",
+          "instruction_en": "Find the two quantities in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "5, 3",
+          "game_options": [
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both."
+            },
+            {
+              "text_si": "5, 3",
+              "text_en": "5, 3",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "5, 8",
+              "text_en": "5, 8",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses an intermediate sum with original numbers."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": null
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "තාරකා අතර ගජාගේ අභ්‍යවකාශ චාරිකාව",
+        "title_en": "Gaja's Starry Space Expedition",
+        "backdrop_si": "ගජා අභ්‍යවකාශ ඇඳුම ඇඳගෙන තරු සහ ග්‍රහලෝක ගණනය කරමින් සඳමත පියවර තබයි.",
+        "backdrop_en": "Astronaut Gaja embarks on a cosmic journey across glowing stars and colorful constellations.",
+        "quest_goal_si": "රොකට්ටුවේ බලශක්ති සංඛ්‍යා නිවැරදිව ගණනය කර තාරකා ගවේෂණය කරන්න!",
+        "quest_goal_en": "Calculate rocket propulsion numbers accurately to explore distant stars!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "සූදානම්ද? ගගනගාමී ගජා සමඟ අභ්‍යවකාශයට පියාසර කරමු!",
+            "en": "Ready for lift-off? Join Astronaut Gaja into the starry cosmos!"
+          },
+          "hint": {
+            "si": "තරු රටා සහ අංක හොඳින් නිරීක්ෂණය කරන්න.",
+            "en": "Observe the star patterns and numbers with steady focus."
+          },
+          "praise": {
+            "si": "විශිෂ්ටයි! රොකට්ටුවේ බලශක්තිය උපරිමයි!",
+            "en": "Brilliant! The rocket's energy systems are perfectly aligned!"
+          },
+          "retry": {
+            "si": "ගණනය නැවත කර බලමු, අපිට පුළුවන්!",
+            "en": "Let's recalculate the star coordinate, we've got this!"
+          },
+          "celebrate": {
+            "si": "මෙහෙයුම සම්පූර්ණයි! ඔබ සුපිරි අභ්‍යවකාශ තරුවක්!",
+            "en": "Mission Accomplished! You are a brilliant cosmic explorer!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?"
+    },
+    "_id": "2eeac191142c47b9b1025b2aa3077866"
+  },
+  {
+    "activity_id": "act_b494c5d94b",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "blueprint": {
+      "activity_id": "act_b494c5d94b",
+      "source_question_id": "G1-NUM-001",
+      "grade": 1,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා දෙක සොයන්න",
+          "instruction_en": "Find the two quantities in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "5, 3",
+          "game_options": [
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both."
+            },
+            {
+              "text_si": "5, 3",
+              "text_en": "5, 3",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "5, 8",
+              "text_en": "5, 8",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses an intermediate sum with original numbers."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": null
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?"
+    },
+    "_id": "5b4c13b1e5e14758959c2eaed3397297"
+  },
+  {
+    "activity_id": "act_43151ead3e",
+    "cli_score": 2.8,
+    "raw_sinhala_question": "රුපියල් 20 ක ටොෆි පැකට්ටුවක් සහ රුපියල් 15 ක බිස්කට් පැකට්ටුවක් ගැනීමට අවශ්‍ය මුළු මුදල කීයද?",
+    "blueprint": {
+      "activity_id": "act_43151ead3e",
+      "source_question_id": "G2-MON-003",
+      "grade": 2,
+      "topic": "Money",
+      "game_theme": "JUNGLE_ADVENTURE",
+      "adhd_game_settings": {
+        "step_granularity": "TWO_TIER",
+        "distractor_count": 3,
+        "stimulus_density": "MEDIUM",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "බෙදීම (÷)",
+              "text_en": "Division (÷)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            20,
+            15
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "35",
+          "game_options": [
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "20",
+              "text_en": "20",
+              "numeric_value": 20.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "15",
+              "text_en": "15",
+              "numeric_value": 15.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "35",
+              "text_en": "35",
+              "numeric_value": 35.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            20,
+            15
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "සිංහරාජ වනපෙතේ ගජාගේ වික්‍රමය",
+        "title_en": "Gaja's Rainforest Adventure",
+        "backdrop_si": "සිංහරාජ නිවර්තන වනාන්තරයේ ගජා අලි පැටියා තම යහළුවන්ට නෙළුම් මල් සහ පලතුරු සොයා දෙයි.",
+        "backdrop_en": "In the lush Sinharaja rainforest, little elephant Gaja gathers lotus flowers and counts forest treats for friends.",
+        "quest_goal_si": "ගණිත පියවර විසඳා වනපෙතේ රහස් මාවත සොයා ගැනීමට ගජාට උදවු වන්න!",
+        "quest_goal_en": "Solve the math steps to uncover the secret forest trail with Gaja!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අද අපි වනපෙතේ වික්‍රමාන්විත ගමනක් යමු!",
+            "en": "Hello! I'm Gaja. Let's head out on a fun jungle adventure!"
+          },
+          "hint": {
+            "si": "ගස් සහ මල් දෙස සෙමින් බලා සංඛ්‍යා හඳුනාගන්න.",
+            "en": "Look gently at the flowers and trees to find the numbers."
+          },
+          "praise": {
+            "si": "නියමයි! ගජාගේ හොඳම මිතුරා ඔයා තමයි!",
+            "en": "Awesome! You are Gaja's most observant forest companion!"
+          },
+          "retry": {
+            "si": "කලබල වෙන්න එපා, නැවත මාවත සොයා බලමු!",
+            "en": "No rush at all, take a breath and let's check the path again!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! වනපෙතේ සම්පත සොයා ගත්තා!",
+            "en": "Hooray! We discovered the hidden jungle treasure!"
+          }
+        }
+      },
+      "cli_score": 2.8,
+      "raw_sinhala_question": "රුපියල් 20 ක ටොෆි පැකට්ටුවක් සහ රුපියල් 15 ක බිස්කට් පැකට්ටුවක් ගැනීමට අවශ්‍ය මුළු මුදල කීයද?"
+    },
+    "_id": "3cb0996d521048239c657710be995fe9"
+  },
+  {
+    "activity_id": "act_4f971ce217",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "blueprint": {
+      "activity_id": "act_4f971ce217",
+      "source_question_id": "G1-NUM-001",
+      "grade": 1,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
+          "instruction_en": "Find and count the items in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "නිවැරදි පිළිතුර තෝරන්න",
+          "instruction_en": "Select the correct count or answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ ගම්පළ පොළේ ඇපල් ගණන් කරමු",
+        "title_en": "Counting Apples at the Village Market with Gaja",
+        "backdrop_si": "අපි අද ගම්පළ සති පොළට ගියෙමු. එහි ගජා හස්තියා අප එනතුරු සිනාසෙමින් බලා සිටියි. පොළේ රසවත් පලතුරු සහ කූඩ පිරුණු කතාවකි.",
+        "backdrop_en": "We visited the village weekend market today. Gaja the elephant is smiling and waiting for us. It's a colorful story filled with fresh fruits and market baskets.",
+        "quest_goal_si": "මාලා ළඟ දැන් මුළු ඇපල් කීයක් තියෙනවාද කියලා ගජාට හොයාගන්න උදව් කරන්න!",
+        "quest_goal_en": "Help Gaja find out how many total apples Mala has now!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අද අපි පොළෙන් ඇපල් එකතු කරමු!",
+            "en": "Hello! I am Gaja. Today we will collect apples from the market!"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න... මාලා ළඟ තිබුණු ඇපල් 5 ට, නිමල් දුන් ඇපල් 3 එකතු කරන්න.",
+            "en": "Take your time... Add the 3 apples Nimal gave to Mala's starting 5 apples."
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා ගණන් හදාපු විදිහ හරිම අගෙයි!",
+            "en": "Awesome! You figured it out brilliantly!"
+          },
+          "retry": {
+            "si": "කමක් නෑ, හදිස්සි නැතුව අපි නැවත ගණන් කරමු!",
+            "en": "That's okay, no rush, let's count again together!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! ඇපල් 8 ක් සොයාගෙන අපි මෙහෙයුම ජයගත්තා!",
+            "en": "Quest Complete! We found 8 apples and won the challenge!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?"
+    },
+    "_id": "61c79aeee5fe4796aa784212bb0c542e"
+  },
+  {
+    "activity_id": "act_9f204bde1a",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "blueprint": {
+      "activity_id": "act_9f204bde1a",
+      "source_question_id": "G1-NUM-001",
+      "grade": 1,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
+          "instruction_en": "Find and count the items in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "නිවැරදි පිළිතුර තෝරන්න",
+          "instruction_en": "Select the correct count or answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ ගම්මානේ පොළේ ගණන් හැදීම",
+        "title_en": "Counting at the Village Market with Gaja",
+        "backdrop_si": "රුමාවතේ ගම්මානයේ සජීවී පොළ. වටපිටාවේ රසවත් පළතුරු සුවඳ සහ හැඩකාර වෙළඳ කුටි ඇත.",
+        "backdrop_en": "The lively village market filled with the sweet scent of fresh fruits and colorful stalls.",
+        "quest_goal_si": "මාලාට ඇති සහ ලැබුණු ඇපල් එකතු කර ගජාට උදව් කරන්න.",
+        "quest_goal_en": "Help Gaja find the total number of apples Mala has by adding them up.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අද අපි ගමේ පොළෙන් මාලාගේ ඇපල් ගණන් කරමුද?",
+            "en": "Hello! I am Gaja. Shall we count Mala's apples at the village market today?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න, මාලා ළඟ මුලින් තිබුණු ඇපල් 5 ට, තවත් ලැබුණු 3 එකතු කරමු.",
+            "en": "Take your time. Let's add the 3 new apples to Mala's starting 5 apples."
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා හරිම දක්ෂයි!",
+            "en": "Awesome! You are very smart!"
+          },
+          "retry": {
+            "si": "කමක් නෑ, අපි ආයෙත් එකතු කරලා බලමු!",
+            "en": "That's okay, let's add them up again!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! ඇපල් 8 ක් තියෙනවා!",
+            "en": "Quest Complete! There are 8 apples!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?"
+    },
+    "_id": "2cffbd2a77694839917b071aefb63672"
+  },
+  {
+    "activity_id": "act_e96af33fe5",
+    "cli_score": 2.4,
+    "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
+    "blueprint": {
+      "activity_id": "act_e96af33fe5",
+      "source_question_id": "G3-MON-001",
+      "grade": 3,
+      "topic": "Money",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා හඳුනාගන්න",
+          "instruction_en": "Find the quantities in the problem",
+          "target_visual_asset": "COIN_BAG",
+          "correct_target_value": "50, 20",
+          "game_options": [
+            {
+              "text_si": "50, 70",
+              "text_en": "50, 70",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses intermediate count with quantity."
+            },
+            {
+              "text_si": "20",
+              "text_en": "20",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both."
+            },
+            {
+              "text_si": "50, 20",
+              "text_en": "50, 20",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": null
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "70",
+          "game_options": [
+            {
+              "text_si": "70",
+              "text_en": "70",
+              "numeric_value": 70.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "30",
+              "text_en": "30",
+              "numeric_value": 30.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "50",
+              "text_en": "50",
+              "numeric_value": 50.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ පොළේ සවාරිය",
+        "title_en": "Village Market Trip with Gaja",
+        "backdrop_si": "අපේ හුරුපුරුදු ගම්මානයේ සෙනඟ පිරි කඩ මණ්ඩියක, කමල් අලුත් පොතක් සහ පෑනක් මිලදී ගන්න උදව්වක් ඉල්ලනවා. ගජා අපිට මෙන්න මේ ගණන් හැදිල්ල ලේසියෙන්ම කරගන්න අත්වැලක් වෙනවා.",
+        "backdrop_en": "At the bustling village market, Kamal needs help buying a book and a pen. Gaja the friendly elephant is here to guide us through the steps calmly and happily.",
+        "quest_goal_si": "කමල් කඩකාරයාට දුන් රුපියල් 100 ක මුදලින් බඩු වලට ගිය වියදම අඩු කර, නිවැරදි ඉතිරි මුදල සොයා ගැනීමට ගජාට උදව් කරන්න.",
+        "quest_goal_en": "Help Gaja calculate the correct balance by subtracting the total cost of the items from the Rs. 100 Kamal gave to the shopkeeper.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් පුංචි යාළුවා! මම ගජා. අද අපි කමල්ට පොළෙන් බඩු ගන්න උදව් කරමුද?",
+            "en": "Hello little friend! I am Gaja. Shall we help Kamal with his market shopping today?"
+          },
+          "hint": {
+            "si": "මඳක් නතර වී සිතන්න: මුලින්ම පොතයි පෑනයි මිල එකතු කරමුද? ඊටපස්සේ රුපියල් 100 කින් ඒක අඩු කරමු!",
+            "en": "Take a deep breath and pause: First, let's add the book and pen prices together. Then, take it away from 100!"
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා හරිම දක්ෂයි යාළුවා!",
+            "en": "Awesome! You are super smart, friend!"
+          },
+          "retry": {
+            "si": "කමක් නෑ පුංචි යාළුවා, හදිස්සි නැහැ. අපි තව වතාවක් සන්සුන්ව උත්සාහ කරමු!",
+            "en": "No worries at all, there's no rush. Let's take a calm breath and try once more!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි ඉතිරි මුදල හරියටම සොයා ගත්තා! ගජාගේ සතුටු නැටුම!",
+            "en": "Quest Complete! We found the exact balance! Time for Gaja's happy elephant dance!"
+          }
+        }
+      },
+      "cli_score": 2.4,
+      "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?"
+    },
+    "_id": "fce63e8819804c268ec7fa18dd9d74bf"
+  },
+  {
+    "activity_id": "act_d57ca3b142",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "blueprint": {
+      "activity_id": "act_d57ca3b142",
+      "source_question_id": "G1-NUM-001",
+      "grade": 1,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
+          "instruction_en": "Find and count the items in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "නිවැරදි පිළිතුර තෝරන්න",
+          "instruction_en": "Select the correct count or answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ ගම්පළවත්තේ ඇපල් එකතු කිරීම",
+        "title_en": "Apple Counting at the Village Market with Gaja",
+        "backdrop_si": "හැපෙන සුළඟක් සමඟ ගම්මානයේ පොළේ පාට පාට පළතුරු කූඩ පිරී ඇත. ගජා නම් මිත්‍රශීලී ඇතා මාලාට උදව් කිරීමට සිනාසෙමින් බලා සිටියි.",
+        "backdrop_en": "The colorful village market is bustling with fresh fruit stalls under the gentle morning sun. Gaja the friendly elephant is smiling brightly, ready to help Mala at the fruit basket stall.",
+        "quest_goal_si": "මාලා ළඟ දැන් මුළු ඇපල් කීයක් තියෙනවාදැයි ගජා සමඟ එකතු කර සොයා ගන්න!",
+        "quest_goal_en": "Join Gaja to count the total number of apples Mala has now by adding them up!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් පුංචි යාළුවේ! මම ගජා. අද අපි මාලාට උදව් කරමුද ඇපල් ගණන් කරන්න?",
+            "en": "Hello little friend! I am Gaja. Shall we help Mala count her apples today?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න යාළුවා... මාලා ළඟ මුලින්ම ඇපල් 5ක් තිබුණා. නිමල් තවත් 3ක් දුන්නා. ඒවා එකට එකතු කරමු!",
+            "en": "Take your time, friend... Mala started with 5 apples, and Nimal gave 3 more. Let's count them all together!"
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා ගොඩක් දක්ෂයි!",
+            "en": "Awesome! You are super smart!"
+          },
+          "retry": {
+            "si": "කමක් නෑ යාළුවා, අපි නැවත වතාවක් සන්සුන්ව ගණන් කරමු!",
+            "en": "That's okay, friend! Let's take a breath and try counting again!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! ඇපල් 8 ක් සොයා ගත්තා! ගජා ඔයාට සතුටින් අත්පුඩි ගසයි!",
+            "en": "Quest Complete! You found all 8 apples! Gaja is happily flapping his ears for you!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?"
+    },
+    "_id": "ac5c771e27e24093a57ddd0cc166ee9f"
+  },
+  {
+    "activity_id": "act_2347276323",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?",
+    "blueprint": {
+      "activity_id": "act_2347276323",
+      "source_question_id": "G1-NUM-001",
+      "grade": 1,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
+          "instruction_en": "Find and count the items in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "නිවැරදි පිළිතුර තෝරන්න",
+          "instruction_en": "Select the correct count or answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "2",
+              "text_en": "2",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            5,
+            3
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ ගම්මානේ පොළේ ගණිත චාරිකාව",
+        "title_en": "Gaja's Village Market Math Adventure",
+        "backdrop_si": "ගමේ සුවඳ දනවන පොළ දිනයයි. වර්ණවත් පළතුරු කූඩ අතරින් ඇවිදින අපේ යාළුවා මාලාට උදව් කරන්න ගජා සූදානම්.",
+        "backdrop_en": "It's a vibrant village market day. Gaja is ready to help our friend Mala count the fresh fruits among the colorful stalls.",
+        "quest_goal_si": "මාලා ළඟ දැන් මුළු ඇපල් කීයක් තියෙනවද කියලා ගජාට හොයාගන්න උදව් කරන්න!",
+        "quest_goal_en": "Help Gaja find out how many total apples Mala has now!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා.",
+            "en": "Hello! I am Gaja."
+          },
+          "hint": {
+            "si": "කලබල නොවී සෙමින් බලන්න.",
+            "en": "Take your time, look closely."
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා හරිම දක්ෂයි!",
+            "en": "Awesome! You are brilliant!"
+          },
+          "retry": {
+            "si": "කමක් නෑ, නැවත උත්සාහ කරමු!",
+            "en": "No worries, let's try again!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! ඔක්කොම හරි!",
+            "en": "Victory! Quest complete!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "මාලාට ඇපල් 5 ක් ඇත. නිමල් ඇයට තවත් ඇපල් 3 ක් දුන්නේය. දැන් මාලා ළඟ ඇපල් කීයක් තිබේද?"
+    },
+    "_id": "c28ee4a0142b4685a1ecf6f7bfe67b43"
+  },
+  {
+    "activity_id": "act_f5dab05ac7",
+    "cli_score": 2.4,
+    "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
+    "blueprint": {
+      "activity_id": "act_f5dab05ac7",
+      "source_question_id": "G3-MON-001",
+      "grade": 3,
+      "topic": "Money",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා හඳුනාගන්න",
+          "instruction_en": "Find the quantities in the problem",
+          "target_visual_asset": "COIN_BAG",
+          "correct_target_value": "50, 20",
+          "game_options": [
+            {
+              "text_si": "50, 70",
+              "text_en": "50, 70",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses intermediate count with quantity."
+            },
+            {
+              "text_si": "20",
+              "text_en": "20",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both."
+            },
+            {
+              "text_si": "50, 20",
+              "text_en": "50, 20",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": null
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "70",
+          "game_options": [
+            {
+              "text_si": "70",
+              "text_en": "70",
+              "numeric_value": 70.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "30",
+              "text_en": "30",
+              "numeric_value": 30.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "50",
+              "text_en": "50",
+              "numeric_value": 50.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ පොළේ සවාරිය",
+        "title_en": "Village Market Trip with Gaja",
+        "backdrop_si": "හිරු එළිය වැටුණු සුන්දර ගම්මාන පොළක, කමල් අලුත් පොතක් සහ පෑනක් මිලදී ගැනීමට වෙළඳසැලකට ගියේය. අපේ යාළුවා ගජා හස්තියා ඔහුට උදව් කිරීමට සූදාමිනි!",
+        "backdrop_en": "At a sunny and vibrant village market, Kamal is buying a new book and a pen. Our friendly elephant companion Gaja is ready to help him count the coins!",
+        "quest_goal_si": "කමල්ට ලැබිය යුතු ඉතිරි මුදල (රුපියල් 30) ගණනය කර ගජාට උදව් කරන්න.",
+        "quest_goal_en": "Help Gaja calculate the correct balance of Rs. 30 that Kamal should receive from the shopkeeper.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් පුංචි යාළුවා! මම ගජා. අද අපි කමල්ට පොළේදී ඉතිරි මුදම සොයාගන්න උදව් කරමුද?",
+            "en": "Hello little friend! I am Gaja. Shall we help Kamal find his correct change at the market today?"
+          },
+          "hint": {
+            "si": "සෙමින් පියවරෙන් පියවර බලමු. මුලින්ම පොතයි පෑනයි එකතු කරමුද? (50 + 20)",
+            "en": "Take your time and step by step. First, let's add the book and pen together! (50 + 20)"
+          },
+          "praise": {
+            "si": "නියමයි! ඔබ ඉතා දක්ෂයි!",
+            "en": "Awesome! You are super smart!"
+          },
+          "retry": {
+            "si": "කමක් නෑ පුංචි යාළුවා, අපි තව වතාවක් සන්සුන්ව උත්සාහ කරමු!",
+            "en": "That's okay, little friend, let's take a deep breath and try once more!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි ගණන් කිරීම සාර්ථකව අවසන් කළා!",
+            "en": "Quest Complete! We successfully figured out the balance!"
+          }
+        }
+      },
+      "cli_score": 2.4,
+      "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?"
+    },
+    "_id": "8f52d3436c45442ea69b82ff15d48134"
+  },
+  {
+    "activity_id": "act_4f01a2d569",
+    "cli_score": 2.65,
+    "raw_sinhala_question": "1 සිට 9 තෙක් එකිනෙකට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණයට අදාළ සංඛ්‍යාව හඳුනා ගැනීම, කියවීම.",
+    "blueprint": {
+      "activity_id": "act_4f01a2d569",
+      "source_question_id": "G1-EXT-001",
+      "grade": 1,
+      "topic": "Counting",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "TWO_TIER",
+        "distractor_count": 3,
+        "stimulus_density": "MEDIUM",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
+          "instruction_en": "Find and count the items in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "5",
+          "game_options": [
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            },
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": 3.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-2 counting skip while counting objects."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            }
+          ],
+          "operands": [
+            5
+          ],
+          "operation": "COUNT"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "නිවැරදි පිළිතුර තෝරන්න",
+          "instruction_en": "Select the correct count or answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "5",
+          "game_options": [
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            },
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": 3.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-2 counting skip while counting objects."
+            },
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            }
+          ],
+          "operands": [
+            5
+          ],
+          "operation": "COUNT"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජාගේ ගම්පළ පොළ සාප්පුව",
+        "title_en": "Gaja's Village Market Adventure",
+        "backdrop_si": "හිරු එළිය වැටුණු අලංකාර ගම්පළ පොළකි. වටේටම නැවුම් කෙසෙල් ගෙඩි සහ පළතුරු පිරී ඇත.",
+        "backdrop_en": "A bright, bustling village market bathed in warm sunlight, filled with colorful stalls of fresh bananas and tropical fruits.",
+        "quest_goal_si": "ගජා සමඟ එකතු වී වෙළඳපොළේ ඇති කෙසෙල් ගෙඩි ප්‍රමාණය ගණන් කර නිවැරදි අංකය සොයමු!",
+        "quest_goal_en": "Join Gaja to count the yummy bananas at the market stall and find the correct number!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අද අපි පොළෙන් රසවත් කෙසෙල් ගෙඩි ගණන් කරමුද?",
+            "en": "Hello! I am Gaja. Shall we count some delicious bananas at the market today?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න, අත්පොළසන් දෙමින් එකින් එක ගණන් කරමු!",
+            "en": "Take your time, let's point and count them one by one!"
+          },
+          "praise": {
+            "si": "නියමයි! ඔබ හරියටම ගණන් කළා!",
+            "en": "Awesome! You counted them just right!"
+          },
+          "retry": {
+            "si": "කමක් නෑ, ගජාත් එක්ක නැවත වතාවක් උත්සාහ කරමු!",
+            "en": "That's okay, let's try counting together again with Gaja!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි අංක පහ සොයාගත්තා!",
+            "en": "Quest Complete! We found the number five!"
+          }
+        }
+      },
+      "cli_score": 2.65,
+      "raw_sinhala_question": "1 සිට 9 තෙක් එකිනෙකට අදාළ ද්‍රව්‍ය ප්‍රමාණය, රූප ප්‍රමාණයට අදාළ සංඛ්‍යාව හඳුනා ගැනීම, කියවීම."
+    },
+    "_id": "a274a16a46684fe886bfd4f8a1b40c5f"
+  },
+  {
+    "activity_id": "act_a319b98f82",
+    "cli_score": 3.4,
+    "raw_sinhala_question": "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම.",
+    "blueprint": {
+      "activity_id": "act_a319b98f82",
+      "source_question_id": "G1-EXT-003",
+      "grade": 1,
+      "topic": "Money",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
+          "instruction_en": "Find and count the items in the problem",
+          "target_visual_asset": "COIN_BAG",
+          "correct_target_value": "5",
+          "game_options": [
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            },
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            }
+          ],
+          "operands": [
+            5
+          ],
+          "operation": "IDENTIFY"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "නිවැරදි පිළිතුර තෝරන්න",
+          "instruction_en": "Select the correct count or answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "5",
+          "game_options": [
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            },
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            }
+          ],
+          "operands": [
+            5
+          ],
+          "operation": "IDENTIFY"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජාගේ සතිපොළ ගමන",
+        "title_en": "Gaja's Village Market Adventure",
+        "backdrop_si": "අපි අද ගජා සමඟ පාට පාට කොළ, බෙලිමල් සහ රසවත් කැවිලි පිරුණු ගමේ සතිපොළට යමු!",
+        "backdrop_en": "Let's visit the colorful village market filled with fresh fruits and sweet treats with Gaja!",
+        "quest_goal_si": "රුපියල් 5 ක කාසිය නිවැරදිව හඳුනාගෙන ගජාට උදව් කරන්න.",
+        "quest_goal_en": "Help Gaja by correctly identifying the 5 rupees coin.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අද පොළේදී මට ලස්සන රුපියල් පහේ කාසියක් හමුවුණා!",
+            "en": "Hello! I am Gaja. Today at the market, I found a special coin!"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න... මේක ටිකක් ලොකු රුපියල් 5 ක කාසියක්.",
+            "en": "Take your time... Look for the bigger 5 rupees coin."
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා හරිම දක්ෂයි!",
+            "en": "Awesome! You are super smart!"
+          },
+          "retry": {
+            "si": "කමක් නෑ, අපි නැවතත් උත්සාහ කරමු!",
+            "en": "That's okay, let's try again!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි රුපියල් පහේ කාසිය සාර්ථකව හොයාගත්තා!",
+            "en": "Quest Complete! We successfully found the 5 rupees coin!"
+          }
+        }
+      },
+      "cli_score": 3.4,
+      "raw_sinhala_question": "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම."
+    },
+    "_id": "728c5ab3d4ca4c5580b68cb6618cc3d2"
+  },
+  {
+    "activity_id": "act_1b5e6fb38c",
+    "cli_score": 3.4,
+    "raw_sinhala_question": "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම.",
+    "blueprint": {
+      "activity_id": "act_1b5e6fb38c",
+      "source_question_id": "G1-EXT-003",
+      "grade": 1,
+      "topic": "Money",
+      "game_theme": "JUNGLE_ADVENTURE",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
+          "instruction_en": "Find and count the items in the problem",
+          "target_visual_asset": "COIN_BAG",
+          "correct_target_value": "5",
+          "game_options": [
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            },
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            }
+          ],
+          "operands": [
+            5
+          ],
+          "operation": "IDENTIFY"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "නිවැරදි පිළිතුර තෝරන්න",
+          "instruction_en": "Select the correct count or answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "5",
+          "game_options": [
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            },
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            }
+          ],
+          "operands": [
+            5
+          ],
+          "operation": "IDENTIFY"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "රුපියල් පහේ කැලෑ මෙහෙයුම",
+        "title_en": "The Five Rupee Jungle Quest",
+        "backdrop_si": "ගජා සමඟ ලස්සන සිංහරාජ කැලයේ ඇවිදිමින්, වැටී ඇති කාසි එකතු කරමු.",
+        "backdrop_en": "Walking through the beautiful Sinharaja forest with Gaja, let's collect the fallen coins.",
+        "quest_goal_si": "රුපියල් පහේ කාසිය හොයාගෙන ගජාට උදව් කරන්න!",
+        "quest_goal_en": "Find the 5-rupee coin and help Gaja!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අද අපි කැලේ වටිනා කාසි සොයමු!",
+            "en": "Hello! I am Gaja. Today let's find valuable coins in the jungle!"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න, අංක 5 ලියා ඇති ලොකුම කාසිය මෙයයි.",
+            "en": "Take your time, this is the biggest coin with the number 5 on it."
+          },
+          "praise": {
+            "si": "නියමයි! ඔබ හරිම දක්ෂයි!",
+            "en": "Awesome! You are very clever!"
+          },
+          "retry": {
+            "si": "කමක් නෑ, නැවත බලමු!",
+            "en": "Let's try again!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි රුපියල් පහේ කාසිය හොයාගත්තා!",
+            "en": "Quest Complete! We found the 5-rupee coin!"
+          }
+        }
+      },
+      "cli_score": 3.4,
+      "raw_sinhala_question": "රුපියල, රුපියල් දෙක සහ රුපියල් පහ යන කාසි හඳුනා ගැනීම."
+    },
+    "_id": "ecf7f331b00041eca73346435818e6ba"
+  },
+  {
+    "activity_id": "act_829c81cf15",
+    "cli_score": 2.95,
+    "raw_sinhala_question": "පන්තියේ පිරිමි ළමුන් 14 ක් සහ ගැහැනු ළමුන් 15 ක් සිටිති. පන්තියේ සිටින මුළු ළමුන් ගණන කීයද?",
+    "blueprint": {
+      "activity_id": "act_829c81cf15",
+      "source_question_id": "G2-ADD-001",
+      "grade": 2,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "TWO_TIER",
+        "distractor_count": 3,
+        "stimulus_density": "MEDIUM",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "බෙදීම (÷)",
+              "text_en": "Division (÷)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            14,
+            15
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "29",
+          "game_options": [
+            {
+              "text_si": "15",
+              "text_en": "15",
+              "numeric_value": 15.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "29",
+              "text_en": "29",
+              "numeric_value": 29.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "1",
+              "text_en": "1",
+              "numeric_value": 1.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "14",
+              "text_en": "14",
+              "numeric_value": 14.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            }
+          ],
+          "operands": [
+            14,
+            15
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 2.95,
+      "raw_sinhala_question": "පන්තියේ පිරිමි ළමුන් 14 ක් සහ ගැහැනු ළමුන් 15 ක් සිටිති. පන්තියේ සිටින මුළු ළමුන් ගණන කීයද?"
+    },
+    "_id": "01f3c4d6e0ca4644a65dec2dc4dd05ad"
+  },
+  {
+    "activity_id": "act_aa940d7cfe",
+    "cli_score": 3.1,
+    "raw_sinhala_question": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව තෝරන්න.",
+    "blueprint": {
+      "activity_id": "act_aa940d7cfe",
+      "source_question_id": "G1-CNT-001",
+      "grade": 1,
+      "topic": "Counting",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
+          "instruction_en": "Find and count the items in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "5",
+          "game_options": [
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            },
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            }
+          ],
+          "operands": [
+            5
+          ],
+          "operation": "COUNT"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "නිවැරදි පිළිතුර තෝරන්න",
+          "instruction_en": "Select the correct count or answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "5",
+          "game_options": [
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            },
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects."
+            }
+          ],
+          "operands": [
+            5
+          ],
+          "operation": "COUNT"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ අඹ වෙළඳපොළේදී",
+        "title_en": "Mango Market Adventure with Gaja",
+        "backdrop_si": "අපි අද ගම්මානයේ සජීවී පොළට ගොස් නැවුම් සහ සුවඳවත් අඹ ගණන් කරමු!",
+        "backdrop_en": "Let's visit the lively village market today to count fresh and fragrant mangoes!",
+        "quest_goal_si": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව සොයා ගැනීමට ගජාට උදව් කරන්න.",
+        "quest_goal_en": "Help Gaja count the 5 mangoes in the basket and select the correct number.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් පුංචි යාළුවා! මම ගජා. අද අපි පොළේ අඹ කූඩය ළඟ ඉන්නේ. කූඩයේ අඹ කීයක් තියෙනවද බලමුද?",
+            "en": "Hello little friend! I am Gaja. Today we are at the market near the mango basket. Shall we see how many mangoes are in the basket?"
+          },
+          "hint": {
+            "si": "සෙමින්, එකින් එක අඹ මත අත තබා ගණන් කරන්න. මම ඔයාත් එක්කම ඉන්නවා!",
+            "en": "Take your time, touch and count the mangoes one by one. I am right here with you!"
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා හරිම දක්ෂයි!",
+            "en": "Awesome! You are super smart!"
+          },
+          "retry": {
+            "si": "කමක් නෑ පුංචි යාළුවා, අපි නැවත වතාවක් සෙමින් ගණන් කරමු!",
+            "en": "That's okay little friend, let's count slowly once more!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි සාර්ථකව අඹ ගණන් කළා!",
+            "en": "Quest Complete! We successfully counted the mangoes!"
+          }
+        }
+      },
+      "cli_score": 3.1,
+      "raw_sinhala_question": "කූඩයේ ඇති අඹ 5 ගණන් කර නිවැරදි සංඛ්‍යාව තෝරන්න."
+    },
+    "_id": "d990f9c898de4278b353b6a91cba59ca"
+  },
+  {
+    "activity_id": "act_219127d414",
+    "cli_score": 2.4,
+    "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
+    "blueprint": {
+      "activity_id": "act_219127d414",
+      "source_question_id": "G3-MON-001",
+      "grade": 3,
+      "topic": "Money",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා හඳුනාගන්න",
+          "instruction_en": "Find the quantities in the problem",
+          "target_visual_asset": "COIN_BAG",
+          "correct_target_value": "50, 20",
+          "game_options": [
+            {
+              "text_si": "50, 70",
+              "text_en": "50, 70",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses intermediate count with quantity.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "20",
+              "text_en": "20",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "50, 20",
+              "text_en": "50, 20",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": null,
+          "visual_props": {}
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD",
+          "visual_props": {}
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "70",
+          "game_options": [
+            {
+              "text_si": "70",
+              "text_en": "70",
+              "numeric_value": 70.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "30",
+              "text_en": "30",
+              "numeric_value": 30.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "50",
+              "text_en": "50",
+              "numeric_value": 50.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD",
+          "visual_props": {}
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ ගම්මානේ වෙළඳපොළ චාරිකාව",
+        "title_en": "Village Market Trip with Gaja",
+        "backdrop_si": "අද අපි ගමේ සති පොළේ දී කමල්ට උදව් කරන්නෙමු. පොතක් සහ පෑනක් මිලදී ගෙන ඉතිරි මුදල සොයා ගැනීමට ගජා අපට උදව් වේ.",
+        "backdrop_en": "Today we are helping Kamal at the village fair. Gaja is here to help us buy a book and a pen and figure out the correct change.",
+        "quest_goal_si": "කඩකාරයාට රුපියල් 100 ක් දී, නිවැරදි ඉතිරි මුදල වන රුපියල් 30 ගණනය කර කමල්ට බාර දීමට ගජා සමඟ එක්වන්න.",
+        "quest_goal_en": "Join Gaja to calculate the correct balance of Rs. 30 after giving Rs. 100 to the shopkeeper, and help Kamal complete his shopping.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අද අපි කමල්ට පොතයි පෑනයි අරන් ඉතිරි සල්ලි ටික හරියටම හොයාගමුද?",
+            "en": "Hello! I am Gaja. Shall we help Kamal buy his book and pen and find the right change today?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න... මුලින්ම පොතේ මිලයි පෑනේ මිලයි එකතු කරමුද? (50 + 20)",
+            "en": "Take your time... Let's add the price of the book and the pen first! (50 + 20)"
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා ගොඩක් දක්ෂයි!",
+            "en": "Awesome! You are super smart!"
+          },
+          "retry": {
+            "si": "කමක් නෑ, හදිසි නැහැ. අපි තව වතාවක් සන්සුන්ව උත්සාහ කරමු!",
+            "en": "That's okay, no rush at all. Let's take a deep breath and try once more!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි ඉතිරි මුදල හරියටම හොයාගත්තා!",
+            "en": "Quest Complete! We found the exact balance!"
+          }
+        }
+      },
+      "cli_score": 2.4,
+      "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?"
+    },
+    "_id": "ca078c2225bb4057b48eaafb7e9f51b6"
+  },
+  {
+    "activity_id": "act_5ab79aa52b",
+    "cli_score": 2.95,
+    "raw_sinhala_question": "යාළුවේ! ගජාට ලස්සන රවුම හැඩය හොයලා දෙන්න පුළුවන්ද? 🟡",
+    "raw_english_question": "Friend! Can you help Gaja find the lovely circle shape? 🟡",
+    "blueprint": {
+      "activity_id": "act_5ab79aa52b",
+      "source_question_id": "G1-EXT-001",
+      "grade": 1,
+      "topic": "Shapes",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "TWO_TIER",
+        "distractor_count": 4,
+        "stimulus_density": "MEDIUM",
+        "visual_clutter_filter": true,
+        "timer_enabled": true
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "MATCH_SHAPE",
+          "instruction_si": "ගජා සොයන රවුම් හැඩය හඳුනාගන්න 🟡",
+          "instruction_en": "Identify the circle shape Gaja is looking for 🟡",
+          "target_visual_asset": "SHAPE_CARD",
+          "correct_target_value": "1",
+          "game_options": [
+            {
+              "text_si": "රවුම (Circle)",
+              "text_en": "Circle",
+              "numeric_value": 1.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": "CIRCLE"
+            },
+            {
+              "text_si": "ත්‍රිකෝණය (Triangle)",
+              "text_en": "Triangle",
+              "numeric_value": 2.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": null,
+              "icon_or_shape": "TRIANGLE"
+            },
+            {
+              "text_si": "කොටුව (Square)",
+              "text_en": "Square",
+              "numeric_value": 3.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": null,
+              "icon_or_shape": "SQUARE"
+            }
+          ],
+          "operands": [
+            1
+          ],
+          "operation": "SHAPE",
+          "visual_props": {}
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජාගේ පොළේ රවුම් සොයා යාම",
+        "title_en": "Gaja's Village Market Shape Hunt",
+        "backdrop_si": "අපේ ගමේ සාරවත් පොළේ, ගජා හස්තියා පලතුරු සහ රසකැවිලි අලෙවි කරන කඩ අතර ඇවිදිමින් සිටියි. හිරු එළිය බැබළෙන මේ සුන්දර දවසේ, අපට රවුම් හැඩැති දේවල් සොයා ගැනීමට උදව් අවශ්‍ය වී ඇත.",
+        "backdrop_en": "In our vibrant village market, Gaja the elephant is strolling past colorful fruit and sweet stalls. On this bright sunny day, we need help finding all the round-shaped items.",
+        "quest_goal_si": "පින්තූරයේ ඇති වස්තූන් අතරින් රවුම් හැඩය පමණක් තෝරන්න.",
+        "quest_goal_en": "Select only the round shape among the objects in the picture.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අද අපි පොළේ රවුම් හැඩැති රසවත් දේවල් හොයමුද?",
+            "en": "Hello! I am Gaja. Shall we find some round, tasty things at the market today?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න... මගේ බෝලයක් වගේ වටකුරු දේ මෙතන කොහෙද තියෙන්නේ?",
+            "en": "Take your time... Where is the round thing that looks like my ball?"
+          },
+          "praise": {
+            "si": "නියමයි! ඔන්න ඔයා හරියටම රවුම් හැඩය හොයාගත්තා!",
+            "en": "Awesome! You found the exact round shape!"
+          },
+          "retry": {
+            "si": "කමක් නෑ, කලබල වෙන්න එපා. අපි නැවත හොඳින් බලමු!",
+            "en": "That's okay, no rush. Let's look closely again!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි හැම රවුම් හැඩයක්ම සාර්ථකව හොයාගත්තා!",
+            "en": "Quest Complete! We successfully found all the round shapes!"
+          }
+        }
+      },
+      "cli_score": 2.8,
+      "effective_cli_score": 2.95,
+      "raw_sinhala_question": "යාළුවේ! ගජාට ලස්සන රවුම හැඩය හොයලා දෙන්න පුළුවන්ද? 🟡",
+      "raw_english_question": "Friend! Can you help Gaja find the lovely circle shape? 🟡",
+      "target_learner_id": null,
+      "student_name": "Inattentive Profile (අවධානය)",
+      "customized_by_teacher": true,
+      "behavior_profile": {
+        "learner_id": null,
+        "student_name": "Inattentive Profile (අවධානය)",
+        "archetype_id": "INATTENTIVE",
+        "inattention_level": "HIGH",
+        "impulsivity_level": "LOW",
+        "working_memory_support": true,
+        "activity_pace": "CALM_STEP_BY_STEP",
+        "visual_assistance": "ALWAYS",
+        "audio_assistance": "READ_ON_CLICK"
+      }
+    },
+    "_id": "28b5e581e6f94ccbbe1b966f8c4c1ce7"
+  },
+  {
+    "activity_id": "act_98b35941c1",
+    "cli_score": 1.15,
+    "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
+    "raw_english_question": "Kamal bought a book for Rs. 50 and a pen for Rs. 20. He gave Rs. 100 to the shopkeeper. How much is the balance?",
+    "blueprint": {
+      "activity_id": "act_98b35941c1",
+      "source_question_id": "G3-MON-001",
+      "grade": 3,
+      "topic": "Money",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා හඳුනාගන්න",
+          "instruction_en": "Find the quantities in the problem",
+          "target_visual_asset": "COIN_BAG",
+          "correct_target_value": "50, 20",
+          "game_options": [
+            {
+              "text_si": "50, 70",
+              "text_en": "50, 70",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses intermediate count with quantity.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "20",
+              "text_en": "20",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "50, 20",
+              "text_en": "50, 20",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": null,
+          "visual_props": {}
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD",
+          "visual_props": {}
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "70",
+          "game_options": [
+            {
+              "text_si": "70",
+              "text_en": "70",
+              "numeric_value": 70.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "30",
+              "text_en": "30",
+              "numeric_value": 30.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "50",
+              "text_en": "50",
+              "numeric_value": 50.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            50,
+            20
+          ],
+          "operation": "ADD",
+          "visual_props": {}
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජා සමඟ පොළේ සවාරිය",
+        "title_en": "Village Market Trip with Gaja",
+        "backdrop_si": "අපේ හුරුපුරුදු ගම්මානයේ පොළ ඉතා සජීවී ය. කමල් පාසල් බෑගය සූදානම් කර ගැනීමට අවශ්‍ය ද්‍රව්‍ය මිලදී ගැනීමට අලි යාළුවා වන ගජා සමඟ පොළට ගියේය.",
+        "backdrop_en": "Our village fair is very lively. Kamal went to the market with his elephant friend Gaja to buy some stationery supplies.",
+        "quest_goal_si": "කමල්ට ලැබිය යුතු ඉතිරි මුදල සොයා ගජාට කඩකාරයාට උදව් කරන්න.",
+        "quest_goal_en": "Help Gaja calculate the correct balance change that Kamal should receive from the shopkeeper.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් පුංචි යාළුවා! මම ගජා. අද අපි කමල්ට පොළේ ගනුදෙනු කරන්න උදව් කරමුද?",
+            "en": "Hello little friend! I am Gaja. Shall we help Kamal with his shopping math today?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න යාළුවා. පළමුව බයිතුයි පෑනයි ගත්ත මුදල් එකතු කර, පස්සේ 100න් අඩු කරමු.",
+            "en": "Take your time, friend. First add the cost of the book and pen, then subtract it from 100."
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා ගණන් හැදූ ආකාරය අගය කරනවා!",
+            "en": "Awesome! I love how you solved that math problem!"
+          },
+          "retry": {
+            "si": "කමක් නෑ යාළුවා, අපි තව වරක් සෙමින් උත්සාහ කරමු!",
+            "en": "That's okay friend, let's take a deep breath and try once more!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි නිවැරදි ඉතිරි මුදල රුපියල් 30 ක් ලෙස සොයා ගත්තා!",
+            "en": "Quest Complete! We successfully found the correct balance of Rs. 30!"
+          }
+        }
+      },
+      "cli_score": 2.4,
+      "effective_cli_score": 1.15,
+      "raw_sinhala_question": "කමල් රුපියල් 50 කට පොතක් සහ රුපියල් 20 කට පෑනක් මිලදී ගත්තේය. ඔහු කඩකාරයාට රුපියල් 100 ක් දුන්නේය. ඉතිරිය කොපමණද?",
+      "raw_english_question": "Kamal bought a book for Rs. 50 and a pen for Rs. 20. He gave Rs. 100 to the shopkeeper. How much is the balance?",
+      "target_learner_id": null,
+      "student_name": "Inattentive Profile (අවධානය)",
+      "customized_by_teacher": true,
+      "behavior_profile": {
+        "learner_id": null,
+        "student_name": "Inattentive Profile (අවධානය)",
+        "archetype_id": "INATTENTIVE",
+        "inattention_level": "HIGH",
+        "impulsivity_level": "LOW",
+        "working_memory_support": true,
+        "activity_pace": "CALM_STEP_BY_STEP",
+        "visual_assistance": "ALWAYS",
+        "audio_assistance": "READ_ON_CLICK"
+      }
+    },
+    "_id": "defb3478ab0946099f54240272329412"
+  },
+  {
+    "activity_id": "act_d9ee0cc1d6",
+    "cli_score": 2.45,
+    "raw_sinhala_question": "බලන්නකෝ ලස්සන රටාව! හිස් තැනට එන නිවැරදි හැඩය හෝ පාට තෝරමු 🚂",
+    "raw_english_question": "Look at the fun pattern! Let's choose what comes next 🚂",
+    "blueprint": {
+      "activity_id": "act_d9ee0cc1d6",
+      "source_question_id": "G1-EXT-002",
+      "grade": 1,
+      "topic": "Patterns",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "COMPLETE_PATTERN",
+          "instruction_si": "රටාවේ හිස් තැනට එන නිවැරදි වර්ණය හෝ හැඩය තෝරන්න 🚂",
+          "instruction_en": "Choose what comes next in the pattern 🚂",
+          "target_visual_asset": "PATTERN_TRAIN",
+          "correct_target_value": "2",
+          "game_options": [
+            {
+              "text_si": "නිල් පාට (Blue)",
+              "text_en": "Blue",
+              "numeric_value": 2.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": "BLUE"
+            },
+            {
+              "text_si": "රතු පාට (Red)",
+              "text_en": "Red",
+              "numeric_value": 1.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": null,
+              "icon_or_shape": "RED"
+            },
+            {
+              "text_si": "කහ පාට (Yellow)",
+              "text_en": "Yellow",
+              "numeric_value": 3.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": null,
+              "icon_or_shape": "YELLOW"
+            }
+          ],
+          "operands": [
+            2
+          ],
+          "operation": "PATTERN",
+          "visual_props": {}
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "පොළේ වර්ණ රටාව",
+        "title_en": "The Village Market Color Pattern",
+        "backdrop_si": "ගම මැද පිහිටි විචිත්‍රවත් පොළේ, ගජා සහ මිතුරන් රසවත් පළතුරු සහ සැරසිලි විකුණමින් සිටී.",
+        "backdrop_en": "At the bustling village market, Gaja and friends are setting up colorful fruit stalls and decorations.",
+        "quest_goal_si": "රතු සහ නිල් කොඩි රටාව නිවැරදිව තේරුම් ගෙන ඊළඟ වර්ණය සොයා ගැනීමට ගජාට උදව් කරන්න.",
+        "quest_goal_en": "Help Gaja figure out the red and blue flag pattern to find out which color comes next.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අපේ පොළේ සැරසිලි කොඩි රතු, නිල්, රතු, නිල් විදිහට එල්ලා තිබෙනවා. ඊළඟට එන පාට මොකක්ද?",
+            "en": "Hello! I am Gaja. Our market flags are hung red, blue, red, blue. Can you guess which color comes next?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න... රතු, නිල්, රතු, නිල්... ඊළඟට මොකක් වෙයිද?",
+            "en": "Take your time... Red, blue, red, blue... What could be next?"
+          },
+          "praise": {
+            "si": "නියමයි! ඔබ හරි.",
+            "en": "Awesome! You got it right."
+          },
+          "retry": {
+            "si": "කමක් නෑ, නැවත වතාවක් රටාව දෙස බලමු!",
+            "en": "That's okay, let's look at the pattern again!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! පොළ දැන් හරිම ලස්සනයි!",
+            "en": "Quest Complete! The market looks so wonderful now!"
+          }
+        }
+      },
+      "cli_score": 3.7,
+      "effective_cli_score": 2.45,
+      "raw_sinhala_question": "බලන්නකෝ ලස්සන රටාව! හිස් තැනට එන නිවැරදි හැඩය හෝ පාට තෝරමු 🚂",
+      "raw_english_question": "Look at the fun pattern! Let's choose what comes next 🚂",
+      "target_learner_id": null,
+      "student_name": "Inattentive Profile (අවධානය)",
+      "customized_by_teacher": true,
+      "behavior_profile": {
+        "learner_id": null,
+        "student_name": "Inattentive Profile (අවධානය)",
+        "archetype_id": "INATTENTIVE",
+        "inattention_level": "HIGH",
+        "impulsivity_level": "LOW",
+        "working_memory_support": true,
+        "activity_pace": "CALM_STEP_BY_STEP",
+        "visual_assistance": "ALWAYS",
+        "audio_assistance": "READ_ON_CLICK"
+      }
+    },
+    "_id": "287ec42d99354ca7b1e8d1780e3eb2e2"
+  },
+  {
+    "activity_id": "act_7dae0b3110",
+    "cli_score": 1.25,
+    "raw_sinhala_question": "එක් පෙට්ටියක පැන්සල් 6 බැගින් ඇති පෙට්ටි 4 ක ඇති මුළු පැන්සල් ගණන කීයද?",
+    "raw_english_question": "If each box has 6 pencils, how many pencils are there altogether in 4 such boxes?",
+    "blueprint": {
+      "activity_id": "act_7dae0b3110",
+      "source_question_id": "G3-MUL-002",
+      "grade": 3,
+      "topic": "Multiplication",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "IDENTIFY_ENTITY",
+          "instruction_si": "ගැටලුවේ ඇති සංඛ්‍යා හඳුනාගන්න",
+          "instruction_en": "Find the quantities in the problem",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "6, 4",
+          "game_options": [
+            {
+              "text_si": "6, 10",
+              "text_en": "6, 10",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "WORKING_MEMORY_OVERFLOW",
+              "distractor_rationale": "Confuses intermediate count with quantity.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Quickly picks single salient number without scanning both.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "6, 4",
+              "text_en": "6, 4",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            6,
+            4
+          ],
+          "operation": null,
+          "visual_props": {}
+        },
+        {
+          "step_order": 2,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "×",
+          "game_options": [
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "බෙදීම (÷)",
+              "text_en": "Division (÷)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            6,
+            4
+          ],
+          "operation": "MUL",
+          "visual_props": {}
+        },
+        {
+          "step_order": 3,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "24",
+          "game_options": [
+            {
+              "text_si": "6",
+              "text_en": "6",
+              "numeric_value": 6.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "24",
+              "text_en": "24",
+              "numeric_value": 24.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "10",
+              "text_en": "10",
+              "numeric_value": 10.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            6,
+            4
+          ],
+          "operation": "MUL",
+          "visual_props": {}
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගජාගේ සතිපොළ ගණන් බැලීම",
+        "title_en": "Gaja's Village Market Count",
+        "backdrop_si": "හිරු එළිය වැටුණු ගම්මානයේ සතිපොළේ, ගජා හස්තියා පාට පාට පැන්සල් පෙට්ටි ගණන් කිරීමට උදව් ඉල්ලයි.",
+        "backdrop_en": "At the sunny village market, Gaja the friendly elephant needs help counting colorful pencil boxes.",
+        "quest_goal_si": "පෙට්ටි 4ක ඇති මුළු පැන්සල් ගණන සොයා ගජාට වෙළඳපොළේ ගනුදෙනුව අවසන් කිරීමට උදව් කරන්න.",
+        "quest_goal_en": "Help Gaja find the total number of pencils in 4 boxes to complete the market errand.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන්! මම ගජා. අද අපි පොළෙන් පැන්සල් පෙට්ටි ගන්නවා. පෙට්ටි 4ක පැන්සල් කීයද කියලා හොයමුද?",
+            "en": "Hello! I am Gaja. Today we are buying pencil boxes at the market. Shall we find out how many pencils are in 4 boxes?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න... පෙට්ටියක 6 බැගින් පෙට්ටි 4 ක් තියෙනවා. එකතු කරමුද, නැත්නම් ගුණ කරමුද?",
+            "en": "Take your time... There are 4 boxes with 6 pencils in each. Shall we add them up or multiply?"
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා හරිම දක්ෂයි!",
+            "en": "Awesome! You are super smart!"
+          },
+          "retry": {
+            "si": "කමක් නෑ, අපිට තව වතාවක් උත්සාහ කරන්න පුළුවන්!",
+            "en": "That's okay, we can try again!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි පැන්සල් 24ක් හොයාගත්තා!",
+            "en": "Quest Complete! We found all 24 pencils!"
+          }
+        }
+      },
+      "cli_score": 2.5,
+      "effective_cli_score": 1.25,
+      "raw_sinhala_question": "එක් පෙට්ටියක පැන්සල් 6 බැගින් ඇති පෙට්ටි 4 ක ඇති මුළු පැන්සල් ගණන කීයද?",
+      "raw_english_question": "If each box has 6 pencils, how many pencils are there altogether in 4 such boxes?",
+      "target_learner_id": null,
+      "student_name": "Inattentive Profile (අවධානය)",
+      "customized_by_teacher": true,
+      "behavior_profile": {
+        "learner_id": null,
+        "student_name": "Inattentive Profile (අවධානය)",
+        "archetype_id": "INATTENTIVE",
+        "inattention_level": "HIGH",
+        "impulsivity_level": "LOW",
+        "working_memory_support": true,
+        "activity_pace": "CALM_STEP_BY_STEP",
+        "visual_assistance": "ALWAYS",
+        "audio_assistance": "READ_ON_CLICK"
+      }
+    },
+    "_id": "7e416d66f49b447ea710ae0f5d17bb14"
+  },
+  {
+    "activity_id": "act_8d8f34d60d",
+    "cli_score": 1.0,
+    "raw_sinhala_question": "අඩු පෑන් ප්‍රමාණය තෝරන්න: 3 හෝ 7?",
+    "raw_english_question": "Pick the smaller amount: 3 or 7?",
+    "blueprint": {
+      "activity_id": "act_8d8f34d60d",
+      "source_question_id": "doc_g1_grade_1-p012-2",
+      "grade": 1,
+      "topic": "Comparison",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "COMPARE_QUANTITY",
+          "instruction_si": "වඩා කුඩා එක තෝරන්න",
+          "instruction_en": "Pick the smaller one",
+          "target_visual_asset": "COMPARISON_SCALE",
+          "correct_target_value": "3",
+          "game_options": [
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": 3.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "7",
+              "text_en": "7",
+              "numeric_value": 7.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Picks the first or most eye-catching quantity without comparing.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            3,
+            7
+          ],
+          "operation": "COMPARE",
+          "visual_props": {
+            "target": "SMALLER"
+          }
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "පොළේ පෑන් තෝරමු",
+        "title_en": "Pens at the Village Fair",
+        "backdrop_si": "ගමේ සති පොළ අද හරිම කලබලකාරී වගේම ලස්සනයි! ලිපිද්‍රව්‍ය කඩේ පාට පාට පෑන් තොගයක් විකුණන්න තියෙනවා.",
+        "backdrop_en": "The village fair is bustling with lively stalls today! The stationery shop has bundles of bright, colorful pens on display.",
+        "quest_goal_si": "පෑන් ගොඩවල් දෙකෙන් කුඩාම ප්‍රමාණය තෝරාගෙන ගජාගේ පුංචි පැන්සල් පෙට්ටිය පුරවන්න උදවු කරන්න.",
+        "quest_goal_en": "Help Gaja find the smaller pile of pens to fit neatly into his little pencil case.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යාලුවේ! මම ගජා. මගේ පොඩි බෑගයට දාගන්න අඩුම පෑන් ගණන තියෙන ගොඩ හොයලා දෙන්න පුළුවන්ද?",
+            "en": "Hello friend! I am Gaja. Can you help me pick the smaller bunch of pens to fit into my little pouch?"
+          },
+          "hint": {
+            "si": "සෙමින් බලන්න... ඇඟිලි තුනක් දිගු කරලා, ඊළඟට හතක් එක්ක සසඳලා බලන්න. අඩු ප්‍රමාණය කොයිකද?",
+            "en": "Take your time... Show 3 on one hand and 7 on both hands. Which one has fewer fingers?"
+          },
+          "praise": {
+            "si": "නියමයි! ඔයා හරිම දක්ෂයි! පෑන් 3 තමයි කුඩාම ප්‍රමාණය!",
+            "en": "Awesome! You are brilliant! 3 pens is definitely the smaller amount!"
+          },
+          "retry": {
+            "si": "කමක් නෑ යාලුවේ, කලබල වෙන්න එපා. අපි ආයෙමත් හිමීට ගණන් කරලා බලමු!",
+            "en": "No worries! Let's take a calm breath and compare the two piles again together."
+          },
+          "celebrate": {
+            "si": "ජය වේවා! ගජාගේ බෑගයට හරියටම ගැලපෙන පෑන් ටික ලැබුණා. අපි ඊළඟ කඩේට යමු!",
+            "en": "Quest Complete! Gaja has the perfect pen set now. Let's explore the next market stall!"
+          }
+        }
+      },
+      "cli_score": 1.75,
+      "effective_cli_score": 1.0,
+      "raw_sinhala_question": "අඩු පෑන් ප්‍රමාණය තෝරන්න: 3 හෝ 7?",
+      "raw_english_question": "Pick the smaller amount: 3 or 7?",
+      "target_learner_id": null,
+      "student_name": "Inattentive Profile (අවධානය)",
+      "customized_by_teacher": true,
+      "behavior_profile": {
+        "learner_id": null,
+        "student_name": "Inattentive Profile (අවධානය)",
+        "archetype_id": "INATTENTIVE",
+        "inattention_level": "HIGH",
+        "impulsivity_level": "LOW",
+        "working_memory_support": true,
+        "activity_pace": "CALM_STEP_BY_STEP",
+        "visual_assistance": "ALWAYS",
+        "audio_assistance": "READ_ON_CLICK"
+      }
+    },
+    "_id": "4db539d460b9482087cd1e4b4a2b0273"
+  },
+  {
+    "activity_id": "act_5754c26b32",
+    "cli_score": 2.8,
+    "raw_sinhala_question": "රුපියල් 20 ක ටොෆි පැකට්ටුවක් සහ රුපියල් 15 ක බිස්කට් පැකට්ටුවක් ගැනීමට අවශ්‍ය මුළු මුදල කීයද?",
+    "blueprint": {
+      "activity_id": "act_5754c26b32",
+      "source_question_id": "G2-MON-003",
+      "grade": 2,
+      "topic": "Money",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "TWO_TIER",
+        "distractor_count": 3,
+        "stimulus_density": "MEDIUM",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "බෙදීම (÷)",
+              "text_en": "Division (÷)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            20,
+            15
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "35",
+          "game_options": [
+            {
+              "text_si": "5",
+              "text_en": "5",
+              "numeric_value": 5.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "20",
+              "text_en": "20",
+              "numeric_value": 20.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "15",
+              "text_en": "15",
+              "numeric_value": 15.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "35",
+              "text_en": "35",
+              "numeric_value": 35.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            }
+          ],
+          "operands": [
+            20,
+            15
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 2.8,
+      "raw_sinhala_question": "රුපියල් 20 ක ටොෆි පැකට්ටුවක් සහ රුපියල් 15 ක බිස්කට් පැකට්ටුවක් ගැනීමට අවශ්‍ය මුළු මුදල කීයද?"
+    },
+    "_id": "78023a665ecb48a0ad9f2d4925cd1062"
+  },
+  {
+    "activity_id": "act_2a25e55739",
+    "cli_score": 2.95,
+    "raw_sinhala_question": "පන්තියේ පිරිමි ළමුන් 14 ක් සහ ගැහැනු ළමුන් 15 ක් සිටිති. පන්තියේ සිටින මුළු ළමුන් ගණන කීයද?",
+    "blueprint": {
+      "activity_id": "act_2a25e55739",
+      "source_question_id": "G2-ADD-001",
+      "grade": 2,
+      "topic": "Addition",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "TWO_TIER",
+        "distractor_count": 3,
+        "stimulus_density": "MEDIUM",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "SELECT_OPERATOR",
+          "instruction_si": "නිවැරදි ගණිත ක්‍රියාව තෝරන්න",
+          "instruction_en": "Choose the correct operation",
+          "target_visual_asset": "OPERATOR_CHEST",
+          "correct_target_value": "+",
+          "game_options": [
+            {
+              "text_si": "ගුණ කිරීම (×)",
+              "text_en": "Multiplication (×)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "බෙදීම (÷)",
+              "text_en": "Division (÷)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            },
+            {
+              "text_si": "එකතු කිරීම (+)",
+              "text_en": "Addition (+)",
+              "numeric_value": null,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "අඩු කිරීම (−)",
+              "text_en": "Subtraction (−)",
+              "numeric_value": null,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selects an operator by surface cue without reading the full problem."
+            }
+          ],
+          "operands": [
+            14,
+            15
+          ],
+          "operation": "ADD"
+        },
+        {
+          "step_order": 2,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "දැන් අවසන් පිළිතුර සොයන්න",
+          "instruction_en": "Now find the answer",
+          "target_visual_asset": "NUMBER_BLOCK",
+          "correct_target_value": "29",
+          "game_options": [
+            {
+              "text_si": "15",
+              "text_en": "15",
+              "numeric_value": 15.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            },
+            {
+              "text_si": "29",
+              "text_en": "29",
+              "numeric_value": 29.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null
+            },
+            {
+              "text_si": "1",
+              "text_en": "1",
+              "numeric_value": 1.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Impulsively applied the opposite arithmetic operation without checking the sign."
+            },
+            {
+              "text_si": "14",
+              "text_en": "14",
+              "numeric_value": 14.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Selected a number directly visible in the problem text due to rapid stimulus response."
+            }
+          ],
+          "operands": [
+            14,
+            15
+          ],
+          "operation": "ADD"
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 2.95,
+      "raw_sinhala_question": "පන්තියේ පිරිමි ළමුන් 14 ක් සහ ගැහැනු ළමුන් 15 ක් සිටිති. පන්තියේ සිටින මුළු ළමුන් ගණන කීයද?"
+    },
+    "_id": "2b51c54fea06469ebc902fc6110a409f"
+  }
+]

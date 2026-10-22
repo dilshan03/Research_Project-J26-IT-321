@@ -1,17 +1,17 @@
 import asyncio
 import uuid
 from pathlib import Path
-from typing import List, Optional
+from typing import Annotated, List, Optional
 from fastapi import APIRouter, Body, File, Form, HTTPException, Query, UploadFile
 
-from app.schemas.api import BlueprintEnvelope
+from app.schemas.api import BlueprintEnvelope, error_responses
 from app.schemas.syllabus import (
     AdaptProblemRequest,
+    CognitiveLoadPreviewRequest,
+    CognitiveLoadPreviewResponse,
     CurriculumProblem,
-    CustomADHDGameSettings,
     DocumentUploadResponse,
     SeedSyllabiResponse,
-    StudentBehaviorProfile,
     SyllabusDocument,
     TuneBlueprintRequest,
 )
@@ -27,11 +27,56 @@ from app.services.syllabus_pipeline import page_count_bytes
 
 router = APIRouter(prefix="/api/v1/syllabus", tags=["syllabus-curriculum"])
 
+# Swagger "Try it out" presets. Knob values are what the studio's Bayesian trait tracker
+# (apps/web/.../adaptive/traitTracker.ts) produces for each archetype.
+ADAPT_EXAMPLES = {
+    "impulse_regulation": {
+        "summary": "Impulse Regulation archetype",
+        "value": {
+            "game_theme": "JUNGLE_ADVENTURE",
+            "student_name": "Impulse Regulation",
+            "behavior_profile": {
+                "archetype_id": "IMPULSIVE", "inattention_level": "MODERATE", "impulsivity_level": "HIGH",
+                "working_memory_support": True, "activity_pace": "CALM_STEP_BY_STEP",
+                "visual_assistance": "SOMETIMES", "audio_assistance": "READ_ON_CLICK",
+            },
+            "custom_settings": {
+                "step_granularity": "MAXIMAL_THREE_TIER", "distractor_count": 3, "stimulus_density": "LOW",
+                "visual_clutter_filter": True, "timer_enabled": False,
+            },
+        },
+    },
+    "general_classroom": {
+        "summary": "General Classroom archetype",
+        "value": {
+            "game_theme": "VILLAGE_MARKET",
+            "student_name": "General Classroom",
+            "behavior_profile": {
+                "archetype_id": "BALANCED", "inattention_level": "LOW", "impulsivity_level": "LOW",
+                "working_memory_support": False, "activity_pace": "REGULAR",
+                "visual_assistance": "SOMETIMES", "audio_assistance": "READ_ON_CLICK",
+            },
+            "custom_settings": {
+                "step_granularity": "TWO_TIER", "distractor_count": 4, "stimulus_density": "MEDIUM",
+                "visual_clutter_filter": False, "timer_enabled": True,
+            },
+        },
+    },
+    "defaults_only": {"summary": "No profile (service defaults)", "value": {"adhd_risk_level": "MEDIUM"}},
+}
+
+TUNE_EXAMPLES = {
+    "fewer_choices": {
+        "summary": "Fewer choices, smaller steps",
+        "value": {"custom_settings": {"distractor_count": 2, "step_granularity": "MAXIMAL_THREE_TIER"}},
+    },
+}
+
 UPLOAD_DIR = DATA_DIR / "uploads"
 MAX_UPLOAD_BYTES = 300 * 1024 * 1024
 
 
-@router.post("/upload", response_model=DocumentUploadResponse, status_code=201)
+@router.post("/upload", response_model=DocumentUploadResponse, status_code=201, responses=error_responses(400, 413, 422))
 async def upload_syllabus_document(
     file: UploadFile = File(...),
     grade: int = Form(..., ge=1, le=5),
@@ -105,7 +150,7 @@ async def list_documents(
     return sorted((SyllabusDocument(**d) for d in docs), key=lambda d: (d.grade, d.filename))
 
 
-@router.get("/documents/{doc_id}", response_model=SyllabusDocument)
+@router.get("/documents/{doc_id}", response_model=SyllabusDocument, responses=error_responses(404))
 async def get_document(doc_id: str):
     doc = await db_service.get_syllabus_documents().find_one({"doc_id": doc_id})
     if not doc:
@@ -113,7 +158,7 @@ async def get_document(doc_id: str):
     return SyllabusDocument(**doc)
 
 
-@router.post("/documents/{doc_id}/extract", response_model=SyllabusDocument, status_code=202)
+@router.post("/documents/{doc_id}/extract", response_model=SyllabusDocument, status_code=202, responses=error_responses(404, 422))
 async def extract_problems_from_document(
     doc_id: str,
     wait: bool = Query(False, description="Block until extraction finishes (scripts/tests)"),
@@ -151,7 +196,7 @@ async def list_curriculum_problems(
     return sorted(problems, key=lambda p: (p.grade, p.page_number or 0, p.problem_id))
 
 
-@router.get("/problems/{problem_id}", response_model=CurriculumProblem)
+@router.get("/problems/{problem_id}", response_model=CurriculumProblem, responses=error_responses(404))
 async def get_curriculum_problem(problem_id: str):
     probs_col = db_service.get_curriculum_problems()
     item = await probs_col.find_one({"problem_id": problem_id})
@@ -160,8 +205,11 @@ async def get_curriculum_problem(problem_id: str):
     return CurriculumProblem(**item)
 
 
-@router.post("/problems/{problem_id}/adapt", response_model=BlueprintEnvelope, status_code=201)
-async def adapt_problem_to_game(problem_id: str, req: AdaptProblemRequest):
+@router.post("/problems/{problem_id}/adapt", response_model=BlueprintEnvelope, status_code=201, responses=error_responses(404, 422))
+async def adapt_problem_to_game(
+    problem_id: str,
+    req: Annotated[AdaptProblemRequest, Body(openapi_examples=ADAPT_EXAMPLES)],
+):
     probs_col = db_service.get_curriculum_problems()
     prob_dict = await probs_col.find_one({"problem_id": problem_id})
     if not prob_dict:
@@ -193,8 +241,11 @@ async def adapt_problem_to_game(problem_id: str, req: AdaptProblemRequest):
     return await repository.save(envelope)
 
 
-@router.put("/blueprints/{activity_id}/tune", response_model=BlueprintEnvelope)
-async def tune_game_blueprint(activity_id: str, req: TuneBlueprintRequest):
+@router.put("/blueprints/{activity_id}/tune", response_model=BlueprintEnvelope, responses=error_responses(404, 422))
+async def tune_game_blueprint(
+    activity_id: str,
+    req: Annotated[TuneBlueprintRequest, Body(openapi_examples=TUNE_EXAMPLES)],
+):
     env = await repository.get(activity_id)
     if not env:
         raise HTTPException(status_code=404, detail=f"Blueprint {activity_id} not found")
@@ -233,16 +284,12 @@ async def tune_game_blueprint(activity_id: str, req: TuneBlueprintRequest):
     return await repository.save(new_envelope)
 
 
-@router.post("/cognitive-load/preview")
-async def preview_cognitive_load(payload: dict = Body(...)):
-    raw_sinhala_text = payload.get("raw_sinhala_text", "")
-    custom_settings_dict = payload.get("custom_settings")
-    behavior_profile_dict = payload.get("behavior_profile")
-
-    base_cli = compute_cli(raw_sinhala_text, operation_count=1)
-
-    custom_settings = CustomADHDGameSettings(**custom_settings_dict) if custom_settings_dict else None
-    behavior_profile = StudentBehaviorProfile(**behavior_profile_dict) if behavior_profile_dict else None
+@router.post("/cognitive-load/preview", response_model=CognitiveLoadPreviewResponse)
+async def preview_cognitive_load(req: CognitiveLoadPreviewRequest):
+    """Base and effective Cognitive Load Index for a question under the given settings and profile."""
+    base_cli = compute_cli(req.raw_sinhala_text, operation_count=1)
+    custom_settings = req.custom_settings
+    behavior_profile = req.behavior_profile
 
     if custom_settings or behavior_profile:
         from app.services.cognitive_load import build_custom_adhd_game_settings, calculate_custom_cli

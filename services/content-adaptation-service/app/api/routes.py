@@ -8,6 +8,7 @@ from app.schemas.api import (
     BlueprintEnvelope,
     GenerateBlueprintRequest,
     StatusUpdate,
+    error_responses,
 )
 from app.services.blueprint_generator import generate_blueprint
 from app.services.cognitive_load import compute_cli, derive_adhd_game_settings
@@ -36,7 +37,7 @@ def analyze(req: GenerateBlueprintRequest):
     )
 
 
-@router.post("/blueprints", response_model=BlueprintEnvelope, status_code=201)
+@router.post("/blueprints", response_model=BlueprintEnvelope, status_code=201, responses=error_responses(422))
 async def create_blueprint(req: GenerateBlueprintRequest):
     try:
         blueprint, cli, _ = generate_blueprint(
@@ -64,7 +65,7 @@ async def list_blueprints(status: Optional[str] = Query(None, pattern="^(draft|a
     return await repository.list(status)
 
 
-@router.get("/blueprints/{activity_id}", response_model=BlueprintEnvelope)
+@router.get("/blueprints/{activity_id}", response_model=BlueprintEnvelope, responses=error_responses(404))
 async def get_blueprint(activity_id: str):
     env = await repository.get(activity_id)
     if env is None:
@@ -72,7 +73,7 @@ async def get_blueprint(activity_id: str):
     return env
 
 
-@router.patch("/blueprints/{activity_id}/status", response_model=BlueprintEnvelope)
+@router.patch("/blueprints/{activity_id}/status", response_model=BlueprintEnvelope, responses=error_responses(404, 422))
 async def update_status(activity_id: str, body: StatusUpdate):
     env = await repository.set_status(activity_id, body.status)
     if env is None:

@@ -4308,5 +4308,119 @@
       "raw_sinhala_question": "පන්තියේ පිරිමි ළමුන් 14 ක් සහ ගැහැනු ළමුන් 15 ක් සිටිති. පන්තියේ සිටින මුළු ළමුන් ගණන කීයද?"
     },
     "_id": "2b51c54fea06469ebc902fc6110a409f"
+  },
+  {
+    "activity_id": "act_9a8161f8b3",
+    "cli_score": 1.0,
+    "raw_sinhala_question": "මෙන්න බෝතල් මූඩි. කීයද ගණන් කරන්න.",
+    "raw_english_question": "Count the bottle caps.",
+    "blueprint": {
+      "activity_id": "act_9a8161f8b3",
+      "source_question_id": "doc_g1_grade_1-p013-1",
+      "grade": 1,
+      "topic": "Counting",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "CALCULATE_MICROSTEP",
+          "instruction_si": "ගණන් කරලා නිවැරදි සංඛ්‍යාව තෝරන්න",
+          "instruction_en": "Count them, then pick the number",
+          "target_visual_asset": "FRUIT_BASKET",
+          "correct_target_value": "12",
+          "game_options": [
+            {
+              "text_si": "11",
+              "text_en": "11",
+              "numeric_value": 11.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "13",
+              "text_en": "13",
+              "numeric_value": 13.0,
+              "is_correct": false,
+              "distractor_type": "MAGNITUDE_SLIP",
+              "distractor_rationale": "Off-by-1 counting skip while counting objects.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "12",
+              "text_en": "12",
+              "numeric_value": 12.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            12
+          ],
+          "operation": "COUNT",
+          "visual_props": {}
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "පොළේ බෝතල් මූඩි ගණන් කරමු",
+        "title_en": "Counting Bottle Caps at the Village Fair",
+        "backdrop_si": "ගම්මානයේ සජීවී පොළේ ගජා සමඟ ඇවිදිමින්, විශේෂ කඩයක තිබෙන බෝතල් මූඩි සොයා යාම.",
+        "backdrop_en": "Strolling through the bustling village market with Gaja to discover a fascinating collection of bottle caps at a local stall.",
+        "quest_goal_si": "පෙට්ටියේ ඇති බෝතල් මූඩි 12 ගජා සමඟ එකින් එක ගණන් කරන්න.",
+        "quest_goal_en": "Count the 12 bottle caps in the box step-by-step with Gaja.",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් මිත්‍රයා! මම ගජා. අද අපි පොළේ අරුමපුදුම පෙට්ටියක ඇති බෝතල් මූඩි ගණන් කරමුද?",
+            "en": "Hello friend! I am Gaja. Shall we count the bottle caps in this special box at the market together?"
+          },
+          "hint": {
+            "si": "ඉස්සරහටම යමු, එක මූඩියකට ඇඟිල්ල තබා සෙමින් ගණන් කරමු.",
+            "en": "Let's take it slow. Touch each cap one by one as we count."
+          },
+          "praise": {
+            "si": "නියමයි! ඔන්න ඔහොමයි හරියටම කරන්නේ.",
+            "en": "Awesome! That is how you do it."
+          },
+          "retry": {
+            "si": "කමක් නෑ, අපට තව වරක් උත්සාහ කළ හැකියි. ගජා ඔයා එක්කම ඉන්නවා!",
+            "en": "That's okay, let's try counting once more. Gaja is right here with you!"
+          },
+          "celebrate": {
+            "si": "ජය වේවා! අපි මූඩි 12 ක් සාර්ථකව ගණන් කළා!",
+            "en": "Quest Complete! We successfully counted all 12 caps!"
+          }
+        }
+      },
+      "cli_score": 2.2,
+      "effective_cli_score": 1.0,
+      "raw_sinhala_question": "මෙන්න බෝතල් මූඩි. කීයද ගණන් කරන්න.",
+      "raw_english_question": "Count the bottle caps.",
+      "target_learner_id": null,
+      "student_name": "Inattentive Profile (අවධානය)",
+      "customized_by_teacher": true,
+      "behavior_profile": {
+        "learner_id": null,
+        "student_name": "Inattentive Profile (අවධානය)",
+        "archetype_id": "INATTENTIVE",
+        "inattention_level": "HIGH",
+        "impulsivity_level": "LOW",
+        "working_memory_support": true,
+        "activity_pace": "CALM_STEP_BY_STEP",
+        "visual_assistance": "ALWAYS",
+        "audio_assistance": "READ_ON_CLICK"
+      }
+    },
+    "_id": "97a2fd26d88044f59679ec378827534f"
   }
 ]

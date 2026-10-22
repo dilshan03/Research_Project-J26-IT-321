@@ -1,0 +1,100 @@
+{
+  "model": "TF-IDF char n-grams (2-5) + Logistic Regression",
+  "dataset": {
+    "total": 217,
+    "train": 173,
+    "test": 44,
+    "class_counts": {
+      "ADD": 76,
+      "SUB": 83,
+      "MUL": 36,
+      "DIV": 22
+    }
+  },
+  "holdout_test": {
+    "accuracy": 0.818,
+    "macro_f1": 0.855,
+    "per_class": {
+      "ADD": {
+        "precision": 0.75,
+        "recall": 0.8,
+        "f1-score": 0.7741935483870968,
+        "support": 15.0
+      },
+      "SUB": {
+        "precision": 0.8125,
+        "recall": 0.7647058823529411,
+        "f1-score": 0.7878787878787878,
+        "support": 17.0
+      },
+      "MUL": {
+        "precision": 0.8571428571428571,
+        "recall": 0.8571428571428571,
+        "f1-score": 0.8571428571428571,
+        "support": 7.0
+      },
+      "DIV": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 5.0
+      },
+      "accuracy": 0.8181818181818182,
+      "macro avg": {
+        "precision": 0.8549107142857143,
+        "recall": 0.8554621848739495,
+        "f1-score": 0.8548037983521855,
+        "support": 44.0
+      },
+      "weighted avg": {
+        "precision": 0.8196022727272727,
+        "recall": 0.8181818181818182,
+        "f1-score": 0.818337332266951,
+        "support": 44.0
+      }
+    },
+    "confusion_matrix": {
+      "labels": [
+        "ADD",
+        "SUB",
+        "MUL",
+        "DIV"
+      ],
+      "matrix": [
+        [
+          12,
+          2,
+          1,
+          0
+        ],
+        [
+          4,
+          13,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          6,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          5
+        ]
+      ]
+    }
+  },
+  "cross_validation_5fold": {
+    "accuracy_mean": 0.875,
+    "accuracy_std": 0.038,
+    "macro_f1": 0.891
+  },
+  "baseline_rule_parser": {
+    "holdout_accuracy": 0.545,
+    "full_dataset_accuracy": 0.571
+  }
+}

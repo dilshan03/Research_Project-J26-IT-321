@@ -1,5 +1,5 @@
 """API request/response models for the Content Adaptation endpoints."""
-from typing import List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 from pydantic import BaseModel, Field
 
 from app.schemas.game_blueprint import (
@@ -35,3 +35,21 @@ class BlueprintEnvelope(BaseModel):
 class StatusUpdate(BaseModel):
     status: Literal["draft", "approved", "rejected"]
     reviewer_note: Optional[str] = None
+
+
+class ApiError(BaseModel):
+    """Error body. `detail` is a message, or FastAPI's list of field errors when the input is invalid."""
+    detail: Union[str, List[Dict[str, Any]]]
+
+
+_ERROR_DESCRIPTIONS = {
+    400: "The upload is not a readable, non-empty PDF",
+    404: "No record with this id",
+    413: "The PDF is larger than 300 MB",
+    422: "Invalid input, or a problem that cannot become a sensible game (e.g. a negative answer)",
+}
+
+
+def error_responses(*codes: int) -> Dict[Union[int, str], Dict[str, Any]]:
+    """Swagger `responses=` entries for the error codes a route can return."""
+    return {code: {"model": ApiError, "description": _ERROR_DESCRIPTIONS[code]} for code in codes}

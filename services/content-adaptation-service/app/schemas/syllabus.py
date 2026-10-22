@@ -117,6 +117,18 @@ class TuneBlueprintRequest(BaseModel):
     game_theme: Optional[Literal["VILLAGE_MARKET", "JUNGLE_ADVENTURE", "SPACE_QUEST"]] = None
 
 
+class CognitiveLoadPreviewRequest(BaseModel):
+    raw_sinhala_text: str = Field("", description="Question text the base Cognitive Load Index is computed from")
+    custom_settings: Optional[CustomADHDGameSettings] = Field(None, description="Teacher knob values to apply")
+    behavior_profile: Optional[StudentBehaviorProfile] = Field(None, description="Learner behaviour archetype")
+
+
+class CognitiveLoadPreviewResponse(BaseModel):
+    base_cli: float
+    effective_cli: float
+    difference: float
+
+
 class DocumentUploadResponse(BaseModel):
     document: SyllabusDocument
     message: str

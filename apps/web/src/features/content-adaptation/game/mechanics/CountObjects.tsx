@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { SHAKE, THEME_ITEM, seededShuffle } from '../gameKit';
+import { LINES, SHAKE, THEME_ITEM, seededShuffle } from '../gameKit';
 import type { MechanicProps } from './types';
 import type { GameChoiceOption } from '../../types';
 
@@ -33,7 +33,7 @@ export function CountObjects({ step, theme, isMoney, lang, calm, onWrong, onCorr
       setShaking(opt.text_en);
       setTimeout(() => setShaking(null), 450);
       setTapped([]); // fresh, gentle recount
-      onWrong(opt.text_en, opt.distractor_type);
+      onWrong(opt.text_en, opt.distractor_type, LINES.countHint);
     }
   };
 

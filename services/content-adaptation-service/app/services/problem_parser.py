@@ -45,7 +45,8 @@ def _apply(op: str, a: int, b: int) -> int:
 
 
 def parse_problem(raw_sinhala_text: str, operation_hint: Optional[str] = None) -> ParsedProblem:
-    numbers = [int(n) for n in re.findall(r"\d+", raw_sinhala_text)]
+    # "1,000" is one quantity, not 1 and 000.
+    numbers = [int(n.replace(",", "")) for n in re.findall(r"\d{1,3}(?:,\d{3})+|\d+", raw_sinhala_text)]
     is_money = _has(raw_sinhala_text, MONEY_CUES)
     parsed = ParsedProblem(numbers=numbers, is_money=is_money)
 

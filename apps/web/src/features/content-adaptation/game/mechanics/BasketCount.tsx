@@ -44,7 +44,7 @@ export function BasketCount({ step, theme, isMoney, lang, calm, onWrong, onCorre
   const pick = (opt: GameChoiceOption) => {
     if (done || wrong.includes(opt.text_en)) return;
     if (opt.is_correct) { setDone(true); setTimeout(() => onCorrect(opt.text_en), 700); }
-    else { setWrong(w => [...w, opt.text_en]); onWrong(opt.text_en, opt.distractor_type); }
+    else { setWrong(w => [...w, opt.text_en]); onWrong(opt.text_en, opt.distractor_type, LINES.basketHint); }
   };
 
   const draggable = (it: Item) => phase === 'build' && (isSub ? it.place === 'basket' : it.place === 'ground');

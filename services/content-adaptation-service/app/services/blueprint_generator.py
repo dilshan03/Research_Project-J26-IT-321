@@ -3,6 +3,7 @@ Blueprint generator: converts a curriculum question into an ADHD-friendly
 GameActivityBlueprint using the CLI score, derived game settings,
 deterministic MathVerificationService, and Gaja mascot narrative enrichment.
 """
+import re
 import uuid
 from typing import Dict, List, Optional, Tuple
 
@@ -65,6 +66,65 @@ def resolve_english_question(question_id: Optional[str] = None, raw_text: Option
         if raw_text and sq.get("raw_sinhala_question") == raw_text:
             return sq.get("translation_en")
     return None
+
+ARITHMETIC_OPS = ("ADD", "SUB", "MUL", "DIV")
+_SINHALA_CHARS = re.compile(r"[඀-෿]")
+
+
+def has_all_numbers(text: Optional[str], numbers: List[int]) -> bool:
+    """True when every number (counting repeats) appears in the text as its own number."""
+    # Matches the game's NumberHunt: "1,000" is one number, the ".00" of a time like "8.00" is not.
+    found = [n.replace(",", "") for n in re.findall(r"(?<!\d\.)(?:\d{1,3}(?:,\d{3})+|\d+)", text or "")]
+    for n in numbers:
+        if str(n) not in found:
+            return False
+        found.remove(str(n))
+    return True
+
+
+def choose_question_prompts(problem: CurriculumProblem, op: str) -> Tuple[str, Optional[str]]:
+    """
+    Picks the Sinhala/English question the learner sees. Child prompts are preferred, but
+    older extractions produced generic ones ("let's add them all for Gaja!") with no numbers,
+    which leaves the learner nothing to solve. For arithmetic the shown text must carry the
+    operands; for shapes it must not name a different shape than the one being asked for.
+    """
+    operands = problem.operands or []
+    si_candidates = [t for t in (problem.child_prompt_si, problem.raw_problem_text) if t and t.strip()]
+    en_candidates = [
+        t for t in (problem.child_prompt_en, problem.english_translation)
+        if t and t.strip() and not _SINHALA_CHARS.search(t)  # some "English" prompts are untranslated Sinhala
+    ]
+
+    target_shape = shape_named_in(problem.raw_problem_text) or str(
+        (problem.visual_props or {}).get("target_shape") or "").upper()
+
+    def fits(text: str) -> bool:
+        if op in ARITHMETIC_OPS:
+            return has_all_numbers(text, operands)
+        if op == "SHAPE":
+            return shape_named_in(text) in (None, target_shape)
+        return True
+
+    si = next((t for t in si_candidates if fits(t)), si_candidates[0] if si_candidates else "")
+    en = next((t for t in en_candidates if op not in ARITHMETIC_OPS or has_all_numbers(t, operands)), None)
+    return si, en or resolve_english_question(problem.problem_id, problem.raw_problem_text)
+
+
+def verified_problem_answer(problem: CurriculumProblem, op: str, operands: List[int]) -> int:
+    """Deterministic answer for the problem, refusing results a primary learner cannot have."""
+    if op not in ARITHMETIC_OPS:
+        return problem.expected_answer
+    if op == "DIV" and len(operands) >= 2 and operands[1] and operands[0] % operands[1]:
+        raise ValueError(f"{operands[0]} ÷ {operands[1]} does not divide evenly; primary division must have no remainder.")
+    answer = MathVerificationService.execute_calculation(operands, op)
+    if answer < 0:
+        raise ValueError(
+            f"The extracted quantities {operands} with {op} give a negative answer ({answer}). "
+            "The problem was probably extracted wrongly; please fix it in the problem bank."
+        )
+    return answer
+
 
 # Which wrong operator an impulsive learner most often picks.
 OPERATOR_CONFUSIONS = {
@@ -151,7 +211,14 @@ def _identify_step(operands: List[int], order: int, settings: ADHDGameSettings, 
         (f"{a + 1}, {b}" if len(operands) > 1 else f"{max(0, a - 1)}", "MAGNITUDE_SLIP", "Off-by-one error reading the numbers."),
         (f"{a}", "IMPULSIVITY", "Picks first observed number immediately."),
     ]
-    for text, dtype, rat in wrong[: settings.distractor_count]:
+    # Equal operands (e.g. 5 and 5) make some candidates collide with each other or the answer.
+    used = {correct}
+    unique_wrong = []
+    for text, dtype, rat in wrong:
+        if text not in used:
+            used.add(text)
+            unique_wrong.append((text, dtype, rat))
+    for text, dtype, rat in unique_wrong[: settings.distractor_count]:
         opts.append(GameChoiceOption(
             text_si=text, text_en=text, is_correct=False, distractor_type=dtype,  # type: ignore
             distractor_rationale=rat,
@@ -217,8 +284,30 @@ COLOR_LABELS = {
 }
 
 
-def _shape_step(vp: dict, n_wrong: int) -> GameMicroStep:
+# Sinhala shape names (without ZWJ). Longer names first so "සමචතුරස්‍ර" wins over "චතුරස්‍ර".
+SHAPE_NAME_CUES = [
+    ("සෘජුකෝණාස්රා", "RECTANGLE"), ("සෘජුකෝණාස්ර", "RECTANGLE"),
+    ("සමචතුරස්ර", "SQUARE"), ("චතුරස්ර", "SQUARE"),
+    ("ත්රිකෝණ", "TRIANGLE"), ("රවුම", "CIRCLE"), ("වෘත්ත", "CIRCLE"),
+]
+
+
+def shape_named_in(text: Optional[str]) -> Optional[str]:
+    """The shape a Sinhala sentence names, if any."""
+    plain = (text or "").replace("‍", "")
+    for cue, shape in SHAPE_NAME_CUES:
+        if cue in plain:
+            return shape
+    return None
+
+
+def _shape_step(vp: dict, n_wrong: int, question_text: Optional[str] = None) -> GameMicroStep:
     target = str(vp.get("target_shape") or "CIRCLE").upper()
+    # Extracted visual_props sometimes default to CIRCLE while the problem asks about another
+    # shape ("how many sides does a square have?"). The problem text wins.
+    named = shape_named_in(question_text)
+    if named:
+        target = named
     if target not in SHAPE_LABELS:
         target = "CIRCLE"
     si, en = SHAPE_LABELS[target]
@@ -303,6 +392,8 @@ def _color_pattern_step(seq: List[str], target: str, n_wrong: int) -> GameMicroS
 
 def _compare_step(operands: List[int], vp: dict) -> GameMicroStep:
     a, b = operands[0], operands[1]
+    if a == b:
+        raise ValueError("A comparison needs two different quantities.")
     want_smaller = str(vp.get("target") or "BIGGER").upper() == "SMALLER"
     correct = min(a, b) if want_smaller else max(a, b)
     opts = []
@@ -336,13 +427,23 @@ def build_micro_steps(
     partial_results: Optional[List[int]] = None,
     grade: int = 2,
     visual_props: Optional[dict] = None,
+    question_text: Optional[str] = None,
 ) -> List[GameMicroStep]:
+    """`question_text` is what the learner sees; the "find the numbers" step is only
+    offered when the numbers are actually in it (otherwise it cannot be solved)."""
     op = operations[0] if operations else ("COUNT" if grade == 1 else "ADD")
     vp = visual_props or {}
     n_wrong = max(1, min(settings.distractor_count, 3))
+    can_hunt = question_text is None or has_all_numbers(question_text, operands[:2])
+
+    # Legacy IDENTIFY items (e.g. "what is this coin worth?") play as counting: the game
+    # draws the items and the learner picks how many. The old two-step version asked the
+    # learner to find numbers that were not in the prompt, then showed a nonsense "5 = 5" scale.
+    if op == "IDENTIFY":
+        op = "COUNT"
 
     if op == "SHAPE":
-        return [_shape_step(vp, n_wrong)]
+        return [_shape_step(vp, n_wrong, question_text)]
 
     if op == "PATTERN":
         if str(vp.get("kind") or "").upper() == "NUMBER" and len(vp.get("sequence") or []) >= 3:
@@ -373,33 +474,6 @@ def build_micro_steps(
             operation="COUNT",
         )]
 
-    # Legacy IDENTIFY items (coin recognition): find the number, then pick it.
-    if op == "IDENTIFY":
-        return [
-            GameMicroStep(
-                step_order=1,
-                action_type="IDENTIFY_ENTITY",
-                instruction_si="ප්‍රශ්නයේ ඇති ද්‍රව්‍ය ගණන සොයා බලන්න",
-                instruction_en="Find and count the items in the problem",
-                target_visual_asset=_quantity_asset(is_money),
-                correct_target_value=str(final_answer),
-                game_options=_numeric_options(final_answer, settings.distractor_count, operands, op),
-                operands=operands,
-                operation=op,  # type: ignore
-            ),
-            GameMicroStep(
-                step_order=2,
-                action_type="CALCULATE_MICROSTEP",
-                instruction_si="නිවැරදි පිළිතුර තෝරන්න",
-                instruction_en="Select the correct count or answer",
-                target_visual_asset=VisualAssetTag.NUMBER_BLOCK,
-                correct_target_value=str(final_answer),
-                game_options=_numeric_options(final_answer, settings.distractor_count, operands, op),
-                operands=operands,
-                operation=op,  # type: ignore
-            ),
-        ]
-
     if len(operands) < 2:
         raise ValueError("Could not find at least two numeric quantities in the question.")
 
@@ -407,7 +481,7 @@ def build_micro_steps(
     # skip the operator step and go straight to the hands-on basket.
     if grade == 1 and op in ("ADD", "SUB"):
         steps: List[GameMicroStep] = []
-        if settings.step_granularity == "MAXIMAL_THREE_TIER":
+        if settings.step_granularity == "MAXIMAL_THREE_TIER" and can_hunt:
             steps.append(_identify_step(operands[:2], 1, settings, is_money))
         steps.append(_calc_step(len(steps) + 1, final_answer, operands=operands[:2], op=op, settings=settings, final=True))
         return steps
@@ -425,11 +499,23 @@ def build_micro_steps(
 
     # Standard Arithmetic Workflow (Grade 2 to 5)
     steps: List[GameMicroStep] = []
-    if settings.step_granularity == "MAXIMAL_THREE_TIER":
+    if settings.step_granularity == "MAXIMAL_THREE_TIER" and can_hunt:
         steps.append(_identify_step(operands[:2], 1, settings, is_money))
     steps.append(_operator_step(op, len(steps) + 1, settings, operands=operands[:2]))
     steps.append(_calc_step(len(steps) + 1, final_answer, operands=operands[:2], op=op, settings=settings, final=True))
     return steps
+
+
+def _prepare_problem(problem: CurriculumProblem) -> Tuple[str, List[int], int, str, Optional[str]]:
+    """Operation, operands, verified answer and the question texts shown to the learner."""
+    op = problem.operation or ("COUNT" if problem.grade == 1 else "ADD")
+    operands = list(problem.operands) if problem.operands else [problem.expected_answer]
+    # "8 take away 3" is sometimes extracted as [3, 8]; primary subtraction never goes negative.
+    if op == "SUB" and len(operands) == 2 and operands[0] < operands[1]:
+        operands.reverse()
+    answer = verified_problem_answer(problem, op, operands)
+    question_si, question_en = choose_question_prompts(problem, op)
+    return op, operands, answer, question_si, question_en
 
 
 def generate_blueprint(
@@ -504,15 +590,7 @@ async def generate_blueprint_from_curriculum_problem(
     3. Enriches cultural narrative and Gaja dialogue.
     4. Deconstructs into tailored ADHD micro-steps with cognitive distractors.
     """
-    op = problem.operation or ("COUNT" if problem.grade == 1 else "ADD")
-    operands = problem.operands if problem.operands else [problem.expected_answer]
-
-    # Deterministic verification
-    MathVerificationService.verify_grade_invariants(problem.grade, operands, op)
-    if op in ("COUNT", "COMPARE", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME"):
-        verified_answer = problem.expected_answer
-    else:
-        verified_answer = MathVerificationService.execute_calculation(operands, op)
+    op, operands, verified_answer, question_si, question_en = _prepare_problem(problem)
 
     # CLI Score computation & custom settings build
     cli = compute_cli(problem.raw_problem_text, operation_count=1)
@@ -539,6 +617,7 @@ async def generate_blueprint_from_curriculum_problem(
         is_money=problem.is_money,
         grade=problem.grade,
         visual_props=problem.visual_props,
+        question_text=question_si,
     )
 
     blueprint = GameActivityBlueprint(
@@ -553,8 +632,8 @@ async def generate_blueprint_from_curriculum_problem(
         story_narrative=narrative.model_dump(),
         cli_score=round(cli, 2),
         effective_cli_score=effective_cli,
-        raw_sinhala_question=problem.child_prompt_si or problem.raw_problem_text,
-        raw_english_question=problem.child_prompt_en or problem.english_translation or resolve_english_question(problem.problem_id, problem.raw_problem_text) or (narrative.quest_goal_en if narrative else None),
+        raw_sinhala_question=question_si,
+        raw_english_question=question_en or (narrative.quest_goal_en if narrative else None),
         target_learner_id=learner_id,
         student_name=student_name,
         customized_by_teacher=is_customized,
@@ -575,13 +654,7 @@ def tune_existing_blueprint(
     cognitive load settings, micro-steps, and distractor profiles,
     preserving the existing story narrative and mascot dialogue.
     """
-    op = problem.operation or ("COUNT" if problem.grade == 1 else "ADD")
-    operands = problem.operands if problem.operands else [problem.expected_answer]
-
-    if op in ("COUNT", "COMPARE", "IDENTIFY", "SHAPE", "PATTERN", "COLOR", "FRACTION", "TIME"):
-        verified_answer = problem.expected_answer
-    else:
-        verified_answer = MathVerificationService.execute_calculation(operands, op)
+    op, operands, verified_answer, question_si, question_en = _prepare_problem(problem)
 
     base_cli = existing.cli_score or compute_cli(problem.raw_problem_text, operation_count=1)
 
@@ -604,6 +677,7 @@ def tune_existing_blueprint(
         is_money=problem.is_money,
         grade=problem.grade,
         visual_props=problem.visual_props,
+        question_text=question_si,
     )
 
     updated_blueprint = existing.model_copy(
@@ -612,7 +686,9 @@ def tune_existing_blueprint(
             "adhd_game_settings": settings,
             "micro_steps": micro_steps,
             "effective_cli_score": effective_cli,
-            "raw_english_question": existing.raw_english_question or problem.child_prompt_en or problem.english_translation or resolve_english_question(problem.problem_id, problem.raw_problem_text),
+            # Re-chosen so a blueprint made from an old, number-less prompt is repaired on tune.
+            "raw_sinhala_question": question_si,
+            "raw_english_question": question_en or existing.raw_english_question,
             "customized_by_teacher": True,
             "behavior_profile": behavior_profile.model_dump() if behavior_profile else existing.behavior_profile,
             "target_learner_id": behavior_profile.learner_id if behavior_profile and behavior_profile.learner_id else existing.target_learner_id,

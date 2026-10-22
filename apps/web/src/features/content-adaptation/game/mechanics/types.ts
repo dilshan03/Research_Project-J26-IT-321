@@ -8,8 +8,11 @@ export interface MechanicProps {
   isMoney: boolean;
   lang: Lang;
   calm: boolean;
-  /** Learner made a mistake. `hint` lets the mechanic choose what Gaja says. */
-  onWrong: (label: string, distractor: DistractorType | null | undefined, hint?: Line) => void;
+  /**
+   * Learner made a mistake. `hint` lets the mechanic choose what Gaja says. A `soft` miss
+   * (e.g. tapping a word while hunting for numbers) is logged but costs no star, streak or break.
+   */
+  onWrong: (label: string, distractor: DistractorType | null | undefined, hint?: Line, opts?: { soft?: boolean }) => void;
   /** Learner solved the step. */
   onCorrect: (label: string) => void;
   /** Mechanic wants Gaja to say something (e.g. phase change), without scoring. */

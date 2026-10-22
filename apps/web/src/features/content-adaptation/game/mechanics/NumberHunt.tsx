@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { LINES } from '../gameKit';
+import { tokenNumber } from './huntNumbers';
 import type { MechanicProps } from './types';
 
 /**
@@ -15,11 +16,11 @@ export function NumberHunt({ step, question, lang, calm, onWrong, onCorrect }: M
   const [shake, setShake] = useState<number | null>(null);
   const [misses, setMisses] = useState(0);
 
-  const foundValues = found.map(i => tokens[i].replace(/\D/g, ''));
+  const foundValues = found.map(i => tokenNumber(tokens[i]));
 
   const tap = (i: number) => {
     if (found.includes(i)) return;
-    const digits = tokens[i].replace(/\D/g, '');
+    const digits = tokenNumber(tokens[i]);
     const remaining = [...targets];
     foundValues.forEach(v => { const k = remaining.indexOf(v); if (k >= 0) remaining.splice(k, 1); });
 
@@ -32,7 +33,10 @@ export function NumberHunt({ step, question, lang, calm, onWrong, onCorrect }: M
     setShake(i);
     setTimeout(() => setShake(null), 450);
     setMisses(m => m + 1);
-    onWrong(tokens[i], digits ? 'WORKING_MEMORY_OVERFLOW' : 'IMPULSIVITY', digits ? LINES.retry : LINES.notNumber);
+    // Tapping a word is exploring, not a maths mistake: Gaja redirects without it counting
+    // towards the breathing break. Tapping the wrong number is a real miss.
+    if (digits) onWrong(tokens[i], 'WORKING_MEMORY_OVERFLOW', LINES.retry);
+    else onWrong(tokens[i], 'IMPULSIVITY', LINES.notNumber, { soft: true });
   };
 
   const hint = misses >= 2;
@@ -42,7 +46,7 @@ export function NumberHunt({ step, question, lang, calm, onWrong, onCorrect }: M
       <div className="flex flex-wrap justify-center gap-2 md:gap-3 max-w-2xl" lang={lang}>
         {tokens.map((t, i) => {
           const isFound = found.includes(i);
-          const isNum = /\d/.test(t);
+          const isNum = tokenNumber(t) !== '';
           return (
             <motion.button
               key={i}

@@ -54,6 +54,9 @@ export const LINES = {
   heavy: { si: 'ටිකක් බරයි! කුඩා එකක් උත්සාහ කරන්න.', en: 'Too heavy! Try a smaller one.' },
   light: { si: 'ටිකක් සැහැල්ලුයි! විශාල එකක් උත්සාහ කරන්න.', en: 'Too light! Try a bigger one.' },
   notNumber: { si: 'ඒක වචනයක්. සංඛ්‍යාවක් සොයන්න.', en: "That's a word. Look for a number." },
+  operatorHint: { si: 'ප්‍රශ්නය නැවත කියවමු: අපි එකතු කරනවද, අඩු කරනවද, බෙදනවද?', en: 'Read the question again: are we putting together, taking away or sharing?' },
+  countHint: { si: 'එකින් එක තට්ටු කරලා, හෙමින් ගණන් කරමු.', en: "Tap each one, one at a time, and count slowly." },
+  basketHint: { si: 'කූඩයේ ඇති ඒවා එකින් එක ගණන් කරලා බලමු.', en: "Let's count what's in the basket, one by one." },
   nudge: { si: 'මම මෙතන ඉන්නවා. අපි එකට කරමු!', en: "I'm right here. Let's do it together!" },
   breakTime: { si: 'අපි ටිකක් හුස්ම ගමු.', en: "Let's take a little breathing break." },
 } satisfies Record<string, Line>;

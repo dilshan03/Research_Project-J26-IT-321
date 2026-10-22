@@ -8,6 +8,7 @@ import { Gaja } from './Gaja';
 import { BreathingBreak } from './BreathingBreak';
 import { Celebration } from './Celebration';
 import { NumberHunt } from './mechanics/NumberHunt';
+import { canHunt } from './mechanics/huntNumbers';
 import { OperatorDrop } from './mechanics/OperatorDrop';
 import { BasketCount } from './mechanics/BasketCount';
 import { BalanceScale } from './mechanics/BalanceScale';
@@ -23,6 +24,8 @@ interface Attempt {
   step_order: number;
   label: string;
   correct: boolean;
+  /** Exploratory miss (e.g. tapping a word): kept for telemetry, not scored. */
+  soft?: boolean;
   distractor_type?: DistractorType | null;
   at: number;
 }
@@ -39,13 +42,16 @@ function pickMechanic(step: GameMicroStep): { Comp: (p: MechanicProps) => React.
     return { Comp: ShapeMatcher, intro: { si: 'යාළුවේ! ගජා සොයන නිවැරදි හැඩය තෝරමු!', en: "Let's find the shape Gaja is looking for!" } };
   }
   if (step.action_type === 'COMPLETE_PATTERN' || step.operation === 'PATTERN') {
-    return { Comp: PatternTrain, intro: { si: 'ලස්සන දුම්රිය රටාවේ ඊළඟට එන වර්ණය තෝරමු!', en: "Let's find what comes next in the train pattern!" } };
+    return step.visual_props?.kind === 'NUMBER'
+      ? { Comp: PatternTrain, intro: { si: 'දුම්රිය රටාවේ ඊළඟට එන සංඛ්‍යාව තෝරමු!', en: "Let's find the number that comes next on the train!" } }
+      : { Comp: PatternTrain, intro: { si: 'ලස්සන දුම්රිය රටාවේ ඊළඟට එන වර්ණය තෝරමු!', en: "Let's find the colour that comes next on the train!" } };
   }
   if (step.action_type === 'COMPARE_QUANTITY' || step.operation === 'COMPARE') {
     // The step says whether to pick the bigger or the smaller one.
     return { Comp: ComparisonScale, intro: { si: step.instruction_si, en: step.instruction_en } };
   }
-  if (step.operation === 'COUNT' && step.action_type === 'CALCULATE_MICROSTEP') {
+  // Older blueprints play coin/item IDENTIFY as a calculation; on a balance scale that read "5 = 5".
+  if ((step.operation === 'COUNT' || step.operation === 'IDENTIFY') && step.action_type === 'CALCULATE_MICROSTEP') {
     return { Comp: CountObjects, intro: { si: 'එකින් එක තට්ටු කරලා ගණන් කරමු!', en: "Let's tap each one and count!" } };
   }
   if (step.action_type === 'IDENTIFY_ENTITY') return { Comp: NumberHunt, intro: LINES.identify };
@@ -58,6 +64,9 @@ function pickMechanic(step: GameMicroStep): { Comp: (p: MechanicProps) => React.
   }
   return { Comp: BalanceScale, intro: LINES.balance };
 }
+
+/** Text the game treats as English must not be untranslated Sinhala. */
+const hasSinhala = (text?: string | null) => !!text && /[඀-෿]/.test(text);
 
 export function GamePlayer({
   envelope,
@@ -123,30 +132,40 @@ export function GamePlayer({
 
   const [lang, setLang] = useState<Lang>('si');
 
+  const sinhalaQuestion = blueprint.raw_sinhala_question || question;
   const activeQuestion = useMemo(() => {
     if (lang === 'en') {
-      return (
-        blueprint.raw_english_question ||
-        envelope.raw_english_question ||
-        getEnglishQuestionFallback(question) ||
-        blueprint.story_narrative?.quest_goal_en ||
-        question
-      );
+      // Some older "English" prompts are untranslated Sinhala; skip them.
+      const english = [
+        blueprint.raw_english_question,
+        envelope.raw_english_question,
+        getEnglishQuestionFallback(question),
+        blueprint.story_narrative?.quest_goal_en,
+      ].find(t => t && !hasSinhala(t));
+      return english || sinhalaQuestion;
     }
-    return blueprint.raw_sinhala_question || question;
+    return sinhalaQuestion;
   }, [
     lang,
     blueprint.raw_english_question,
-    blueprint.raw_sinhala_question,
     envelope.raw_english_question,
     blueprint.story_narrative?.quest_goal_en,
     question,
+    sinhalaQuestion,
   ]);
 
   const reduced = useReducedMotion();
   const calm = settings.stimulus_density === 'LOW' || !!reduced;
   const isMoney = /money/i.test(blueprint.topic) || question.includes('රුපියල්');
-  const steps = blueprint.micro_steps;
+  // A "find the numbers" step whose numbers are not in the question cannot be finished
+  // (older blueprints were built from generic prompts like "let's add them all for Gaja!").
+  // It is only a warm-up scaffold, so it is dropped rather than leaving the learner stuck.
+  const steps = useMemo(() => {
+    const playable = blueprint.micro_steps.filter(
+      s => s.action_type !== 'IDENTIFY_ENTITY' || canHunt(s, sinhalaQuestion),
+    );
+    return playable.length ? playable : blueprint.micro_steps;
+  }, [blueprint.micro_steps, sinhalaQuestion]);
 
   const [voiceOn, setVoiceOn] = useState(true);
   const [phase, setPhase] = useState<'intro' | 'play' | 'done'>('intro');
@@ -178,10 +197,8 @@ export function GamePlayer({
   // wording lacks them (a translation can drop or spell out numbers), use the Sinhala text.
   const stepQuestion = useMemo(() => {
     if (step?.action_type !== 'IDENTIFY_ENTITY' || lang !== 'en') return activeQuestion;
-    const digits: string[] = activeQuestion.match(/\d+/g) ?? [];
-    const hasAll = (step.operands ?? []).every(n => digits.includes(String(n)));
-    return hasAll ? activeQuestion : blueprint.raw_sinhala_question || question;
-  }, [step, lang, activeQuestion, blueprint.raw_sinhala_question, question]);
+    return canHunt(step, activeQuestion) ? activeQuestion : sinhalaQuestion;
+  }, [step, lang, activeQuestion, sinhalaQuestion]);
 
   const say = useCallback((l: Line, m?: Mood) => {
     setLine(l);
@@ -231,15 +248,19 @@ export function GamePlayer({
     if (mechanic) say(mechanic.intro, 'thinking');
   };
 
-  const log = (label: string, correct: boolean, distractor?: DistractorType | null) => {
+  const log = (label: string, correct: boolean, distractor?: DistractorType | null, soft = false) => {
     onAnswerSelect(label);
     onAnswerSubmit(label, correct);
-    setAttempts(a => [...a, { step_order: step.step_order, label, correct, distractor_type: distractor, at: Date.now() }]);
+    setAttempts(a => [...a, { step_order: step.step_order, label, correct, soft, distractor_type: distractor, at: Date.now() }]);
   };
 
-  const onWrong: MechanicProps['onWrong'] = (label, distractor, hint) => {
+  const onWrong: MechanicProps['onWrong'] = (label, distractor, hint, opts) => {
     resetIdle();
-    log(label, false, distractor);
+    log(label, false, distractor, !!opts?.soft);
+    if (opts?.soft) {
+      say(hint ?? LINES.retry, 'encourage');
+      return;
+    }
     setStepHadMistake(true);
     setStreak(0);
     const run = wrongRun + 1;
@@ -293,7 +314,7 @@ export function GamePlayer({
     setStepIndex(0); setPhase('intro'); setMood('happy'); setLine(story.intro);
   };
 
-  const mistakes = attempts.filter(a => !a.correct).length;
+  const mistakes = attempts.filter(a => !a.correct && !a.soft).length;
   const stars = mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
 
   // Report the reward once per completed run (a replay reports again).
@@ -418,7 +439,9 @@ export function GamePlayer({
                 </div>
               )}
               <AnimatePresence>{celebrating && <Celebration calm={calm} />}</AnimatePresence>
-              {step.action_type !== 'IDENTIFY_ENTITY' && (
+              {/* NumberHunt renders the question itself; shape steps are fully described by the
+                  instruction, and an older shape prompt can name a different shape. */}
+              {step.action_type !== 'IDENTIFY_ENTITY' && step.action_type !== 'MATCH_SHAPE' && (
                 <p className={`${lang === 'si' ? 'sinhala' : 'font-medium'} text-center text-lg text-mq-text mb-6 px-6 py-2.5 rounded-full bg-mq-surface-soft border border-mq-border/50 max-w-2xl w-full mx-auto`}>
                   {activeQuestion}
                 </p>

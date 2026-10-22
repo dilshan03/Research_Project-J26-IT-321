@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { THEME_ITEM, isOver } from '../gameKit';
+import { LINES, THEME_ITEM, isOver } from '../gameKit';
 import type { MechanicProps } from './types';
 import type { GameChoiceOption } from '../../types';
 
@@ -25,9 +25,11 @@ function Group({ value, icon }: { value: number; icon: string }) {
  * Learner drags (or taps) an operator gem into the gap.
  */
 export function OperatorDrop({ step, theme, isMoney, lang, calm, onWrong, onCorrect }: MechanicProps) {
-  const slotRef = useRef<HTMLDivElement>(null);
+  // One gap per pair of groups (a three-item bill has two); a gem may go into any of them.
+  const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [placed, setPlaced] = useState<GameChoiceOption | null>(null);
   const [rejected, setRejected] = useState<string | null>(null);
+  const [misses, setMisses] = useState(0);
   const icon = isMoney ? '🪙' : THEME_ITEM[theme];
   const operands = step.operands ?? [];
 
@@ -39,7 +41,9 @@ export function OperatorDrop({ step, theme, isMoney, lang, calm, onWrong, onCorr
     } else {
       setRejected(opt.text_en);
       setTimeout(() => setRejected(null), 500);
-      onWrong(opt.text_en, opt.distractor_type);
+      // From the second miss on, point back at the story instead of a bare "try again".
+      onWrong(opt.text_en, opt.distractor_type, misses >= 1 ? LINES.operatorHint : undefined);
+      setMisses(m => m + 1);
     }
   };
 
@@ -51,7 +55,7 @@ export function OperatorDrop({ step, theme, isMoney, lang, calm, onWrong, onCorr
         {operands.map((v, i) => (
           <div key={i} className="flex items-center gap-4">
             {i > 0 && (
-              <div ref={i === 1 ? slotRef : undefined}
+              <div ref={el => { slotRefs.current[i] = el; }}
                 className={`w-24 h-24 rounded-full flex items-center justify-center border-4 border-dashed transition-colors
                   ${placed ? 'border-mq-success bg-[var(--mq-success-bg)]' : 'border-mq-accent-purple bg-mq-accent-purple/10'}`}>
                 {placed
@@ -78,7 +82,7 @@ export function OperatorDrop({ step, theme, isMoney, lang, calm, onWrong, onCorr
                 whileDrag={{ scale: 1.2, zIndex: 50 }}
                 whileHover={{ scale: 1.08, y: -4 }}
                 animate={rejected === opt.text_en ? { x: [0, -10, 10, -6, 6, 0] } : {}}
-                onDragEnd={(_, info) => { if (isOver(slotRef.current, info.point)) tryPlace(opt); }}
+                onDragEnd={(_, info) => { if (slotRefs.current.some(el => isOver(el, info.point))) tryPlace(opt); }}
                 onClick={() => tryPlace(opt)}
                 className="w-20 h-20 rounded-2xl bg-gradient-to-br from-mq-accent-purple to-mq-info text-white text-4xl font-extrabold shadow-lg cursor-grab active:cursor-grabbing touch-none"
               >

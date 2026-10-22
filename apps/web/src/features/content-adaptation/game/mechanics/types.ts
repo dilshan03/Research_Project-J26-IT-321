@@ -17,6 +17,8 @@ export interface MechanicProps {
   onCorrect: (label: string) => void;
   /** Mechanic wants Gaja to say something (e.g. phase change), without scoring. */
   onSay: (line: Line) => void;
+  /** Misses on this step before the mechanic shows its strategy hint (set by the trait tracker; default 2). */
+  hintAfter?: number;
 }
 
 export const OP_SYMBOL: Record<string, string> = {

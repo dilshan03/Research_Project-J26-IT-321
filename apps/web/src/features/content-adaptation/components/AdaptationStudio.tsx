@@ -702,19 +702,10 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
           {/* Teacher Customization: Student Behavioral Needs & Cognitive Load Tuning */}
           <StudentBehaviorSelector
             selectedProfile={selectedStudentProfile}
-            onSelectProfile={(prof) => {
-              setSelectedStudentProfile(prof);
-              // Auto-tune cognitive load based on archetype
-              if (prof.inattention_level === 'HIGH') {
-                setCustomAdhdSettings((prev) => ({ ...prev, distractor_count: 2, visual_clutter_filter: true }));
-              }
-              if (prof.impulsivity_level === 'HIGH') {
-                setCustomAdhdSettings((prev) => ({ ...prev, timer_enabled: false, step_granularity: 'MAXIMAL_THREE_TIER' }));
-              }
-              if (prof.activity_pace === 'CALM_STEP_BY_STEP') {
-                setCustomAdhdSettings((prev) => ({ ...prev, timer_enabled: false, stimulus_density: 'LOW' }));
-              }
-            }}
+            onSelectProfile={setSelectedStudentProfile}
+            // The Bayesian trait tracker turns the archetype into knob values; they replace
+            // the current knobs (the teacher can still fine-tune them afterwards).
+            onApplyScaffold={(settings) => setCustomAdhdSettings((prev) => ({ ...prev, ...settings }))}
             customStudentName={customStudentName}
             onCustomStudentNameChange={setCustomStudentName}
           />

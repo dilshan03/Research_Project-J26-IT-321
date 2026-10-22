@@ -1,6 +1,15 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Brain, User, CheckCircle2 } from 'lucide-react';
 import type { StudentBehaviorProfile } from '../types';
+import {
+  beliefs, prefsFromProfile, priorFromProfile, scaffold, type GeneratorSettings, type Trait,
+} from '../adaptive/traitTracker';
+
+const TRAIT_LABELS: Record<Trait, { en: string; si: string }> = {
+  inattention: { en: 'Inattention', si: 'අවධානය' },
+  impulsivity: { en: 'Impulsivity', si: 'ආවේගය' },
+  workingMemory: { en: 'Working memory', si: 'මතකය' },
+};
 
 export interface ArchetypePreset {
   id: string;
@@ -89,7 +98,7 @@ export const ARCHETYPE_PRESETS: ArchetypePreset[] = [
     id: 'BALANCED',
     nameEn: 'General Classroom (Standard)',
     nameSi: 'සාමාන්‍ය පන්ති කාමරය',
-    tagline: 'Standard 2-tier micro-steps, balanced distractors, moderate pace.',
+    tagline: 'Standard 2-tier micro-steps, a fuller set of choices, soft timer, regular pace.',
     icon: '📚',
     colorClass: 'border-slate-300 bg-slate-50/70 text-slate-800',
     profile: {
@@ -108,6 +117,8 @@ export const ARCHETYPE_PRESETS: ArchetypePreset[] = [
 interface StudentBehaviorSelectorProps {
   selectedProfile: StudentBehaviorProfile | null;
   onSelectProfile: (profile: StudentBehaviorProfile) => void;
+  /** Called when an archetype is picked, with the knob values the trait tracker recommends. */
+  onApplyScaffold?: (settings: GeneratorSettings) => void;
   customStudentName: string;
   onCustomStudentNameChange: (name: string) => void;
 }
@@ -115,11 +126,17 @@ interface StudentBehaviorSelectorProps {
 export function StudentBehaviorSelector({
   selectedProfile,
   onSelectProfile,
+  onApplyScaffold,
   customStudentName,
   onCustomStudentNameChange,
 }: StudentBehaviorSelectorProps) {
   const [activeArchetypeId, setActiveArchetypeId] = useState<string>(
     selectedProfile?.archetype_id || 'INATTENTIVE'
+  );
+
+  const recommended = useMemo(
+    () => (selectedProfile ? scaffold(beliefs(priorFromProfile(selectedProfile)), prefsFromProfile(selectedProfile)) : null),
+    [selectedProfile],
   );
 
   const handleSelectPreset = (preset: ArchetypePreset) => {
@@ -128,6 +145,7 @@ export function StudentBehaviorSelector({
       ...preset.profile,
       student_name: customStudentName.trim() || preset.profile.student_name,
     });
+    onApplyScaffold?.(scaffold(beliefs(priorFromProfile(preset.profile)), prefsFromProfile(preset.profile)).settings);
   };
 
   return (
@@ -221,6 +239,45 @@ export function StudentBehaviorSelector({
           <span className="badge bg-white text-mq-text-strong font-semibold shadow-2xs">
             {selectedProfile.working_memory_support ? '🧠 Working Memory Support Active' : 'Normal Memory Load'}
           </span>
+        </div>
+      )}
+
+      {/* Trait beliefs (Bayesian prior from the archetype) and why each setting was chosen */}
+      {recommended && (
+        <div className="grid md:grid-cols-[minmax(0,14rem)_1fr] gap-4 rounded-2xl p-3 border border-mq-border/70 bg-white">
+          <div className="space-y-2" aria-label="Trait beliefs">
+            <p className="text-[11px] font-bold text-mq-text-muted uppercase tracking-wide">Trait beliefs (0–1)</p>
+            {(Object.keys(TRAIT_LABELS) as Trait[]).map((t) => {
+              const p = recommended.beliefs[t];
+              return (
+                <div key={t} className="text-xs">
+                  <div className="flex justify-between font-semibold text-mq-text">
+                    <span>{TRAIT_LABELS[t].en} <span className="sinhala text-mq-text-muted font-normal">{TRAIT_LABELS[t].si}</span></span>
+                    <span>{p.toFixed(2)}</span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-mq-border/60 overflow-hidden">
+                    <div className={`h-full rounded-full ${p > 0.65 ? 'bg-mq-danger' : p > 0.35 ? 'bg-mq-warning' : 'bg-mq-success'}`} style={{ width: `${p * 100}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+            <p className="text-[10px] text-mq-text-muted leading-snug">Starts from this archetype and keeps updating from the child's answers during play.</p>
+          </div>
+          <div>
+            <p className="text-[11px] font-bold text-mq-text-muted uppercase tracking-wide mb-1.5">Why these settings</p>
+            {recommended.reasons.length ? (
+              <ul className="space-y-1 text-xs text-mq-text">
+                {recommended.reasons.map((r) => (
+                  <li key={r.en} className="flex gap-1.5">
+                    <span className="text-mq-primary">•</span>
+                    <span>{r.en} <span className="sinhala text-mq-text-muted">({r.si})</span></span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-mq-text-muted">Standard settings: no trait is strong enough to need extra scaffolding.</p>
+            )}
+          </div>
         </div>
       )}
     </div>

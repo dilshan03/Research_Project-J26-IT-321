@@ -24,7 +24,7 @@ function Group({ value, icon }: { value: number; icon: string }) {
  * SELECT_OPERATOR: two quantity groups with a glowing gap between them.
  * Learner drags (or taps) an operator gem into the gap.
  */
-export function OperatorDrop({ step, theme, isMoney, lang, calm, onWrong, onCorrect }: MechanicProps) {
+export function OperatorDrop({ step, theme, isMoney, lang, calm, onWrong, onCorrect, hintAfter = 2 }: MechanicProps) {
   // One gap per pair of groups (a three-item bill has two); a gem may go into any of them.
   const slotRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [placed, setPlaced] = useState<GameChoiceOption | null>(null);
@@ -41,8 +41,8 @@ export function OperatorDrop({ step, theme, isMoney, lang, calm, onWrong, onCorr
     } else {
       setRejected(opt.text_en);
       setTimeout(() => setRejected(null), 500);
-      // From the second miss on, point back at the story instead of a bare "try again".
-      onWrong(opt.text_en, opt.distractor_type, misses >= 1 ? LINES.operatorHint : undefined);
+      // Once the learner has missed `hintAfter` times, point back at the story instead of a bare "try again".
+      onWrong(opt.text_en, opt.distractor_type, misses + 1 >= hintAfter ? LINES.operatorHint : undefined);
       setMisses(m => m + 1);
     }
   };

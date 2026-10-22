@@ -183,7 +183,7 @@ export function CognitiveLoadCustomizer({
               <Brain size={14} className="text-mq-primary" /> Distractor Count
             </label>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-mq-surface-soft text-mq-text">
-              {settings.distractor_count || 3} Options / Step
+              {(settings.distractor_count || 3) + 1} choices (1 right + {settings.distractor_count || 3})
             </span>
           </div>
           <p className="text-[11px] text-mq-text-muted">

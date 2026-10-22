@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Flame, Map, RotateCcw, Star, Volume2, VolumeX } from 'lucide-react';
-import type { BlueprintEnvelope, DistractorType, GameMicroStep } from '../types';
+import type { BlueprintEnvelope, DistractorType, GameMicroStep, StudentBehaviorProfile } from '../types';
+import {
+  beliefs, observe, prefsFromProfile, priorFromProfile, scaffold, trimOptions,
+  type TraitBeliefs, type TraitEvent,
+} from '../adaptive/traitTracker';
 import { useGameplayTracker } from '../../behaviour-monitoring/useGameplayTracker';
 import { LINES, SCENES, STORY, getEnglishQuestionFallback, speak, type Lang, type Line, type Mood } from './gameKit';
 import { Gaja } from './Gaja';
@@ -28,11 +32,11 @@ interface Attempt {
   soft?: boolean;
   distractor_type?: DistractorType | null;
   at: number;
+  /** Trait beliefs right after this answer (the learner's adaptation trajectory). */
+  beliefs: TraitBeliefs;
 }
 
-const BREAK_AFTER_WRONG = 3;
 const IDLE_NUDGE_MS = 20000;
-const ADVANCE_MS = 1400;
 /** Soft per-step time bar (only when the teacher enables the timer). Running out never fails the step. */
 const STEP_TIME_MS = 60000;
 const COINS_PER_GAME = 15;
@@ -77,7 +81,7 @@ export function GamePlayer({
   envelope: BlueprintEnvelope;
   onExit: () => void;
   learnerId?: string;
-  onComplete?: (result: { activityId: string; starsEarned: number; coinsEarned: number }) => void;
+  onComplete?: (result: { activityId: string; starsEarned: number; coinsEarned: number; traitBeliefs: TraitBeliefs }) => void;
 }) {
   const { blueprint, raw_sinhala_question: question } = envelope;
 
@@ -167,7 +171,21 @@ export function GamePlayer({
     return playable.length ? playable : blueprint.micro_steps;
   }, [blueprint.micro_steps, sinhalaQuestion]);
 
-  const [voiceOn, setVoiceOn] = useState(true);
+  // Bayesian trait tracker: the teacher's archetype is the prior, the child's answers are the
+  // evidence, and `adapt` is the play behaviour the current beliefs call for.
+  const profile = blueprint.behavior_profile as Partial<StudentBehaviorProfile> | null | undefined;
+  const prefs = useMemo(() => prefsFromProfile(profile), [profile]);
+  const [traits, setTraits] = useState(() => priorFromProfile(profile));
+  const traitsRef = useRef(traits);
+  const adapt = useMemo(() => scaffold(beliefs(traits), prefs), [traits, prefs]);
+  const learn = useCallback((ev: TraitEvent) => {
+    const next = observe(traitsRef.current, ev);
+    traitsRef.current = next;
+    setTraits(next);
+    return scaffold(beliefs(next), prefs);
+  }, [prefs]);
+
+  const [voiceOn, setVoiceOn] = useState(adapt.play.voice !== 'OFF');
   const [phase, setPhase] = useState<'intro' | 'play' | 'done'>('intro');
   const [isWardrobeOpen, setIsWardrobeOpen] = useState(false);
   const { companion } = useCompanion();
@@ -185,13 +203,33 @@ export function GamePlayer({
   const [nudging, setNudging] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
   const [breakCount, setBreakCount] = useState(0);
+  const [braking, setBraking] = useState(false);
   const idleTimer = useRef<number | undefined>(undefined);
   const advanceTimer = useRef<number | undefined>(undefined);
+  const brakeTimer = useRef<number | undefined>(undefined);
+  /** When the learner could last start answering; answer latency is measured from here. */
+  const readyAt = useRef(Date.now());
   // Guards against a double tap scoring the same step twice while the celebration plays.
   const advancing = useRef(false);
 
   const step = steps[stepIndex];
   const mechanic = useMemo(() => (step ? pickMechanic(step) : null), [step]);
+  // Strongly inattentive learners see fewer wrong options. Decided once when the step
+  // appears (from the beliefs at that moment) so options never vanish mid-step.
+  const playStep = useMemo(() => {
+    if (!step) return step;
+    const b = beliefs(traitsRef.current);
+    const options = trimOptions(step.game_options, scaffold(b, prefs).play.maxWrongOptions, b);
+    return options === step.game_options ? step : { ...step, game_options: options };
+  }, [step, prefs]);
+
+  /** Impulse brake: ignore taps for `ms` so the learner looks before answering. */
+  const holdForThinking = useCallback((ms: number) => {
+    window.clearTimeout(brakeTimer.current);
+    if (ms <= 0) { setBraking(false); readyAt.current = Date.now(); return; }
+    setBraking(true);
+    brakeTimer.current = window.setTimeout(() => { setBraking(false); readyAt.current = Date.now(); }, ms);
+  }, []);
 
   // NumberHunt asks the learner to tap the step's numbers in the question. If the English
   // wording lacks them (a translation can drop or spell out numbers), use the Sinhala text.
@@ -200,16 +238,18 @@ export function GamePlayer({
     return canHunt(step, activeQuestion) ? activeQuestion : sinhalaQuestion;
   }, [step, lang, activeQuestion, sinhalaQuestion]);
 
+  // READ_ON_CLICK profiles hear Gaja only when they tap the speech bubble.
+  const autoVoice = voiceOn && adapt.play.voice === 'AUTO';
   const say = useCallback((l: Line, m?: Mood) => {
     setLine(l);
     setLineKey(k => k + 1);
     if (m) setMood(m);
-    if (voiceOn) speak(l, lang);
-  }, [voiceOn, lang]);
+    if (autoVoice) speak(l, lang);
+  }, [autoVoice, lang]);
 
   const handleLanguageToggle = (newL: Lang) => {
     setLang(newL);
-    if (voiceOn && line) {
+    if (autoVoice && line) {
       speak(line, newL);
     }
   };
@@ -221,15 +261,22 @@ export function GamePlayer({
     if (phase !== 'play' || onBreak) return;
     idleTimer.current = window.setTimeout(() => {
       setNudging(true);
+      learn({ kind: 'idle' });
       say(mechanic?.intro ?? LINES.nudge, 'thinking');
     }, IDLE_NUDGE_MS);
-  }, [phase, onBreak, say, mechanic]);
+  }, [phase, onBreak, say, mechanic, learn]);
 
   useEffect(() => { resetIdle(); return () => window.clearTimeout(idleTimer.current); }, [resetIdle, stepIndex]);
   useEffect(() => () => {
     window.speechSynthesis?.cancel();
     window.clearTimeout(advanceTimer.current);
+    window.clearTimeout(brakeTimer.current);
   }, []);
+  // Every new step starts with the think-pause the current beliefs call for.
+  useEffect(() => {
+    if (phase === 'play') holdForThinking(adapt.play.brakeMs);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, stepIndex]);
 
   const { isTracking, onStepStart, onAnswerSelect, onAnswerSubmit, onGameExit } = tracker;
   useEffect(() => {
@@ -251,33 +298,40 @@ export function GamePlayer({
   const log = (label: string, correct: boolean, distractor?: DistractorType | null, soft = false) => {
     onAnswerSelect(label);
     onAnswerSubmit(label, correct);
-    setAttempts(a => [...a, { step_order: step.step_order, label, correct, soft, distractor_type: distractor, at: Date.now() }]);
+    const snapshot = beliefs(traitsRef.current);
+    setAttempts(a => [...a, { step_order: step.step_order, label, correct, soft, distractor_type: distractor, at: Date.now(), beliefs: snapshot }]);
   };
+
+  const latency = () => Date.now() - readyAt.current;
 
   const onWrong: MechanicProps['onWrong'] = (label, distractor, hint, opts) => {
     resetIdle();
-    log(label, false, distractor, !!opts?.soft);
     if (opts?.soft) {
+      log(label, false, distractor, true);
       say(hint ?? LINES.retry, 'encourage');
       return;
     }
+    const next = learn({ kind: 'wrong', distractor, latencyMs: latency() });
+    log(label, false, distractor);
     setStepHadMistake(true);
     setStreak(0);
     const run = wrongRun + 1;
     setWrongRun(run);
-    if (run >= BREAK_AFTER_WRONG) {
+    if (run >= next.play.breakAfterWrong) {
       say(LINES.breakTime, 'encourage');
       setOnBreak(true);
       setWrongRun(0);
     } else {
       const customRetry = story.dialogue?.retry;
       say(hint ?? (customRetry || LINES.retry), 'encourage');
+      holdForThinking(next.play.brakeMs);
     }
   };
 
   const onCorrect: MechanicProps['onCorrect'] = label => {
     if (advancing.current) return;
     advancing.current = true;
+    const next = learn({ kind: 'correct', firstTry: !stepHadMistake, latencyMs: latency(), multiStep: steps.length > 1 });
     log(label, true);
     setWrongRun(0);
     const s = stepHadMistake ? 0 : streak + 1;
@@ -289,16 +343,16 @@ export function GamePlayer({
     advanceTimer.current = window.setTimeout(() => {
       advancing.current = false;
       setCelebrating(false);
-      const next = stepIndex + 1;
+      const nextIndex = stepIndex + 1;
       setStepHadMistake(false);
-      if (next >= steps.length) {
+      if (nextIndex >= steps.length) {
         setPhase('done');
         say(story.outro, 'celebrate');
       } else {
-        setStepIndex(next);
-        say(pickMechanic(steps[next]).intro, 'thinking');
+        setStepIndex(nextIndex);
+        say(pickMechanic(steps[nextIndex]).intro, 'thinking');
       }
-    }, ADVANCE_MS);
+    }, next.play.advanceMs);
   };
 
   const onTimeUp = () => {
@@ -323,7 +377,7 @@ export function GamePlayer({
     if (phase !== 'done') { rewarded.current = false; return; }
     if (rewarded.current) return;
     rewarded.current = true;
-    onComplete?.({ activityId: blueprint.activity_id, starsEarned: stars, coinsEarned: COINS_PER_GAME });
+    onComplete?.({ activityId: blueprint.activity_id, starsEarned: stars, coinsEarned: COINS_PER_GAME, traitBeliefs: beliefs(traitsRef.current) });
   }, [phase, stars, blueprint.activity_id, onComplete]);
 
   return (
@@ -439,6 +493,16 @@ export function GamePlayer({
                 </div>
               )}
               <AnimatePresence>{celebrating && <Celebration calm={calm} />}</AnimatePresence>
+              {/* Working-memory support: answers of solved steps stay in view. */}
+              {adapt.play.memoryRecap && stepIndex > 0 && (
+                <div className="flex flex-wrap justify-center gap-2 mb-4" aria-label={lang === 'si' ? 'මෙතෙක් විසඳූ' : 'Solved so far'}>
+                  {steps.slice(0, stepIndex).map(s => (
+                    <span key={s.step_order} className="px-3 py-1 rounded-full bg-[var(--mq-success-bg)] border border-mq-success/40 text-mq-success font-bold">
+                      ✓ {s.correct_target_value}
+                    </span>
+                  ))}
+                </div>
+              )}
               {/* NumberHunt renders the question itself; shape steps are fully described by the
                   instruction, and an older shape prompt can name a different shape. */}
               {step.action_type !== 'IDENTIFY_ENTITY' && step.action_type !== 'MATCH_SHAPE' && (
@@ -449,10 +513,15 @@ export function GamePlayer({
               <h2 className={`text-center text-2xl md:text-3xl font-extrabold mb-8 max-w-2xl w-full mx-auto ${lang === 'si' ? 'sinhala' : ''}`}>
                 {lang === 'si' ? step.instruction_si : step.instruction_en}
               </h2>
-              <div className="w-full flex justify-center">
+              {/* Impulse brake: the mechanic ignores taps briefly so the learner looks first. */}
+              <p className={`h-6 mb-2 text-sm font-semibold text-mq-text-muted transition-opacity ${braking ? 'opacity-100' : 'opacity-0'} ${lang === 'si' ? 'sinhala' : ''}`} aria-live="polite">
+                {braking ? (lang === 'si' ? '🤔 මොහොතක් හිතලා බලමු…' : '🤔 Look carefully first…') : ''}
+              </p>
+              <div className={`w-full flex justify-center transition-opacity duration-300 ${braking ? 'pointer-events-none opacity-60' : ''}`} aria-busy={braking}>
                 <mechanic.Comp
-                  step={step} question={stepQuestion} theme={blueprint.game_theme} isMoney={isMoney}
+                  step={playStep ?? step} question={stepQuestion} theme={blueprint.game_theme} isMoney={isMoney}
                   lang={lang} calm={calm} onWrong={onWrong} onCorrect={onCorrect} onSay={l => say(l, 'thinking')}
+                  hintAfter={adapt.play.hintAfter}
                 />
               </div>
             </motion.section>
@@ -487,13 +556,20 @@ export function GamePlayer({
 
       {/* Companion stays in the corner during play */}
       {phase !== 'intro' && (
-        <div className="fixed left-4 bottom-4 z-30">
+        // Tapping Gaja reads the current line aloud (the only way for READ_ON_CLICK profiles).
+        <button
+          type="button"
+          id="gaja-speak"
+          className="fixed left-4 bottom-4 z-30 text-left"
+          aria-label={lang === 'si' ? 'ගජාට සවන් දෙන්න' : 'Hear Gaja'}
+          onClick={() => { if (voiceOn && line) speak(line, lang); }}
+        >
           <Gaja mood={mood} line={line} lineKey={lineKey} lang={lang} calm={calm} companionConfig={companion} />
-        </div>
+        </button>
       )}
 
       <AnimatePresence>
-        {onBreak && <BreathingBreak lang={lang} onDone={() => { setOnBreak(false); setBreakCount(c => c + 1); say(LINES.nudge, 'happy'); }} />}
+        {onBreak && <BreathingBreak lang={lang} onDone={() => { setOnBreak(false); setBreakCount(c => c + 1); readyAt.current = Date.now(); say(LINES.nudge, 'happy'); }} />}
       </AnimatePresence>
 
       <CompanionWardrobeModal

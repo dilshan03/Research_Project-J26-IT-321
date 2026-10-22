@@ -9,7 +9,7 @@ import type { MechanicProps } from './types';
  * Learner taps the numbers; each one flies onto Gaja's slate.
  * After two misses the numbers start glowing (scaffolded hint).
  */
-export function NumberHunt({ step, question, lang, calm, onWrong, onCorrect }: MechanicProps) {
+export function NumberHunt({ step, question, lang, calm, onWrong, onCorrect, hintAfter = 2 }: MechanicProps) {
   const targets = (step.operands ?? []).map(String);
   const tokens = question.split(/\s+/).filter(Boolean);
   const [found, setFound] = useState<number[]>([]); // token indexes
@@ -39,7 +39,7 @@ export function NumberHunt({ step, question, lang, calm, onWrong, onCorrect }: M
     else onWrong(tokens[i], 'IMPULSIVITY', LINES.notNumber, { soft: true });
   };
 
-  const hint = misses >= 2;
+  const hint = misses >= hintAfter;
 
   return (
     <div className="flex flex-col items-center gap-8">

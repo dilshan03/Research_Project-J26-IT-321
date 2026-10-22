@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, UserPlus, UserPen, AlertCircle, Check, Languages, Info } from 'lucide-react';
-import type {
-  Learner,
-  CreateLearnerData,
-  UpdateLearnerData,
-  LanguageComprehensionLevel,
-  PrimaryInstructionLanguage,
-} from '../types';
+import { Loader2, UserPlus, UserPen, AlertCircle, Check } from 'lucide-react';
+import type { Learner, CreateLearnerData, UpdateLearnerData } from '../types';
 import { AVATAR_OPTIONS } from '../types';
 import { parentText } from '../../../shared/i18n/parentText';
 import { ParentModalShell } from './parent/ParentModalShell';
-import { comprehensionLabel } from './parent/labels';
+import { pick } from '../../../shared/i18n/language';
 
 interface LearnerModalProps {
   isOpen: boolean;
@@ -19,14 +13,6 @@ interface LearnerModalProps {
   editingLearner?: Learner | null;
 }
 
-// Stored values stay in English; only their display labels are localized.
-const COMPREHENSION_LEVELS: { level: LanguageComprehensionLevel; dots: number }[] = [
-  { level: 'Understands a little', dots: 1 },
-  { level: 'Understands basic instructions', dots: 2 },
-  { level: 'Understands well', dots: 3 },
-];
-
-const LANGUAGE_IDS = ['Sinhala', 'English', 'Bilingual'] as const;
 const AGES = [6, 7, 8, 9, 10];
 const GRADES = [1, 2, 3, 4, 5];
 
@@ -73,11 +59,6 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
   const [preferredName, setPreferredName] = useState('');
   const [age, setAge] = useState<number>(7);
   const [grade, setGrade] = useState<number>(2);
-  const [preferredLanguage, setPreferredLanguage] = useState<string>('Sinhala');
-  const [sinhalaComprehension, setSinhalaComprehension] = useState<string>('');
-  const [englishComprehension, setEnglishComprehension] = useState<string>('');
-  const [primaryInstructionLanguage, setPrimaryInstructionLanguage] =
-    useState<PrimaryInstructionLanguage>('Sinhala');
   const [avatarId, setAvatarId] = useState<string>('avatar_lion');
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -90,12 +71,6 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
       setPreferredName(editingLearner.preferredName || '');
       setAge(typeof editingLearner.age === 'number' ? editingLearner.age : 7);
       setGrade(typeof editingLearner.grade === 'number' ? editingLearner.grade : 2);
-      setPreferredLanguage(editingLearner.preferredLanguage || 'Sinhala');
-      setSinhalaComprehension(editingLearner.sinhalaComprehension || '');
-      setEnglishComprehension(editingLearner.englishComprehension || '');
-      setPrimaryInstructionLanguage(
-        (editingLearner.primaryInstructionLanguage as PrimaryInstructionLanguage) || 'Sinhala'
-      );
       // Edit the parent's own selection; the child's choice (if any) is stored separately and is not changed here.
       setAvatarId(editingLearner.parentAvatarId || editingLearner.avatarId || 'avatar_lion');
     } else {
@@ -103,10 +78,6 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
       setPreferredName('');
       setAge(7);
       setGrade(2);
-      setPreferredLanguage('Sinhala');
-      setSinhalaComprehension('');
-      setEnglishComprehension('');
-      setPrimaryInstructionLanguage('Sinhala');
       setAvatarId('avatar_lion');
     }
     setFormErrors({});
@@ -145,16 +116,14 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
 
     setIsSubmitting(true);
     try {
-      const isBilingual = preferredLanguage === 'Bilingual';
+      // Every child's learning language is Sinhala: new children are created with it, and editing a child
+      // leaves the stored value untouched. The interface language is chosen with the global switch instead.
       const payload: CreateLearnerData | UpdateLearnerData = {
         firstName: firstName.trim(),
         preferredName: preferredName.trim() || undefined,
         age,
         grade,
-        preferredLanguage,
-        sinhalaComprehension: isBilingual && sinhalaComprehension ? sinhalaComprehension : undefined,
-        englishComprehension: isBilingual && englishComprehension ? englishComprehension : undefined,
-        primaryInstructionLanguage: isBilingual ? primaryInstructionLanguage : undefined,
+        ...(isEditing ? {} : { preferredLanguage: 'Sinhala' }),
         avatarId,
       };
 
@@ -170,42 +139,6 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
       setIsSubmitting(false);
     }
   };
-
-  const renderComprehension = (
-    value: string,
-    setValue: React.Dispatch<React.SetStateAction<string>>,
-    label: string
-  ) => (
-    <div>
-      <FieldLabel hint={parentText.common.optional}>{label}</FieldLabel>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-        {COMPREHENSION_LEVELS.map((opt) => {
-          const isSelected = value === opt.level;
-          return (
-            <button
-              key={opt.level}
-              type="button"
-              aria-pressed={isSelected}
-              onClick={() => setValue((prev) => (prev === opt.level ? '' : opt.level))}
-              className={`${choiceClass(isSelected)} min-h-[48px] px-3 py-2 text-sm text-left flex items-center justify-between gap-2`}
-            >
-              <span className="leading-snug">{comprehensionLabel(opt.level)}</span>
-              <span className="flex items-center gap-0.5 shrink-0" aria-hidden="true">
-                {[1, 2, 3].map((d) => (
-                  <span
-                    key={d}
-                    className={`w-1.5 h-1.5 rounded-full ${
-                      d <= opt.dots ? (isSelected ? 'bg-mq-primary' : 'bg-mq-text-muted') : 'bg-mq-border'
-                    }`}
-                  />
-                ))}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
 
   return (
     <ParentModalShell
@@ -260,7 +193,7 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
               <span className="text-2xl leading-none" aria-hidden="true">
                 {AVATAR_OPTIONS.find((a) => a.id === editingLearner.avatarId)?.icon}
               </span>
-              <span>{t.childChoseAvatar(AVATAR_OPTIONS.find((a) => a.id === editingLearner.avatarId)?.nameSi ?? '')}</span>
+              <span>{t.childChoseAvatar(pick(AVATAR_OPTIONS.find((a) => a.id === editingLearner.avatarId)?.nameSi, AVATAR_OPTIONS.find((a) => a.id === editingLearner.avatarId)?.name))}</span>
             </p>
           )}
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
@@ -275,7 +208,7 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
                   className={`${choiceClass(isSelected)} relative min-h-[88px] p-2 flex flex-col items-center justify-center gap-1`}
                 >
                   <span className="text-3xl leading-none" aria-hidden="true">{item.icon}</span>
-                  <span className="text-xs font-medium text-mq-text leading-tight text-center">{item.nameSi}</span>
+                  <span className="text-xs font-medium text-mq-text leading-tight text-center">{pick(item.nameSi, item.name)}</span>
                   {isSelected && (
                     <span className="absolute top-1.5 right-1.5 w-5 h-5 bg-mq-primary text-white rounded-full flex items-center justify-center">
                       <Check size={12} strokeWidth={3} />
@@ -359,62 +292,6 @@ export const LearnerModal: React.FC<LearnerModalProps> = ({
             {formErrors.grade && <p className="text-sm text-mq-danger mt-1.5">{formErrors.grade}</p>}
           </fieldset>
         </div>
-
-        {/* Learning language */}
-        <fieldset>
-          <FieldLabel>{t.language}</FieldLabel>
-          <div className="grid grid-cols-3 gap-2">
-            {LANGUAGE_IDS.map((id) => (
-              <button
-                key={id}
-                type="button"
-                aria-pressed={preferredLanguage === id}
-                onClick={() => setPreferredLanguage(id)}
-                className={`${choiceClass(preferredLanguage === id)} min-h-[48px] px-2 text-sm`}
-              >
-                {parentText.languages[id]}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-
-        {preferredLanguage === 'Bilingual' && (
-          <div className="p-4 sm:p-5 rounded-2xl bg-mq-surface-soft border border-mq-border space-y-5">
-            <div className="flex items-start gap-2.5">
-              <Languages size={18} className="text-mq-primary shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-semibold text-mq-text-strong">{t.bilingualTitle}</p>
-                <p className="text-sm text-mq-text-muted">{t.bilingualHelp}</p>
-              </div>
-            </div>
-
-            <div>
-              <FieldLabel>{t.mainLanguage}</FieldLabel>
-              <div className="grid grid-cols-2 gap-2">
-                {(['Sinhala', 'English'] as PrimaryInstructionLanguage[]).map((id) => (
-                  <button
-                    key={id}
-                    type="button"
-                    aria-pressed={primaryInstructionLanguage === id}
-                    onClick={() => setPrimaryInstructionLanguage(id)}
-                    className={`${choiceClass(primaryInstructionLanguage === id)} min-h-[46px] px-3 text-sm`}
-                  >
-                    {parentText.languages[id]}
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-mq-text-muted mt-1.5">{t.mainLanguageHelp}</p>
-            </div>
-
-            {renderComprehension(sinhalaComprehension, setSinhalaComprehension, t.sinhalaUnderstanding)}
-            {renderComprehension(englishComprehension, setEnglishComprehension, t.englishUnderstanding)}
-
-            <p className="flex items-start gap-2 text-xs text-mq-text-muted">
-              <Info size={14} className="shrink-0 mt-0.5 text-mq-primary" />
-              <span>{t.understandingNote}</span>
-            </p>
-          </div>
-        )}
 
         <p className="text-xs text-mq-text-muted">{parentText.common.requiredNote}</p>
       </div>

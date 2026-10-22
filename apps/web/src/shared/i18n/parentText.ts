@@ -1,10 +1,12 @@
 /**
- * Parent portal wording (Sinhala).
+ * Parent portal wording: Sinhala here, English in parentText.en.ts (same `ParentDictionary` shape).
  *
- * Single source of parent-facing text. A future English dictionary should provide an object of
- * the same `ParentDictionary` shape; the planned language toggle can then choose between them
- * without touching components. Data values (API fields, option keys) are never translated here.
+ * Single source of parent-facing text. The global language switch (shared/i18n/language.ts) chooses
+ * between the two at read time, so components keep using `parentText.section.key` unchanged.
+ * Data values (API fields, option keys) are never translated here.
  */
+import { localized } from './language';
+import { en } from './parentText.en';
 
 type TextValue = string | ((...args: never[]) => string);
 interface TextTree {
@@ -226,6 +228,7 @@ const si = {
     actionCompleted: 'ප්‍රතිඵල බලන්න',
     actionInProgress: 'ඇගයීම ඉදිරියට කරන්න',
     actionNotStarted: 'ආරම්භක ඇගයීම අරඹන්න',
+    gameProfile: 'ක්‍රීඩා පැතිකඩ',
   },
 
   childForm: {
@@ -494,6 +497,10 @@ const si = {
     toastSocialSaved: 'ඉගෙනුම් පරිසරය සුරැකුවා.',
     toastMathDone: 'ගණිත ක්‍රියාකාරකම අවසන්!',
     toastSkipFailed: 'මඟ හැරීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.',
+    headerTitle: 'The Living Canvas • ඔබේ පුංචි ලෝකය',
+    headerSubtitle: 'සන්සුන් ගවේෂණ පරිසරය',
+    pauseExit: 'නවත්වා පසුව නැවත පටන් ගන්න',
+    pauseExitTitle: 'දරුවාගේ ක්‍රියාකාරකම් අතරමැදදී සුරැකෙන්නේ නැත; ඊළඟ වතාවේ මුල සිට පටන් ගනී.',
   },
 
   stepper: {
@@ -692,5 +699,5 @@ type Widen<T> = {
 /** Shape every parent-portal dictionary (Sinhala now, English later) must provide. */
 export type ParentDictionary = Widen<typeof si>;
 
-/** Active parent-portal dictionary. Replace with a language-aware selector when the toggle is added. */
-export const parentText: ParentDictionary = si;
+/** Active parent-portal dictionary: Sinhala or English, following the global language switch. */
+export const parentText: ParentDictionary = localized<ParentDictionary>({ si, en });

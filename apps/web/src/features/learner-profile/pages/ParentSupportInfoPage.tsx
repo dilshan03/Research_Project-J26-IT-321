@@ -12,6 +12,7 @@ import { SnapIvProgressSection } from '../components/parent/SnapIvProgress';
 import { readRememberedChild, rememberChild } from '../utils/rememberedChild';
 import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
 import { parentText } from '../../../shared/i18n/parentText';
+import { pick } from '../../../shared/i18n/language';
 
 const t = parentText.support;
 
@@ -199,8 +200,8 @@ export const ParentSupportInfoPage: React.FC = () => {
             >
               {adhd ? (
                 <dl>
-                  <Row label={t.adhdDiagnosed} value={adhdStatus?.labelSi ?? '—'} />
-                  {adhdType && <Row label={t.adhdType} value={adhdType.labelSi} />}
+                  <Row label={t.adhdDiagnosed} value={adhdStatus ? pick(adhdStatus.labelSi, adhdStatus.labelEn) : '—'} />
+                  {adhdType && <Row label={t.adhdType} value={pick(adhdType.labelSi, adhdType.labelEn)} />}
                   {adhd.diagnosisReportedMonth && <Row label={t.adhdMonth} value={adhd.diagnosisReportedMonth} />}
                 </dl>
               ) : (

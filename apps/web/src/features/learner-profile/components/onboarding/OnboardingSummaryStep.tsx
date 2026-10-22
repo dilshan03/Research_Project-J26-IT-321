@@ -11,6 +11,7 @@ import { RecommendationList, RecommendationResearchRows } from '../parent/Recomm
 import { ResearchDetails } from '../parent/ResearchDetails';
 import { languageLabel, optionTitle } from '../parent/labels';
 import { parentText } from '../../../../shared/i18n/parentText';
+import { pick } from '../../../../shared/i18n/language';
 
 interface Props {
   summary: OnboardingFullSummary;
@@ -171,13 +172,13 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
             <dl className="text-sm space-y-1">
               <div>
                 <dt className="text-xs text-mq-text-muted">{t.adhdDiagnosed}</dt>
-                <dd className="font-semibold text-mq-text-strong">{adhdStatus.labelSi}</dd>
+                <dd className="font-semibold text-mq-text-strong">{pick(adhdStatus.labelSi, adhdStatus.labelEn)}</dd>
               </div>
               {adhdPresentation && (
                 <div>
                   <dt className="text-xs text-mq-text-muted">{t.adhdType}</dt>
                   <dd className="font-semibold text-mq-text-strong">
-                    {adhdPresentation.labelSi}
+                    {pick(adhdPresentation.labelSi, adhdPresentation.labelEn)}
                     {adhd.diagnosisReportedMonth && (
                       <span className="font-normal text-mq-text-muted"> • {adhd.diagnosisReportedMonth}</span>
                     )}

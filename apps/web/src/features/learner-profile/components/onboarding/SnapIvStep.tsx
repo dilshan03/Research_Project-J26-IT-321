@@ -16,6 +16,7 @@ import {
   type SnapIvItemAnswer,
 } from '../../types/onboarding';
 import { parentText } from '../../../../shared/i18n/parentText';
+import { pick } from '../../../../shared/i18n/language';
 
 interface Props {
   initialResponses?: SnapIvItemAnswer[];
@@ -101,10 +102,10 @@ export const SnapIvStep: React.FC<Props> = ({
               answers[item.id] !== undefined ? 'border-mq-border bg-white' : 'border-mq-border/60 bg-mq-surface-soft/50'
             }`}
           >
-            <legend className="sr-only">{`${item.id}. ${item.textSi}`}</legend>
+            <legend className="sr-only">{`${item.id}. ${pick(item.textSi, item.textEn)}`}</legend>
             <p className="mb-3 text-base text-mq-text-strong leading-relaxed" aria-hidden="true">
               <span className="font-bold text-mq-primary mr-2">{item.id}.</span>
-              {item.textSi}
+              {pick(item.textSi, item.textEn)}
             </p>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -122,7 +123,7 @@ export const SnapIvStep: React.FC<Props> = ({
                         : 'border-mq-border bg-white hover:border-mq-primary/40 text-mq-text'
                     }`}
                   >
-                    {scale.labelSi}
+                    {pick(scale.labelSi, scale.labelEn)}
                   </button>
                 );
               })}

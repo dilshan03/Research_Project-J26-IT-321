@@ -142,7 +142,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
       // 1. Fetch child profile
       const childRes = await learnerApi.getLearner(learnerId);
       if (!childRes.success || !childRes.data) {
-        setErrorMessage(childRes.message || 'දරුවාගේ පැතිකඩ ලබාගැනීමට නොහැකි විය.');
+        setErrorMessage(childRes.message || parentText.onboarding.loadError);
         setIsLoading(false);
         return;
       }
@@ -199,7 +199,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
         setMathQuestions(qRes.data);
       }
     } catch {
-      setErrorMessage('සේවාදායකය සමඟ සම්බන්ධ වීමේදී දෝෂයක් හටගැනිණි.');
+      setErrorMessage(parentText.onboarding.connectionError);
     } finally {
       setIsLoading(false);
     }
@@ -218,7 +218,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
       markCompleted('adhd_information');
       return res.data.adhdInformation;
     }
-    showToast(res.message || 'සුරැකීමට නොහැකි විය (Could not save).');
+    showToast(res.message || parentText.common.saveFailed);
     return null;
   };
 
@@ -228,7 +228,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
     try {
       const saved = await saveAdhd(data);
       if (saved) {
-        showToast('තොරතුරු සුරකින ලදී (Information saved).');
+        showToast(parentText.onboarding.toastAdhdSaved);
         if (returnToSummary) {
           await goBackToSummary();
         } else {
@@ -238,7 +238,7 @@ export const OnboardingPlaceholderPage: React.FC = () => {
         }
       }
     } catch {
-      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
+      showToast(parentText.common.networkError);
     } finally {
       setIsActionLoading(false);
     }
@@ -249,11 +249,11 @@ export const OnboardingPlaceholderPage: React.FC = () => {
     setIsActionLoading(true);
     try {
       if (await saveAdhd(data)) {
-        showToast('තොරතුරු සුරකින ලදී (Information saved).');
+        showToast(parentText.onboarding.toastAdhdSaved);
         navigate('/learners');
       }
     } catch {
-      showToast('ජාල දෝෂයක් හටගැනිණි. සුරැකීමට නොහැකි විය.');
+      showToast(parentText.common.networkError);
     } finally {
       setIsActionLoading(false);
     }
@@ -270,8 +270,8 @@ export const OnboardingPlaceholderPage: React.FC = () => {
         markCompleted('snap_iv');
         showToast(
           res.data.snapIvStatus === 'COMPLETED'
-            ? 'කලින් සුරැකි පිළිතුරු එලෙසම තබා ඇත (Your earlier answers were kept).'
-            : 'SNAP-IV මඟ හරින ලදී. පසුව සම්පූර්ණ කළ හැක (Skipped - you can complete it later).'
+            ? parentText.onboarding.toastSnapKept
+            : parentText.onboarding.toastSnapSkipped
         );
         if (returnToSummary) {
           await goBackToSummary();
@@ -279,10 +279,10 @@ export const OnboardingPlaceholderPage: React.FC = () => {
           setCurrentStep(resolveNextStep({ ...currentFlags(), snapDone: true }));
         }
       } else {
-        showToast(res.message || 'මඟ හැරීමට නොහැකි විය.');
+        showToast(res.message || parentText.onboarding.toastSkipFailed);
       }
     } catch {
-      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
+      showToast(parentText.common.networkError);
     } finally {
       setIsActionLoading(false);
     }
@@ -298,12 +298,12 @@ export const OnboardingPlaceholderPage: React.FC = () => {
         setSavedPreferences(data);
         markCompleted('preferences');
         setCurrentStep(resolveNextStep({ ...currentFlags(), prefsDone: true }));
-        showToast('ඉගෙනුම් මනාපයන් සාර්ථකව සුරකින ලදී.');
+        showToast(parentText.onboarding.toastPreferencesSaved);
       } else {
-        showToast(res.message || 'සුරැකීමට නොහැකි විය.');
+        showToast(res.message || parentText.common.saveFailed);
       }
     } catch {
-      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
+      showToast(parentText.common.networkError);
     } finally {
       setIsActionLoading(false);
     }
@@ -316,13 +316,13 @@ export const OnboardingPlaceholderPage: React.FC = () => {
       const res = await onboardingApi.savePreferences(learnerId, data);
       if (res.success) {
         setSavedPreferences(data);
-        showToast('ඉගෙනුම් මනාපයන් සුරකින ලදී.');
+        showToast(parentText.onboarding.toastPreferencesSaved);
         navigate('/learners');
       } else {
-        showToast(res.message || 'සුරැකීමට නොහැකි විය.');
+        showToast(res.message || parentText.common.saveFailed);
       }
     } catch {
-      showToast('ජාල දෝෂයක් හටගැනිණි. සුරැකීමට නොහැකි විය.');
+      showToast(parentText.common.networkError);
     } finally {
       setIsActionLoading(false);
     }
@@ -338,17 +338,17 @@ export const OnboardingPlaceholderPage: React.FC = () => {
         setSavedSnapIv(responses);
         setSnapIvStatus('COMPLETED');
         markCompleted('snap_iv');
-        showToast('SNAP-IV ලකුණු සාර්ථකව සටහන් කරගන්නා ලදී.');
+        showToast(parentText.onboarding.toastSnapSaved);
         if (returnToSummary) {
           await goBackToSummary();
         } else {
           setCurrentStep(resolveNextStep({ ...currentFlags(), snapDone: true }));
         }
       } else {
-        showToast(res.message || 'SNAP-IV සුරැකීමට නොහැකි විය.');
+        showToast(res.message || parentText.snap.saveError);
       }
     } catch {
-      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
+      showToast(parentText.common.networkError);
     } finally {
       setIsActionLoading(false);
     }
@@ -362,13 +362,13 @@ export const OnboardingPlaceholderPage: React.FC = () => {
       if (res.success) {
         setSavedSnapIv(responses);
         setSnapIvStatus('COMPLETED');
-        showToast('SNAP-IV ලකුණු සුරකින ලදී.');
+        showToast(parentText.onboarding.toastSnapSaved);
         navigate('/learners');
       } else {
-        showToast(res.message || 'SNAP-IV සුරැකීමට නොහැකි විය.');
+        showToast(res.message || parentText.snap.saveError);
       }
     } catch {
-      showToast('ජාල දෝෂයක් හටගැනිණි. සුරැකීමට නොහැකි විය.');
+      showToast(parentText.common.networkError);
     } finally {
       setIsActionLoading(false);
     }
@@ -384,12 +384,12 @@ export const OnboardingPlaceholderPage: React.FC = () => {
         setSavedSocialContext(data);
         markCompleted('social_context');
         setCurrentStep('handover');
-        showToast('සමාජීය ඉගෙනුම් පසුබිම සටහන් කරගන්නා ලදී.');
+        showToast(parentText.onboarding.toastSocialSaved);
       } else {
-        showToast(res.message || 'සුරැකීමට නොහැකි විය.');
+        showToast(res.message || parentText.common.saveFailed);
       }
     } catch {
-      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
+      showToast(parentText.common.networkError);
     } finally {
       setIsActionLoading(false);
     }
@@ -402,13 +402,13 @@ export const OnboardingPlaceholderPage: React.FC = () => {
       const res = await onboardingApi.saveSocialContext(learnerId, data);
       if (res.success) {
         setSavedSocialContext(data);
-        showToast('සමාජීය පසුබිම සුරකින ලදී.');
+        showToast(parentText.onboarding.toastSocialSaved);
         navigate('/learners');
       } else {
-        showToast(res.message || 'සුරැකීමට නොහැකි විය.');
+        showToast(res.message || parentText.common.saveFailed);
       }
     } catch {
-      showToast('ජාල දෝෂයක් හටගැනිණි. සුරැකීමට නොහැකි විය.');
+      showToast(parentText.common.networkError);
     } finally {
       setIsActionLoading(false);
     }
@@ -442,12 +442,12 @@ export const OnboardingPlaceholderPage: React.FC = () => {
           if (sumRes.data.learner) setLearner(sumRes.data.learner);
         }
         setCurrentStep('summary');
-        showToast('ගණිත ඇගයීම සාර්ථකව සම්පූර්ණ කරන ලදී!');
+        showToast(parentText.onboarding.toastMathDone);
       } else {
-        showToast(res.message || 'ඇගයීම සුරැකීමට නොහැකි විය.');
+        showToast(res.message || parentText.common.saveFailed);
       }
     } catch {
-      showToast('ජාල දෝෂයක් හටගැනිණි. කරුණාකර නැවත උත්සාහ කරන්න.');
+      showToast(parentText.common.networkError);
     } finally {
       setIsActionLoading(false);
     }
@@ -474,21 +474,21 @@ export const OnboardingPlaceholderPage: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <span className="text-xs font-bold text-teal-950 block font-sinhala truncate">
-                  The Living Canvas • ඔබේ පුංචි ලෝකය
+                  {parentText.onboarding.headerTitle}
                 </span>
                 <span className="text-[10px] text-teal-700/80 block truncate">
-                  A Little World That Learns About Me • සන්සුන් ගවේෂණ පරිසරය
+                  {parentText.onboarding.headerSubtitle}
                 </span>
               </div>
             </div>
             <button
               type="button"
               onClick={() => navigate('/learners')}
-              title="The child activities are not saved part-way; they start again from the beginning next time."
+              title={parentText.onboarding.pauseExitTitle}
               className="text-xs font-bold text-slate-500 hover:text-teal-700 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer shrink-0 whitespace-nowrap"
             >
               {/* Nothing is saved part-way: the child activities restart next time (no partial evidence is stored) */}
-              Pause & Exit (පසුව ආයෙත් පටන් ගන්න)
+              {parentText.onboarding.pauseExit}
             </button>
           </div>
         </header>

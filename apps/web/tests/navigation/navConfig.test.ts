@@ -1,6 +1,6 @@
 /**
  * Role-based navigation (public navbar, mobile menu and profile dropdown).
- * Run: node --experimental-strip-types --test tests/navigation/navConfig.test.ts
+ * Run: node --experimental-strip-types --import ./tests/ts-resolve.mjs --test tests/navigation/navConfig.test.ts
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -11,13 +11,22 @@ import {
   isNavItemActive,
   navItemsFor,
 } from '../../src/shared/components/navConfig.ts';
+import { setLanguage } from '../../src/shared/i18n/language.ts';
 
 const labels = (items: { label: string }[]) => items.map((i) => i.label);
 
-test('each role gets exactly the requested links', () => {
+test('each role gets exactly the requested links (English)', () => {
+  setLanguage('en');
   assert.deepEqual(labels(navItemsFor(undefined, false)), ['Home', 'Features', 'How It Works', 'About', 'Contact']);
   assert.deepEqual(labels(navItemsFor('parent', true)), ['Dashboard', 'My Children', 'Progress', 'Recommendations', 'Profile']);
   assert.deepEqual(labels(navItemsFor('teacher', true)), ['Dashboard', 'My Students', 'Learner Profiles', 'Progress', 'Profile']);
+});
+
+test('the same links switch to Sinhala', () => {
+  setLanguage('si');
+  assert.deepEqual(labels(navItemsFor(undefined, false)), ['මුල් පිටුව', 'විශේෂාංග', 'ක්‍රියා කරන ආකාරය', 'අප ගැන', 'සම්බන්ධ වන්න']);
+  assert.deepEqual(labels(navItemsFor('parent', true)), ['පුවරුව', 'මගේ දරුවන්', 'ප්‍රගතිය', 'උපදෙස්', 'පැතිකඩ']);
+  assert.equal(navItemsFor('teacher', true).length, 5);
 });
 
 test('admins and signed-out sessions keep the public links; there is no student role', () => {

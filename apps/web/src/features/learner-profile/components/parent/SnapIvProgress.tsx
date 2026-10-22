@@ -4,14 +4,15 @@ import type { SnapIvComparison, SnapIvHistoryEntry, SnapIvProgress as Progress, 
 import { SNAP_IV_SCALE_OPTIONS } from '../../types/onboarding';
 import { directionArrow, formatAverage, nearestScaleStep, snapIvChartPoints, snapIvDate } from '../../utils/snapIvProgress';
 import { parentText } from '../../../../shared/i18n/parentText';
+import { pick } from '../../../../shared/i18n/language';
 
 const t = parentText.support.progress;
 
 /* Two colours checked for colour-vision deficiency (same pair as the research charts); the series also differ
    by line style and marker shape, so colour is never the only cue. Neither colour means "good" or "bad". */
 const SERIES = {
-  inattention: { color: '#1d4ed8', dash: undefined as string | undefined, label: t.inattention },
-  hyperactivity: { color: '#b45309', dash: '6 4', label: t.hyperactivity },
+  inattention: { color: '#1d4ed8', dash: undefined as string | undefined, get label() { return t.inattention; } },
+  hyperactivity: { color: '#b45309', dash: '6 4', get label() { return t.hyperactivity; } },
 };
 
 /* ------------------------------------------------------------------ */
@@ -128,7 +129,7 @@ export const SnapIvChart: React.FC<{ history: SnapIvHistoryEntry[] }> = ({ histo
       <ul className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs text-mq-text-muted">
         {SNAP_IV_SCALE_OPTIONS.map((o) => (
           <li key={o.value} className="rounded-xl bg-mq-surface-soft px-2.5 py-1.5">
-            <span className="font-bold text-mq-text-strong">{o.value}</span> = {o.labelSi}
+            <span className="font-bold text-mq-text-strong">{o.value}</span> = {pick(o.labelSi, o.labelEn)}
           </li>
         ))}
       </ul>
@@ -200,7 +201,7 @@ const ComparisonBlock: React.FC<{ title: string; c: SnapIvComparison }> = ({ tit
 
 /* Simple view: where things are now (in the questionnaire's own words) and whether it changed since last time. */
 
-const SCALE_WORDS = SNAP_IV_SCALE_OPTIONS.map((o) => o.labelSi);
+const scaleWord = (step: number) => pick(SNAP_IV_SCALE_OPTIONS[step].labelSi, SNAP_IV_SCALE_OPTIONS[step].labelEn);
 const pct = (avg: number) => `${(Math.min(3, Math.max(0, avg)) / 3) * 100}%`;
 
 const SimpleCard: React.FC<{ subscale: 'inattention' | 'hyperactivity'; latest: SnapIvHistoryEntry; change: SnapIvSubscaleChange | null }> = ({
@@ -222,7 +223,7 @@ const SimpleCard: React.FC<{ subscale: 'inattention' | 'hyperactivity'; latest: 
       ) : (
         <>
           <p className="text-base text-mq-text">
-            {t.nowWords} <strong className="text-mq-text-strong">"{SCALE_WORDS[nearestScaleStep(now)]}"</strong>
+            {t.nowWords} <strong className="text-mq-text-strong">"{scaleWord(nearestScaleStep(now))}"</strong>
           </p>
           {/* 0-3 answer scale with "before" (hollow) and "now" (filled) markers */}
           <div

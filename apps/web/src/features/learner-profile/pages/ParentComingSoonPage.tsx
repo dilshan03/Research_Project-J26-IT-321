@@ -6,14 +6,14 @@ import { parentText } from '../../../shared/i18n/parentText';
 type Feature = 'progress' | 'activities' | 'behaviour';
 
 const FEATURES: Record<Feature, { title: string; text: string; Icon: typeof TrendingUp; action?: { label: string; href: string } }> = {
-  progress: { title: parentText.nav.progress, text: parentText.comingSoon.progressText, Icon: TrendingUp },
+  progress: { get title() { return parentText.nav.progress; }, get text() { return parentText.comingSoon.progressText; }, Icon: TrendingUp },
   activities: {
-    title: parentText.nav.activities,
-    text: parentText.comingSoon.activitiesText,
+    get title() { return parentText.nav.activities; },
+    get text() { return parentText.comingSoon.activitiesText; },
     Icon: Gamepad2,
-    action: { label: parentText.comingSoon.activitiesAction, href: '#/play' },
+    action: { get label() { return parentText.comingSoon.activitiesAction; }, href: '#/play' },
   },
-  behaviour: { title: parentText.nav.behaviour, text: parentText.comingSoon.behaviourText, Icon: Activity },
+  behaviour: { get title() { return parentText.nav.behaviour; }, get text() { return parentText.comingSoon.behaviourText; }, Icon: Activity },
 };
 
 /**

@@ -7,6 +7,10 @@ import { PasswordInput } from '../components/PasswordInput';
 import { RoleSelector } from '../components/RoleSelector';
 import type { RegistrableRole } from '../types';
 import { authService } from '../services/authService';
+import { publicText } from '../../../shared/i18n/publicText';
+
+const a = publicText.auth;
+const t = publicText.auth.signUp;
 
 export const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
@@ -26,33 +30,33 @@ export const SignUpPage: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!fullName.trim()) {
-      newErrors.fullName = 'Full name is required.';
+      newErrors.fullName = t.errFullNameRequired;
     } else if (fullName.trim().length < 2) {
-      newErrors.fullName = 'Please enter a valid full name.';
+      newErrors.fullName = t.errFullNameInvalid;
     }
 
     if (!email.trim()) {
-      newErrors.email = 'Email address is required.';
+      newErrors.email = a.errEmailRequired;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      newErrors.email = 'Please enter a valid email address.';
+      newErrors.email = a.errEmailInvalid;
     }
 
     if (!password) {
-      newErrors.password = 'Password is required.';
+      newErrors.password = a.errPasswordRequired;
     } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters.';
+      newErrors.password = t.errPasswordShort;
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      newErrors.password = 'Must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number.';
+      newErrors.password = t.errPasswordWeak;
     }
 
     if (!confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password.';
+      newErrors.confirmPassword = t.errConfirmRequired;
     } else if (confirmPassword !== password) {
-      newErrors.confirmPassword = 'Passwords do not match.';
+      newErrors.confirmPassword = t.errConfirmMismatch;
     }
 
     if (!acceptedTerms) {
-      newErrors.acceptedTerms = 'You must accept the Terms of Service & Privacy Policy.';
+      newErrors.acceptedTerms = t.errTerms;
     }
 
     setErrors(newErrors);
@@ -80,21 +84,21 @@ export const SignUpPage: React.FC = () => {
     setIsLoading(false);
 
     if (response.success) {
-      setSuccessMessage('Account created successfully. Redirecting to Sign In...');
+      setSuccessMessage(t.success);
       setTimeout(() => {
         navigate('/sign-in');
       }, 1500);
     } else {
       setGlobalError(
-        response.error?.message || response.message || 'Registration failed. Please try again.'
+        response.error?.message || response.message || t.failed
       );
     }
   };
 
   return (
     <AuthLayout
-      title="Create Account"
-      subtitle="Join MathQuest to empower your child's math journey"
+      title={t.title}
+      subtitle={t.subtitle}
     >
       {/* A single message: success or failure, never both and never repeated */}
       {successMessage ? (
@@ -124,9 +128,9 @@ export const SignUpPage: React.FC = () => {
         {/* Full Name Input */}
         <AuthInput
           id="signUpFullName"
-          label="Full Name"
+          label={t.fullName}
           type="text"
-          placeholder="e.g. Priyantha Perera"
+          placeholder={t.fullNamePlaceholder}
           value={fullName}
           onChange={(e) => {
             setFullName(e.target.value);
@@ -142,7 +146,7 @@ export const SignUpPage: React.FC = () => {
         {/* Email Input */}
         <AuthInput
           id="signUpEmail"
-          label="Email Address"
+          label={a.emailLabel}
           type="email"
           placeholder="parent@example.com"
           value={email}
@@ -160,8 +164,8 @@ export const SignUpPage: React.FC = () => {
         {/* Password Input */}
         <PasswordInput
           id="signUpPassword"
-          label="Password"
-          placeholder="Min 8 chars (A-z, 0-9)"
+          label={a.passwordLabel}
+          placeholder={t.passwordPlaceholder}
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
@@ -176,8 +180,8 @@ export const SignUpPage: React.FC = () => {
         {/* Confirm Password Input */}
         <PasswordInput
           id="signUpConfirmPassword"
-          label="Confirm Password"
-          placeholder="Re-enter your password"
+          label={t.confirmPassword}
+          placeholder={t.confirmPlaceholder}
           value={confirmPassword}
           onChange={(e) => {
             setConfirmPassword(e.target.value);
@@ -203,14 +207,15 @@ export const SignUpPage: React.FC = () => {
               disabled={isLoading}
             />
             <span>
-              I agree to MathQuest's{' '}
+              {t.termsStart}
               <a href="#" className="font-bold text-mq-primary hover:underline">
-                Terms of Service
-              </a>{' '}
-              and{' '}
+                {t.terms}
+              </a>
+              {t.and}
               <a href="#" className="font-bold text-mq-primary hover:underline">
-                Privacy Policy
-              </a>.
+                {t.privacy}
+              </a>
+              {t.termsEnd}
             </span>
           </label>
           {errors.acceptedTerms && (
@@ -230,22 +235,22 @@ export const SignUpPage: React.FC = () => {
           {isLoading ? (
             <span className="flex items-center gap-2">
               <Loader2 size={20} className="animate-spin" />
-              Creating Account...
+              {t.submitting}
             </span>
           ) : (
-            'Create Account'
+            t.submit
           )}
         </button>
 
         {/* Sign In Link */}
         <div className="text-center pt-4 border-t border-mq-border/60 mt-6">
           <p className="text-xs text-mq-text-muted font-medium">
-            Already have an account?{' '}
+            {t.haveAccount}{' '}
             <Link
               to="/sign-in"
               className="font-bold text-mq-primary hover:text-mq-primary-hover hover:underline ml-1"
             >
-              Sign In
+              {t.signIn}
             </Link>
           </p>
         </div>

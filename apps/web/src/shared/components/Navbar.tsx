@@ -18,9 +18,11 @@ import {
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks/useAuth';
-import { dashboardNameFor, dashboardPathFor } from '../../features/auth/roleRoutes';
+import { dashboardPathFor } from '../../features/auth/roleRoutes';
 import { UserMenu } from './UserMenu';
-import { STUDENT_ACCESS_NOTE, isNavItemActive, navItemsFor, type NavIcon } from './navConfig';
+import { isNavItemActive, navItemsFor, studentAccessNote, type NavIcon } from './navConfig';
+import { LanguageSwitch } from './LanguageSwitch';
+import { publicText } from '../i18n/publicText';
 
 const ICONS: Record<NavIcon, React.ReactNode> = {
   home: <Home size={16} />,
@@ -51,7 +53,9 @@ export const Navbar: React.FC = () => {
   const navItems = navItemsFor(user?.role, signedIn);
   const hasRoleNav = signedIn && (user?.role === 'parent' || user?.role === 'teacher');
   const dashboardLink = dashboardPathFor(user?.role);
-  const dashboardLabel = `${dashboardNameFor(user?.role)} Dashboard`;
+  const t = publicText.nav;
+  const roleName = user?.role === 'admin' ? t.roleAdmin : user?.role === 'teacher' ? t.roleTeacher : t.roleParent;
+  const dashboardLabel = t.dashboardOf(roleName);
   const isActive = (to: (typeof navItems)[number]) => isNavItemActive(to, location.pathname, location.hash);
 
   const handleSignOut = () => {
@@ -62,7 +66,7 @@ export const Navbar: React.FC = () => {
   return (
     <nav
       className="w-full bg-white/95 backdrop-blur-md sticky top-0 z-50 shadow-xs border-b border-mq-border h-16"
-      aria-label={hasRoleNav ? `${dashboardNameFor(user?.role)} Navigation` : 'Main Public Navigation'}
+      aria-label={hasRoleNav ? t.roleNavAria(roleName) : t.mainNavAria}
     >
       <div className="w-full max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         {/* ========================================================= */}
@@ -71,7 +75,7 @@ export const Navbar: React.FC = () => {
         <Link
           to="/"
           className="flex flex-col shrink-0 min-w-0 text-left group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary/40 rounded-lg p-0.5"
-          aria-label="MathQuest Home"
+          aria-label={t.homeAria}
         >
           <span className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center">
             <span className="text-mq-primary-dark">Math</span>
@@ -81,7 +85,7 @@ export const Navbar: React.FC = () => {
             </span>
           </span>
           <span className="text-mq-text-muted text-[9px] sm:text-[10px] font-semibold tracking-wider uppercase mt-0.5 whitespace-nowrap">
-            Small Steps Big Progress
+            {t.tagline}
           </span>
         </Link>
 
@@ -112,6 +116,7 @@ export const Navbar: React.FC = () => {
         {/* 3. Right: Contextual Portal CTA & Profile / Sign In       */}
         {/* ========================================================= */}
         <div className="hidden lg:flex items-center gap-3 shrink-0">
+          <LanguageSwitch compact />
           {signedIn ? (
             <div className="flex items-center gap-3">
               {/* Parents and teachers already have "Dashboard" in their links; admins keep the button */}
@@ -134,14 +139,14 @@ export const Navbar: React.FC = () => {
                 to="/sign-in"
                 className="btn btn-secondary text-xs py-1.5 px-4 rounded-full whitespace-nowrap"
               >
-                Sign In
+                {t.signIn}
               </Link>
               <Link
                 to="/sign-up"
-                title="Create a parent or teacher account"
+                title={t.getStartedTitle}
                 className="btn btn-primary text-xs py-1.5 px-4 rounded-full whitespace-nowrap inline-flex items-center gap-1.5"
               >
-                <span>Get Started</span>
+                <span>{t.getStarted}</span>
                 <ArrowRight size={13} strokeWidth={2.5} />
               </Link>
             </div>
@@ -157,7 +162,7 @@ export const Navbar: React.FC = () => {
               to={dashboardLink}
               className="btn btn-primary text-xs py-1.5 px-3 rounded-full inline-flex items-center gap-1"
             >
-              <span>Dashboard</span>
+              <span>{t.dashboardShort}</span>
               <ArrowRight size={12} strokeWidth={2.5} />
             </Link>
           )}
@@ -166,7 +171,7 @@ export const Navbar: React.FC = () => {
             type="button"
             onClick={() => setIsMobileMenuOpen((prev) => !prev)}
             className="p-2 rounded-xl text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary border border-mq-border/60"
-            aria-label={isMobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+            aria-label={isMobileMenuOpen ? t.closeMenu : t.openMenu}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-navigation-menu"
           >
@@ -191,10 +196,12 @@ export const Navbar: React.FC = () => {
               </span>
               <div className="min-w-0">
                 <p className="text-sm font-bold text-mq-text-strong truncate">{user.fullName || user.email}</p>
-                <p className="text-[11px] font-semibold text-mq-primary capitalize">{user.role}</p>
+                <p className="text-[11px] font-semibold text-mq-primary capitalize">{roleName}</p>
               </div>
             </div>
           )}
+
+          <LanguageSwitch />
 
           {/* Role-based or public links */}
           <div className="flex flex-col space-y-1 font-semibold text-mq-text text-sm">
@@ -230,7 +237,7 @@ export const Navbar: React.FC = () => {
                     className="btn btn-primary w-full justify-center gap-2 text-xs py-2.5 rounded-xl font-bold"
                   >
                     <LayoutDashboard size={15} />
-                    <span>Go to {dashboardLabel}</span>
+                    <span>{dashboardLabel}</span>
                   </Link>
                 )}
                 {hasRoleNav && (
@@ -239,7 +246,7 @@ export const Navbar: React.FC = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="py-2 px-3 rounded-xl text-sm font-semibold text-mq-text-muted hover:bg-mq-surface-soft hover:text-mq-primary inline-flex items-center gap-2.5"
                   >
-                    <Home size={16} /> Public Website
+                    <Home size={16} /> {t.publicWebsite}
                   </Link>
                 )}
 
@@ -249,7 +256,7 @@ export const Navbar: React.FC = () => {
                   className="btn btn-secondary w-full justify-center gap-2 text-xs py-2 rounded-xl text-mq-danger hover:bg-mq-danger-bg border-mq-border"
                 >
                   <LogOut size={15} />
-                  <span>Sign Out ({user.email})</span>
+                  <span>{t.signOut} ({user.email})</span>
                 </button>
               </>
             ) : (
@@ -259,17 +266,17 @@ export const Navbar: React.FC = () => {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="btn btn-secondary w-full justify-center text-xs py-2.5 rounded-full font-bold"
                 >
-                  Sign In
+                  {t.signIn}
                 </Link>
                 <Link
                   to="/sign-up"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="btn btn-primary w-full justify-center text-xs py-2.5 rounded-full font-bold inline-flex items-center gap-2"
                 >
-                  <span>Get Started</span>
+                  <span>{t.getStarted}</span>
                   <ArrowRight size={14} strokeWidth={2.5} />
                 </Link>
-                <p className="text-xs text-mq-text-muted leading-relaxed pt-1">{STUDENT_ACCESS_NOTE}</p>
+                <p className="text-xs text-mq-text-muted leading-relaxed pt-1">{studentAccessNote()}</p>
               </div>
             )}
           </div>

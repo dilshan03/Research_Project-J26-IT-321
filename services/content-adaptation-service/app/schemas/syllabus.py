@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import List, Literal, Optional
+from typing import Dict, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
@@ -35,6 +35,14 @@ class SyllabusDocument(BaseModel):
     gridfs_id: Optional[str] = Field(None, description="GridFS file identifier if stored in Mongo")
     local_path: Optional[str] = Field(None, description="Local filesystem path for fallback storage")
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    pipeline_version: int = Field(1, description="2 = registered for the page-image ingestion pipeline; older records are legacy")
+    # Background extraction progress (polled by the teacher studio)
+    progress_stage: Optional[Literal["queued", "transcribing", "extracting", "done"]] = None
+    progress_done: int = 0
+    progress_total: int = 0
+    error_message: Optional[str] = None
+    rejected_count: int = 0
+    rejection_summary: Dict[str, int] = Field(default_factory=dict, description="Why candidate problems were rejected, with counts")
 
 
 class CurriculumProblem(BaseModel):
@@ -55,6 +63,11 @@ class CurriculumProblem(BaseModel):
     difficulty: Literal["EASY", "MEDIUM", "HARD"] = Field("MEDIUM", description="Cognitive difficulty tier")
     page_number: Optional[int] = Field(None, description="PDF page reference")
     is_money: bool = Field(False, description="Whether problem involves currency/money")
+    source: Literal["syllabus", "manual", "legacy"] = Field("legacy", description="'syllabus' = extracted and verified against the cited PDF page")
+    source_kind: Optional[Literal["exercise", "aligned"]] = Field(
+        None, description="'exercise' = printed in the guide; 'aligned' = written for the quoted competency level within its number limit"
+    )
+    source_quote: Optional[str] = Field(None, description="Verbatim text from the cited page this problem comes from")
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 

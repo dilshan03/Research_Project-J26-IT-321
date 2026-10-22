@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
+import { useScrollToTopOnChange } from '../../../../shared/hooks/useScrollToTopOnChange';
+import { LegacyItemTracker, buildLegacyAnswers } from './legacyAnswers';
 import type { MathQuestion, MathItemAnswer, LearningPreferencesData, MathSubmissionExtras } from '../../types/onboarding';
 import { LivingCanvasOnboarding } from './LivingCanvasOnboarding';
 import { Grade1Journey } from './journey/ChildJourney';
+import { Grade2Journey } from './journey/Grade2Journey';
+import { Grade3Journey } from './journey/Grade3Journey';
+import UpperGradeJourney from './journey/UpperGradeJourney';
+import { GRADE4_JOURNEY } from './journey/grade4';
+import { GRADE5_JOURNEY } from './journey/grade5';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
   ArrowRight,
@@ -32,17 +39,33 @@ interface Props {
   avatarId?: string;
 }
 
-/** Grade 1 uses the interactive onboarding-v2 journey; set to false to fall back to the previous flow. */
+/** Grades 1–5 use the interactive onboarding-v2 journeys; set one to false to fall back to the previous flow. */
 const GRADE1_JOURNEY_ENABLED = true;
+const GRADE2_JOURNEY_ENABLED = true;
+const GRADE3_JOURNEY_ENABLED = true;
+const GRADE4_JOURNEY_ENABLED = true;
+const GRADE5_JOURNEY_ENABLED = true;
 
 export const MathAssessmentStep: React.FC<Props> = (props) => {
   if (GRADE1_JOURNEY_ENABLED && props.grade === 1) {
     return <Grade1Journey onSubmit={props.onSubmit} isSubmitting={props.isSubmitting} />;
   }
+  if (GRADE2_JOURNEY_ENABLED && props.grade === 2) {
+    return <Grade2Journey onSubmit={props.onSubmit} isSubmitting={props.isSubmitting} />;
+  }
+  if (GRADE3_JOURNEY_ENABLED && props.grade === 3) {
+    return <Grade3Journey onSubmit={props.onSubmit} isSubmitting={props.isSubmitting} />;
+  }
+  if (GRADE4_JOURNEY_ENABLED && props.grade === 4) {
+    return <UpperGradeJourney key="grade4" config={GRADE4_JOURNEY} onSubmit={props.onSubmit} isSubmitting={props.isSubmitting} />;
+  }
+  if (GRADE5_JOURNEY_ENABLED && props.grade === 5) {
+    return <UpperGradeJourney key="grade5" config={GRADE5_JOURNEY} onSubmit={props.onSubmit} isSubmitting={props.isSubmitting} />;
+  }
   return <LegacyMathAssessmentStep {...props} />;
 };
 
-/** Previous child assessment flow, unchanged; still used by Grades 2–5. */
+/** Previous child assessment flow, unchanged; used only when a grade's journey flag above is off. */
 const LegacyMathAssessmentStep: React.FC<Props> = (props) => {
   // Default to the new 2D watercolor Living Canvas discovery experience
   const [viewMode, setViewMode] = useState<'canvas' | 'standard'>('canvas');
@@ -90,6 +113,7 @@ const StandardMathAssessmentView: React.FC<StandardViewProps> = ({
 }) => {
   const shouldReduceMotion = useReducedMotion();
   const [currentIndex, setCurrentIndex] = useState(0);
+  useScrollToTopOnChange(currentIndex);
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [hintsUsed, setHintsUsed] = useState<Record<string, boolean>>({});
   const [attempts, setAttempts] = useState<Record<string, number>>({});
@@ -98,13 +122,13 @@ const StandardMathAssessmentView: React.FC<StandardViewProps> = ({
   const [companionState, setCompanionState] = useState<CompanionState>('idle');
   const [numericInput, setNumericInput] = useState('');
 
-  const questionStartTimeRef = React.useRef<number>(Date.now());
-  const responseTimesRef = React.useRef<Record<string, number>>({});
+  // Measured presentation and first-answer timing (no defaults)
+  const trackerRef = React.useRef(new LegacyItemTracker());
 
   const currentQuestion = questions[currentIndex];
 
   React.useEffect(() => {
-    questionStartTimeRef.current = Date.now();
+    if (currentQuestion) trackerRef.current.show(currentQuestion.questionId);
     setShowHintModal(false);
     setShowTranslation(false);
     setCompanionState('idle');
@@ -126,18 +150,9 @@ const StandardMathAssessmentView: React.FC<StandardViewProps> = ({
     );
   }
 
-  const recordTimeForCurrent = () => {
-    if (!currentQuestion) return;
-    const elapsedSeconds = (Date.now() - questionStartTimeRef.current) / 1000.0;
-    const prev = responseTimesRef.current[currentQuestion.questionId] || 0;
-    responseTimesRef.current[currentQuestion.questionId] = Number(
-      (prev + elapsedSeconds).toFixed(1)
-    );
-  };
-
   const handleSelectOption = (optionId: string) => {
     if (!currentQuestion) return;
-    recordTimeForCurrent();
+    trackerRef.current.answered(currentQuestion.questionId);
     setAnswers((prev) => ({ ...prev, [currentQuestion.questionId]: optionId }));
     setAttempts((prev) => ({
       ...prev,
@@ -156,6 +171,7 @@ const StandardMathAssessmentView: React.FC<StandardViewProps> = ({
         return copy;
       });
     } else {
+      trackerRef.current.answered(currentQuestion.questionId);
       const numVal = Number(val);
       setAnswers((prev) => ({
         ...prev,
@@ -176,20 +192,18 @@ const StandardMathAssessmentView: React.FC<StandardViewProps> = ({
     setShowHintModal(true);
   };
 
+  // Only presented questions are sent; unanswered ones as 'skipped'; time only when measured
   const compileAnswers = (): MathItemAnswer[] => {
-    recordTimeForCurrent();
-    return questions.map((q) => ({
-      questionId: q.questionId,
-      userAnswer: answers[q.questionId] !== undefined ? answers[q.questionId] : '',
-      attempts: attempts[q.questionId] || 1,
-      responseTimeSeconds: responseTimesRef.current[q.questionId] || 5.0,
-      hintUsed: Boolean(hintsUsed[q.questionId]),
-    }));
+    trackerRef.current.leave();
+    return buildLegacyAnswers(
+      questions.map((q) => q.questionId),
+      trackerRef.current,
+      (id) => ({ userAnswer: answers[id], attempts: attempts[id], hintUsed: hintsUsed[id] })
+    );
   };
 
   const handleNext = () => {
     if (isSubmitting) return;
-    recordTimeForCurrent();
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
@@ -200,7 +214,6 @@ const StandardMathAssessmentView: React.FC<StandardViewProps> = ({
 
   const handlePrev = () => {
     if (isSubmitting) return;
-    recordTimeForCurrent();
     if (currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
     } else {

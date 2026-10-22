@@ -7,6 +7,7 @@ import type {
   RevisionEvent,
   SupportEvent,
 } from '../../../types/onboarding';
+import { InteractionObserver, attachInteractionObserver } from './interactionObservations';
 
 /** Static description of one onboarding-v2 item. IDs mirror the server item bank. */
 export interface ItemMeta {
@@ -51,10 +52,17 @@ export class ItemRecorder {
   private attempts = 0;
   private missedDrops = 0;
   private input: InputDetail | undefined;
+  // Raw interaction observations, kept separate from the mathematical evidence above
+  private readonly observer = new InteractionObserver(this.startedAtMs);
 
   constructor(meta: ItemMeta) {
     this.meta = meta;
     this.instructionEvents = [{ action: 'delivered', timestampSeconds: 0, occurredAt: new Date().toISOString() }];
+  }
+
+  /** Starts observing page interactions while this item is shown; returns the detach function. */
+  observe(): () => void {
+    return attachInteractionObserver(this.observer);
   }
 
   private elapsed(): number {
@@ -113,6 +121,7 @@ export class ItemRecorder {
       hintUsed: this.supportEvents.length > 0,
       missedDropCount: this.missedDrops,
       selfCorrectionsCount: this.revisionEvents.length,
+      interactionObservations: this.observer.snapshot(performance.now()),
     } as MathItemAnswer;
 
     if (this.firstResponse === undefined) {

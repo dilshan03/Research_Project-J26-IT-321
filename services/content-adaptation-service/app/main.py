@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes import router as adaptations_router
 from app.api.syllabus_routes import router as syllabus_router
+from app.services import ingestion_jobs
 from app.services.db import db_service
 
 
@@ -12,6 +13,7 @@ from app.services.db import db_service
 async def lifespan(app: FastAPI):
     # Initialize database connection on startup
     await db_service.initialize()
+    await ingestion_jobs.recover_interrupted()
     yield
 
 

@@ -47,8 +47,6 @@ export const LearnersPage: React.FC = () => {
   const [learnerToDelete, setLearnerToDelete] = useState<Learner | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
 
-  // Restore state
-  const [restoringLearnerId, setRestoringLearnerId] = useState<string | null>(null);
 
   const fetchAllData = useCallback(async () => {
     setIsLoading(true);
@@ -149,7 +147,6 @@ export const LearnersPage: React.FC = () => {
 
   // Restore Handler
   const handleConfirmRestore = async (learner: Learner) => {
-    setRestoringLearnerId(learner.learnerId);
     try {
       const res = await learnerApi.restoreLearner(learner.learnerId);
       if (res.success) {
@@ -160,8 +157,6 @@ export const LearnersPage: React.FC = () => {
       }
     } catch {
       setErrorMessage(parentText.common.networkError);
-    } finally {
-      setRestoringLearnerId(null);
     }
   };
 

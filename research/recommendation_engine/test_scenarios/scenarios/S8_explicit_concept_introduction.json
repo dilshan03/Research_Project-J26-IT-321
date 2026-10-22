@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "MQ-LEARNER-CONTEXT-v0.1",
+  "learnerRef": "SYN-L008",
+  "grade": 2,
+  "notes": {"description": "Explicit, provenance-backed concept introduction (equal groups); one introduced concept already has an ELP-X estimate", "synthetic": true},
+  "mathEvidence": {
+    "provenance": {"source": "assessment", "instrument": "ELP-X-v1.0"},
+    "skills": [
+      {"skillId": "addition", "provisionalSkillLevel": "DEVELOPING", "distinctQuestionsAssessed": 5, "isEvidenceSufficient": true}
+    ]
+  },
+  "conceptIntroduction": {
+    "provenance": {"source": "system", "instrument": "SYNTHETIC-CURRICULUM-SEQUENCE-v0"},
+    "concepts": [
+      {"skillId": "multiplication", "conceptId": "equal_groups", "stage": "introduction",
+       "basis": "first lesson of the 'equal groups' unit in the curriculum sequence"},
+      {"skillId": "addition", "conceptId": "two_digit_regrouping", "stage": "introduction",
+       "basis": "first lesson of the regrouping unit in the curriculum sequence"}
+    ]
+  },
+  "parentReportedAdhdContext": {
+    "provenance": {"source": "parent", "instrument": "ADHD-INFO-v1.0", "verificationStatus": "NOT_VERIFIED"},
+    "diagnosisStatus": "yes", "reportedPresentation": "predominantly_inattentive"
+  }
+}

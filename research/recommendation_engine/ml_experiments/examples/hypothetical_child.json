@@ -1,0 +1,20 @@
+{
+  "description": "HYPOTHETICAL input for the NSCH K2Q31A demo. Not a real child or survey respondent. All 74 model features are specified using documented NSCH codes; any omitted feature would be treated as missing.",
+  "features": {
+    "SC_AGE_YEARS": "8", "TOTAGE_0_5": "0", "TOTAGE_6_11": "2", "TOTAGE_12_17": "0", "FAMCOUNT": "3", "HHCOUNT": "3",
+    "A1_AGE": "36", "FPL_I1": "150", "K11Q43R": "1",
+    "SC_SEX": "1", "SC_RACE_R": "1", "SC_HISPANIC_R": "2", "BORNUSA": "1", "HOUSE_GEN": "3", "HHLANGUAGE": "1",
+    "SC_ENGLISH": "1", "BIRTHWT": "3", "K2Q05": "2", "AGEPOS4": "2",
+    "TOTKIDS_R": "2", "FAMILY_R": "5", "HIGRADE": "2", "A1_GRADE": "3", "A1_SEX": "2", "A1_RELATION": "1",
+    "A1_BORN": "1", "A1_MARITAL": "4", "A1_EMPLOYED_R": "1", "A1_ACTIVE": "1", "A1_MENTHEALTH": "3",
+    "A1_PHYSHEALTH": "2", "A2_RELATION": "8",
+    "TENURE": "3", "FOODSIT": "2", "ACE1": "3", "K11Q60": "2", "K11Q61": "1", "K11Q62": "1", "S9Q34": "2",
+    "EBTCARDS": "2", "HOMEEVIC": "4", "MISSMORTGAGE": "2", "EVERHOMELESS": "2",
+    "CURRINS": "1", "INSTYPE": "1", "INSGAP": "1", "METRO_YN": "1", "MPC_YN": "2",
+    "K9Q40": "2", "VAPE": "2", "ACE3": "1", "ACE4": "2", "ACE5": "2", "ACE6": "2", "ACE7": "2", "ACE8": "2",
+    "ACE9": "2", "ACE10": "2",
+    "K10Q11": "1", "K10Q12": "1", "K10Q13": "1", "K10Q14": "1", "K10Q20": "2", "K10Q22": "2", "K10Q23": "2",
+    "K10Q30": "2", "K10Q31": "2", "K10Q40_R": "1",
+    "K8Q35": "1", "TALKABOUT": "2", "WKTOSOLVE": "2", "STRENGTHS": "2", "HOPEFUL": "2", "K8Q11": "3"
+  }
+}

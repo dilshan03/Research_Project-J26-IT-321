@@ -1,4 +1,8 @@
-export type UserRole = 'parent' | 'teacher';
+/** 'admin' exists only when set manually on a user document; it cannot be self-registered. */
+export type UserRole = 'parent' | 'teacher' | 'admin';
+
+/** Roles available on the public sign-up form. */
+export type RegistrableRole = Exclude<UserRole, 'admin'>;
 
 export interface User {
   id: string;
@@ -22,7 +26,7 @@ export interface SignInCredentials {
 }
 
 export interface SignUpData {
-  role: UserRole;
+  role: RegistrableRole;
   fullName: string;
   email: string;
   password: string;

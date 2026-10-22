@@ -19,7 +19,11 @@ export interface Learner {
   sinhalaComprehension?: LanguageComprehensionLevel | string;
   englishComprehension?: LanguageComprehensionLevel | string;
   primaryInstructionLanguage?: PrimaryInstructionLanguage | string;
+  /** Effective avatar: the child's own choice when one exists (kept until the child chooses again), otherwise the parent's. */
   avatarId: string;
+  avatarSource?: 'child' | 'parent';
+  /** The parent's selection, kept even while the child's choice is shown. */
+  parentAvatarId?: string;
   onboardingStatus: OnboardingStatus;
   isArchived?: boolean;
   archivedAt?: string | null;

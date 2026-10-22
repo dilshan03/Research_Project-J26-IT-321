@@ -5,7 +5,10 @@ import { PortalHeader } from '../components/portal/PortalHeader';
 import { DashboardSidebar } from '../components/DashboardSidebar';
 import { ParentBottomNav } from '../components/portal/ParentBottomNav';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { dashboardNameFor, dashboardPathFor } from '../../features/auth/roleRoutes';
 import { parentText } from '../i18n/parentText';
+import { teacherText } from '../i18n/teacherText';
+import { useLanguage } from '../i18n/language';
 
 export interface DashboardLayoutProps {
   role: 'parent' | 'teacher';
@@ -17,9 +20,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const isParent = role === 'parent';
-  // Parent portal content is Sinhala; the class pairs Lexend (Latin) with Noto Sans Sinhala.
-  const rootLang = isParent ? 'si' : undefined;
-  const rootClass = isParent ? 'parent-portal' : '';
+  // Content follows the global language switch; the class pairs Lexend (Latin) with Noto Sans Sinhala.
+  const lang = useLanguage();
+  const rootLang = lang;
+  const rootClass = isParent || lang === 'si' ? 'parent-portal' : '';
 
   const handleCloseMobileSidebar = useCallback(() => {
     setIsMobileSidebarOpen(false);
@@ -37,7 +41,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="flex flex-col items-center gap-3 p-8 rounded-3xl bg-white border border-mq-border shadow-xs text-mq-primary font-semibold text-sm">
             <Loader2 size={36} className="animate-spin text-mq-primary" />
-            <span>{isParent ? parentText.shell.loading : 'Loading dashboard workspace...'}</span>
+            <span>{isParent ? parentText.shell.loading : teacherText.portal.loading}</span>
           </div>
         </div>
       </div>
@@ -55,18 +59,16 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
               <ShieldAlert size={32} />
             </div>
             <h2 className="text-xl font-extrabold text-mq-text-strong mb-2">
-              {isParent ? parentText.shell.signInRequiredTitle : 'Authentication Required'}
+              {isParent ? parentText.shell.signInRequiredTitle : teacherText.portal.authTitle}
             </h2>
             <p className="text-sm text-mq-text-muted mb-6">
-              {isParent
-                ? parentText.shell.signInRequiredText
-                : `You must sign in with your verified ${role} account to access this dashboard.`}
+              {isParent ? parentText.shell.signInRequiredText : teacherText.portal.authText}
             </p>
             <Link
               to="/sign-in"
               className="btn btn-primary w-full justify-center py-2.5 rounded-full text-sm font-bold"
             >
-              {isParent ? parentText.shell.signIn : 'Sign In to Continue'}
+              {isParent ? parentText.shell.signIn : teacherText.portal.signIn}
             </Link>
           </div>
         </div>
@@ -76,8 +78,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
 
   // 3. Access Denied State: Role Mismatch
   if (user.role !== role) {
-    const targetDashboard = user.role === 'parent' ? '/parent/dashboard' : '/teacher/dashboard';
-    const targetRoleName = user.role === 'parent' ? 'Parent' : 'Teacher';
+    const targetDashboard = dashboardPathFor(user.role);
+    const targetRoleName = dashboardNameFor(user.role);
 
     return (
       <div className="min-h-screen flex flex-col bg-mq-bg">

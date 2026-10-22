@@ -49,6 +49,7 @@ This document specifies all data fields required, optionally utilized, or planne
 | `missedDropCount` | `int` | `EvaluatedQuestionItem.missedDropCount` | Telemetry | Implemented (v2) | Motor/device usability indicator; never treated as maths or attention deficit. |
 | `inputMethod` | `InputMethod` | `EvaluatedQuestionItem.inputMethod` | Telemetry | Implemented (v2) | Values: `'drag'`, `'tap'`, `'select'`. Distinguishes fine-motor modes. |
 | `clinicalReferenceLabel` | `str` | Planned Clinical Dataset Schema | Clinician | Planned (Offline Only) | Documented clinical diagnosis; mandatory prerequisite for supervised ML. |
+| `conceptIntroduction` | `{skillId, conceptId?, stage, basis}[]` + provenance | Planned: item-bank probe role or curriculum sequence (MQ-REC v0.1 prototype input) | Assessment / System | Planned (no producer yet) | Required by `MQ-RS2-04`. `stage` ∈ `introduction`, `practice`, `review`; a stated `basis` and provenance instrument are mandatory. A missing ELP-X estimate is never a substitute. |
 | `preSessionCheckInState` | `Dict[str, str]` | Planned Pre-Session Check-In Schema | Child / Parent | Planned (Proposed) | Captures acute fatigue, hunger, or distress; rules out ephemeral confounders. |
 
 ---

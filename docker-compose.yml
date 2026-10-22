@@ -1,0 +1,123 @@
+services:
+  # =========================================================================
+  # 1. Authentication Backend Service (Node.js / Express — Port 5000)
+  # =========================================================================
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: mathquest-auth-service
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      - PORT=5000
+    volumes:
+      - ./services/auth-service/src:/workspace/services/auth-service/src
+    restart: unless-stopped
+
+  # =========================================================================
+  # 2. Child Learner Profile Service (Python / FastAPI — Port 5001)
+  # =========================================================================
+  learner-profile-service:
+    build:
+      context: ./services/learner-profile-service
+      dockerfile: Dockerfile
+    container_name: mathquest-learner-profile
+    ports:
+      - "5001:5001"
+    env_file:
+      - .env
+    environment:
+      - PORT=5001
+      - LEARNER_PROFILE_PORT=5001
+      - WATCHFILES_FORCE_POLLING=true
+    volumes:
+      - ./services/learner-profile-service/app:/app/app
+    restart: unless-stopped
+
+  # =========================================================================
+  # 3. Pedagogical Engine Decision & Telemetry API (Node.js — Port 5002)
+  # =========================================================================
+  decision-api:
+    build:
+      context: .
+      dockerfile: services/pedagogical-engine/decision-api/Dockerfile
+    container_name: mathquest-decision-api
+    ports:
+      - "5002:5002"
+    env_file:
+      - .env
+    environment:
+      - PEDAGOGICAL_DECISION_PORT=5002
+    volumes:
+      - ./services/pedagogical-engine/decision-api/src:/workspace/services/pedagogical-engine/decision-api/src
+      - ./services/pedagogical-engine/decision-api/data:/workspace/services/pedagogical-engine/decision-api/data
+    restart: unless-stopped
+
+  # =========================================================================
+  # 4. Content Adaptation Service (Python / FastAPI — Port 8003)
+  # =========================================================================
+  content-adaptation-service:
+    build:
+      context: ./services/content-adaptation-service
+      dockerfile: Dockerfile
+    container_name: mathquest-content-adaptation
+    ports:
+      - "8003:8003"
+    env_file:
+      - .env
+    environment:
+      - PORT=8003
+      - WATCHFILES_FORCE_POLLING=true
+    volumes:
+      - ./services/content-adaptation-service/app:/app/app
+    restart: unless-stopped
+
+  # =========================================================================
+  # 5. Behaviour Signal Service (Python / FastAPI — Port 8004)
+  # =========================================================================
+  behaviour-signal-service:
+    build:
+      context: ./services/behaviour-signal-service
+      dockerfile: Dockerfile
+    container_name: mathquest-behaviour-signal
+    ports:
+      - "8004:8004"
+    env_file:
+      - .env
+    environment:
+      - PORT=8004
+      - DEV_ALLOW_UNAUTHENTICATED=true
+      - WATCHFILES_FORCE_POLLING=true
+    volumes:
+      - ./services/behaviour-signal-service/app:/app/app
+    restart: unless-stopped
+
+  # =========================================================================
+  # 6. MathQuest Web Frontend (React + Vite — Port 5173)
+  # =========================================================================
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: mathquest-web
+    ports:
+      - "5173:5173"
+    environment:
+      - AUTH_API_URL=http://auth-service:5000
+      - DECISION_API_URL=http://decision-api:5002
+      - VITE_LEARNER_PROFILE_API_URL=http://localhost:5001
+      - VITE_BEHAVIOUR_API_URL=http://localhost:8004
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./apps/web/src:/app/src
+      - ./apps/web/public:/app/public
+    depends_on:
+      - auth-service
+      - learner-profile-service
+      - decision-api
+      - content-adaptation-service
+      - behaviour-signal-service
+    restart: unless-stopped

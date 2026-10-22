@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useScrollToTopOnChange } from '../../../../shared/hooks/useScrollToTopOnChange';
+import { LegacyItemTracker, buildLegacyAnswers, type LegacyItemEvidence } from './legacyAnswers';
 import type { MathQuestion, MathItemAnswer, LearningPreferencesData } from '../../types/onboarding';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
@@ -62,6 +64,7 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
 
   // Living Canvas Discovery Stages
   const [stage, setStage] = useState<CanvasStage>('B_SHAPE_ISLAND');
+  useScrollToTopOnChange(`${stage}:${currentIndex}`);
   const [companionState, setCompanionState] = useState<CompanionState>('idle');
   const [representationMode, setRepresentationMode] = useState<RepresentationMode>('nature');
   const [showHint, setShowHint] = useState(false);
@@ -84,12 +87,17 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [hintsUsed, setHintsUsed] = useState<Record<string, boolean>>({});
   const [demonstrationsUsed, setDemonstrationsUsed] = useState<Record<string, boolean>>({});
-  const questionStartTimeRef = useRef<number>(Date.now());
-  const responseTimesRef = useRef<Record<string, number>>({});
+  // Measured presentation and first-answer timing (no defaults)
+  const trackerRef = useRef(new LegacyItemTracker());
+  // Counting-item evidence captured at confirmation (per-question state resets on navigation)
+  const countingEvidenceRef = useRef<Record<string, LegacyItemEvidence>>({});
+
+  useEffect(() => {
+    if (currentQuestion) trackerRef.current.show(currentQuestion.questionId);
+  }, [currentQuestion]);
 
   // Reset or initialize on question change
   useEffect(() => {
-    questionStartTimeRef.current = Date.now();
     setStage('B_SHAPE_ISLAND');
     setCompanionState('idle');
     setShowHint(false);
@@ -101,15 +109,6 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
     isFirstCorrectRef.current = null;
     setFeedbackMessage(null);
   }, [currentIndex]);
-
-  const recordTime = () => {
-    if (!currentQuestion) return;
-    const elapsed = (Date.now() - questionStartTimeRef.current) / 1000.0;
-    const prev = responseTimesRef.current[currentQuestion.questionId] || 0;
-    responseTimesRef.current[currentQuestion.questionId] = Number(
-      (prev + elapsed).toFixed(1)
-    );
-  };
 
   // Check if current question is the supported Living Canvas slice
   const isLivingCanvasQuestion =
@@ -167,7 +166,7 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
   // Explicit "All Done" confirmation handler
   const handleConfirmIsland = () => {
     if (!currentQuestion) return;
-    recordTime();
+    trackerRef.current.answered(currentQuestion.questionId);
 
     const newAttempts = confirmedAttempts + 1;
     setConfirmedAttempts(newAttempts);
@@ -182,6 +181,12 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
       const isCorrect = placedCount === TARGET_COUNT;
       isFirstCorrectRef.current = isCorrect;
     }
+    countingEvidenceRef.current[currentQuestion.questionId] = {
+      attempts: newAttempts,
+      firstConfirmedResponse: firstConfirmedResponseRef.current,
+      isFirstResponseCorrect: isFirstCorrectRef.current ?? undefined,
+      selfCorrectionsCount,
+    };
 
     setAnswers((prev) => ({
       ...prev,
@@ -202,50 +207,24 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
     }
   };
 
+  // Only presented questions are sent; unconfirmed/unanswered ones as 'skipped'; no invented
+  // answers, correctness or times (the server derives correctness itself).
   const compileAnswers = (): MathItemAnswer[] => {
-    recordTime();
-    return questions.map((q) => {
-      let finalAns = answers[q.questionId];
-      if (finalAns === undefined) {
-        if (q.questionId === 'g1_num_count_01') {
-          finalAns = `opt_${placedCount}`;
-        } else {
-          finalAns = '';
+    trackerRef.current.leave();
+    return buildLegacyAnswers(
+      questions.map((q) => q.questionId),
+      trackerRef.current,
+      (id) => {
+        const hintUsed = Boolean(hintsUsed[id]);
+        if (id === 'g1_num_count_01') {
+          const counted = countingEvidenceRef.current[id];
+          return counted
+            ? { ...counted, userAnswer: answers[id], hintUsed, demonstrationUsed: Boolean(demonstrationsUsed[id]) }
+            : { hintUsed };
         }
+        return { userAnswer: answers[id], attempts: 1, hintUsed, firstConfirmedResponse: answers[id] };
       }
-
-      if (q.questionId === 'g1_num_count_01') {
-        const firstConfirmed = firstConfirmedResponseRef.current || `opt_${placedCount}`;
-        const isFirstCorrect =
-          isFirstCorrectRef.current !== null
-            ? isFirstCorrectRef.current
-            : placedCount === TARGET_COUNT;
-
-        return {
-          questionId: q.questionId,
-          userAnswer: finalAns,
-          attempts: Math.max(1, confirmedAttempts),
-          responseTimeSeconds: responseTimesRef.current[q.questionId] || 6.5,
-          hintUsed: Boolean(hintsUsed[q.questionId]),
-          firstConfirmedResponse: firstConfirmed,
-          isFirstResponseCorrect: isFirstCorrect,
-          demonstrationUsed: Boolean(demonstrationsUsed[q.questionId]),
-          selfCorrectionsCount: selfCorrectionsCount,
-        };
-      }
-
-      return {
-        questionId: q.questionId,
-        userAnswer: finalAns,
-        attempts: 1,
-        responseTimeSeconds: responseTimesRef.current[q.questionId] || 6.5,
-        hintUsed: Boolean(hintsUsed[q.questionId]),
-        firstConfirmedResponse: finalAns,
-        isFirstResponseCorrect: true,
-        demonstrationUsed: false,
-        selfCorrectionsCount: 0,
-      };
-    });
+    );
   };
 
   const handleFinishAndSubmit = () => {
@@ -257,7 +236,7 @@ export const LivingCanvasOnboarding: React.FC<LivingCanvasOnboardingProps> = ({
   // Fallback handler for unsupported questions in Grade 1-5
   const handleSelectFallbackOption = (optId: string) => {
     if (!currentQuestion) return;
-    recordTime();
+    trackerRef.current.answered(currentQuestion.questionId);
     setAnswers((prev) => ({
       ...prev,
       [currentQuestion.questionId]: optId,

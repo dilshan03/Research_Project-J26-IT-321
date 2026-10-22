@@ -11,7 +11,7 @@ const EMPTY_TILT = -14; // left pan heavier when right pan is empty
  * the learner drags an answer weight onto the right pan. The beam tilts to show
  * "too heavy / too light", turning magnitude errors into visible feedback.
  */
-export function BalanceScale({ step, lang, onWrong, onCorrect }: MechanicProps) {
+export function BalanceScale({ step, lang, calm, onWrong, onCorrect }: MechanicProps) {
   const panRef = useRef<HTMLDivElement>(null);
   const correct = Number(step.correct_target_value);
   const [onPan, setOnPan] = useState<GameChoiceOption | null>(null);
@@ -52,7 +52,8 @@ export function BalanceScale({ step, lang, onWrong, onCorrect }: MechanicProps) 
         <motion.div
           className="absolute left-[8%] right-[8%] top-12 h-3 rounded-full bg-[#8E6233] origin-center"
           animate={{ rotate: tilt }}
-          transition={{ type: 'spring', stiffness: 60, damping: solved ? 6 : 12 }}
+          // A settling wobble on success reads as "balanced!"; calm mode settles without overshoot.
+          transition={{ type: 'spring', stiffness: 60, damping: calm ? 20 : solved ? 6 : 12 }}
         >
           <div className="absolute left-1/2 -translate-x-1/2 -top-3 w-7 h-7 rounded-full bg-mq-accent-yellow border-4 border-[#8E6233]" />
           {/* Left pan */}

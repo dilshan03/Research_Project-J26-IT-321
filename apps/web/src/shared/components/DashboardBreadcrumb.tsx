@@ -4,6 +4,8 @@ import { ChevronRight, Home } from 'lucide-react';
 import { getRouteMeta } from './sidebar/sidebarConfig';
 import { parentText } from '../i18n/parentText';
 import { PARENT_ROUTE_LABELS } from '../i18n/parentNav';
+import { teacherText } from '../i18n/teacherText';
+import { pick } from '../i18n/language';
 
 export interface BreadcrumbItem {
   label: string;
@@ -21,7 +23,7 @@ export const DashboardBreadcrumb: React.FC<DashboardBreadcrumbProps> = ({ role, 
   const getAutoItems = (): BreadcrumbItem[] => {
     const rootPath = `/${role}/dashboard`;
     const isParent = role === 'parent';
-    const rootLabel = isParent ? parentText.nav.portal : 'Teacher Dashboard';
+    const rootLabel = isParent ? parentText.nav.portal : teacherText.portal.breadcrumbRoot;
 
     // Special handling for canonical /learners
     if (role === 'parent' && (location.pathname === '/learners' || location.pathname.startsWith('/parent/dashboard/children'))) {
@@ -59,7 +61,7 @@ export const DashboardBreadcrumb: React.FC<DashboardBreadcrumbProps> = ({ role, 
       const meta = getRouteMeta(role, accumulatedPath);
       const title =
         (isParent && PARENT_ROUTE_LABELS[accumulatedPath]) ||
-        meta.breadcrumbLabel ||
+        (meta.titleSi ? pick(meta.titleSi, meta.breadcrumbLabel || meta.title) : meta.breadcrumbLabel) ||
         meta.title ||
         seg.charAt(0).toUpperCase() + seg.slice(1);
 
@@ -76,7 +78,7 @@ export const DashboardBreadcrumb: React.FC<DashboardBreadcrumbProps> = ({ role, 
 
   return (
     <nav
-      aria-label={role === 'parent' ? parentText.shell.breadcrumb : 'Dashboard Breadcrumb'}
+      aria-label={role === 'parent' ? parentText.shell.breadcrumb : teacherText.portal.breadcrumbAria}
       className={`py-1 px-0.5 text-mq-text-muted ${role === 'parent' ? 'text-sm' : 'text-xs'}`}
     >
       <ol className="flex items-center flex-wrap gap-1.5 sm:gap-2">
@@ -84,10 +86,10 @@ export const DashboardBreadcrumb: React.FC<DashboardBreadcrumbProps> = ({ role, 
           <Link
             to={role === 'parent' ? '/parent/dashboard' : '/teacher/dashboard'}
             className="inline-flex items-center gap-1 text-mq-text-muted hover:text-mq-primary transition-colors"
-            title={role === 'parent' ? parentText.shell.home : 'Dashboard Home'}
+            title={role === 'parent' ? parentText.shell.home : teacherText.portal.home}
           >
             <Home size={14} />
-            <span className="sr-only">{role === 'parent' ? parentText.shell.home : 'Home'}</span>
+            <span className="sr-only">{role === 'parent' ? parentText.shell.home : teacherText.portal.home}</span>
           </Link>
         </li>
 

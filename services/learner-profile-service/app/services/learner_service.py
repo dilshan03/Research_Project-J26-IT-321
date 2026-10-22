@@ -11,6 +11,23 @@ from app.schemas.learner import CreateLearnerRequest, UpdateLearnerRequest
 
 logger = logging.getLogger("learner_profile.service")
 
+# Companions a child can choose during onboarding (mirrors COMPANION_IDS in apps/web .../journey/themes.ts).
+CHILD_SELECTABLE_AVATAR_IDS = frozenset({"avatar_lion", "avatar_elephant", "avatar_rabbit", "avatar_owl"})
+
+
+def effective_avatar_fields(doc: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    The avatar shown everywhere: the child's own choice when one exists (it stays until the child chooses
+    again), otherwise the parent's selection. The parent's selection is kept, never overwritten.
+    """
+    parent_avatar = doc.get("avatarId", "avatar_1")
+    child_avatar = doc.get("childAvatarId")
+    return {
+        "avatarId": child_avatar or parent_avatar,
+        "avatarSource": "child" if child_avatar else "parent",
+        "parentAvatarId": parent_avatar,
+    }
+
 
 def serialize_learner_doc(doc: Dict[str, Any]) -> Dict[str, Any]:
     """Converts a MongoDB learner document into an API-compliant dictionary."""
@@ -30,7 +47,7 @@ def serialize_learner_doc(doc: Dict[str, Any]) -> Dict[str, Any]:
         "sinhalaComprehension": doc.get("sinhalaComprehension"),
         "englishComprehension": doc.get("englishComprehension"),
         "primaryInstructionLanguage": doc.get("primaryInstructionLanguage"),
-        "avatarId": doc.get("avatarId", "avatar_1"),
+        **effective_avatar_fields(doc),
         "onboardingStatus": doc.get("onboardingStatus", "NOT_STARTED"),
         "isArchived": bool(doc.get("isArchived", False)),
         "archivedAt": archived_at.isoformat() if isinstance(archived_at, datetime) else (str(archived_at) if archived_at else None),

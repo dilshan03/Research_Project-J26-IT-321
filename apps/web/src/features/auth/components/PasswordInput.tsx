@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { publicText } from '../../../shared/i18n/publicText';
 
 interface PasswordInputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label: string;
@@ -41,8 +42,8 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           type="button"
           onClick={() => setShowPassword(!showPassword)}
           className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-mq-text-muted hover:text-mq-primary transition-colors focus:outline-none"
-          title={showPassword ? 'Hide password' : 'Show password'}
-          aria-label={showPassword ? 'Hide password' : 'Show password'}
+          title={showPassword ? publicText.auth.hidePassword : publicText.auth.showPassword}
+          aria-label={showPassword ? publicText.auth.hidePassword : publicText.auth.showPassword}
         >
           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>

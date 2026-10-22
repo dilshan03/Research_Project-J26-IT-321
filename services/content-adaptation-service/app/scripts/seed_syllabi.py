@@ -1,153 +1,95 @@
+"""
+Register the bundled NIE teacher's guides in data/syllabi and queue them for extraction.
 
+    python -m app.scripts.seed_syllabi          # register + extract, waits until done
+
+The PDFs are referenced in place (never copied into GridFS: the Grade 4 guide alone is
+~190 MB). Page transcripts are cached under data/syllabi/_cache, so re-running is cheap.
+"""
 import asyncio
-import io
 import re
 from pathlib import Path
-from typing import Optional
-
-from pypdf import PdfReader
+from typing import List, Optional
 
 from app.schemas.syllabus import SeedSyllabiResponse, SyllabusDocument
+from app.services import ingestion_jobs
 from app.services.db import db_service
-from app.services.llm_extractor import upload_and_extract_problems
+from app.services.syllabus_pipeline import page_count
+
+SYLLABI_DIR = Path(__file__).resolve().parents[2] / "data" / "syllabi"
 
 
-def _infer_grade_from_filename(filename: str) -> int:
-    m = re.search(r"grade[_\-\s]*0?([1-5])", filename, re.IGNORECASE)
-    if m:
-        return int(m.group(1))
-    return 1
+def infer_grade_from_filename(filename: str) -> Optional[int]:
+    m = re.search(r"grade[_\-\s]*0?([1-5])\b", filename, re.IGNORECASE)
+    return int(m.group(1)) if m else None
 
 
-async def run_seed(syllabi_dir: Optional[Path] = None) -> SeedSyllabiResponse:
+def doc_id_for(path: Path, grade: int) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "_", path.stem.lower()).strip("_")
+    return f"doc_g{grade}_{slug}"
+
+
+async def register_local_syllabi(syllabi_dir: Optional[Path] = None) -> List[SyllabusDocument]:
     await db_service.initialize()
-
-    if syllabi_dir is None:
-        syllabi_dir = Path(__file__).resolve().parents[2] / "data" / "syllabi"
-
-    syllabi_dir.mkdir(parents=True, exist_ok=True)
-
-    pdf_files = sorted(syllabi_dir.glob("*.pdf"))
-
-    print(
-        f"[SeedSyllabi] Found {len(pdf_files)} PDF files "
-        f"in {syllabi_dir}"
-    )
-
+    syllabi_dir = syllabi_dir or SYLLABI_DIR
     docs_col = db_service.get_syllabus_documents()
-    probs_col = db_service.get_curriculum_problems()
-    gridfs = db_service.get_gridfs()
+    registered: List[SyllabusDocument] = []
 
-    imported_docs = []
-    total_problems = 0
-
-    for pdf_path in pdf_files:
-        grade = _infer_grade_from_filename(pdf_path.name)
-        file_bytes = pdf_path.read_bytes()
-
-        # Read PDF page count
+    for pdf_path in sorted(syllabi_dir.glob("*.pdf")):
+        grade = infer_grade_from_filename(pdf_path.name)
+        if grade is None:
+            print(f"[SeedSyllabi] Skipping {pdf_path.name}: no grade (1-5) in the filename")
+            continue
         try:
-            reader = PdfReader(io.BytesIO(file_bytes))
-            page_count = len(reader.pages)
-        except Exception as e:
-            print(
-                f"[SeedSyllabi] Unable to read page count "
-                f"for {pdf_path.name}: {e}"
-            )
-            page_count = 1
+            pages = await asyncio.to_thread(page_count, pdf_path)
+        except Exception as e:  # noqa: BLE001
+            print(f"[SeedSyllabi] Skipping {pdf_path.name}: not a readable PDF ({e})")
+            continue
 
-        doc_id = f"doc_g{grade}_{pdf_path.stem.lower()}"
-
-        # Upload PDF to MongoDB GridFS
-        # FIX 1: Use 'source' instead of 'source_bytes'
-        gridfs_id = await gridfs.upload_from_stream(
-            filename=pdf_path.name,
-            source=file_bytes,
-            metadata={
-                "grade": grade,
-                "subject": "Mathematics",
-                "year": 2024,
-                "language": "si",
-            },
-        )
-
-        # Create syllabus document record
-        # FIX 2: Convert MongoDB ObjectId to string
+        doc_id = doc_id_for(pdf_path, grade)
+        existing = await docs_col.find_one({"doc_id": doc_id}) or {}
         doc = SyllabusDocument(
             doc_id=doc_id,
             filename=pdf_path.name,
             grade=grade,
-            subject="Mathematics",
-            year=2024,
-            language="si",
-            page_count=page_count,
-            file_size=len(file_bytes),
-            status="extracting",
-            extracted_problem_count=0,
-            gridfs_id=str(gridfs_id),
+            page_count=max(pages, 1),
+            file_size=pdf_path.stat().st_size,
+            status=existing.get("status", "uploaded") if existing.get("pipeline_version") == ingestion_jobs.PIPELINE_VERSION else "uploaded",
+            extracted_problem_count=existing.get("extracted_problem_count", 0) if existing.get("pipeline_version") == ingestion_jobs.PIPELINE_VERSION else 0,
             local_path=str(pdf_path),
+            pipeline_version=ingestion_jobs.PIPELINE_VERSION,
         )
+        await docs_col.update_one({"doc_id": doc_id}, {"$set": doc.model_dump()}, upsert=True)
+        registered.append(doc)
+    return registered
 
-        # Save syllabus document metadata
-        await docs_col.update_one(
-            {"doc_id": doc_id},
-            {"$set": doc.model_dump()},
-            upsert=True,
-        )
 
-        # Extract mathematics problems from PDF
-        problems = await upload_and_extract_problems(
-            pdf_file_path_or_bytes=file_bytes,
-            grade=grade,
-            doc_id=doc_id,
-        )
+async def run_seed(syllabi_dir: Optional[Path] = None, wait: bool = False) -> SeedSyllabiResponse:
+    docs = await register_local_syllabi(syllabi_dir)
+    for d in docs:
+        ingestion_jobs.start_extraction(d.doc_id)
+    if wait:
+        for d in docs:
+            await ingestion_jobs.wait_for(d.doc_id)
 
-        # Save extracted problems in MongoDB
-        for p in problems:
-            await probs_col.update_one(
-                {"problem_id": p.problem_id},
-                {"$set": p.model_dump()},
-                upsert=True,
-            )
-
-        # Update document extraction status
-        doc.status = "extracted"
-        doc.extracted_problem_count = len(problems)
-
-        await docs_col.update_one(
-            {"doc_id": doc_id},
-            {
-                "$set": {
-                    "status": "extracted",
-                    "extracted_problem_count": len(problems),
-                }
-            },
-        )
-
-        imported_docs.append(doc)
-        total_problems += len(problems)
-
-        print(
-            f"[OK] Ingested {pdf_path.name} "
-            f"(Grade {grade}, {page_count} pages) "
-            f"-> {len(problems)} problems"
-        )
-
-    print(
-        f"[SeedSyllabi] Complete! "
-        f"{len(imported_docs)} documents registered, "
-        f"{total_problems} problems extracted."
-    )
-
+    docs_col = db_service.get_syllabus_documents()
+    fresh = [SyllabusDocument(**(await docs_col.find_one({"doc_id": d.doc_id}))) for d in docs]
     return SeedSyllabiResponse(
-        imported_documents=len(imported_docs),
-        extracted_problems=total_problems,
-        documents=imported_docs,
+        imported_documents=len(fresh),
+        extracted_problems=sum(d.extracted_problem_count for d in fresh),
+        documents=fresh,
     )
 
 
 def main():
-    asyncio.run(run_seed())
+    async def _go():
+        res = await run_seed(wait=True)
+        for d in res.documents:
+            extra = f" ({d.error_message})" if d.error_message else ""
+            print(f"  Grade {d.grade} {d.filename}: {d.status}, {d.extracted_problem_count} problems, "
+                  f"{d.rejected_count} rejected{extra}")
+        print(f"[SeedSyllabi] {res.imported_documents} documents, {res.extracted_problems} problems.")
+    asyncio.run(_go())
 
 
 if __name__ == "__main__":

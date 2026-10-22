@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Edit3,
   ArrowRight,
@@ -10,10 +10,12 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
+  Gamepad2,
 } from 'lucide-react';
 import type { Learner, DeletionRequest } from '../types';
 import { AVATAR_OPTIONS } from '../types';
 import { OnboardingStatusBadge } from './OnboardingStatusBadge';
+import { setActiveStudentProfile } from '../utils/activeStudentStorage';
 import { parentText } from '../../../shared/i18n/parentText';
 import { comprehensionLabel, deletionStatusLabel, languageLabel } from './parent/labels';
 
@@ -50,6 +52,7 @@ export const LearnerCard: React.FC<LearnerCardProps> = ({
   onRequestDeletion,
   deletionRequest,
 }) => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -77,6 +80,15 @@ export const LearnerCard: React.FC<LearnerCardProps> = ({
 
   const menuItemClass =
     'w-full text-left px-4 py-2.5 flex items-center gap-2.5 text-sm transition-colors cursor-pointer';
+
+  const handleOpenStudentGameProfile = () => {
+    setActiveStudentProfile(learner);
+    const params = new URLSearchParams({
+      learnerId: learner.learnerId,
+      parentId: learner.parentId,
+    });
+    navigate(`/student/dashboard?${params.toString()}`);
+  };
 
   return (
     <div
@@ -243,13 +255,26 @@ export const LearnerCard: React.FC<LearnerCardProps> = ({
           <span>{t.restore}</span>
         </button>
       ) : (
-        <Link
-          to={`/learners/${learner.learnerId}/onboarding`}
-          className="w-full btn btn-primary min-h-[46px] px-4 rounded-2xl inline-flex items-center justify-center gap-2 text-sm"
-        >
-          <span>{actionLabel}</span>
-          <ArrowRight size={16} strokeWidth={2.5} className="shrink-0" />
-        </Link>
+        <div className="space-y-2.5">
+          <Link
+            to={`/learners/${learner.learnerId}/onboarding`}
+            className="w-full btn btn-primary min-h-[46px] px-4 rounded-2xl inline-flex items-center justify-center gap-2 text-sm"
+          >
+            <span>{actionLabel}</span>
+            <ArrowRight size={16} strokeWidth={2.5} className="shrink-0" />
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleOpenStudentGameProfile}
+            className="w-full py-2.5 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs sm:text-sm font-extrabold bg-mq-surface-green hover:bg-mq-secondary text-mq-success hover:text-white border border-mq-secondary/50 hover:border-mq-secondary shadow-xs hover:shadow-sm transition-all cursor-pointer font-sinhala"
+            title={`Open ${learner.firstName}'s Student Game Dashboard`}
+          >
+            <Gamepad2 size={16} className="shrink-0" />
+            <span className="truncate">{t.gameProfile}</span>
+            <ArrowRight size={15} strokeWidth={2.5} className="shrink-0" />
+          </button>
+        </div>
       )}
     </div>
   );

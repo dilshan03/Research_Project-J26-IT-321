@@ -86,6 +86,25 @@ export function getEnglishQuestionFallback(sinhalaQuestion?: string | null): str
   return null;
 }
 
+/**
+ * Stable shuffle keyed by a seed. Blueprints often list the correct option first;
+ * shuffling stops learners from learning "always tap the first one", while keeping
+ * the order fixed across re-renders of the same step.
+ */
+export function seededShuffle<T>(items: readonly T[], seed: number): T[] {
+  const out = [...items];
+  let s = (seed * 9301 + 49297) % 233280 || 1;
+  for (let i = out.length - 1; i > 0; i--) {
+    s = (s * 9301 + 49297) % 233280;
+    const j = Math.floor((s / 233280) * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+/** Gentle "no, try again" wiggle shared by every mechanic. */
+export const SHAKE = { x: [0, -8, 8, -5, 5, 0], transition: { duration: 0.4 } };
+
 /** Returns the pointer position in viewport coordinates and tests it against an element. */
 export function isOver(el: HTMLElement | null, point: { x: number; y: number }): boolean {
   if (!el) return false;

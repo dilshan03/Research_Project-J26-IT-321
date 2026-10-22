@@ -1,0 +1,580 @@
+{
+ "source": "NSCH 2025 Topical Variable List (public documentation)",
+ "features": {
+  "SC_AGE_YEARS": {
+   "label": "Age of Selected Child - In Years (S1)",
+   "codes": {}
+  },
+  "TOTAGE_0_5": {
+   "label": "Count of Children Ages 0 to 5 in Household (S1)",
+   "codes": {}
+  },
+  "TOTAGE_6_11": {
+   "label": "Count of Children Ages 6 to 11 in Household (S1)",
+   "codes": {}
+  },
+  "TOTAGE_12_17": {
+   "label": "Count of Children Ages 12 to 17 in Household (S1)",
+   "codes": {}
+  },
+  "FAMCOUNT": {
+   "label": "Number of People That Are Family Members",
+   "codes": {}
+  },
+  "HHCOUNT": {
+   "label": "Number of People Living at Address",
+   "codes": {}
+  },
+  "A1_AGE": {
+   "label": "Adult 1 - Age in Years",
+   "codes": {}
+  },
+  "FPL_I1": {
+   "label": "Family Poverty Ratio, First Implicate",
+   "codes": {}
+  },
+  "K11Q43R": {
+   "label": "How Many Times Moved to New Address",
+   "codes": {}
+  },
+  "SC_SEX": {
+   "label": "Sex of Selected Child (S1)",
+   "codes": {
+    "1": "Male",
+    "2": "Female"
+   }
+  },
+  "SC_RACE_R": {
+   "label": "Race of Selected Child, Detailed (S1)",
+   "codes": {
+    "1": "White alone",
+    "2": "Black or African American alone",
+    "3": "American Indian or Alaska Native alone",
+    "4": "Asian alone",
+    "5": "Native Hawaiian and Other Pacific Islander alone",
+    "7": "Two or More Races"
+   }
+  },
+  "SC_HISPANIC_R": {
+   "label": "Hispanic Origin of Selected Child, Recode (S1)",
+   "codes": {
+    "1": "Hispanic or Latino Origin",
+    "2": "Not Hispanic or Latino Origin"
+   }
+  },
+  "BORNUSA": {
+   "label": "Born in the United States",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "HOUSE_GEN": {
+   "label": "Parental Nativity",
+   "codes": {
+    "1": "1st generation household [Child is born outside the United States and all reported parents are born",
+    "2": "2nd generation household [Child is born in the United States and at least one parent is born outside the",
+    "3": "3rd+ generation [All parents in the household are born in the United States]",
+    "4": "Other [Child is born in the United States, parents are not listed.]"
+   }
+  },
+  "HHLANGUAGE": {
+   "label": "Primary Household Language (S1)",
+   "codes": {
+    "1": "English",
+    "2": "Spanish",
+    "3": "Other"
+   }
+  },
+  "SC_ENGLISH": {
+   "label": "SC  Speaks English (S1)",
+   "codes": {
+    "1": "Very well",
+    "2": "Well",
+    "3": "Not well",
+    "4": "Not at all"
+   }
+  },
+  "BIRTHWT": {
+   "label": "Birth Weight Status",
+   "codes": {
+    "1": "Very low birth weight (less than 1,500g)",
+    "2": "Low birth weight (less than 2,500g)",
+    "3": "Not low birth weight"
+   }
+  },
+  "K2Q05": {
+   "label": "Born 3 or More Weeks Before Due Date",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "AGEPOS4": {
+   "label": "Birth Order of Selected Children in Household (S1)",
+   "codes": {
+    "1": "Only child",
+    "2": "Oldest child",
+    "3": "Second oldest child",
+    "4": "Third oldest child",
+    "5": "Fourth or greater oldest child"
+   }
+  },
+  "TOTKIDS_R": {
+   "label": "Number of Children in Household (S1)",
+   "codes": {
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4+"
+   }
+  },
+  "FAMILY_R": {
+   "label": "Family Structure",
+   "codes": {
+    "1": "Two biogical/adoptive parents, currently married",
+    "2": "Two biogical/adoptive parents, not currently married",
+    "3": "Two parents (at least one not biological/adoptive), currently married",
+    "4": "Two parents (at least one not biological/adoptive), not currently married",
+    "5": "Single mother",
+    "6": "Single father",
+    "7": "Grandparent household",
+    "8": "Other relation"
+   }
+  },
+  "HIGRADE": {
+   "label": "Highest Level of Education among Reported Adults",
+   "codes": {
+    "1": "Less than high school",
+    "2": "High school (including vocational, trade, or business school)",
+    "3": "More than high school"
+   }
+  },
+  "A1_GRADE": {
+   "label": "Adult 1 - Highest Completed Year of School",
+   "codes": {
+    "1": "8th grade or less",
+    "2": "9th-12th grade; No diploma",
+    "3": "High School Graduate or GED Completed",
+    "4": "Completed a vocational, trade, or business school program",
+    "5": "Some College Credit, but no Degree",
+    "6": "Associate Degree (AA, AS)",
+    "7": "Bachelor's Degree (BA, BS, AB)",
+    "8": "Master's Degree (MA, MS, MSW, MBA)",
+    "9": "Doctorate (PhD, EdD) or Professional Degree (MD, DDS, DVM, JD)"
+   }
+  },
+  "A1_SEX": {
+   "label": "Adult 1 - Sex",
+   "codes": {
+    "1": "Male",
+    "2": "Female"
+   }
+  },
+  "A1_RELATION": {
+   "label": "Adult 1 - How Related to Child",
+   "codes": {
+    "1": "Biological or Adoptive Parent",
+    "2": "Step-parent",
+    "3": "Grandparent",
+    "4": "Foster Parent",
+    "6": "Other: Relative",
+    "7": "Other: Non-Relative"
+   }
+  },
+  "A1_BORN": {
+   "label": "Adult 1 - Where Born",
+   "codes": {
+    "1": "In the United States",
+    "2": "Outside of the United States"
+   }
+  },
+  "A1_MARITAL": {
+   "label": "Adult 1 - Marital Status",
+   "codes": {
+    "1": "Married",
+    "2": "Not married, but living with a partner",
+    "3": "Never Married",
+    "4": "Divorced",
+    "5": "Separated",
+    "6": "Widowed"
+   }
+  },
+  "A1_EMPLOYED_R": {
+   "label": "Adult 1 - Current Employment Status",
+   "codes": {
+    "1": "Employed full-time",
+    "2": "Employed part-time",
+    "3": "Working WITHOUT pay",
+    "4": "Not employed but looking for work",
+    "5": "Not employed and not looking for work",
+    "6": "Retired"
+   }
+  },
+  "A1_ACTIVE": {
+   "label": "Adult 1 - Active Duty",
+   "codes": {
+    "1": "Never served in the military",
+    "2": "Only on active duty for training in the Reserves or National Guard",
+    "3": "Now on active duty",
+    "4": "On active duty in the past, but not now"
+   }
+  },
+  "A1_MENTHEALTH": {
+   "label": "Adult 1 - Mental or Emotional Health",
+   "codes": {
+    "1": "Excellent",
+    "2": "Very Good",
+    "3": "Good",
+    "4": "Fair",
+    "5": "Poor"
+   }
+  },
+  "A1_PHYSHEALTH": {
+   "label": "Adult 1 - Physical Health",
+   "codes": {
+    "1": "Excellent",
+    "2": "Very Good",
+    "3": "Good",
+    "4": "Fair",
+    "5": "Poor"
+   }
+  },
+  "A2_RELATION": {
+   "label": "Adult 2 - How Related to Child",
+   "codes": {
+    "8": "There is only one primary adult caregiver in the household for this child",
+    "1": "Biological or Adoptive Parent",
+    "2": "Step-parent",
+    "3": "Grandparent",
+    "4": "Foster Parent",
+    "6": "Other: Relative",
+    "7": "Other: Non-Relative"
+   }
+  },
+  "TENURE": {
+   "label": "The Conditions under Which Land or Buildings Are Held or Occupied (S1)",
+   "codes": {
+    "1": "Owned by you or someone in this household with a mortgage or loan? Include home equity loans",
+    "2": "Owned by you or someone in this household free and clear (without a mortgage or loan)?",
+    "3": "Rented?",
+    "4": "Occupied without payment of rent?"
+   }
+  },
+  "FOODSIT": {
+   "label": "Food Situation In Household - Past 12 Months",
+   "codes": {
+    "1": "We could always afford to eat good nutritious meals.",
+    "2": "We could always afford enough to eat but not always the kinds of food we should eat.",
+    "3": "Sometimes we could not afford enough to eat.",
+    "4": "Often we could not afford enough to eat."
+   }
+  },
+  "ACE1": {
+   "label": "Hard to Cover Basics Like Food or Housing",
+   "codes": {
+    "1": "Never",
+    "2": "Rarely",
+    "3": "Somewhat often",
+    "4": "Very often"
+   }
+  },
+  "K11Q60": {
+   "label": "Cash Assistance from Government - Past 12 Months",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "K11Q61": {
+   "label": "Food Stamps - Past 12 Months",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "K11Q62": {
+   "label": "Free or Reduced Cost Meals - Past 12 Months",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "S9Q34": {
+   "label": "WIC Benefits - Past 12 Months",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "EBTCARDS": {
+   "label": "School Meal Debit",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "HOMEEVIC": {
+   "label": "Worried about Being Evicted",
+   "codes": {
+    "1": "Always",
+    "2": "Usually",
+    "3": "Sometimes",
+    "4": "Rarely",
+    "5": "Never"
+   }
+  },
+  "MISSMORTGAGE": {
+   "label": "Not Able to Pay Mortgage or Rent",
+   "codes": {
+    "1": "Yes",
+    "2": "No",
+    "3": "Don't Know"
+   }
+  },
+  "EVERHOMELESS": {
+   "label": "Homeless or Lived in Shelter",
+   "codes": {
+    "1": "Yes",
+    "2": "No",
+    "3": "Don't Know"
+   }
+  },
+  "CURRINS": {
+   "label": "Health Insurance Coverage - Currently Covered",
+   "codes": {
+    "1": "Currently insured (does not include Indian Health Service or a religious health share)",
+    "2": "Currently uninsured, or only insured through Indian Health Service or a religious health share"
+   }
+  },
+  "INSTYPE": {
+   "label": "Insurance Type (Revised)",
+   "codes": {
+    "1": "Public only (government assistance)",
+    "2": "Private only (privately purchased, including through ACA marketplace, through employer, or TRICARE)",
+    "3": "Private and public",
+    "5": "Not insured"
+   }
+  },
+  "INSGAP": {
+   "label": "Health Insurance Coverage - Past 12 Months",
+   "codes": {
+    "1": "Insured all 12 months",
+    "2": "Insured during the past 12 months but with gaps in coverage",
+    "3": "No coverage past 12 months"
+   }
+  },
+  "METRO_YN": {
+   "label": "Metropolitan Statistical Area Status (Operational)",
+   "codes": {
+    "1": "Metropolitan Statistical Area",
+    "2": "Not Metropolitan Statistical Area"
+   }
+  },
+  "MPC_YN": {
+   "label": "Metropolitan Principal City Status (Operational)",
+   "codes": {
+    "1": "Metropolitan Principal City",
+    "2": "Not Metropolitan Principal City"
+   }
+  },
+  "K9Q40": {
+   "label": "Anyone in Household Use Cigarettes",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "VAPE": {
+   "label": "Vape/E-Cigarettes inside of Home",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "ACE3": {
+   "label": "Child Experienced - Parent or Guardian Divorced",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "ACE4": {
+   "label": "Child Experienced - Parent or Guardian Died",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "ACE5": {
+   "label": "Child Experienced - Parent or Guardian Time in Jail",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "ACE6": {
+   "label": "Child Experienced - Adults Slap, Hit, Kick, Punch Others",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "ACE7": {
+   "label": "Child Experienced - Victim of Violence",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "ACE8": {
+   "label": "Child Experienced - Lived with Mentally Ill",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "ACE9": {
+   "label": "Child Experienced - Lived with Person with Alcohol/Drug Problem",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "ACE10": {
+   "label": "Child Experienced - Treated Unfairly Because of Race",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "K10Q11": {
+   "label": "Neighborhood - Sidewalks or Walking Paths",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "K10Q12": {
+   "label": "Neighborhood - Park or Playground",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "K10Q13": {
+   "label": "Neighborhood - Recreation Center",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "K10Q14": {
+   "label": "Neighborhood - Library or Bookmobile",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "K10Q20": {
+   "label": "Neighborhood - Litter or Garbage",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "K10Q22": {
+   "label": "Neighborhood - Poorly Kept or Rundown Housing",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "K10Q23": {
+   "label": "Neighborhood - Vandalism",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "K10Q30": {
+   "label": "People In Neighborhood Help Each Other Out",
+   "codes": {
+    "1": "Definitely agree",
+    "2": "Somewhat agree",
+    "3": "Somewhat disagree",
+    "4": "Definitely disagree"
+   }
+  },
+  "K10Q31": {
+   "label": "Watch Out for Other's Children",
+   "codes": {
+    "1": "Definitely agree",
+    "2": "Somewhat agree",
+    "3": "Somewhat disagree",
+    "4": "Definitely disagree"
+   }
+  },
+  "K10Q40_R": {
+   "label": "Child is Safe In Neighborhood",
+   "codes": {
+    "1": "Definitely agree",
+    "2": "Somewhat agree",
+    "3": "Somewhat disagree",
+    "4": "Definitely disagree"
+   }
+  },
+  "K8Q35": {
+   "label": "Someone to Turn To for Emotional Support",
+   "codes": {
+    "1": "Yes",
+    "2": "No"
+   }
+  },
+  "TALKABOUT": {
+   "label": "Facing Problems - How Often Talk Together",
+   "codes": {
+    "1": "All of the time",
+    "2": "Most of the time",
+    "3": "Some of the time",
+    "4": "None of the time"
+   }
+  },
+  "WKTOSOLVE": {
+   "label": "Facing Problems - How Often Work Together",
+   "codes": {
+    "1": "All of the time",
+    "2": "Most of the time",
+    "3": "Some of the time",
+    "4": "None of the time"
+   }
+  },
+  "STRENGTHS": {
+   "label": "Facing Problems - How Often Draw on Strengths",
+   "codes": {
+    "1": "All of the time",
+    "2": "Most of the time",
+    "3": "Some of the time",
+    "4": "None of the time"
+   }
+  },
+  "HOPEFUL": {
+   "label": "Facing Problems - How Often Stay Hopeful",
+   "codes": {
+    "1": "All of the time",
+    "2": "Most of the time",
+    "3": "Some of the time",
+    "4": "None of the time"
+   }
+  },
+  "K8Q11": {
+   "label": "How Many Days - Family Eat Meal Together",
+   "codes": {
+    "1": "0 days",
+    "2": "1-3 days",
+    "3": "4-6 days",
+    "4": "Every day"
+   }
+  }
+ }
+}

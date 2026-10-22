@@ -12,9 +12,11 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parents[3] / ".env")
 load_dotenv()
 
-MONGODB_URI = os.getenv("MONGODB_URI", "")
+# CONTENT_FORCE_LOCAL_DB=1 keeps everything in the local JSON store (used by the test suite so
+# it never writes to the shared Atlas database); CONTENT_DATA_DIR relocates that store.
+MONGODB_URI = "" if os.getenv("CONTENT_FORCE_LOCAL_DB") == "1" else os.getenv("MONGODB_URI", "")
 MONGODB_DB_NAME = os.getenv("MONGODB_DB_NAME", "mathquest_db")
-DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "db_store"
+DATA_DIR = Path(os.getenv("CONTENT_DATA_DIR") or Path(__file__).resolve().parents[1] / "data" / "db_store")
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 GRIDFS_DIR = DATA_DIR / "gridfs"
 GRIDFS_DIR.mkdir(parents=True, exist_ok=True)
@@ -79,6 +81,16 @@ class FallbackCollection:
         except Exception:
             pass
 
+    @staticmethod
+    def _get(doc: Dict[str, Any], key: str) -> Any:
+        """Mongo-style dotted lookup, e.g. "blueprint.status"."""
+        value: Any = doc
+        for part in key.split("."):
+            if not isinstance(value, dict):
+                return None
+            value = value.get(part)
+        return value
+
     def _matches(self, doc: Dict[str, Any], query: Dict[str, Any]) -> bool:
         for k, v in query.items():
             if k == "_id" and str(doc.get("_id", "")) != str(v) and str(doc.get("id", "")) != str(v):
@@ -86,9 +98,9 @@ class FallbackCollection:
             elif isinstance(v, dict):
                 # Simple handling for $in operator
                 if "$in" in v:
-                    if doc.get(k) not in v["$in"]:
+                    if self._get(doc, k) not in v["$in"]:
                         return False
-            elif doc.get(k) != v:
+            elif k != "_id" and self._get(doc, k) != v:
                 return False
         return True
 
@@ -156,6 +168,15 @@ class FallbackCollection:
                     self._save()
                     return type("DeleteResult", (), {"deleted_count": 1})()
             return type("DeleteResult", (), {"deleted_count": 0})()
+
+    async def delete_many(self, query: Dict[str, Any]):
+        async with self._lock:
+            doomed = [doc_id for doc_id, doc in self._data.items() if self._matches(doc, query)]
+            for doc_id in doomed:
+                del self._data[doc_id]
+            if doomed:
+                self._save()
+            return type("DeleteResult", (), {"deleted_count": len(doomed)})()
 
     async def count_documents(self, query: Optional[Dict[str, Any]] = None) -> int:
         query = query or {}
@@ -242,11 +263,12 @@ class DatabaseService:
         self._init_done = True
         if MONGODB_URI and "mongodb" in MONGODB_URI:
             try:
-                # 2-second timeout so app never hangs if Atlas IP is restricted or SSL alert fires
+                # 10 s covers a slow Atlas DNS/TLS handshake. A 2 s limit made the service flip
+                # between Atlas and the local store from one start to the next (different data).
                 client = AsyncIOMotorClient(
                     MONGODB_URI,
-                    serverSelectionTimeoutMS=2000,
-                    connectTimeoutMS=2000,
+                    serverSelectionTimeoutMS=10000,
+                    connectTimeoutMS=10000,
                 )
                 await client.admin.command("ping")
                 self.client = client
@@ -256,7 +278,10 @@ class DatabaseService:
                 print(f"[DatabaseService] Connected to MongoDB Atlas: {MONGODB_DB_NAME}")
                 return
             except Exception as e:
-                print(f"[DatabaseService] MongoDB unavailable ({type(e).__name__}). Using local filesystem/in-memory fallback.")
+                print(
+                    f"[DatabaseService] WARNING: MONGODB_URI is set but Atlas is unreachable ({type(e).__name__}). "
+                    f"Using the LOCAL store in {DATA_DIR}; data written now will not appear in Atlas."
+                )
                 self.is_connected = False
         else:
             print("[DatabaseService] No MONGODB_URI configured. Running in local fallback mode.")

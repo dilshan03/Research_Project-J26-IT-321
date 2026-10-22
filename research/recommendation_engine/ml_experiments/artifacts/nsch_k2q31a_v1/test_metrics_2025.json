@@ -1,0 +1,182 @@
+{
+  "evaluated_at_utc": "2026-10-20T17:04:38+00:00",
+  "model_sha256": "73DEE96F696CB4489744568BA47B9C2BC6F511538518DB97B5E3FE571258D1B3",
+  "frozen_at_utc": "2026-10-20T17:03:43+00:00",
+  "test_year": 2025,
+  "selected_model": {
+    "family": "logistic_regression",
+    "params": {
+      "C": 0.1
+    },
+    "selection_rule": "highest validation ROC-AUC (4 d.p.), then lowest validation Brier"
+  },
+  "test": {
+    "n": 10743,
+    "positives": 1634,
+    "prevalence": 0.15209904123615378,
+    "roc_auc": 0.7355501230641599,
+    "pr_auc": 0.34292338794800314,
+    "pr_auc_no_skill_baseline": 0.15209904123615378,
+    "brier": 0.11608321752522534,
+    "brier_skill_vs_observed_prevalence": 0.09988534151134332
+  },
+  "calibration": {
+    "mean_predicted": 0.13982254100342761,
+    "observed_rate": 0.15209904123615378,
+    "calibration_in_the_large": 0.012276500232726167,
+    "calibration_slope": 0.9780149709830671,
+    "calibration_intercept": 0.07493550904884737,
+    "reliability_deciles": [
+      {
+        "n": 1075,
+        "mean_predicted": 0.026643601242723306,
+        "observed_rate": 0.029767441860465118
+      },
+      {
+        "n": 1075,
+        "mean_predicted": 0.04611861590407898,
+        "observed_rate": 0.04279069767441861
+      },
+      {
+        "n": 1075,
+        "mean_predicted": 0.06251693388911299,
+        "observed_rate": 0.06883720930232558
+      },
+      {
+        "n": 1074,
+        "mean_predicted": 0.0788875220855169,
+        "observed_rate": 0.08845437616387337
+      },
+      {
+        "n": 1074,
+        "mean_predicted": 0.09739502522475044,
+        "observed_rate": 0.11266294227188083
+      },
+      {
+        "n": 1074,
+        "mean_predicted": 0.11945515067908954,
+        "observed_rate": 0.1303538175046555
+      },
+      {
+        "n": 1074,
+        "mean_predicted": 0.14573759785682863,
+        "observed_rate": 0.15176908752327747
+      },
+      {
+        "n": 1074,
+        "mean_predicted": 0.18147995437172568,
+        "observed_rate": 0.19553072625698323
+      },
+      {
+        "n": 1074,
+        "mean_predicted": 0.2367807887005867,
+        "observed_rate": 0.29329608938547486
+      },
+      {
+        "n": 1074,
+        "mean_predicted": 0.40347482759566783,
+        "observed_rate": 0.40782122905027934
+      }
+    ]
+  },
+  "at_frozen_threshold": {
+    "threshold": 0.12586380400463063,
+    "confusion_matrix": {
+      "tn": 5740,
+      "fp": 3369,
+      "fn": 468,
+      "tp": 1166
+    },
+    "sensitivity": 0.7135862913096696,
+    "specificity": 0.630146009441212,
+    "precision": 0.2571113561190739,
+    "recall": 0.7135862913096696,
+    "npv": 0.9246134020618557,
+    "f1": 0.37801912789755227,
+    "predicted_positive_rate": 0.4221353439448943
+  },
+  "prevalence_baseline": {
+    "predicted_probability": 0.14206128133704735,
+    "roc_auc": 0.5,
+    "pr_auc": 0.15209904123615378,
+    "brier": 0.12906567951498865,
+    "sensitivity_specificity_at_any_threshold": "all-positive or all-negative only"
+  },
+  "provisional_bootstrap_95ci_unweighted_not_design_adjusted": {
+    "roc_auc": [
+      0.7225034724576785,
+      0.7485946394583264
+    ],
+    "pr_auc": [
+      0.32181506075610256,
+      0.3677163163212338
+    ],
+    "brier": [
+      0.11189757262962167,
+      0.12058292892842916
+    ]
+  },
+  "subgroups": {
+    "sex_male": {
+      "n": 5577,
+      "prevalence": 0.19203873050026896,
+      "roc_auc": 0.7169446858488919,
+      "pr_auc": 0.38126489860351387,
+      "sensitivity": 0.842203548085901,
+      "specificity": 0.4145583666222814
+    },
+    "sex_female": {
+      "n": 5166,
+      "prevalence": 0.10898180410375533,
+      "roc_auc": 0.7326880415081831,
+      "pr_auc": 0.2614989891243541,
+      "sensitivity": 0.4689165186500888,
+      "specificity": 0.8411905279165761
+    },
+    "age_6": {
+      "n": 2002,
+      "prevalence": 0.09290709290709291,
+      "roc_auc": 0.7296906825825398,
+      "pr_auc": 0.2480981413369706,
+      "sensitivity": 0.543010752688172,
+      "specificity": 0.7857929515418502
+    },
+    "age_7": {
+      "n": 2005,
+      "prevalence": 0.1261845386533666,
+      "roc_auc": 0.7365269731261392,
+      "pr_auc": 0.31965875781533976,
+      "sensitivity": 0.616600790513834,
+      "specificity": 0.7277397260273972
+    },
+    "age_8": {
+      "n": 2101,
+      "prevalence": 0.1618277010947168,
+      "roc_auc": 0.7456876106490296,
+      "pr_auc": 0.3765161528771772,
+      "sensitivity": 0.7323529411764705,
+      "specificity": 0.6382737081203862
+    },
+    "age_9": {
+      "n": 2365,
+      "prevalence": 0.17167019027484143,
+      "roc_auc": 0.7007772639604503,
+      "pr_auc": 0.3497638409390654,
+      "sensitivity": 0.7044334975369458,
+      "specificity": 0.5625319040326697
+    },
+    "age_10": {
+      "n": 2270,
+      "prevalence": 0.19779735682819383,
+      "roc_auc": 0.7122643643999907,
+      "pr_auc": 0.37252980381688316,
+      "sensitivity": 0.8329621380846325,
+      "specificity": 0.44590884129599123
+    }
+  },
+  "notes": [
+    "Unweighted metrics describe the 2025 sample, not the US population.",
+    "Confidence intervals are a simple percentile bootstrap and are NOT survey-design adjusted (provisional).",
+    "Threshold was fixed on the 2023-2024 validation partition before 2025 was opened."
+  ]
+}

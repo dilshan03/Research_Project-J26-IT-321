@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "MQ-LEARNER-CONTEXT-v0.1",
+  "learnerRef": "SYN-L007",
+  "grade": 5,
+  "notes": {"description": "High SNAP-IV averages, a clinician reference label, missed drops and a long response time: none of these select support", "synthetic": true},
+  "learningPreferences": {
+    "provenance": {"source": "parent", "instrument": "LEARNING-PREF-v1.0"},
+    "visualAssistance": "sometimes", "audioAssistance": "off", "activityPace": "regular",
+    "hintStyle": "step_guide", "celebrationStyle": "minimal"
+  },
+  "socialContext": {
+    "provenance": {"source": "parent", "instrument": "SOCIAL-CONTEXT-v1.0"},
+    "learningEnvironment": "shared_living_space", "peerCollaboration": "with_sibling_peer",
+    "parentInvolvement": "guided_together", "challengingTaskSupport": "take_a_break"
+  },
+  "mathEvidence": {
+    "provenance": {"source": "assessment", "instrument": "ELP-X-v1.0"},
+    "skills": [
+      {"skillId": "decimals", "provisionalSkillLevel": "DEVELOPING", "distinctQuestionsAssessed": 6, "isEvidenceSufficient": true}
+    ]
+  },
+  "interactionObservations": {
+    "provenance": {"source": "telemetry", "instrument": "ONBOARDING-INTERACTION-OBS-v1.0"},
+    "missedDropCount": 5, "inputMethod": "drag", "responseLatencySeconds": 72.0
+  },
+  "parentReportedAdhdContext": {
+    "provenance": {"source": "parent", "instrument": "ADHD-INFO-v1.0", "verificationStatus": "NOT_VERIFIED"},
+    "diagnosisStatus": "yes", "reportedPresentation": "predominantly_hyperactive_impulsive"
+  },
+  "snapIvSummary": {
+    "provenance": {"source": "parent", "instrument": "SNAP-IV-18"},
+    "inattentionAverage": 2.44, "hyperactivityAverage": 2.67
+  },
+  "clinicalReference": {
+    "provenance": {"source": "clinician", "verificationStatus": "CLINICIAN_DOCUMENTED"},
+    "label": "SYNTHETIC-REFERENCE-LABEL"
+  }
+}

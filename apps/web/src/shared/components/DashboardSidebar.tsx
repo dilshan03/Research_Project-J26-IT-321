@@ -9,6 +9,9 @@ import {
 } from './sidebar/sidebarConfig';
 import { useAuth } from '../../features/auth/hooks/useAuth';
 import { parentText } from '../i18n/parentText';
+import { teacherText } from '../i18n/teacherText';
+import { pick } from '../i18n/language';
+import { LanguageSwitch } from './LanguageSwitch';
 import { PARENT_GROUP_TITLES, PARENT_PRIMARY_PATHS, PARENT_ROUTE_LABELS } from '../i18n/parentNav';
 
 interface DashboardSidebarProps {
@@ -26,10 +29,12 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   const { user } = useAuth();
   const isParent = role === 'parent';
   const groups: NavGroupConfig[] = isParent ? PARENT_NAV_GROUPS : TEACHER_NAV_GROUPS;
-  // Parent portal is Sinhala-first; teacher labels are unchanged.
-  const groupTitle = (group: NavGroupConfig) => (isParent ? PARENT_GROUP_TITLES[group.id] ?? group.title : group.title);
-  const itemLabel = (item: NavItemConfig) => (isParent ? PARENT_ROUTE_LABELS[item.path] ?? item.label : item.label);
-  const portalLabel = isParent ? parentText.nav.portal : 'Teacher Portal';
+  // Labels follow the global language switch (teacher items carry both labels in sidebarConfig).
+  const groupTitle = (group: NavGroupConfig) =>
+    isParent ? PARENT_GROUP_TITLES[group.id] ?? group.title : pick(group.titleSi, group.title);
+  const itemLabel = (item: NavItemConfig) =>
+    isParent ? PARENT_ROUTE_LABELS[item.path] ?? item.label : pick(item.labelSi, item.label);
+  const portalLabel = isParent ? parentText.nav.portal : teacherText.portal.label;
 
   const closeBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -169,17 +174,19 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
           </div>
           <div className="min-w-0 flex-1">
             <p className={`${isParent ? 'text-sm' : 'text-xs'} font-bold text-mq-text-strong truncate`}>
-              {user?.fullName || (isParent ? parentText.shell.parentAccount : 'Teacher Account')}
+              {user?.fullName || (isParent ? parentText.shell.parentAccount : teacherText.portal.account)}
             </p>
             <div className="flex items-center gap-1.5 mt-0.5">
               <span className="inline-block w-2 h-2 rounded-full bg-mq-success shrink-0" />
               <span className={`${isParent ? 'text-xs' : 'text-[11px] capitalize'} font-semibold text-mq-primary`}>
-                {isParent ? parentText.shell.signedIn : `${role} Portal Active`}
+                {isParent ? parentText.shell.signedIn : teacherText.portal.signedIn}
               </span>
             </div>
           </div>
         </div>
       </div>
+
+      <LanguageSwitch className="self-start" />
 
       {/* Navigation Groups */}
       {isParent ? renderParentNav() : (
@@ -222,12 +229,10 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         <div className="p-3 bg-mq-surface-soft rounded-2xl border border-mq-border/60">
           <div className="flex items-center gap-1.5 text-xs font-bold text-mq-primary-dark mb-1">
             <ShieldCheck size={14} className="text-mq-secondary" />
-            <span>{isParent ? parentText.shell.footerTitle : 'MathQuest Research'}</span>
+            <span>{isParent ? parentText.shell.footerTitle : teacherText.portal.footerTitle}</span>
           </div>
           <p className={`${isParent ? 'text-xs leading-relaxed' : 'text-[11px] leading-tight'} text-mq-text-muted`}>
-            {isParent
-              ? parentText.shell.footerText
-              : 'Adaptive Sinhala math learning platform for children with ADHD support needs.'}
+            {isParent ? parentText.shell.footerText : teacherText.portal.footerText}
           </p>
         </div>
       </div>
@@ -241,7 +246,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
       {/* ========================================================= */}
       <aside
         className="hidden lg:flex flex-col w-64 xl:w-72 bg-white border-r border-mq-border shrink-0 sticky top-16 h-[calc(100vh-4rem)] z-30"
-        aria-label={isParent ? parentText.shell.navigation : 'Teacher Dashboard Navigation'}
+        aria-label={isParent ? parentText.shell.navigation : teacherText.portal.navAria}
       >
         {renderNavContent()}
       </aside>
@@ -266,7 +271,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         }`}
         role="dialog"
         aria-modal="true"
-        aria-label={isParent ? parentText.shell.navigation : 'Teacher Navigation Drawer'}
+        aria-label={isParent ? parentText.shell.navigation : teacherText.portal.navAria}
       >
         {/* Drawer Header */}
         <div className="flex items-center justify-between px-4 py-3.5 border-b border-mq-border bg-mq-surface-soft/60">
@@ -286,7 +291,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
             type="button"
             onClick={onCloseMobile}
             className="p-1.5 rounded-xl text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface transition-colors cursor-pointer"
-            aria-label={isParent ? parentText.shell.closeMenu : 'Close navigation sidebar'}
+            aria-label={isParent ? parentText.shell.closeMenu : teacherText.portal.closeNav}
           >
             <X size={18} />
           </button>

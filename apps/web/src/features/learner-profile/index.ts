@@ -2,7 +2,7 @@ export { LearnersPage } from './pages/LearnersPage';
 export { OnboardingPlaceholderPage } from './pages/OnboardingPlaceholderPage';
 export { ParentOverviewPage } from './pages/ParentOverviewPage';
 export { ParentSnapIvPage } from './pages/ParentSnapIvPage';
-export { ParentChildrenPage } from './pages/ParentChildrenPage';
+export { ParentSupportInfoPage } from './pages/ParentSupportInfoPage';
 export { ParentLearnerProfilesPage } from './pages/ParentLearnerProfilesPage';
 export { ParentAssessmentsPage } from './pages/ParentAssessmentsPage';
 export { ParentRecommendationsPage } from './pages/ParentRecommendationsPage';
@@ -16,4 +16,4 @@ export { onboardingApi } from './services/onboardingApi';
 export { profileApi } from './services/profileApi';
 export * from './types';
 export * from './types/onboarding';
-
+export * from './utils/activeStudentStorage';

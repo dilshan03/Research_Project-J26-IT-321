@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { GAJA, type Lang } from './gameKit';
 
@@ -8,6 +8,14 @@ const CYCLE_MS = 8000; // 4s in, 4s out
 export function BreathingBreak({ lang, onDone }: { lang: Lang; onDone: () => void }) {
   const [phase, setPhase] = useState<'in' | 'out'>('in');
   const [cycles, setCycles] = useState(0);
+  // The parent passes a fresh onDone each render; make sure the break only ends once
+  // (auto-finish and the "ready" button could otherwise both fire).
+  const finished = useRef(false);
+  const finish = () => {
+    if (finished.current) return;
+    finished.current = true;
+    onDone();
+  };
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -19,7 +27,8 @@ export function BreathingBreak({ lang, onDone }: { lang: Lang; onDone: () => voi
     return () => clearInterval(t);
   }, []);
 
-  useEffect(() => { if (cycles >= 3) onDone(); }, [cycles, onDone]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (cycles >= 3) finish(); }, [cycles]);
 
   return (
     <motion.div
@@ -42,7 +51,7 @@ export function BreathingBreak({ lang, onDone }: { lang: Lang; onDone: () => voi
       <div className="flex gap-2 mt-4" aria-label="Breaths completed">
         {[0, 1, 2].map(i => <span key={i} className={`w-3 h-3 rounded-full ${i < cycles ? 'bg-mq-secondary' : 'bg-mq-border'}`} />)}
       </div>
-      <button id="break-ready" disabled={cycles < 1} onClick={onDone}
+      <button id="break-ready" disabled={cycles < 1} onClick={finish}
         className="btn btn-primary mt-8 text-lg px-8 disabled:opacity-40 disabled:cursor-not-allowed">
         {lang === 'si' ? 'මම සූදානම්!' : "I'm ready!"}
       </button>

@@ -105,7 +105,11 @@ export function BasketCount({ step, theme, isMoney, lang, calm, onWrong, onCorre
           {isSub && (
             <div ref={awayRef} className="w-48 min-h-32 rounded-full bg-white/80 border-4 border-dashed border-mq-accent-pink p-4 flex flex-wrap gap-2 justify-center content-center">
               {items.filter(i => i.place === 'away').map(renderItem)}
-              {items.every(i => i.place !== 'away') && <span className={`text-mq-text-muted text-sm text-center ${lang === 'si' ? 'sinhala' : ''}`}>{lang === 'si' ? `මෙතනට ${b}ක් දමන්න` : `Put ${b} here`}</span>}
+              {/* Empty slots show how many are still to move, without giving away the final count */}
+              {Array.from({ length: Math.max(0, b - items.filter(i => i.place === 'away').length) }).map((_, k) => (
+                <span key={`slot-${k}`} className="w-9 h-9 rounded-full border-2 border-dashed border-mq-accent-pink/60" aria-hidden />
+              ))}
+              {items.every(i => i.place !== 'away') && <span className={`basis-full text-mq-text-muted text-sm text-center ${lang === 'si' ? 'sinhala' : ''}`}>{lang === 'si' ? `මෙතනට ${b}ක් දමන්න` : `Put ${b} here`}</span>}
             </div>
           )}
         </div>

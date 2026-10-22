@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useScrollToTopOnChange } from '../../../../../shared/hooks/useScrollToTopOnChange';
 import { ArrowRight, Check, Loader2 } from 'lucide-react';
 import type { ChildPreferenceChoices, MathItemAnswer, MathSubmissionExtras } from '../../../types/onboarding';
 import { AVATAR_OPTIONS } from '../../../types';
@@ -16,6 +17,7 @@ import {
   G1_CALIBRATION,
   G1_COMPARE_PRE,
   G1_COMPARE_SUPPORT,
+  G1_COMPARE_INDEPENDENT,
   G1_COMPARE_TRANSFER,
   G1_COUNT,
   G1_MATCH_GROUP,
@@ -28,12 +30,13 @@ type Phase =
   | 'count'
   | 'match_numeral'
   | 'match_group'
+  | 'compare_independent'
   | 'compare_pre'
   | 'compare_support'
   | 'compare_transfer'
   | 'ending';
 
-const PROGRESS_PHASES: Phase[] = ['welcome', 'calibration', 'count', 'match_numeral', 'match_group', 'compare_pre', 'compare_transfer', 'ending'];
+const PROGRESS_PHASES: Phase[] = ['welcome', 'calibration', 'count', 'match_numeral', 'match_group', 'compare_independent', 'compare_pre', 'compare_transfer', 'ending'];
 
 interface Props {
   onSubmit: (answers: MathItemAnswer[], extras: MathSubmissionExtras) => Promise<void>;
@@ -43,11 +46,12 @@ interface Props {
 /**
  * Grade 1 onboarding-v2 child journey (design phases A–F):
  * welcome + child choices → instruction check → independent counting → representation matching
- * → compare pre-probe → guided support (only if needed) → new transfer item → gentle ending.
+ * → independent comparison → compare pre-probe → guided support (only if needed) → new transfer item → gentle ending.
  * Only items actually shown are submitted; scoring happens on the server.
  */
 export const Grade1Journey: React.FC<Props> = ({ onSubmit, isSubmitting }) => {
   const [phase, setPhase] = useState<Phase>('welcome');
+  useScrollToTopOnChange(phase);
   const [companionId, setCompanionId] = useState<string | null>(null);
   const [worldId, setWorldId] = useState<WorldId | null>(null);
   const [soundMode, setSoundMode] = useState<SoundMode | null>(null);
@@ -221,7 +225,21 @@ export const Grade1Journey: React.FC<Props> = ({ onSubmit, isSubmitting }) => {
         stimulus={item.stimulus}
         options={item.options}
         ctx={ctx}
-        onDone={(a) => record(a, phase === 'match_numeral' ? 'match_group' : 'compare_pre')}
+        onDone={(a) => record(a, phase === 'match_numeral' ? 'match_group' : 'compare_independent')}
+      />
+    );
+  }
+
+  /* ---------------- Independent comparison (no help unless the child asks) ---------------- */
+  if (phase === 'compare_independent') {
+    return (
+      <CompareGroupsActivity
+        key="compare_independent"
+        item={G1_COMPARE_INDEPENDENT}
+        scene="nature_garden"
+        mode="independent"
+        ctx={ctx}
+        onDone={(a) => record(a, 'compare_pre')}
       />
     );
   }

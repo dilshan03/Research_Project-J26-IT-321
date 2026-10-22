@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "MQ-LEARNER-CONTEXT-v0.1",
+  "learnerRef": "SYN-L004",
+  "grade": 2,
+  "notes": {"description": "Individual differences A: same parent-reported presentation as S5, but emerging skill and calm pace", "synthetic": true},
+  "learningPreferences": {
+    "provenance": {"source": "parent", "instrument": "LEARNING-PREF-v1.0"},
+    "visualAssistance": "always", "audioAssistance": "read_on_click", "activityPace": "calm_step_by_step",
+    "hintStyle": "visual_clue", "celebrationStyle": "gentle_star"
+  },
+  "mathEvidence": {
+    "provenance": {"source": "assessment", "instrument": "ELP-X-v1.0"},
+    "skills": [
+      {"skillId": "subtraction", "provisionalSkillLevel": "EMERGING", "distinctQuestionsAssessed": 3, "isEvidenceSufficient": true}
+    ]
+  },
+  "parentReportedAdhdContext": {
+    "provenance": {"source": "parent", "instrument": "ADHD-INFO-v1.0", "verificationStatus": "NOT_VERIFIED"},
+    "diagnosisStatus": "yes", "reportedPresentation": "predominantly_inattentive"
+  }
+}

@@ -1,45 +1,54 @@
 """
-In-memory blueprint repository.
+Blueprint repository backed by the service database (Atlas, or the local JSON store).
 
-Kept behind a small interface so it can be swapped for a MongoDB (motor)
-implementation later without touching the routes.
+It used to be an in-memory dict, which emptied on every restart: approved games vanished
+from the learner page and approving a game created before the restart returned 404.
 """
-from threading import Lock
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from app.schemas.api import BlueprintEnvelope
+from app.services.db import db_service
+
+
+def _envelope(doc: dict) -> BlueprintEnvelope:
+    return BlueprintEnvelope(**{k: v for k, v in doc.items() if k != "_id"})
 
 
 class BlueprintRepository:
-    def __init__(self) -> None:
-        self._items: Dict[str, BlueprintEnvelope] = {}
-        self._lock = Lock()
+    @staticmethod
+    def _col():
+        return db_service.get_game_blueprints()
 
-    def save(self, env: BlueprintEnvelope) -> BlueprintEnvelope:
-        with self._lock:
-            self._items[env.blueprint.activity_id] = env
+    async def save(self, env: BlueprintEnvelope) -> BlueprintEnvelope:
+        activity_id = env.blueprint.activity_id
+        await self._col().update_one(
+            {"activity_id": activity_id},
+            {"$set": {"activity_id": activity_id, **env.model_dump()}},
+            upsert=True,
+        )
         return env
 
-    def get(self, activity_id: str) -> Optional[BlueprintEnvelope]:
-        return self._items.get(activity_id)
+    async def get(self, activity_id: str) -> Optional[BlueprintEnvelope]:
+        doc = await self._col().find_one({"activity_id": activity_id})
+        return _envelope(doc) if doc else None
 
-    def list(self, status: Optional[str] = None) -> List[BlueprintEnvelope]:
-        items = list(self._items.values())
-        if status:
-            items = [e for e in items if e.blueprint.status == status]
-        return items
+    async def list(self, status: Optional[str] = None) -> List[BlueprintEnvelope]:
+        query = {"blueprint.status": status} if status else {}
+        docs = await self._col().find(query).to_list(length=1000)
+        envs = []
+        for d in docs:
+            try:
+                envs.append(_envelope(d))
+            except Exception:  # noqa: BLE001 - skip records written by an older schema
+                continue
+        return envs
 
-    def set_status(self, activity_id: str, status: str) -> Optional[BlueprintEnvelope]:
-        with self._lock:
-            env = self._items.get(activity_id)
-            if env is None:
-                return None
-            env.blueprint.status = status
-            return env
-
-    def clear(self) -> None:
-        with self._lock:
-            self._items.clear()
+    async def set_status(self, activity_id: str, status: str) -> Optional[BlueprintEnvelope]:
+        env = await self.get(activity_id)
+        if env is None:
+            return None
+        env.blueprint.status = status  # type: ignore[assignment]
+        return await self.save(env)
 
 
 repository = BlueprintRepository()

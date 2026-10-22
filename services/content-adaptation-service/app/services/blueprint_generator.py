@@ -203,6 +203,130 @@ def _calc_step(
     )
 
 
+SHAPE_LABELS = {
+    "CIRCLE": ("රවුම", "Circle"),
+    "TRIANGLE": ("ත්‍රිකෝණය", "Triangle"),
+    "SQUARE": ("සමචතුරස්‍රය", "Square"),
+    "RECTANGLE": ("සෘජුකෝණාස්‍රය", "Rectangle"),
+}
+COLOR_LABELS = {
+    "RED": ("රතු", "Red"),
+    "BLUE": ("නිල්", "Blue"),
+    "YELLOW": ("කහ", "Yellow"),
+    "GREEN": ("කොළ", "Green"),
+}
+
+
+def _shape_step(vp: dict, n_wrong: int) -> GameMicroStep:
+    target = str(vp.get("target_shape") or "CIRCLE").upper()
+    if target not in SHAPE_LABELS:
+        target = "CIRCLE"
+    si, en = SHAPE_LABELS[target]
+    opts = [GameChoiceOption(text_si=si, text_en=en, is_correct=True, distractor_type="NONE", icon_or_shape=target)]
+    for s in [k for k in SHAPE_LABELS if k != target][:n_wrong]:
+        opts.append(GameChoiceOption(
+            text_si=SHAPE_LABELS[s][0], text_en=SHAPE_LABELS[s][1], is_correct=False,
+            distractor_type="IMPULSIVITY", icon_or_shape=s,
+            distractor_rationale="Picks a visually salient shape without checking its sides and corners.",
+        ))
+    return GameMicroStep(
+        step_order=1,
+        action_type="MATCH_SHAPE",
+        instruction_si=f"{si} හැඩය සොයා තෝරන්න",
+        instruction_en=f"Find the {en.lower()}",
+        target_visual_asset=VisualAssetTag.SHAPE_CARD,
+        correct_target_value=target,
+        game_options=opts,
+        operands=[1],
+        operation="SHAPE",
+        visual_props={"target_shape": target},
+    )
+
+
+def _number_pattern_step(seq: List[int], target: int, n_wrong: int) -> GameMicroStep:
+    d = seq[1] - seq[0]
+    candidates = [
+        (seq[-1], "IMPULSIVITY", "Repeats the last number shown instead of continuing the pattern."),
+        (seq[-1] + 1, "MAGNITUDE_SLIP", "Counts on by one instead of by the pattern's step."),
+        (target + d, "WORKING_MEMORY_OVERFLOW", "Loses track of the position and skips a term."),
+        (target - 1, "MAGNITUDE_SLIP", "Off-by-one just below the next term."),
+        (target + 1, "MAGNITUDE_SLIP", "Off-by-one just above the next term."),
+    ]
+    opts = [GameChoiceOption(text_si=str(target), text_en=str(target), numeric_value=target, is_correct=True, distractor_type="NONE")]
+    used = {target}
+    for val, dtype, rat in candidates:
+        if len(opts) > n_wrong or val in used or val < 0:
+            continue
+        used.add(val)
+        opts.append(GameChoiceOption(
+            text_si=str(val), text_en=str(val), numeric_value=val, is_correct=False,
+            distractor_type=dtype, distractor_rationale=rat,  # type: ignore[arg-type]
+        ))
+    return GameMicroStep(
+        step_order=1,
+        action_type="COMPLETE_PATTERN",
+        instruction_si="රටාවේ ඊළඟට එන සංඛ්‍යාව කුමක්ද?",
+        instruction_en="What number comes next in the pattern?",
+        target_visual_asset=VisualAssetTag.PATTERN_TRAIN,
+        correct_target_value=str(target),
+        game_options=opts,
+        operands=seq,
+        operation="PATTERN",
+        visual_props={"kind": "NUMBER", "sequence": seq, "target": target},
+    )
+
+
+def _color_pattern_step(seq: List[str], target: str, n_wrong: int) -> GameMicroStep:
+    si, en = COLOR_LABELS[target]
+    opts = [GameChoiceOption(text_si=si, text_en=en, is_correct=True, distractor_type="NONE", icon_or_shape=target)]
+    # The colour just shown is the most tempting wrong answer, so it goes first.
+    order = [seq[-1]] + [c for c in COLOR_LABELS if c != seq[-1]]
+    for c in [c for c in dict.fromkeys(order) if c != target][:n_wrong]:
+        opts.append(GameChoiceOption(
+            text_si=COLOR_LABELS[c][0], text_en=COLOR_LABELS[c][1], is_correct=False, icon_or_shape=c,
+            distractor_type="IMPULSIVITY" if c == seq[-1] else "WORKING_MEMORY_OVERFLOW",
+            distractor_rationale="Repeats the colour just seen." if c == seq[-1] else "Loses the repeating unit of the pattern.",
+        ))
+    return GameMicroStep(
+        step_order=1,
+        action_type="COMPLETE_PATTERN",
+        instruction_si="රටාවේ ඊළඟට එන පාට තෝරන්න",
+        instruction_en="Choose the colour that comes next",
+        target_visual_asset=VisualAssetTag.PATTERN_TRAIN,
+        correct_target_value=target,
+        game_options=opts,
+        operands=[list(COLOR_LABELS).index(target) + 1],
+        operation="PATTERN",
+        visual_props={"kind": "COLOR", "sequence": seq, "target": target},
+    )
+
+
+def _compare_step(operands: List[int], vp: dict) -> GameMicroStep:
+    a, b = operands[0], operands[1]
+    want_smaller = str(vp.get("target") or "BIGGER").upper() == "SMALLER"
+    correct = min(a, b) if want_smaller else max(a, b)
+    opts = []
+    for v in (a, b):
+        right = v == correct
+        opts.append(GameChoiceOption(
+            text_si=str(v), text_en=str(v), numeric_value=v, is_correct=right,
+            distractor_type="NONE" if right else "IMPULSIVITY",
+            distractor_rationale=None if right else "Picks the first or most eye-catching quantity without comparing.",
+        ))
+    return GameMicroStep(
+        step_order=1,
+        action_type="COMPARE_QUANTITY",
+        instruction_si="වඩා කුඩා එක තෝරන්න" if want_smaller else "වඩා විශාල එක තෝරන්න",
+        instruction_en="Pick the smaller one" if want_smaller else "Pick the bigger one",
+        target_visual_asset=VisualAssetTag.COMPARISON_SCALE,
+        correct_target_value=str(correct),
+        game_options=opts,
+        operands=[a, b],
+        operation="COMPARE",
+        visual_props={"target": "SMALLER" if want_smaller else "BIGGER"},
+    )
+
+
 def build_micro_steps(
     operands: List[int],
     operations: List[str],
@@ -211,73 +335,47 @@ def build_micro_steps(
     is_money: bool = False,
     partial_results: Optional[List[int]] = None,
     grade: int = 2,
+    visual_props: Optional[dict] = None,
 ) -> List[GameMicroStep]:
     op = operations[0] if operations else ("COUNT" if grade == 1 else "ADD")
+    vp = visual_props or {}
+    n_wrong = max(1, min(settings.distractor_count, 3))
 
     if op == "SHAPE":
-        shape_opts = [
-            GameChoiceOption(text_si="රවුම (Circle)", text_en="Circle", numeric_value=1, is_correct=True, distractor_type="NONE", icon_or_shape="CIRCLE"),
-            GameChoiceOption(text_si="ත්‍රිකෝණය (Triangle)", text_en="Triangle", numeric_value=2, is_correct=False, distractor_type="IMPULSIVITY", icon_or_shape="TRIANGLE"),
-            GameChoiceOption(text_si="කොටුව (Square)", text_en="Square", numeric_value=3, is_correct=False, distractor_type="MAGNITUDE_SLIP", icon_or_shape="SQUARE"),
-        ]
-        return [
-            GameMicroStep(
-                step_order=1,
-                action_type="MATCH_SHAPE",
-                instruction_si="ගජා සොයන රවුම් හැඩය හඳුනාගන්න 🟡",
-                instruction_en="Identify the circle shape Gaja is looking for 🟡",
-                target_visual_asset=VisualAssetTag.SHAPE_CARD,
-                correct_target_value="1",
-                game_options=shape_opts,
-                operands=[1],
-                operation="SHAPE",
-            )
-        ]
+        return [_shape_step(vp, n_wrong)]
 
     if op == "PATTERN":
-        pattern_opts = [
-            GameChoiceOption(text_si="නිල් පාට (Blue)", text_en="Blue", numeric_value=2, is_correct=True, distractor_type="NONE", icon_or_shape="BLUE"),
-            GameChoiceOption(text_si="රතු පාට (Red)", text_en="Red", numeric_value=1, is_correct=False, distractor_type="IMPULSIVITY", icon_or_shape="RED"),
-            GameChoiceOption(text_si="කහ පාට (Yellow)", text_en="Yellow", numeric_value=3, is_correct=False, distractor_type="MAGNITUDE_SLIP", icon_or_shape="YELLOW"),
-        ]
-        return [
-            GameMicroStep(
-                step_order=1,
-                action_type="COMPLETE_PATTERN",
-                instruction_si="රටාවේ හිස් තැනට එන නිවැරදි වර්ණය හෝ හැඩය තෝරන්න 🚂",
-                instruction_en="Choose what comes next in the pattern 🚂",
-                target_visual_asset=VisualAssetTag.PATTERN_TRAIN,
-                correct_target_value="2",
-                game_options=pattern_opts,
-                operands=[2],
-                operation="PATTERN",
-            )
-        ]
+        if str(vp.get("kind") or "").upper() == "NUMBER" and len(vp.get("sequence") or []) >= 3:
+            return [_number_pattern_step([int(x) for x in vp["sequence"]], int(vp["target"]), n_wrong)]
+        seq = [str(c).upper() for c in (vp.get("sequence") or ["RED", "BLUE", "RED"])]
+        target = str(vp.get("target") or "BLUE").upper()
+        if target not in COLOR_LABELS or any(c not in COLOR_LABELS for c in seq):
+            seq, target = ["RED", "BLUE", "RED"], "BLUE"
+        return [_color_pattern_step(seq, target, n_wrong)]
 
     if op == "COMPARE":
-        comp_opts = [
-            GameChoiceOption(text_si="විශාල ප්‍රමාණය (Bigger)", text_en="Bigger", numeric_value=final_answer, is_correct=True, distractor_type="NONE"),
-            GameChoiceOption(text_si="කුඩා ප්‍රමාණය (Smaller)", text_en="Smaller", numeric_value=min(operands) if len(operands) > 1 else 1, is_correct=False, distractor_type="IMPULSIVITY"),
-        ]
-        return [
-            GameMicroStep(
-                step_order=1,
-                action_type="COMPARE_QUANTITY",
-                instruction_si="වඩා විශාල හෝ වැඩි ප්‍රමාණය තෝරන්න 🐘",
-                instruction_en="Select the bigger or greater amount 🐘",
-                target_visual_asset=VisualAssetTag.COMPARISON_SCALE,
-                correct_target_value=str(final_answer),
-                game_options=comp_opts,
-                operands=operands,
-                operation="COMPARE",
-            )
-        ]
+        if len(operands) < 2:
+            raise ValueError("A comparison needs two quantities.")
+        return [_compare_step(operands, vp)]
 
-    # SPECIALIZED GRADE 1 WORKFLOW:
-    # In Sri Lanka, Grade 1 does not use formal addition/subtraction signs (+, -).
-    # Instead, learners identify items (NumberHunt/BasketCount) and pick the count/item directly.
-    if grade == 1 or op in ("COUNT", "IDENTIFY"):
-        steps: List[GameMicroStep] = [
+    if op == "COUNT":
+        # One concrete step: the game draws the objects and the learner picks how many.
+        n = operands[0] if operands else final_answer
+        return [GameMicroStep(
+            step_order=1,
+            action_type="CALCULATE_MICROSTEP",
+            instruction_si="ගණන් කරලා නිවැරදි සංඛ්‍යාව තෝරන්න",
+            instruction_en="Count them, then pick the number",
+            target_visual_asset=_quantity_asset(is_money),
+            correct_target_value=str(n),
+            game_options=_numeric_options(n, settings.distractor_count, [n], "COUNT"),
+            operands=[n],
+            operation="COUNT",
+        )]
+
+    # Legacy IDENTIFY items (coin recognition): find the number, then pick it.
+    if op == "IDENTIFY":
+        return [
             GameMicroStep(
                 step_order=1,
                 action_type="IDENTIFY_ENTITY",
@@ -301,10 +399,18 @@ def build_micro_steps(
                 operation=op,  # type: ignore
             ),
         ]
-        return steps
 
     if len(operands) < 2:
         raise ValueError("Could not find at least two numeric quantities in the question.")
+
+    # Grade 1 adds and takes away with concrete objects (NIE guide), not operator symbols:
+    # skip the operator step and go straight to the hands-on basket.
+    if grade == 1 and op in ("ADD", "SUB"):
+        steps: List[GameMicroStep] = []
+        if settings.step_granularity == "MAXIMAL_THREE_TIER":
+            steps.append(_identify_step(operands[:2], 1, settings, is_money))
+        steps.append(_calc_step(len(steps) + 1, final_answer, operands=operands[:2], op=op, settings=settings, final=True))
+        return steps
 
     # Multi-step balance pattern (Grade 3-5 e.g., sum items, then subtract from paid note)
     if len(operations) >= 2 and partial_results:
@@ -432,6 +538,7 @@ async def generate_blueprint_from_curriculum_problem(
         settings=settings,
         is_money=problem.is_money,
         grade=problem.grade,
+        visual_props=problem.visual_props,
     )
 
     blueprint = GameActivityBlueprint(
@@ -496,6 +603,7 @@ def tune_existing_blueprint(
         settings=settings,
         is_money=problem.is_money,
         grade=problem.grade,
+        visual_props=problem.visual_props,
     )
 
     updated_blueprint = existing.model_copy(

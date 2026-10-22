@@ -1,0 +1,1090 @@
+{
+ "grade": 1,
+ "windows": {
+  "1-10": [],
+  "19-26": [],
+  "35-42": [],
+  "27-34": [
+   {
+    "kind": "aligned",
+    "page_number": 33,
+    "source_quote": "1 සිට 3 තෙක් සංඛ්‍යාවක් ද්‍රව්‍ය ඇසුරෙන් නිරූපණය කරයි.",
+    "number_limit": 3,
+    "operation": "COUNT",
+    "operands": [
+     3
+    ],
+    "expected_answer": 3,
+    "raw_problem_text": "මේසය මත ඇති අඹ ගෙඩි ගණන කීයද?",
+    "child_prompt_si": "මේසය මත අඹ 3ක් ඇත. අඹ ගෙඩි කීයද?",
+    "child_prompt_en": "There are 3 mangoes on the table. How many mangoes?",
+    "english_translation": "How many mangoes are on the table?",
+    "topic": "Counting",
+    "competency_code": "8",
+    "competency_desc": "1 සිට 3 තෙක් සංඛ්‍යා නාම හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 33,
+    "source_quote": "1 සිට 3 තෙක් සංඛ්‍යාවක් රූප ඇසුරෙන් නිරූපණය කරයි.",
+    "number_limit": 3,
+    "operation": "COUNT",
+    "operands": [
+     2
+    ],
+    "expected_answer": 2,
+    "raw_problem_text": "පින්තූරයේ ඇති මල් ගණන කීයද?",
+    "child_prompt_si": "පින්තූරයේ මල් 2ක් ඇත. මල් ගණන කීයද?",
+    "child_prompt_en": "There are 2 flowers in the picture. How many flowers?",
+    "english_translation": "How many flowers are in the picture?",
+    "topic": "Counting",
+    "competency_code": "8",
+    "competency_desc": "1 සිට 3 තෙක් සංඛ්‍යා නාම හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 33,
+    "source_quote": "1 සිට 3 තෙක් සංඛ්‍යා නාම පිළිවෙළින් කියයි.",
+    "number_limit": 3,
+    "operation": "COUNT",
+    "operands": [
+     1
+    ],
+    "expected_answer": 1,
+    "raw_problem_text": "පෙට්ටියේ ඇති බෝල ගණන කීයද?",
+    "child_prompt_si": "පෙට්ටියේ බෝල 1ක් ඇත. බෝල කීයද?",
+    "child_prompt_en": "There is 1 ball in the box. How many balls?",
+    "english_translation": "How many balls are in the box?",
+    "topic": "Counting",
+    "competency_code": "8",
+    "competency_desc": "1 සිට 3 තෙක් සංඛ්‍යා නාම හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   }
+  ],
+  "59-66": [
+   {
+    "kind": "aligned",
+    "page_number": 64,
+    "source_quote": "7 සිට 9 තෙක් සංඛ්‍යාවක් ද්‍රව්‍ය/රූප ඇසුරින් නිරූපණය කරයි.",
+    "number_limit": 9,
+    "operation": "COUNT",
+    "operands": [
+     7
+    ],
+    "expected_answer": 7,
+    "raw_problem_text": "මේසය මත ඇති මල් ගණන කීයද?",
+    "child_prompt_si": "මේසය මත ඇති මල් 7 ගණන් කරන්න.",
+    "child_prompt_en": "Count the 7 flowers on the table.",
+    "english_translation": "Count the 7 flowers on the table.",
+    "topic": "Counting",
+    "competency_code": "21",
+    "competency_desc": "7 සිට 9 තෙක් සංඛ්‍යා හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 64,
+    "source_quote": "7 සිට 9 තෙක් සංඛ්‍යාවක් ද්‍රව්‍ය/රූප ඇසුරින් නිරූපණය කරයි.",
+    "number_limit": 9,
+    "operation": "COUNT",
+    "operands": [
+     8
+    ],
+    "expected_answer": 8,
+    "raw_problem_text": "පෙට්ටියේ ඇති බෝල ගණන කීයද?",
+    "child_prompt_si": "පෙට්ටියේ ඇති බෝල 8 ගණන් කරන්න.",
+    "child_prompt_en": "Count the 8 balls in the box.",
+    "english_translation": "Count the 8 balls in the box.",
+    "topic": "Counting",
+    "competency_code": "21",
+    "competency_desc": "7 සිට 9 තෙක් සංඛ්‍යා හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 64,
+    "source_quote": "7 සිට 9 තෙක් සංඛ්‍යාවක් ද්‍රව්‍ය/රූප ඇසුරින් නිරූපණය කරයි.",
+    "number_limit": 9,
+    "operation": "COUNT",
+    "operands": [
+     9
+    ],
+    "expected_answer": 9,
+    "raw_problem_text": "ගසේ ඇති අඹ ගණන කීයද?",
+    "child_prompt_si": "ගසේ ඇති අඹ 9 ගණන් කරන්න.",
+    "child_prompt_en": "Count the 9 mangoes on the tree.",
+    "english_translation": "Count the 9 mangoes on the tree.",
+    "topic": "Counting",
+    "competency_code": "21",
+    "competency_desc": "7 සිට 9 තෙක් සංඛ්‍යා හඳුනාගෙන භාවිත කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   }
+  ],
+  "51-58": [
+   {
+    "kind": "aligned",
+    "page_number": 51,
+    "source_quote": "සිසුන්ට 10 තෙක් වූ ප්‍රමාණයක් ගණන් කිරීමට දීම වැනි අවස්ථා යොදා ගනිමින් ද්‍රව්‍ය 10 තෙක් ගණන් කිරීමට හැකි ද යන්න තවදුරටත් තහවුරු කර ගත හැකි ය.",
+    "number_limit": 10,
+    "operation": "COUNT",
+    "operands": [
+     7
+    ],
+    "expected_answer": 7,
+    "raw_problem_text": "මේසය මත ඇති අඹ ගෙඩි කීයද?",
+    "child_prompt_si": "මේසය මත අඹ 7ක් ඇත. අඹ කීයද?",
+    "child_prompt_en": "There are 7 mangoes on the table. How many mangoes?",
+    "english_translation": "How many mangoes are on the table?",
+    "topic": "Counting",
+    "competency_code": "3.1",
+    "competency_desc": "ද්‍රව්‍ය 10 තෙක් ගණන් කරයි",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 56,
+    "source_quote": "ද්‍රව්‍ය/රූප වර්ග දෙකක් හෝ තුනක් හෝ මගින් සරල රටා ගොඩනඟයි.",
+    "number_limit": null,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": "BLUE",
+    "raw_problem_text": "නිල්, රතු, නිල්, රතු, ඊළඟට එන පාට කුමක්ද?",
+    "child_prompt_si": "නිල්, රතු, නිල්, රතු. ඊළඟ පාට කුමක්ද?",
+    "child_prompt_en": "BLUE, RED, BLUE, RED. What color is next?",
+    "english_translation": "BLUE, RED, BLUE, RED. What color is next?",
+    "topic": "Patterns",
+    "competency_code": "18.1",
+    "competency_desc": "රටාවකට පිහිටි ද්‍රව්‍ය/රූපවල රටාව හඳුනාගෙන තවදුරටත් රටාව ගොඩනඟයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "kind": "COLOR",
+     "sequence": [
+      "BLUE",
+      "RED",
+      "BLUE",
+      "RED"
+     ],
+     "target": "BLUE"
+    }
+   }
+  ],
+  "43-50": [
+   {
+    "kind": "aligned",
+    "page_number": 45,
+    "source_quote": "• අසමාන බර සහිත වස්තු දෙකක බර සසඳා බර අඩු හෝ බර වැඩි හෝ වශයෙන් හඳුනාගෙන ප්‍රකාශ කරයි.",
+    "number_limit": 10,
+    "operation": "COMPARE",
+    "operands": [
+     8,
+     3
+    ],
+    "expected_answer": 8,
+    "raw_problem_text": "පොත් බෑගයේ බර 8 කි. වතුර බෝතලයේ බර 3 කි. මේ දෙකෙන් බර වැඩි වස්තුව කුමක්ද?",
+    "child_prompt_si": "පොත් බෑගයේ බර 8 කි. වතුර බෝතලයේ බර 3 කි. බර වැඩි වස්තුව කුමක්ද?",
+    "child_prompt_en": "School bag weight is 8. Water bottle weight is 3. Which one is heavier?",
+    "english_translation": "School bag weight is 8. Water bottle weight is 3. Which one is heavier?",
+    "topic": "Weight Comparison",
+    "competency_code": "14",
+    "competency_desc": "බර මැනීම ආශ්‍රිත ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "BIGGER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 45,
+    "source_quote": "• අසමාන බර සහිත වස්තු දෙකක බර සසඳා බර අඩු හෝ බර වැඩි හෝ වශයෙන් හඳුනාගෙන ප්‍රකාශ කරයි.",
+    "number_limit": 10,
+    "operation": "COMPARE",
+    "operands": [
+     2,
+     7
+    ],
+    "expected_answer": 2,
+    "raw_problem_text": "පොතේ බර 2 කි. පාට පෙට්ටියේ බර 7 කි. මේ දෙකෙන් බර අඩු වස්තුව කුමක්ද?",
+    "child_prompt_si": "පොතේ බර 2 කි. පාට පෙට්ටියේ බර 7 කි. බර අඩු වස්තුව කුමක්ද?",
+    "child_prompt_en": "Book weight is 2. Crayon box weight is 7. Which one is lighter?",
+    "english_translation": "Book weight is 2. Crayon box weight is 7. Which one is lighter?",
+    "topic": "Weight Comparison",
+    "competency_code": "14",
+    "competency_desc": "බර මැනීම ආශ්‍රිත ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "SMALLER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 45,
+    "source_quote": "• අසමාන බර සහිත වස්තු දෙකක බර සසඳා බර අඩු හෝ බර වැඩි හෝ වශයෙන් හඳුනාගෙන ප්‍රකාශ කරයි.",
+    "number_limit": 10,
+    "operation": "COMPARE",
+    "operands": [
+     9,
+     4
+    ],
+    "expected_answer": 9,
+    "raw_problem_text": "පොල් ගෙඩියේ බර 9 කි. කැරට් අලයේ බර 4 කි. මේ දෙකෙන් බර වැඩි වස්තුව කුමක්ද?",
+    "child_prompt_si": "පොල් ගෙඩියේ බර 9 කි. කැරට් අලයේ බර 4 කි. බර වැඩි වස්තුව කුමක්ද?",
+    "child_prompt_en": "Coconut weight is 9. Carrot weight is 4. Which one is heavier?",
+    "english_translation": "Coconut weight is 9. Carrot weight is 4. Which one is heavier?",
+    "topic": "Weight Comparison",
+    "competency_code": "14",
+    "competency_desc": "බර මැනීම ආශ්‍රිත ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "BIGGER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 49,
+    "source_quote": "• එකම වර්ගයේ ද්‍රව්‍ය 10ක් නිවැරදිව ගණන් කරයි.",
+    "number_limit": 10,
+    "operation": "COUNT",
+    "operands": [
+     7
+    ],
+    "expected_answer": 7,
+    "raw_problem_text": "වත්තේ මල් 7ක් තිබේ. මල් කීයද?",
+    "child_prompt_si": "වත්තේ මල් 7ක් තිබේ. මල් කීයද?",
+    "child_prompt_en": "There are 7 flowers in the garden. How many flowers?",
+    "english_translation": "There are 7 flowers in the garden. How many flowers?",
+    "topic": "Counting",
+    "competency_code": "16",
+    "competency_desc": "ද්‍රව්‍ය/රූප ගණන් කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 49,
+    "source_quote": "• එකම වර්ගයේ ද්‍රව්‍ය 10ක් නිවැරදිව ගණන් කරයි.",
+    "number_limit": 10,
+    "operation": "COUNT",
+    "operands": [
+     9
+    ],
+    "expected_answer": 9,
+    "raw_problem_text": "මේසය මත බෝතල් මූඩි 9ක් ඇත. මූඩි කීයද?",
+    "child_prompt_si": "මේසය මත බෝතල් මූඩි 9ක් ඇත. මූඩි කීයද?",
+    "child_prompt_en": "There are 9 bottle caps on the table. How many caps?",
+    "english_translation": "There are 9 bottle caps on the table. How many caps?",
+    "topic": "Counting",
+    "competency_code": "16",
+    "competency_desc": "ද්‍රව්‍ය/රූප ගණන් කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 49,
+    "source_quote": "• එකම වර්ගයේ ද්‍රව්‍ය 10ක් නිවැරදිව ගණන් කරයි.",
+    "number_limit": 10,
+    "operation": "COUNT",
+    "operands": [
+     6
+    ],
+    "expected_answer": 6,
+    "raw_problem_text": "පැකට්ටුවේ ඇට 6ක් ඇත. ඇට කීයද?",
+    "child_prompt_si": "පැකට්ටුවේ ඇට 6ක් ඇත. ඇට කීයද?",
+    "child_prompt_en": "There are 6 seeds in the packet. How many seeds?",
+    "english_translation": "There are 6 seeds in the packet. How many seeds?",
+    "topic": "Counting",
+    "competency_code": "16",
+    "competency_desc": "ද්‍රව්‍ය/රූප ගණන් කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   }
+  ],
+  "67-74": [
+   {
+    "kind": "aligned",
+    "page_number": 71,
+    "source_quote": "4.1 එකතුව 6 තෙක් වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "number_limit": 6,
+    "operation": "ADD",
+    "operands": [
+     2,
+     3
+    ],
+    "expected_answer": 5,
+    "raw_problem_text": "මෙහි අඹ 2ක් සහ අඹ 3ක් ඇත. අඹ ඔක්කොම කීයද?",
+    "child_prompt_si": "අඹ 2කුයි අඹ 3කුයි එකතු කළාම කීයද?",
+    "child_prompt_en": "2 mangoes and 3 mangoes make how many?",
+    "english_translation": "There are 2 mangoes and 3 mangoes here. How many mangoes in total?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 71,
+    "source_quote": "ද්‍රව්‍ය භාවිතයෙන් එකතුවට 6 නොවැඩි වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "number_limit": 6,
+    "operation": "ADD",
+    "operands": [
+     4,
+     2
+    ],
+    "expected_answer": 6,
+    "raw_problem_text": "පෑන් 4ක් සහ තවත් පෑන් 2ක් දුන්නා. මුළු පෑන් ගණන කීයද?",
+    "child_prompt_si": "පෑන් 4කුයි පෑන් 2කුයි එකතු කළාම කීයද?",
+    "child_prompt_en": "4 pens and 2 pens make how many?",
+    "english_translation": "Gave 4 pens and another 2 pens. What is the total number of pens?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 71,
+    "source_quote": "රූප භාවිතයෙන් එකතුවට 6 නොවැඩි වන සංඛ්‍යා දෙකක එකතුව සොයා ප්‍රකාශ කරයි.",
+    "number_limit": 6,
+    "operation": "ADD",
+    "operands": [
+     3,
+     3
+    ],
+    "expected_answer": 6,
+    "raw_problem_text": "බෝල 3ක් තිබුණා. තවත් බෝල 3ක් ගත්තා. දැන් බෝල කීයද?",
+    "child_prompt_si": "බෝල 3කුයි බෝල 3කුයි එකතු කළාම කීයද?",
+    "child_prompt_en": "3 balls and 3 balls make how many?",
+    "english_translation": "Had 3 balls. Took another 3 balls. How many balls now?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   }
+  ],
+  "11-18": [
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "4.1 එකතුව 6 තෙක් වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "number_limit": 6,
+    "operation": "ADD",
+    "operands": [
+     2,
+     3
+    ],
+    "expected_answer": 5,
+    "raw_problem_text": "ගෙంట කූඩයේ අඹ 2ක් තිබුණා. අම්මා තවත් අඹ 3ක් දුන්නා. දැන් අඹ කීයද?",
+    "child_prompt_si": "අඹ 2යි තව අඹ 3යි එකතු කළාම කීයද?",
+    "child_prompt_en": "2 mangoes and 3 mangoes make how many?",
+    "english_translation": "There were 2 mangoes in the basket. Mom gave 3 more. How many mangoes now?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "එකතුව 6 තෙක් වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "4.1 එකතුව 6 තෙක් වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "number_limit": 6,
+    "operation": "ADD",
+    "operands": [
+     4,
+     1
+    ],
+    "expected_answer": 5,
+    "raw_problem_text": "මේසය උඩ පොත් 4ක් තිබුණා. තව පොත් 1ක් තැබුවා. දැන් පොත් කීයද?",
+    "child_prompt_si": "පොත් 4යි තව පොත් 1යි එකතු කළාම කීයද?",
+    "child_prompt_en": "4 books and 1 book make how many?",
+    "english_translation": "There were 4 books on the table. 1 more book was placed. How many books now?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "එකතුව 6 තෙක් වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "4.1 එකතුව 6 තෙක් වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "number_limit": 6,
+    "operation": "ADD",
+    "operands": [
+     3,
+     3
+    ],
+    "expected_answer": 6,
+    "raw_problem_text": "පෑන් 3ක් තිබුණා. යාළුවෙක් තව පෑන් 3ක් දුන්නා. දැන් පෑන් කීයද?",
+    "child_prompt_si": "පෑන් 3යි තව පෑන් 3යි එකතු කළාම කීයද?",
+    "child_prompt_en": "3 pens and 3 pens make how many?",
+    "english_translation": "There were 3 pens. A friend gave 3 more pens. How many pens now?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "එකතුව 6 තෙක් වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "5.1 5 තෙක් වූ ද්‍රව්‍ය සංඛ්‍යාවකින් තවත් ද්‍රව්‍ය සංඛ්‍යාවක්, ද්‍රව්‍ය ඇසුරෙන් පමණක් අඩු කර ප්‍රකාශ කරයි.",
+    "number_limit": 5,
+    "operation": "SUB",
+    "operands": [
+     5,
+     2
+    ],
+    "expected_answer": 3,
+    "raw_problem_text": "අඹ 5ක් තිබුණා. 2ක් කෑවා. ඉතුරු අඹ කීයද?",
+    "child_prompt_si": "අඹ 5න් 2ක් ගියාම ඉතුරු කීයද?",
+    "child_prompt_en": "5 mangoes take away 2, how many left?",
+    "english_translation": "There were 5 mangoes. 2 were eaten. How many mangoes are left?",
+    "topic": "Subtraction",
+    "competency_code": "5.1",
+    "competency_desc": "5 තෙක් වූ ද්‍රව්‍ය සංඛ්‍යාවකින් තවත් ද්‍රව්‍ය සංඛ්‍යාවක් අඩු කර ප්‍රකාශ කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "5.1 5 තෙක් වූ ද්‍රව්‍ය සංඛ්‍යාවකින් තවත් ද්‍රව්‍ය සංඛ්‍යාවක්, ද්‍රව්‍ය ඇසුරෙන් පමණක් අඩු කර ප්‍රකාශ කරයි.",
+    "number_limit": 5,
+    "operation": "SUB",
+    "operands": [
+     4,
+     1
+    ],
+    "expected_answer": 3,
+    "raw_problem_text": "මල් 4ක් තිබුණා. 1ක් වැටුණා. ඉතුරු මල් කීයද?",
+    "child_prompt_si": "මල් 4න් 1ක් ගියාම ඉතුරු කීයද?",
+    "child_prompt_en": "4 flowers take away 1, how many left?",
+    "english_translation": "There were 4 flowers. 1 fell off. How many flowers are left?",
+    "topic": "Subtraction",
+    "competency_code": "5.1",
+    "competency_desc": "5 තෙක් වූ ද්‍රව්‍ය සංඛ්‍යාවකින් තවත් ද්‍රව්‍ය සංඛ්‍යාවක් අඩු කර ප්‍රකාශ කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 14,
+    "source_quote": "5.1 5 තෙක් වූ ද්‍රව්‍ය සංඛ්‍යාවකින් තවත් ද්‍රව්‍ය සංඛ්‍යාවක්, ද්‍රව්‍ය ඇසුරෙන් පමණක් අඩු කර ප්‍රකාශ කරයි.",
+    "number_limit": 5,
+    "operation": "SUB",
+    "operands": [
+     5,
+     3
+    ],
+    "expected_answer": 2,
+    "raw_problem_text": "බෝල 5ක් තිබුණා. 3ක් නැති වුණා. ඉතුරු බෝල කීයද?",
+    "child_prompt_si": "බෝල 5න් 3ක් ගියාම ඉතුරු කීයද?",
+    "child_prompt_en": "5 balls take away 3, how many left?",
+    "english_translation": "There were 5 balls. 3 were lost. How many balls are left?",
+    "topic": "Subtraction",
+    "competency_code": "5.1",
+    "competency_desc": "5 තෙක් වූ ද්‍රව්‍ය සංඛ්‍යාවකින් තවත් ද්‍රව්‍ය සංඛ්‍යාවක් අඩු කර ප්‍රකාශ කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 13,
+    "source_quote": "2.2 එකම වර්ගයේ ද්‍රව්‍ය 20ක් නිවැරදි ව ගණන් කරයි.",
+    "number_limit": 20,
+    "operation": "COUNT",
+    "operands": [
+     12
+    ],
+    "expected_answer": 12,
+    "raw_problem_text": "පෙට්ටියේ ඇති බෝතල් මූඩි ගණන් කරන්න.",
+    "child_prompt_si": "මෙන්න බෝතල් මූඩි. කීයද ගණන් කරන්න.",
+    "child_prompt_en": "Count the bottle caps.",
+    "english_translation": "Count the bottle caps in the box.",
+    "topic": "Counting",
+    "competency_code": "2.2",
+    "competency_desc": "එකම වර්ගයේ ද්‍රව්‍ය 20ක් නිවැරදි ව ගණන් කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": 12
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 13,
+    "source_quote": "2.2 එකම වර්ගයේ ද්‍රව්‍ය 20ක් නිවැරදි ව ගණන් කරයි.",
+    "number_limit": 20,
+    "operation": "COUNT",
+    "operands": [
+     15
+    ],
+    "expected_answer": 15,
+    "raw_problem_text": "මේසය උඩ ඇති ගල්කැට ගණන් කරන්න.",
+    "child_prompt_si": "මේසය උඩ ගල්කැට කීයද ගණන් කරන්න.",
+    "child_prompt_en": "Count the stones on the table.",
+    "english_translation": "Count the stones on the table.",
+    "topic": "Counting",
+    "competency_code": "2.2",
+    "competency_desc": "එකම වර්ගයේ ද්‍රව්‍ය 20ක් නිවැරදි ව ගණන් කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "target": 15
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 13,
+    "source_quote": "2.2 එකම වර්ගයේ ද්‍රව්‍ය 20ක් නිවැරදි ව ගණන් කරයි.",
+    "number_limit": 20,
+    "operation": "COUNT",
+    "operands": [
+     18
+    ],
+    "expected_answer": 18,
+    "raw_problem_text": "ගෙවත්තේ ඇති මල් ගණන් කරන්න.",
+    "child_prompt_si": "මල් කීයද කියලා ගණන් කරන්න.",
+    "child_prompt_en": "Count how many flowers.",
+    "english_translation": "Count the flowers in the garden.",
+    "topic": "Counting",
+    "competency_code": "2.2",
+    "competency_desc": "එකම වර්ගයේ ද්‍රව්‍ය 20ක් නිවැරදි ව ගණන් කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "target": 18
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 12,
+    "source_quote": "1.1 ද්‍රව්‍ය හෝ දව හෝ ප්‍රමාණය දෙකක් සසඳයි.",
+    "number_limit": 10,
+    "operation": "COMPARE",
+    "operands": [
+     4,
+     8
+    ],
+    "expected_answer": 8,
+    "raw_problem_text": "සංඛ්‍යා දෙකෙන් වැඩි සංඛ්‍යාව තෝරන්න.",
+    "child_prompt_si": "විශාල සංඛ්‍යාව තෝරන්න: 4 සහ 8",
+    "child_prompt_en": "Pick the bigger number: 4 and 8",
+    "english_translation": "Pick the bigger number between 4 and 8.",
+    "topic": "Comparison",
+    "competency_code": "1.1",
+    "competency_desc": "ද්‍රව්‍ය හෝ දව හෝ ප්‍රමාණය දෙකක් සසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "BIGGER"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 12,
+    "source_quote": "1.1 ද්‍රව්‍ය හෝ දව හෝ ප්‍රමාණය දෙකක් සසඳයි.",
+    "number_limit": 10,
+    "operation": "COMPARE",
+    "operands": [
+     7,
+     3
+    ],
+    "expected_answer": 3,
+    "raw_problem_text": "සංඛ්‍යා දෙකෙන් කුඩා සංඛ්‍යාව තෝරන්න.",
+    "child_prompt_si": "පොඩි සංඛ්‍යාව තෝරන්න: 7 සහ 3",
+    "child_prompt_en": "Pick the smaller number: 7 and 3",
+    "english_translation": "Pick the smaller number between 7 and 3.",
+    "topic": "Comparison",
+    "competency_code": "1.1",
+    "competency_desc": "ද්‍රව්‍ය හෝ දව හෝ ප්‍රමාණය දෙකක් සසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target": "SMALLER"
+    }
+   }
+  ],
+  "75-82": [
+   {
+    "kind": "aligned",
+    "page_number": 77,
+    "source_quote": "• එකතුව 9 ට නොවැඩි වන ද්‍රව්‍ය කට්ටල දෙකක එකතුව සොයයි.",
+    "number_limit": 9,
+    "operation": "ADD",
+    "operands": [
+     4,
+     3
+    ],
+    "expected_answer": 7,
+    "raw_problem_text": "മേശ මත අඹ 4ක් තිබුණා. තවත් අඹ 3ක් ගෙනාවා. ඔක්කොම අඹ කීයද?",
+    "child_prompt_si": "මේසෙ අඹ 4යි. තව අඹ 3යි. ඔක්කොම අඹ කීයද?",
+    "child_prompt_en": "There are 4 mangoes on the table. Brought 3 more mangoes. Total mangoes?",
+    "english_translation": "There were 4 mangoes on the table. Brought 3 more mangoes. Total mangoes?",
+    "topic": "Addition",
+    "competency_code": "26",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 77,
+    "source_quote": "• ද්‍රව්‍ය භාවිතයෙන් එකතුව 9 ට නොවැඩි වන සංඛ්‍යා දෙකක එකතුව සොයා ප්‍රකාශ කරයි.",
+    "number_limit": 9,
+    "operation": "ADD",
+    "operands": [
+     5,
+     2
+    ],
+    "expected_answer": 7,
+    "raw_problem_text": "පෑන් 5ක් සහ පැන්සල් 2ක් එකතු කළ විට භාණ්ඩ කීයද?",
+    "child_prompt_si": "පෑන් 5යි පැන්සල් 2යි එකතු කළාම කීයද?",
+    "child_prompt_en": "5 pens and 2 pencils added together. How many items?",
+    "english_translation": "When 5 pens and 2 pencils are added together, how many items are there?",
+    "topic": "Addition",
+    "competency_code": "26",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 77,
+    "source_quote": "• රූප භාවිතයෙන් එකතුව 9 ට නොවැඩි වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "number_limit": 9,
+    "operation": "ADD",
+    "operands": [
+     6,
+     3
+    ],
+    "expected_answer": 9,
+    "raw_problem_text": "මල් 6ක් සහ තවත් මල් 3ක් එකට තිබුණා. ඔක්කොම මල් කීයද?",
+    "child_prompt_si": "මල් 6යි තව මල් 3යි එකතු කළාම කීයද?",
+    "child_prompt_en": "6 flowers and 3 more flowers together. Total flowers?",
+    "english_translation": "6 flowers and 3 more flowers were together. Total flowers?",
+    "topic": "Addition",
+    "competency_code": "26",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 79,
+    "source_quote": "• 5 තෙක් වූ ද්‍රව්‍ය සංඛ්‍යාවකින් එයට අඩු ද්‍රව්‍ය සංඛ්‍යාවක් ඉවත් කළ විට ඉතුරු ද්‍රව්‍ය සංඛ්‍යාව ප්‍රකාශ කරයි.",
+    "number_limit": 5,
+    "operation": "SUB",
+    "operands": [
+     5,
+     2
+    ],
+    "expected_answer": 3,
+    "raw_problem_text": "බෝල 5කින් බෝල 2ක් ඉවත් කළා. ඉතුරු බෝල කීයද?",
+    "child_prompt_si": "බෝල 5න් 2ක් ගියා. ඉතුරු බෝල කීයද?",
+    "child_prompt_en": "Removed 2 balls from 5 balls. Remaining balls?",
+    "english_translation": "Removed 2 balls out of 5 balls. How many balls are left?",
+    "topic": "Subtraction",
+    "competency_code": "27",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 79,
+    "source_quote": "• 5 තෙක් වූ ද්‍රව්‍ය සංඛ්‍යාවකින් එයට අඩු ද්‍රව්‍ය සංඛ්‍යාවක් ඉවත් කළ විට ඉතුරු ද්‍රව්‍ය සංඛ්‍යාව ප්‍රකාශ කරයි.",
+    "number_limit": 5,
+    "operation": "SUB",
+    "operands": [
+     4,
+     1
+    ],
+    "expected_answer": 3,
+    "raw_problem_text": "පෑන් 4කින් 1ක් දුන්නා. ඉතුරු පෑන් කීයද?",
+    "child_prompt_si": "පෑන් 4න් 1ක් දුන්නා. ඉතුරු පෑන් කීයද?",
+    "child_prompt_en": "Gave 1 pen from 4 pens. Remaining pens?",
+    "english_translation": "Gave 1 pen out of 4 pens. How many pens are left?",
+    "topic": "Subtraction",
+    "competency_code": "27",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 79,
+    "source_quote": "• 5 තෙක් වූ ද්‍රව්‍ය සංඛ්‍යාවකින් එයට අඩු ද්‍රව්‍ය සංඛ්‍යාවක් ඉවත් කළ විට ඉතුරු ද්‍රව්‍ය සංඛ්‍යාව ප්‍රකාශ කරයි.",
+    "number_limit": 5,
+    "operation": "SUB",
+    "operands": [
+     5,
+     3
+    ],
+    "expected_answer": 2,
+    "raw_problem_text": "දොඹ ඇට 5න් 3ක් බිම වැටුණා. ඉතුරු ඇට කීයද?",
+    "child_prompt_si": "ඇට 5න් 3ක් වැටුණා. ඉතුරු ඇට කීයද?",
+    "child_prompt_en": "Fell 3 seeds out of 5 seeds. Remaining seeds?",
+    "english_translation": "3 seeds fell down out of 5 seeds. How many seeds are left?",
+    "topic": "Subtraction",
+    "competency_code": "27",
+    "competency_desc": "සංඛ්‍යා අඩු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 81,
+    "source_quote": "• එකම වර්ගයේ ද්‍රව්‍ය 20 ක් නිවැරදි ව අර්ථවත් ව ගණන් කරයි.",
+    "number_limit": 20,
+    "operation": "COUNT",
+    "operands": [
+     15
+    ],
+    "expected_answer": 15,
+    "raw_problem_text": "භාජනයේ ඇති බොත්තම් ගණන කීයද?",
+    "child_prompt_si": "බොත්තම් කීයද ගණන් කරන්න.",
+    "child_prompt_en": "Count the buttons.",
+    "english_translation": "Count the buttons in the container.",
+    "topic": "Counting",
+    "competency_code": "28",
+    "competency_desc": "ද්‍රව්‍ය/රූප ගණන් කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "n": 15
+    }
+   },
+   {
+    "kind": "exercise",
+    "page_number": 81,
+    "source_quote": "• එකම වර්ගයේ ද්‍රව්‍ය 20 ක් නිවැරදි ව අර්ථවත් ව ගණන් කරයි.",
+    "number_limit": 20,
+    "operation": "COUNT",
+    "operands": [
+     12
+    ],
+    "expected_answer": 12,
+    "raw_problem_text": "මේසය මත ඇති යෝගට් හැදි ගණන කීයද?",
+    "child_prompt_si": "යෝගට් හැදි කීයද ගණන් කරන්න.",
+    "child_prompt_en": "Count the yogurt spoons.",
+    "english_translation": "Count the yogurt spoons on the table.",
+    "topic": "Counting",
+    "competency_code": "28",
+    "competency_desc": "ද්‍රව්‍ය/රූප ගණන් කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "n": 12
+    }
+   },
+   {
+    "kind": "exercise",
+    "page_number": 81,
+    "source_quote": "• එකම වර්ගයේ ද්‍රව්‍ය 20 ක් නිවැරදි ව අර්ථවත් ව ගණන් කරයි.",
+    "number_limit": 20,
+    "operation": "COUNT",
+    "operands": [
+     18
+    ],
+    "expected_answer": 18,
+    "raw_problem_text": "පෙට්ටියේ ඇති පබළු ගණන කීයද?",
+    "child_prompt_si": "පබළු කීයද ගණන් කරන්න.",
+    "child_prompt_en": "Count the beads.",
+    "english_translation": "Count the beads in the box.",
+    "topic": "Counting",
+    "competency_code": "28",
+    "competency_desc": "ද්‍රව්‍ය/රූප ගණන් කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "n": 18
+    }
+   }
+  ],
+  "83-90": [
+   {
+    "kind": "aligned",
+    "page_number": 84,
+    "source_quote": "• රාවයකට පිහිටි/නොපිහිටි රූප 20ක් ගණන් කරයි.",
+    "number_limit": 20,
+    "operation": "COUNT",
+    "operands": [
+     14
+    ],
+    "expected_answer": 14,
+    "raw_problem_text": "පින්තූරයේ ඇති මල් කීයද?",
+    "child_prompt_si": "පින්තූරයේ මල් 14ක් තියෙනවා. ගණන් කරන්න.",
+    "child_prompt_en": "There are 14 flowers in the picture. Count them.",
+    "english_translation": "How many flowers are in the picture?",
+    "topic": "Counting",
+    "competency_code": "29",
+    "competency_desc": "ද්‍රව්‍ය/රූප ගණන් කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 84,
+    "source_quote": "• රාවයකට පිහිටි රූප 20ක් නිවැරදිව ගණන් කරයි.",
+    "number_limit": 20,
+    "operation": "COUNT",
+    "operands": [
+     18
+    ],
+    "expected_answer": 18,
+    "raw_problem_text": "පේළියේ ඇති අඹ ගෙඩි කීයද?",
+    "child_prompt_si": "පේළියට අඹ ගෙඩි 18ක් තියෙනවා. ගණන් කරන්න.",
+    "child_prompt_en": "There are 18 mangoes in a row. Count them.",
+    "english_translation": "How many mangoes are in the row?",
+    "topic": "Counting",
+    "competency_code": "29",
+    "competency_desc": "ද්‍රව්‍ය/රූප ගණන් කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 84,
+    "source_quote": "• රාවයකට නොපිහිටි එකම වර්ගයේ රූප 20ක් නිවැරදි ව ගණන් කරයි.",
+    "number_limit": 20,
+    "operation": "COUNT",
+    "operands": [
+     12
+    ],
+    "expected_answer": 12,
+    "raw_problem_text": "කොළේ ඇති බෝල කීයද?",
+    "child_prompt_si": "කොළේ බෝල 12ක් තියෙනවා. ගණන් කරන්න.",
+    "child_prompt_en": "There are 12 balls on the paper. Count them.",
+    "english_translation": "How many balls are on the paper?",
+    "topic": "Counting",
+    "competency_code": "29",
+    "competency_desc": "ද්‍රව්‍ය/රූප ගණන් කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 89,
+    "source_quote": "• එකතුවට 9 තෙක් වන සංඛ්‍යා දෙකක් එකතු කර එකතුව ප්‍රකාශ කරයි.",
+    "number_limit": 9,
+    "operation": "ADD",
+    "operands": [
+     4,
+     3
+    ],
+    "expected_answer": 7,
+    "raw_problem_text": "ගසේ අඹ 4යි. බිම අඹ 3යි. ඔක්කොම අඹ කීයද?",
+    "child_prompt_si": "ගසේ අඹ 4යි. බිම අඹ 3යි. එකතුව කීයද?",
+    "child_prompt_en": "There are 4 mangoes on the tree and 3 on the ground. What is the total?",
+    "english_translation": "There are 4 mangoes on the tree and 3 on the ground. How many mangoes in total?",
+    "topic": "Addition",
+    "competency_code": "32",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 89,
+    "source_quote": "• එකතුවට 9ට නොවැඩි වන සංඛ්‍යා දෙකක් එකතු කර, එකතුව ප්‍රකාශ කරයි.",
+    "number_limit": 9,
+    "operation": "ADD",
+    "operands": [
+     5,
+     4
+    ],
+    "expected_answer": 9,
+    "raw_problem_text": "පෑන් 5යි. පැන්සල් 4යි. ඔක්කොම කීයද?",
+    "child_prompt_si": "පෑන් 5යි. පැන්සල් 4යි. එකතුව කීයද?",
+    "child_prompt_en": "There are 5 pens and 4 pencils. What is the total?",
+    "english_translation": "There are 5 pens and 4 pencils. How many items in total?",
+    "topic": "Addition",
+    "competency_code": "32",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 89,
+    "source_quote": "• එකතුවට 9 තෙක් වන සංඛ්‍යා දෙකක් එකතු කර එකතුව ප්‍රකාශ කරයි.",
+    "number_limit": 9,
+    "operation": "ADD",
+    "operands": [
+     2,
+     6
+    ],
+    "expected_answer": 8,
+    "raw_problem_text": "ළමයි 2යි. තවත් ළමයි 6යි. ඔක්කොම ළමයි කීයද?",
+    "child_prompt_si": "ළමයි 2යි. තවත් ළමයි 6යි. එකතුව කීයද?",
+    "child_prompt_en": "There are 2 children and 6 more children. What is the total?",
+    "english_translation": "There are 2 children and 6 more children. How many children in total?",
+    "topic": "Addition",
+    "competency_code": "32",
+    "competency_desc": "සංඛ්‍යා එකතු කිරීමේ ගැටලු විසඳයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   }
+  ],
+  "91-95": [
+   {
+    "kind": "exercise",
+    "page_number": 91,
+    "source_quote": "1 එකතු කිරීම 1 සමානයි 2 යි",
+    "number_limit": 2,
+    "operation": "ADD",
+    "operands": [
+     1,
+     1
+    ],
+    "expected_answer": 2,
+    "raw_problem_text": "ගස් මත අඹ 1ක් තිබුණා. තව අඹ 1ක් ගෙඩියක් වැටුණා. දැන් ගසේ ඇති මුළු අඹ ගණන කීයද?",
+    "child_prompt_si": "ගසේ අඹ 1යි. තව අඹ 1ක් හැදුණා. මුළු අඹ කීයද?",
+    "child_prompt_en": "There is 1 mango. 1 more mango grows. How many mangoes in total?",
+    "english_translation": "There was 1 mango on the tree. Another mango grew. How many mangoes are on the tree now?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "එකතුව 6 තෙක් වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 91,
+    "source_quote": "2 එකතු කිරීම 3 සමානයි 5 යි",
+    "number_limit": 5,
+    "operation": "ADD",
+    "operands": [
+     2,
+     3
+    ],
+    "expected_answer": 5,
+    "raw_problem_text": "පන්තියේ ළමයි 2 දෙනෙක් සිටියා. තව ළමයි 3 දෙනෙක් පැමිණියා. දැන් සිටින මුළු ළමයි ගණන කීයද?",
+    "child_prompt_si": "ළමයි 2යි. තව ළමයි 3යි ආවා. මුළු ළමයි කීයද?",
+    "child_prompt_en": "2 children. 3 more children came. How many children in total?",
+    "english_translation": "There were 2 children in the class. Another 3 children arrived. What is the total number of children now?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "එකතුව 6 තෙක් වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "difficulty": "EASY",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 92,
+    "source_quote": "5 + 4 = _",
+    "number_limit": 9,
+    "operation": "ADD",
+    "operands": [
+     5,
+     4
+    ],
+    "expected_answer": 9,
+    "raw_problem_text": "මේසය මත පොත් 5ක් තිබුණා. තව පොත් 4ක් තැබුවා. දැන් මුළු පොත් ගණන කීයද?",
+    "child_prompt_si": "පොත් 5යි. තව පොත් 4යි දැම්මා. මුළු පොත් කීයද?",
+    "child_prompt_en": "5 books. Put 4 more books. How many books in total?",
+    "english_translation": "There were 5 books on the table. Another 4 books were placed. What is the total number of books now?",
+    "topic": "Addition",
+    "competency_code": "4.1",
+    "competency_desc": "එකතුව 9 තෙක් වන සංඛ්‍යා දෙකක එකතුව සොයයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "exercise",
+    "page_number": 93,
+    "source_quote": "'බැලூன் 9ක් තිබුණා. 4ක් ඉවත් කළා. ඉතුරු 5යි.'",
+    "number_limit": 9,
+    "operation": "SUB",
+    "operands": [
+     9,
+     4
+    ],
+    "expected_answer": 5,
+    "raw_problem_text": "බැලூன் 9ක් තිබුණා. එයින් බැලூன் 4ක් පිපිරුණා. දැන් ඉතුරු බැලூன் ගණන කීයද?",
+    "child_prompt_si": "බැලூன் 9න් 4ක් පිපිරුණා. ඉතුරු බැලூன் කීයද?",
+    "child_prompt_en": "Out of 9 balloons, 4 burst. How many balloons are left?",
+    "english_translation": "There were 9 balloons. 4 of them burst. How many balloons are left?",
+    "topic": "Subtraction",
+    "competency_code": "4.2",
+    "competency_desc": "9 තෙක් වූ ද්‍රව්‍ය සංඛ්‍යාවකින් තවත් ද්‍රව්‍ය සංඛ්‍යාවක් අඩු කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {}
+   },
+   {
+    "kind": "aligned",
+    "page_number": 95,
+    "source_quote": "10. ද්‍රව්‍ය/රූප 20ක් ගණන් කරයි.",
+    "number_limit": 20,
+    "operation": "COUNT",
+    "operands": [
+     12
+    ],
+    "expected_answer": 12,
+    "raw_problem_text": "මේසය මත ඇති පෑන් ගණන් කර කීයදැයි පවසන්න.",
+    "child_prompt_si": "මේසය මත ඇති පෑන් කීයද?",
+    "child_prompt_en": "How many pens are on the table?",
+    "english_translation": "Count the pens on the table and say how many there are.",
+    "topic": "Counting",
+    "competency_code": "10",
+    "competency_desc": "ද්‍රව්‍ය/රූප 20ක් ගණන් කරයි.",
+    "difficulty": "MEDIUM",
+    "visual_props": {
+     "target": "12"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 95,
+    "source_quote": "32 | වෘත්තය, ත්‍රිකෝණය, සෘජුකෝණාශ්‍රය සහ සමචතුරුස්‍රය යන ජ්‍යාමිතික හැඩතල හඳුනාගෙන නම් කරයි.",
+    "number_limit": 4,
+    "operation": "SHAPE",
+    "operands": [],
+    "expected_answer": "CIRCLE",
+    "raw_problem_text": "පහත දැක්ෙන හැඩ අතරින් වෘත්තය තෝරන්න.",
+    "child_prompt_si": "වෘත්තය තෝරන්න.",
+    "child_prompt_en": "Pick the circle.",
+    "english_translation": "Select the circle among the shapes shown below.",
+    "topic": "Shapes",
+    "competency_code": "32",
+    "competency_desc": "වෘත්තය, ත්‍රිකෝණය, සෘජුකෝණාශ්‍රය සහ සමචතුරුස්‍රය යන ජ්‍යාමිතික හැඩතල හඳුනාගෙන නම් කරයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "target_shape": "CIRCLE"
+    }
+   },
+   {
+    "kind": "aligned",
+    "page_number": 95,
+    "source_quote": "33 | හැඩතල ඇසුරෙන් සරල රටාව ගොඩනඟයි.",
+    "number_limit": 10,
+    "operation": "PATTERN",
+    "operands": [],
+    "expected_answer": "BLUE",
+    "raw_problem_text": "රටාව දිගටම ගෙන යාමට ඊළඟට එන පාට කුමක්ද?",
+    "child_prompt_si": "රටාවේ ඊළඟ පාට කුමක්ද?",
+    "child_prompt_en": "What is the next color in the pattern?",
+    "english_translation": "What color comes next to continue the pattern?",
+    "topic": "Patterns",
+    "competency_code": "33",
+    "competency_desc": "හැඩතල ඇසුරෙන් සරල රටාව ගොඩනඟයි.",
+    "difficulty": "EASY",
+    "visual_props": {
+     "kind": "COLOR",
+     "sequence": [
+      "RED",
+      "BLUE",
+      "RED"
+     ],
+     "target": "BLUE"
+    }
+   }
+  ]
+ }
+}

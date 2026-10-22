@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AlertTriangle,
   BookOpen,
@@ -52,6 +52,27 @@ const STATUS_STYLE: Record<BlueprintStatus, string> = {
   approved: 'bg-[var(--mq-success-bg)] text-mq-success',
   rejected: 'bg-[var(--mq-danger-bg)] text-mq-danger',
 };
+
+const OP_SIGN: Record<string, string> = { ADD: '+', SUB: '−', MUL: '×', DIV: '÷' };
+
+/** One-line answer key for a problem card, in the form that suits its game type. */
+function problemSummary(p: CurriculumProblem): string {
+  const vp = p.visual_props ?? {};
+  switch (p.operation) {
+    case 'ADD': case 'SUB': case 'MUL': case 'DIV':
+      return `${p.operands.join(` ${OP_SIGN[p.operation]} `)} = ${p.expected_answer}`;
+    case 'COUNT':
+      return `count ${p.expected_answer}`;
+    case 'COMPARE':
+      return `${vp.target === 'SMALLER' ? 'smaller' : 'bigger'} of ${p.operands.join(', ')} → ${p.expected_answer}`;
+    case 'SHAPE':
+      return `find ${String(vp.shape_en ?? vp.target_shape ?? 'shape').toLowerCase()}`;
+    case 'PATTERN':
+      return `${(vp.sequence ?? []).join(', ')}, … → ${vp.target ?? p.expected_answer}`;
+    default:
+      return `${p.operands.join(', ')} → ${p.expected_answer}`;
+  }
+}
 
 function CliMeter({ score }: { score: number }) {
   const pct = Math.min(100, (score / 4) * 100);
@@ -186,15 +207,14 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
     }
   };
 
-  // Bulk Seed Local Syllabi
+  // Bulk Seed Local Syllabi: registers the bundled guides and queues them; progress is polled below.
   const handleSeedLocal = async () => {
     setIsSeeding(true);
     setError(null);
     try {
       const res = await contentAdaptationApi.seedLocalSyllabi();
-      setSuccessMsg(`Successfully imported ${res.imported_documents} documents and extracted ${res.extracted_problems} problems!`);
+      setSuccessMsg(`Queued ${res.imported_documents} NIE guides for extraction. Pages already read are reused from cache.`);
       await refreshDocuments();
-      await refreshProblems();
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -202,22 +222,41 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
     }
   };
 
-  // Extract problems from single document
+  // Extract problems from single document (runs in the background on the server)
   const handleExtractDocument = async (docId: string) => {
     setIsExtractingDocId(docId);
     setError(null);
     try {
-      const probs = await contentAdaptationApi.extractProblems(docId);
-      setSuccessMsg(`Extracted ${probs.length} mathematics problems from syllabus!`);
+      await contentAdaptationApi.extractProblems(docId);
       await refreshDocuments();
-      await refreshProblems();
-      setActiveTab('bank');
     } catch (err) {
       setError((err as Error).message);
     } finally {
       setIsExtractingDocId(null);
     }
   };
+
+  // While any document is extracting, poll its progress; announce each one that finishes.
+  const lastStatus = useRef<Record<string, SyllabusDocument['status']>>({});
+  const anyExtracting = documents.some(d => d.status === 'extracting');
+  useEffect(() => {
+    const finished = documents.filter(d => lastStatus.current[d.doc_id] === 'extracting' && d.status !== 'extracting');
+    lastStatus.current = Object.fromEntries(documents.map(d => [d.doc_id, d.status]));
+    if (finished.length) {
+      refreshProblems();
+      const done = finished.filter(d => d.status === 'extracted');
+      const failed = finished.filter(d => d.status === 'error');
+      if (done.length) {
+        setSuccessMsg(done.map(d => `Grade ${d.grade}: ${d.extracted_problem_count} verified problems`).join(' · '));
+      }
+      if (failed.length) setError(failed.map(d => `${d.filename}: ${d.error_message}`).join(' · '));
+    }
+  }, [documents, refreshProblems]);
+  useEffect(() => {
+    if (!anyExtracting) return;
+    const t = window.setInterval(refreshDocuments, 2500);
+    return () => window.clearInterval(t);
+  }, [anyExtracting, refreshDocuments]);
 
   // Adapt Curriculum Problem into ADHD Blueprint
   const handleAdaptProblem = async (problem: CurriculumProblem) => {
@@ -320,10 +359,10 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
             disabled={isSeeding}
             onClick={handleSeedLocal}
             className="btn btn-secondary !text-xs !py-2 !px-3.5 flex items-center gap-1.5 shadow-sm"
-            title="Scan and import all Grade 1 to Grade 5 syllabus PDFs from data/syllabi"
+            title="Register the Grade 1-5 NIE teacher's guides in data/syllabi and extract their problems"
           >
             {isSeeding ? <Loader2 size={14} className="animate-spin" /> : <Database size={14} />}
-            {isSeeding ? 'Importing Syllabi...' : 'Bulk Ingest Local Syllabi'}
+            {isSeeding ? 'Queuing Guides...' : 'Ingest NIE Guides'}
           </button>
         </div>
       </header>
@@ -534,6 +573,8 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
                               ? 'bg-[var(--mq-success-bg)] text-mq-success'
                               : doc.status === 'extracting'
                               ? 'bg-mq-surface-yellow text-mq-warning animate-pulse'
+                              : doc.status === 'error'
+                              ? 'bg-[var(--mq-danger-bg)] text-mq-danger'
                               : 'bg-mq-surface-soft text-mq-text-muted'
                           }`}
                         >
@@ -544,8 +585,51 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
                         {doc.filename}
                       </h3>
                       <p className="text-xs text-mq-text-muted mt-1">
-                        {doc.page_count} Pages · {(doc.file_size / 1024).toFixed(1)} KB · {doc.subject}
+                        {doc.page_count} Pages · {(doc.file_size / 1024 / 1024).toFixed(1)} MB · {doc.subject}
                       </p>
+
+                      {doc.status === 'extracting' && (
+                        <div className="mt-3" aria-live="polite">
+                          <div className="flex justify-between text-[11px] font-semibold text-mq-text-muted mb-1">
+                            <span>
+                              {doc.progress_stage === 'transcribing' ? 'Reading pages'
+                                : doc.progress_stage === 'extracting' ? 'Finding problems'
+                                : 'Waiting in queue'}
+                            </span>
+                            {!!doc.progress_total && <span>{doc.progress_done}/{doc.progress_total}</span>}
+                          </div>
+                          <div className="h-1.5 rounded-full bg-mq-surface-soft overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-mq-primary transition-all duration-700"
+                              style={{ width: `${doc.progress_total ? (100 * (doc.progress_done ?? 0)) / doc.progress_total : 3}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {doc.status === 'error' && doc.error_message && (
+                        <p className="mt-3 text-[11px] font-semibold text-mq-danger bg-[var(--mq-danger-bg)] rounded-lg px-2.5 py-1.5">
+                          {doc.error_message}
+                        </p>
+                      )}
+
+                      {doc.status === 'extracted' && !!doc.rejected_count && (
+                        <details className="mt-3 text-[11px] text-mq-text-muted">
+                          <summary className="cursor-pointer font-semibold">
+                            {doc.rejected_count} candidate{doc.rejected_count === 1 ? '' : 's'} rejected by verification
+                          </summary>
+                          <ul className="mt-1.5 space-y-0.5 pl-3">
+                            {Object.entries(doc.rejection_summary ?? {})
+                              .sort((a, b) => b[1] - a[1])
+                              .map(([reason, n]) => (
+                                <li key={reason} className="flex justify-between gap-3">
+                                  <span>{reason}</span>
+                                  <span className="font-bold text-mq-text-strong">{n}</span>
+                                </li>
+                              ))}
+                          </ul>
+                        </details>
+                      )}
                     </div>
 
                     <div className="mt-4 pt-3 border-t border-mq-border/60 flex items-center justify-between">
@@ -554,16 +638,18 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
                       </span>
                       <button
                         id={`extract-doc-${doc.doc_id}`}
-                        disabled={isExtractingDocId === doc.doc_id}
+                        disabled={isExtractingDocId === doc.doc_id || doc.status === 'extracting'}
                         onClick={() => handleExtractDocument(doc.doc_id)}
                         className="btn btn-secondary !text-xs !py-1.5 !px-3 flex items-center gap-1"
                       >
-                        {isExtractingDocId === doc.doc_id ? (
+                        {isExtractingDocId === doc.doc_id || doc.status === 'extracting' ? (
                           <Loader2 size={12} className="animate-spin" />
                         ) : (
                           <Sparkles size={12} />
                         )}
-                        {doc.extracted_problem_count > 0 ? 'Re-extract Problems' : 'Extract Math Problems'}
+                        {doc.status === 'extracting' ? 'Extracting…'
+                          : doc.status === 'error' ? 'Retry Extraction'
+                          : doc.extracted_problem_count > 0 ? 'Re-extract Problems' : 'Extract Math Problems'}
                       </button>
                     </div>
                   </div>
@@ -731,13 +817,23 @@ export function AdaptationStudio({ onPlay }: { onPlay: (env: BlueprintEnvelope) 
                         <strong>Competency {prob.competency_code}:</strong> {prob.competency_desc}
                       </p>
                     )}
+
+                    {prob.source_quote && (
+                      <blockquote className="mt-2 border-l-4 border-mq-primary/40 pl-2.5 text-[11px] text-mq-text-muted">
+                        <span className="font-bold text-mq-text-strong not-italic">
+                          {prob.source_kind === 'exercise' ? 'Printed in the guide' : 'Written for this competency'}
+                          {prob.page_number ? ` · page ${prob.page_number}` : ''}:
+                        </span>{' '}
+                        <span className="sinhala">“{prob.source_quote}”</span>
+                      </blockquote>
+                    )}
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-mq-border/60 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="font-bold text-mq-text-muted">Operands:</span>
+                      <span className="font-bold text-mq-text-muted">{prob.operation ?? 'Task'}:</span>
                       <code className="bg-mq-surface-soft px-1.5 py-0.5 rounded text-mq-text-strong font-bold">
-                        {prob.operands.join(` ${prob.operation === 'SUB' ? '−' : prob.operation === 'MUL' ? '×' : prob.operation === 'DIV' ? '÷' : '+'} `)} = {prob.expected_answer}
+                        {problemSummary(prob)}
                       </code>
                     </div>
 

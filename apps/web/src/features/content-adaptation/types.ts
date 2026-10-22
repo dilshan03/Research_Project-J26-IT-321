@@ -126,6 +126,15 @@ export interface SyllabusDocument {
   gridfs_id?: string | null;
   local_path?: string | null;
   created_at: string;
+  pipeline_version?: number;
+  /** Background extraction progress, polled while status is 'extracting'. */
+  progress_stage?: 'queued' | 'transcribing' | 'extracting' | 'done' | null;
+  progress_done?: number;
+  progress_total?: number;
+  error_message?: string | null;
+  rejected_count?: number;
+  /** Why candidate problems were rejected, with counts. */
+  rejection_summary?: Record<string, number>;
 }
 
 export interface CurriculumProblem {
@@ -148,6 +157,11 @@ export interface CurriculumProblem {
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   page_number?: number | null;
   is_money: boolean;
+  /** 'syllabus' = verified against the cited page of the NIE guide. */
+  source?: 'syllabus' | 'manual' | 'legacy';
+  /** 'exercise' = printed in the guide; 'aligned' = written for the quoted competency within its number limit. */
+  source_kind?: 'exercise' | 'aligned' | null;
+  source_quote?: string | null;
   created_at: string;
 }
 

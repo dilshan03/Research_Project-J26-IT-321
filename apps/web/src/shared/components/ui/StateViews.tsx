@@ -1,4 +1,5 @@
 import React from 'react';
+import { teacherText } from '../../i18n/teacherText';
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export interface LoadingStateProps {
@@ -8,7 +9,7 @@ export interface LoadingStateProps {
 }
 
 export const LoadingState: React.FC<LoadingStateProps> = ({
-  message = 'Loading data...',
+  message = teacherText.state.loading,
   messageSi,
   minHeightClass = 'min-h-[280px]',
 }) => {
@@ -89,7 +90,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({
   message,
   messageSi,
   onRetry,
-  retryLabel = 'Retry',
+  retryLabel = teacherText.state.retry,
 }) => {
   return (
     <div className="p-4 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-center justify-between gap-3 text-xs sm:text-sm text-mq-danger font-medium animate-fade-in shadow-xs">
@@ -124,7 +125,7 @@ export interface SuccessAlertProps {
 export const SuccessAlert: React.FC<SuccessAlertProps> = ({
   message,
   onDismiss,
-  dismissLabel = 'Dismiss',
+  dismissLabel = teacherText.state.dismiss,
 }) => {
   return (
     <div className="p-4 bg-mq-success-bg border border-mq-success/30 rounded-2xl flex items-center justify-between gap-3 text-xs sm:text-sm text-mq-success font-bold animate-fade-in shadow-xs">

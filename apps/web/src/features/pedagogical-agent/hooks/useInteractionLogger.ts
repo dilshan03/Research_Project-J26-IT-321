@@ -5,6 +5,9 @@ import type { HintLevel } from '../types/agent.types';
 export interface UseInteractionLoggerProps {
   sessionId?: string;
   studentId?: string;
+  parentId?: string;
+  studentName?: string;
+  grade?: number;
   questionId: string;
   concept?: string;
   onLogEvent?: (event: InteractionEvent) => void;
@@ -13,13 +16,16 @@ export interface UseInteractionLoggerProps {
 export function useInteractionLogger({
   sessionId = 'sess_' + Math.random().toString(36).substring(2, 9),
   studentId = 'student_demo',
+  parentId = 'parent_demo',
+  studentName = 'Student',
+  grade = 1,
   questionId,
   concept = 'addition_basic',
   onLogEvent
 }: UseInteractionLoggerProps) {
   // Logs history for research review & telemetry sync
   const [logs, setLogs] = useState<InteractionEvent[]>([]);
-  
+
   // Real-time calculated session metrics
   const [metrics, setMetrics] = useState<SessionMetrics>({
     totalAttempts: 0,
@@ -36,6 +42,24 @@ export function useInteractionLogger({
   const idleTimeBeforeFirstAction = useRef<number>(0);
   const attemptCount = useRef<number>(0);
   const hintCount = useRef<number>(0);
+  const prevStudentRef = useRef<string>(`${parentId}__${studentId}`);
+
+  // Reset session logs when switching to a different child or parent
+  useEffect(() => {
+    const compositeKey = `${parentId}__${studentId}`;
+    if (prevStudentRef.current !== compositeKey) {
+      prevStudentRef.current = compositeKey;
+      setLogs([]);
+      setMetrics({
+        totalAttempts: 0,
+        correctCount: 0,
+        wrongCount: 0,
+        totalHintsCount: 0,
+        avgResponseTimeMs: 0,
+        streak: 0
+      });
+    }
+  }, [parentId, studentId]);
 
   // Helper to persist event to backend API asynchronously
   const sendToBackend = async (event: InteractionEvent) => {
@@ -64,6 +88,10 @@ export function useInteractionLogger({
       id: 'evt_' + Math.random().toString(36).substring(2, 9),
       sessionId,
       studentId,
+      learnerId: studentId,
+      parentId,
+      studentName,
+      grade,
       questionId,
       concept,
       eventType: 'QUESTION_VIEW',
@@ -78,7 +106,7 @@ export function useInteractionLogger({
     setLogs((prev) => [...prev, viewEvent]);
     sendToBackend(viewEvent);
     if (onLogEvent) onLogEvent(viewEvent);
-  }, [questionId, sessionId, studentId, concept, onLogEvent]);
+  }, [questionId, sessionId, studentId, parentId, studentName, grade, concept, onLogEvent]);
 
   // Record first action time for inattention tracking
   const markFirstAction = () => {
@@ -102,6 +130,10 @@ export function useInteractionLogger({
         id: 'evt_' + Math.random().toString(36).substring(2, 9),
         sessionId,
         studentId,
+        learnerId: studentId,
+        parentId,
+        studentName,
+        grade,
         questionId,
         concept,
         eventType: 'ANSWER_SUBMIT',
@@ -144,7 +176,7 @@ export function useInteractionLogger({
 
       return answerEvent;
     },
-    [sessionId, studentId, questionId, concept, onLogEvent]
+    [sessionId, studentId, parentId, studentName, grade, questionId, concept, onLogEvent]
   );
 
   /**
@@ -161,6 +193,10 @@ export function useInteractionLogger({
         id: 'evt_' + Math.random().toString(36).substring(2, 9),
         sessionId,
         studentId,
+        learnerId: studentId,
+        parentId,
+        studentName,
+        grade,
         questionId,
         concept,
         eventType: 'HINT_REQUEST',
@@ -185,7 +221,7 @@ export function useInteractionLogger({
 
       return hintEvent;
     },
-    [sessionId, studentId, questionId, concept, onLogEvent]
+    [sessionId, studentId, parentId, studentName, grade, questionId, concept, onLogEvent]
   );
 
   /**
@@ -193,6 +229,14 @@ export function useInteractionLogger({
    */
   const clearLogs = useCallback(() => {
     setLogs([]);
+    setMetrics({
+      totalAttempts: 0,
+      correctCount: 0,
+      wrongCount: 0,
+      totalHintsCount: 0,
+      avgResponseTimeMs: 0,
+      streak: 0
+    });
   }, []);
 
   return {

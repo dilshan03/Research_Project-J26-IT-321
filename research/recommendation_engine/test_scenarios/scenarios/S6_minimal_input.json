@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "MQ-LEARNER-CONTEXT-v0.1",
+  "learnerRef": "SYN-L006",
+  "grade": 4,
+  "notes": {"description": "Only the required fields: nothing else is known, so nothing is recommended or assumed", "synthetic": true}
+}

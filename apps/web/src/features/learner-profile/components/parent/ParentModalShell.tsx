@@ -2,6 +2,7 @@ import React, { useEffect, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { parentText } from '../../../../shared/i18n/parentText';
+import { getLanguage } from '../../../../shared/i18n/language';
 
 type Tone = 'default' | 'warning' | 'danger';
 
@@ -75,7 +76,7 @@ export const ParentModalShell: React.FC<ParentModalShellProps> = ({
 
   return createPortal(
     <div
-      lang="si"
+      lang={getLanguage()}
       className="parent-portal fixed inset-0 z-[60] flex items-end sm:items-center justify-center sm:p-6 bg-black/45 animate-fade-in"
     >
       <div

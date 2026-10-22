@@ -63,6 +63,71 @@ export const isAdhdTypeReported = (adhd: AdhdInformationRecord | null | undefine
 
 export type SnapIvStatus = 'COMPLETED' | 'SKIPPED' | 'NOT_STARTED';
 
+/** One SNAP-IV subscale result: total of 9 answers (0–27) and their average (0–3). */
+export interface SnapIvSubscaleScore {
+  total: number;
+  average: number;
+}
+
+/** One completed SNAP-IV questionnaire (parent-reported). Subscales are null for old records without answers. */
+export interface SnapIvHistoryEntry {
+  completedAt: string | null;
+  version?: string | null;
+  respondentRelation?: string | null;
+  inattention: SnapIvSubscaleScore | null;
+  hyperactivity: SnapIvSubscaleScore | null;
+}
+
+export type SnapIvChangeDirection = 'LOWER' | 'HIGHER' | 'SIMILAR' | 'NOT_COMPARABLE';
+export type SnapIvChangeFlag = 'SHORT_INTERVAL' | 'DIFFERENT_RESPONDENT' | 'DIFFERENT_VERSION' | 'SCORES_UNAVAILABLE';
+
+export interface SnapIvSubscaleChange {
+  direction: SnapIvChangeDirection;
+  before: number | null;
+  after: number | null;
+  change: number | null;
+  itemsRatedLower: number | null;
+  itemsRatedHigher: number | null;
+  itemsUnchanged: number | null;
+}
+
+export interface SnapIvComparison {
+  from: string | null;
+  to: string | null;
+  daysBetween: number | null;
+  inattention: SnapIvSubscaleChange;
+  hyperactivity: SnapIvSubscaleChange;
+  flags: SnapIvChangeFlag[];
+}
+
+/** Descriptive comparison of repeated SNAP-IV entries (SNAPIV-PROGRESS). Not a diagnosis or clinical change. */
+export interface SnapIvProgress {
+  version: string;
+  entryCount: number;
+  latestChange: SnapIvComparison | null;
+  overallChange: SnapIvComparison | null;
+  similarBand: number;
+  scale: { min: number; max: number; meaning: string };
+  notice: string;
+}
+
+/**
+ * Parent view of ADHD & support information. SNAP-IV history carries the parent's own subscale scores
+ * over time (never individual item answers) with a descriptive, non-diagnostic comparison.
+ */
+export interface SupportInformation {
+  learnerId: string;
+  onboardingStatus: string;
+  adhdInformation: AdhdInformationRecord | null;
+  snapIv: {
+    status: SnapIvStatus;
+    /** Newest first. */
+    history: SnapIvHistoryEntry[];
+    progress?: SnapIvProgress;
+    notice: string;
+  };
+}
+
 export const ADHD_DIAGNOSIS_STATUS_OPTIONS: Array<{
   value: AdhdDiagnosisStatus;
   labelEn: string;
@@ -217,6 +282,54 @@ export interface ImlrSummary {
   uncertaintyNote?: string;
 }
 
+/**
+ * Descriptive RU / SC / IC / IA counts (DIM-DESCRIPTIVE-v0.1) computed on the server from onboarding-v2
+ * evidence. Counts only: no thresholds, levels or labels; interpretation is pending educator review.
+ */
+export interface DimensionSummaries {
+  version: string;
+  status: 'DESCRIPTIVE_PENDING_EDUCATOR_REVIEW';
+  note: string;
+  representationUnderstanding: {
+    byRepresentation: Record<'concrete' | 'pictorial' | 'symbolic', { independentItems: number; correctFirstResponses: number }>;
+    representationsObserved: string[];
+    independentItemsWithoutRepresentation: number;
+    itemsNotIndependent: number;
+    sampleNote: string;
+  };
+  selfCorrection: {
+    itemsObserved: number;
+    itemsWithRevisions: number;
+    totalRevisions: number;
+    revisedItemsFirstConfirmedCorrect: number;
+    revisedItemsFirstConfirmedIncorrect: number;
+    revisionNote: string;
+  };
+  instructionComprehension: {
+    calibration: { presented: boolean; firstAttemptOnTarget?: boolean | null; attempts?: number | null; instructionReplays?: number; missedDrops?: number | null };
+    itemsObserved: number;
+    itemsWithInstructionReplay: number;
+    totalInstructionReplays: number;
+    totalClarifications: number;
+    helpRequestedBeforeFirstResponse: number;
+  };
+  interactionAccessibility: {
+    itemsPresented: number;
+    itemsAnswered: number;
+    itemsSkipped: number;
+    inputMethods: Record<string, number>;
+    interactionModes: Record<string, number>;
+    /** null when not measured (not zero) */
+    missedDrops: number | null;
+    itemsWithMissedDrops: number;
+    itemsWithInteractionObservations: number;
+    pageHiddenEvents: number;
+    invalidTaps: number | null;
+    observationsTruncated: boolean;
+    observationNote: string;
+  };
+}
+
 export interface MathItemAnswer {
   questionId: string;
   userAnswer: string | number;
@@ -246,6 +359,28 @@ export interface MathItemAnswer {
   conceptId?: string;
   inputMethod?: 'drag' | 'tap' | 'select';
   missedDropCount?: number;
+  /** Raw interaction observations (stored only; never scored or interpreted). */
+  interactionObservations?: InteractionObservations;
+}
+
+/**
+ * ONBOARDING-INTERACTION-OBS-v1.0: transparent counts and timestamps for one item, in
+ * milliseconds from item display. Not a measure of attention, impulsivity or ADHD.
+ */
+export interface InteractionObservations {
+  version: string;
+  parameters: { burstMaxGapMs: number; burstMinTaps: number; idleThresholdMs: number; maxEventsPerList: number };
+  observedDurationMs: number;
+  idleTimeBeforeFirstActionMs: number | null;
+  pointerDownCount: number;
+  keyDownCount: number;
+  tapBursts: Array<{ startMs: number; endMs: number; tapCount: number }>;
+  idleIntervals: Array<{ startMs: number; durationMs: number }>;
+  pageEvents: Array<{ type: 'hidden' | 'visible' | 'blur' | 'focus'; atMs: number }>;
+  hiddenDurationMs: number;
+  invalidTapCount: number | null;
+  invalidTaps: Array<{ atMs: number }>;
+  truncated: boolean;
 }
 
 /** Request-level fields sent alongside answers by the interactive onboarding journey. */
@@ -355,6 +490,7 @@ export interface MathAssessmentSummary {
   // Protocol v2 Additive Fields (Optional)
   impsa?: ImpsaSummary;
   imlr?: ImlrSummary;
+  dimensionSummaries?: DimensionSummaries | null;
   childPreferences?: ChildPreferenceChoices;
   evaluatedItems?: any[];
   excludedItems?: any[];
@@ -385,6 +521,7 @@ export interface OnboardingProgress {
   childPreferences?: ChildPreferenceChoices;
   impsaSummary?: ImpsaSummary;
   imlrSummary?: ImlrSummary;
+  dimensionSummaries?: DimensionSummaries | null;
   // Parent-reported ADHD information and optional SNAP-IV status (Optional)
   adhdInformationCompleted?: boolean;
   adhdInformation?: AdhdInformationRecord | null;

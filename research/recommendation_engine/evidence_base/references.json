@@ -14,11 +14,29 @@
     {
       "sourceId": "REF-BCH-2020",
       "title": "Guided Self-Management Tools for ADHD: Children 6-12 (Version 1.1)",
-      "author": "Erica Lee, PhD and Keneisha Sinclair-McBride, PhD (Equal Authors); with Heather J. Walter, MD, MPH; David R. DeMaso, MD; Eugene D'Angelo, PhD; Louis Vernacchio, MD; Jonas Bromberg, PsyD; Betsy Brooks, MD, MPH; Bhavana Arora, MD, MBA",
+      "author": "Erica Lee, PhD and Keneisha Sinclair-McBride, PhD (Equal Authors)",
+      "authors": [
+        "Erica Lee, PhD (Clinical Psychology), Boston Children's Hospital / Harvard Medical School",
+        "Keneisha Sinclair-McBride, PhD (Clinical Psychology), Boston Children's Hospital / Harvard Medical School"
+      ],
+      "reviewers": [
+        "Heather J Walter, MD, MPH",
+        "David R DeMaso, MD",
+        "Eugene D'Angelo, PhD",
+        "Louis Vernacchio, MD",
+        "Jonas Bromberg, PsyD",
+        "Betsy Brooks, MD, MPH",
+        "Bhavana Arora, MD, MBA"
+      ],
+      "graphicDesigner": "Zoë Judd",
+      "creditsSource": "Credits page, PDF p. 41: headings AUTHORS (Lee and Sinclair-McBride, marked as equal authors), GRAPHIC DESIGNER and REVIEWERS",
+      "version": "Version 1.1 (printed on the cover, PDF p. 1)",
       "organization": "Boston Children's Hospital / Harvard Medical School",
-      "publicationYear": 2020,
+      "publicationYear": null,
+      "dateInformation": "No publication date is printed in the document. The PDF file metadata records a creation date of 2020-01-03; this is file metadata, not a confirmed publication date. Cite as n.d. unless a publication date is confirmed from the publisher. The sourceId 'REF-BCH-2020' is a legacy identifier kept so existing evidence mappings remain valid.",
       "documentFilename": "Guided Self-Management Tools for ADHD - Children 6-12.pdf",
-      "relevantPagesOrSections": "Introduction & Skills 1–9 (printed pp. 1–44 / PDF pp. 1–44): Introduction (printed p. 2 / PDF p. 2), Skill 1 (Household Rules and Structure, printed pp. 3–6 / PDF pp. 3–6), Skill 2 (Homework Help, printed pp. 7–10 / PDF pp. 7–10), Skill 3 (Daily School Check-In, printed pp. 11–15 / PDF pp. 11–15), Skill 4 (Problem Solving for ADHD, printed pp. 16–21 / PDF pp. 16–21), Skill 5 (Remembering Things I Need To Do, printed pp. 22–25 / PDF pp. 22–25), Skill 6 (How to Get Things Done - Task Roadmap & Mini-tasks, printed pp. 26–30 / PDF pp. 26–30), Skill 7 (How to Organize My Stuff, printed pp. 31–33 / PDF pp. 31–33), Skill 8 (How to Manage My Time - Check Your Time Game & Short Breaks, printed pp. 34–37 / PDF pp. 34–37), Skill 9 (How to Feel Good About Myself - Self-Esteem & Strength Identification, printed pp. 38–40 / PDF pp. 38–40), Credentials (printed p. 44 / PDF p. 44)",
+      "pageNumbering": "The PDF has no printed page numbers. All page references for this source are PDF page numbers (PDF p. 1 = cover).",
+      "relevantPagesOrSections": "Introduction & Skills 1–9 (PDF pp. 1–44): Cover (PDF p. 1), Introduction (PDF p. 2), Skill 1 (Household Rules and Structure, PDF pp. 3–6), Skill 2 (Homework Help, PDF pp. 7–10), Skill 3 (Daily School Check-In, PDF pp. 11–15), Skill 4 (Problem Solving for ADHD, PDF pp. 16–21), Skill 5 (Remembering Things I Need To Do, PDF pp. 22–25), Skill 6 (How to Get Things Done - Task Roadmap & Mini-tasks, PDF pp. 26–30), Skill 7 (How to Organize My Stuff, PDF pp. 31–33), Skill 8 (How to Manage My Time - Check Your Time Game & Short Breaks, PDF pp. 34–37), Skill 9 (How to Feel Good About Myself - Self-Esteem & Strength Identification, PDF pp. 38–40), Credits: authors, graphic designer and reviewers (PDF p. 41), Credentials (PDF pp. 42–44)",
       "researchRelevance": "Provides evidence-based executive functioning and self-management strategies for children aged 6–12 with ADHD. Directly supports MathQuest educational adaptations: deconstructing goals into mini-tasks (Skill 6), non-punitive collaborative problem solving (Skill 4), time awareness without timer anxiety (Skill 8), clear visual checklists (Skill 5), and focusing on effort praise to protect academic self-esteem (Skills 1, 9). Offers examples of short stretch breaks (e.g., 5 minutes or less during multi-step homework routines), though these are illustrative home/school strategies and not mandatory game rules.",
       "limitations": "Designed as clinician-guided parent/child home and school worksheets rather than automated software algorithms. The 5-minute break mentioned in homework examples is an illustrative guide, not a mandatory or universally appropriate duration for digital gaming. Cultural adaptation is required for Sri Lankan family contexts, bilingual Sinhala-English instruction, and software delivery. Does not provide automated telemetry decision thresholds."
     },

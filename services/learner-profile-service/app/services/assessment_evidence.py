@@ -144,6 +144,9 @@ def _raw_item_record(ans: MathItemAnswerSubmission) -> Dict[str, Any]:
         record["inputMethod"] = _enum_value(ans.inputMethod)
     if ans.missedDropCount is not None:
         record["missedDropCount"] = ans.missedDropCount
+    # Raw interaction observations are preserved in their own block and never read by scoring.
+    if ans.interactionObservations is not None:
+        record["interactionObservations"] = ans.interactionObservations.model_dump(mode="json")
     return record
 
 

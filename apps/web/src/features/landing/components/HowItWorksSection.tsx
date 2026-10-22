@@ -5,22 +5,26 @@ import imgAdaptive from '../../../assets/images/public-pages/home/section-3-how-
 import imgBehaviour from '../../../assets/images/public-pages/home/section-3-how-it-works/behaviour-und.png';
 import imgSupport from '../../../assets/images/public-pages/home/section-3-how-it-works/personalized-support.png';
 
+import { publicText } from '../../../shared/i18n/publicText';
+
+const t = publicText.how;
+
 export const HowItWorksSection = () => {
   return (
-    <section className="relative pt-12 pb-0 bg-gradient-to-b from-mq-surface-soft to-white overflow-hidden">
+    <section id="how-it-works" className="relative pt-12 pb-0 bg-gradient-to-b from-mq-surface-soft to-white overflow-hidden scroll-mt-16">
       
       {/* --- Floating Background Graphics --- */}
       {/* Left Blob Text */}
       <div className="absolute top-20 left-[-3%] w-64 h-64 bg-white rounded-full -z-10 animate-morph flex items-center justify-center opacity-80 rotate-[-15deg] p-8 text-center shadow-sm">
         <p className="text-mq-primary/60 font-extrabold text-xl leading-tight">
-          Observe <br/> Understand <br/> Adapt <br/> Support <br/> Grow <span className="inline-block mt-1 text-2xl">😊</span>
+          {t.blobLeft.map((line, i) => (<span key={i}>{i > 0 && <br />}{line}</span>))} <span className="inline-block mt-1 text-2xl">😊</span>
         </p>
       </div>
       
       {/* Right Floating Text */}
       <div className="absolute top-24 right-[2%] w-64 -z-10 rotate-[12deg] text-center">
         <p className="text-mq-primary/70 font-extrabold text-xl leading-tight mb-2">
-          Different <br/> Steps, <br/> Brighter <br/> Tomorrows
+          {t.blobRight.map((line, i) => (<span key={i}>{i > 0 && <br />}{line}</span>))}
         </p>
         <svg className="w-8 h-8 mx-auto text-mq-secondary/70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -34,17 +38,17 @@ export const HowItWorksSection = () => {
           <div className="flex items-center justify-center gap-4">
             <span className="w-8 h-[2px] bg-mq-border-strong"></span>
             <span className="px-5 py-2 bg-mq-surface-blue text-mq-primary font-bold rounded-full text-sm tracking-wide">
-              How It Works
+              {t.badge}
             </span>
             <span className="w-8 h-[2px] bg-mq-border-strong"></span>
           </div>
           
           <h2 className="text-2xl sm:text-4xl md:text-[3.2rem] font-extrabold text-mq-text-strong leading-[1.2] tracking-tight">
-            A Smarter Learning Journey <br className="hidden md:block"/> Designed <span className="text-mq-primary">Around the Learner</span>
+            {t.titleStart} <br className="hidden md:block"/> <span className="text-mq-primary">{t.titleHighlight}</span>
           </h2>
           
           <p className="text-base sm:text-lg text-mq-text-muted font-medium">
-            MathQuest combines learner data, adaptive content, behavioural insights and intelligent support to create a personalized mathematics learning experience.
+            {t.intro}
           </p>
         </div>
 
@@ -55,15 +59,15 @@ export const HowItWorksSection = () => {
           <div className="relative bg-[#F4FBF7] rounded-[2rem] p-5 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm border border-mq-success/10 z-10">
             <div className="w-10 h-10 rounded-full bg-mq-success text-white flex items-center justify-center font-bold text-xl mb-4 shadow-sm">1</div>
             <div className="w-full h-36 mb-2 flex items-center justify-center">
-              <img src={imgProfile} alt="Learner Profile" className="w-[85%] h-auto object-contain animate-float" />
+              <img src={imgProfile} alt={t.imageAlts[0]} className="w-[85%] h-auto object-contain animate-float" />
             </div>
-            <h3 className="text-xl font-extrabold text-mq-text-strong mb-3">Learner Profile</h3>
+            <h3 className="text-xl font-extrabold text-mq-text-strong mb-3">{t.cards[0].title}</h3>
             <p className="text-mq-text-muted text-[0.95rem] leading-relaxed font-medium mb-5 flex-grow">
-              We understand each learner's performance, help-seeking behaviour, support response and learning readiness.
+              {t.cards[0].text}
             </p>
             <div className="mt-auto inline-flex items-center gap-2 px-4 py-2 bg-mq-success-bg text-mq-success font-bold rounded-full text-sm self-start">
               <User size={16} />
-              Personalized from the start
+              {t.cards[0].tag}
             </div>
           </div>
 
@@ -79,15 +83,15 @@ export const HowItWorksSection = () => {
           <div className="relative bg-mq-surface-blue rounded-[2rem] p-5 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm border border-mq-primary/10 z-10 lg:mt-6">
             <div className="w-10 h-10 rounded-full bg-mq-info text-white flex items-center justify-center font-bold text-xl mb-4 shadow-sm">2</div>
             <div className="w-full h-36 mb-2 flex items-center justify-center">
-              <img src={imgAdaptive} alt="Adaptive Content" className="w-[85%] h-auto object-contain animate-float delay-100" />
+              <img src={imgAdaptive} alt={t.imageAlts[1]} className="w-[85%] h-auto object-contain animate-float delay-100" />
             </div>
-            <h3 className="text-xl font-extrabold text-mq-text-strong mb-3">Adaptive Content</h3>
+            <h3 className="text-xl font-extrabold text-mq-text-strong mb-3">{t.cards[1].title}</h3>
             <p className="text-mq-text-muted text-[0.95rem] leading-relaxed font-medium mb-5 flex-grow">
-              Mathematics concepts are converted into short, step-by-step activities with bilingual (Sinhala & English) support, designed to reduce cognitive load.
+              {t.cards[1].text}
             </p>
             <div className="mt-auto inline-flex items-center gap-2 px-4 py-2 bg-white text-mq-info font-bold rounded-full text-sm self-start">
               <BookOpen size={16} />
-              Simple. Clear. Bilingual.
+              {t.cards[1].tag}
             </div>
           </div>
 
@@ -103,15 +107,15 @@ export const HowItWorksSection = () => {
           <div className="relative bg-mq-surface-purple rounded-[2rem] p-5 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm border border-mq-accent-purple/10 z-10">
             <div className="w-10 h-10 rounded-full bg-mq-accent-purple text-white flex items-center justify-center font-bold text-xl mb-4 shadow-sm">3</div>
             <div className="w-full h-36 mb-2 flex items-center justify-center">
-              <img src={imgBehaviour} alt="Behaviour Understanding" className="w-[85%] h-auto object-contain animate-float delay-200" />
+              <img src={imgBehaviour} alt={t.imageAlts[2]} className="w-[85%] h-auto object-contain animate-float delay-200" />
             </div>
-            <h3 className="text-xl font-extrabold text-mq-text-strong mb-3">Behaviour Understanding</h3>
+            <h3 className="text-xl font-extrabold text-mq-text-strong mb-3">{t.cards[2].title}</h3>
             <p className="text-mq-text-muted text-[0.95rem] leading-relaxed font-medium mb-5 flex-grow">
-              We analyse gameplay interactions such as response time, attempts, pauses and other behavioural signals to understand the learner's current state.
+              {t.cards[2].text}
             </p>
             <div className="mt-auto inline-flex items-center gap-2 px-4 py-2 bg-white text-mq-accent-purple font-bold rounded-full text-sm self-start">
               <BarChart2 size={16} />
-              Real-time insights
+              {t.cards[2].tag}
             </div>
           </div>
 
@@ -127,15 +131,15 @@ export const HowItWorksSection = () => {
           <div className="relative bg-mq-surface-yellow rounded-[2rem] p-5 flex flex-col hover:-translate-y-2 transition-transform duration-300 shadow-sm border border-mq-warning/10 z-10 lg:mt-6">
             <div className="w-10 h-10 rounded-full bg-mq-accent-yellow text-white flex items-center justify-center font-bold text-xl mb-4 shadow-sm">4</div>
             <div className="w-full h-36 mb-2 flex items-center justify-center">
-              <img src={imgSupport} alt="Personalized Support" className="w-[85%] h-auto object-contain animate-float delay-300" />
+              <img src={imgSupport} alt={t.imageAlts[3]} className="w-[85%] h-auto object-contain animate-float delay-300" />
             </div>
-            <h3 className="text-xl font-extrabold text-mq-text-strong mb-3">Personalized Support</h3>
+            <h3 className="text-xl font-extrabold text-mq-text-strong mb-3">{t.cards[3].title}</h3>
             <p className="text-mq-text-muted text-[0.95rem] leading-relaxed font-medium mb-5 flex-grow">
-              Our intelligent agent estimates mastery and retention, and selects the right difficulty, hints, revision activities and encouragement — only when needed.
+              {t.cards[3].text}
             </p>
             <div className="mt-auto inline-flex items-center gap-2 px-4 py-2 bg-mq-warning-bg text-mq-warning font-bold rounded-full text-sm self-start">
               <Lightbulb size={16} />
-              The right support, at the right time
+              {t.cards[3].tag}
             </div>
           </div>
 
@@ -155,16 +159,16 @@ export const HowItWorksSection = () => {
           <div className="animate-fade-in delay-500">
             <p className="text-mq-text-soft uppercase tracking-widest text-xs sm:text-sm font-bold mb-3 flex items-center justify-center gap-3 sm:gap-4">
               <span className="w-8 sm:w-12 h-[2px] bg-mq-border-strong"></span>
-              Same Goal
+              {t.goalKicker}
               <span className="w-8 sm:w-12 h-[2px] bg-mq-border-strong"></span>
             </p>
             <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-mq-text-strong flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
               <svg className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--mq-accent-yellow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-              <span>More Confident Learners, Brighter Futures</span>
+              <span>{t.goalTitle}</span>
               <svg className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="var(--mq-accent-yellow)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
             </h2>
             <p className="text-mq-text-muted font-medium text-base sm:text-lg mt-4 sm:mt-6">
-              Step by step, MathQuest helps every learner reach their full potential.
+              {t.goalText}
             </p>
           </div>
         </div>

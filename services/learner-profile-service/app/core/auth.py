@@ -85,3 +85,35 @@ async def require_parent(current_user: Dict[str, Any] = Depends(get_current_user
             detail="Access restricted: Only registered parent accounts can create or modify child learner profiles.",
         )
     return current_user
+
+
+async def require_admin(current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
+    """
+    Enforces the 'admin' role (set manually on the user document; it cannot be self-registered).
+    Every other role, including parents and teachers, receives HTTP 403 Forbidden.
+    """
+    if current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access restricted: Administrator accounts only.",
+        )
+    return current_user
+
+
+async def require_research_access(admin: Dict[str, Any] = Depends(require_admin)) -> Dict[str, Any]:
+    """
+    Research & Model Analytics: the 'admin' role AND `researchAnalyticsAccess: true` on the user document.
+    The flag is granted manually per account (it is never self-assignable) and applies to research analytics
+    only; ordinary admin pages keep using `require_admin`. Anything other than boolean true is refused.
+    """
+    try:
+        user_object_id = ObjectId(admin["id"])
+    except Exception:
+        user_object_id = admin["id"]
+    user_doc = await get_users_collection().find_one({"_id": user_object_id})
+    if not user_doc or user_doc.get("researchAnalyticsAccess") is not True:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access restricted: research analytics access has not been granted to this administrator account.",
+        )
+    return admin

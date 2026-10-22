@@ -80,8 +80,9 @@ export const contentAdaptationApi = {
   getDocument: (docId: string) =>
     request<SyllabusDocument>(`${SYLLABUS_API}/documents/${docId}`),
 
+  /** Starts background extraction; poll `getDocument`/`listDocuments` for progress. */
   extractProblems: (docId: string) =>
-    request<CurriculumProblem[]>(`${SYLLABUS_API}/documents/${docId}/extract`, {
+    request<SyllabusDocument>(`${SYLLABUS_API}/documents/${docId}/extract`, {
       method: 'POST',
     }),
 

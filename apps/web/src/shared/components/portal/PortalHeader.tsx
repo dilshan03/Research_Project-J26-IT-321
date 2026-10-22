@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { Menu, Globe } from 'lucide-react';
 import { UserMenu } from '../UserMenu';
 import { parentText } from '../../i18n/parentText';
+import { teacherText } from '../../i18n/teacherText';
+import { LanguageSwitch } from '../LanguageSwitch';
 
 export interface PortalHeaderProps {
   role: 'parent' | 'teacher';
@@ -15,13 +17,12 @@ export const PortalHeader: React.FC<PortalHeaderProps> = ({
 }) => {
   const isParent = role === 'parent';
   const homeLink = isParent ? '/parent/dashboard' : '/teacher/dashboard';
-  // Parent portal is Sinhala-first; teacher wording is unchanged.
-  const portalLabel = isParent ? parentText.nav.portal : 'Teacher Portal';
+  const portalLabel = isParent ? parentText.nav.portal : teacherText.portal.label;
 
   return (
     <header
       className="w-full bg-white/95 backdrop-blur-md sticky top-0 z-40 shadow-xs border-b border-mq-border h-16"
-      aria-label={isParent ? parentText.nav.portal : 'Teacher Portal Header'}
+      aria-label={isParent ? parentText.nav.portal : teacherText.portal.headerAria}
     >
       {/* Parent header spans the full width so the logo aligns with the sidebar */}
       <div
@@ -36,7 +37,7 @@ export const PortalHeader: React.FC<PortalHeaderProps> = ({
               type="button"
               onClick={onToggleMobileSidebar}
               className="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft border border-mq-border/70 transition-colors shrink-0 cursor-pointer"
-              aria-label={isParent ? parentText.shell.openMenu : 'Open navigation sidebar'}
+              aria-label={isParent ? parentText.shell.openMenu : teacherText.portal.openNav}
             >
               <Menu size={20} />
             </button>
@@ -45,7 +46,7 @@ export const PortalHeader: React.FC<PortalHeaderProps> = ({
           <Link
             to={homeLink}
             className="flex items-center gap-2.5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mq-primary/40 rounded-lg p-0.5 min-w-0"
-            aria-label={isParent ? parentText.shell.home : 'MathQuest Portal Dashboard'}
+            aria-label={isParent ? parentText.shell.home : teacherText.portal.homeAria}
           >
             <span className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center shrink-0">
               <span className="text-mq-primary-dark">Math</span>
@@ -66,13 +67,14 @@ export const PortalHeader: React.FC<PortalHeaderProps> = ({
         </div>
 
         {/* Right: Actions + Profile Dropdown */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <LanguageSwitch compact className="hidden sm:inline-flex" />
           <Link
             to="/"
             className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-mq-text-muted hover:text-mq-primary hover:bg-mq-surface-soft px-3 py-1.5 rounded-full border border-mq-border/60 transition-colors whitespace-nowrap"
           >
             <Globe size={14} />
-            <span>{isParent ? parentText.shell.publicWebsite : 'Public Website'}</span>
+            <span>{isParent ? parentText.shell.publicWebsite : teacherText.portal.publicWebsite}</span>
           </Link>
 
           <UserMenu />

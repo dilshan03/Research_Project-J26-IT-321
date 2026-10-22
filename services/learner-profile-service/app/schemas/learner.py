@@ -140,7 +140,9 @@ class LearnerResponse(BaseModel):
     sinhalaComprehension: Optional[str] = None
     englishComprehension: Optional[str] = None
     primaryInstructionLanguage: Optional[str] = None
-    avatarId: str
+    avatarId: str  # effective avatar: the child's own choice when one exists, otherwise the parent's
+    avatarSource: str = "parent"  # "child" | "parent"
+    parentAvatarId: Optional[str] = None
     onboardingStatus: str
     isArchived: bool = False
     archivedAt: Optional[str] = None

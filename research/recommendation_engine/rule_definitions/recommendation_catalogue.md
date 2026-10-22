@@ -21,7 +21,7 @@ This catalogue defines the standardized vocabulary of **personalized learning su
 
 | Strategy Code | Strategy Name | Intended Recipient | Evidence Source | Overlap with ELP-X v1.0 | Core Pedagogical Action |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `TASK_CHUNKING` | Micro-Task Goal Deconstruction | Game Delivery / Child | BCH Skill 6 (pp. 26–30); NICE Section 1.5 | Extends ELP-X `ADAPTIVE_HINT_PACING` | Deconstruct multi-step arithmetic tasks into single-step checkpoints with intermediate reinforcement. |
+| `TASK_CHUNKING` | Micro-Task Goal Deconstruction | Game Delivery / Child | BCH Skill 6 (PDF pp. 26–30); NICE Section 1.5 | Extends ELP-X `ADAPTIVE_HINT_PACING` | Deconstruct multi-step arithmetic tasks into single-step checkpoints with intermediate reinforcement. |
 | `OPTIONAL_REST_BREAK` | Context-Sensitive Movement Break | Child / Parent | BCH Skill 2, 8; NICE NG87 Terms | New (Not in ELP-X) | Offer an optional, non-punitive brief stretch or "I need a break" button when task fatigue is reported. |
 | `CRA_SCAFFOLDING` | Concrete-Representational-Abstract Progression | Game Delivery / Teacher | IES 2021 Rec 3 (pp. 21–28) | Extends ELP-X `SUPPORTED_PRACTICE` | Present virtual manipulatives (counters, base-10 blocks) before 2D drawings or abstract numerals. |
 | `NUMBER_LINE_SUPPORT` | Linear Number Line Spatial Representation | Game Delivery / Child | IES 2021 Rec 4 (pp. 29–39) | New (Not in ELP-X) | Provide horizontal equidistant number line with landmark anchors ($0, 10, 100$) for addition/subtraction. |
@@ -33,6 +33,7 @@ This catalogue defines the standardized vocabulary of **personalized learning su
 | `ASSESSMENT_EXPANSION` | Baseline Data Collection Expansion | Parent / Teacher | ELP-X Specification; Review Pack R7 | Preserved from ELP-X | Advise completing additional varied items when fewer than 3 observations exist for a concept. |
 | `FLEXIBLE_TRANSFER_PROBE` | Non-Immediate Concept Reassessment | Assessment Protocol | Sivalingam Review (Rule R4) | New (Not in ELP-X) | Schedule unassisted transfer probes flexibly (interleaved or next session) following scaffolded success. |
 | `DEVICE_ACCESSIBILITY_ADJUST` | Tap-to-Place Motor Accommodation | Child Interface | Sivalingam Review (Rule R5) | New (Not in ELP-X) | Switch fine-motor drag-and-drop interactions to tap-to-select mode when interface friction is detected. |
+| `CHILD_SENSORY_PREFERENCE` | Child-Chosen Sensory Comfort (**proposed educational preference strategy**) | Child Interface / Parent | BCH Skill 1 & 9 (PDF pp. 3–6, 38–40); NICE NG87 Section 1.4 (pp. 13–16) | New (adjusts delivery of ELP-X `AUDIO_INSTRUCTION`) | When the child chose a quiet or silent sound mode and the parent setting is automatic narration, mute ambient sound and offer spoken prompts as optional tap-to-hear. Produced by rule `MQ-RS1-01`; proposal pending expert review. |
 
 ---
 
@@ -73,6 +74,16 @@ This catalogue defines the standardized vocabulary of **personalized learning su
 - **Description (EN)**: Enable tap-to-select controls rather than precision drag-and-drop. This removes touchscreen motor barriers and ensures the focus stays entirely on mathematical thinking.
 - **Description (SI)**: තිරය මත ඇදගෙන යාමේ අපහසුතා මඟහරවා ගැනීමට, සරලව ස්පර්ශ කර පිළිතුරු තේරීමේ පහසුකම සක්‍රිය කරන්න.
 
+### 6. `CHILD_SENSORY_PREFERENCE` (proposed educational preference strategy)
+- **Status**: Proposed in MQ-REC v0.1 (research prototype); not yet reviewed by the expert panel.
+- **Source rule**: `MQ-RS1-01` (child-expressed sensory comfort priority); applies catalogue Conflict Rule 2.
+- **Reason Codes**: `['CHILD_AGENCY_PRIORITY', 'TAP_TO_HEAR_AUDIO']`
+- **Title (EN)**: Honour the child's quiet sound choice
+- **Title (SI)**: දරුවා තෝරාගත් නිහඬ ශබ්ද මාදිලියට ගරු කිරීම
+- **Description (EN)**: Your child selected quiet sound mode. Spoken guidance is set to 'tap-to-hear' so audio plays only when clicked, supporting calm focus.
+- **Description (SI)**: දරුවා නිහඬ ශබ්ද මාදිලිය තෝරාගෙන ඇත. එමනිසා අවශ්‍ය විටෙක පමණක් ක්ලික් කර ශ්‍රව්‍ය උපදෙස් ලබා ගැනීමට සකසා ඇත.
+- **Boundary**: An educational preference adjustment only. It is never derived from ADHD information, SNAP-IV or response time, and audio always remains available on request.
+
 ---
 
 ## 4. Priority Ranking & Conflict Resolution
@@ -80,7 +91,7 @@ This catalogue defines the standardized vocabulary of **personalized learning su
 When multiple rules trigger concurrently, the engine resolves priority as follows:
 
 ```
-Priority 1: Child Sensory Preferences (avatarId, soundMode, theme) -> Immediate child agency override
+Priority 1: Child Sensory Preferences (avatarId, soundMode, theme; CHILD_SENSORY_PREFERENCE) -> Immediate child agency override
 Priority 2: Accessibility & Motor Accommodations (DEVICE_ACCESSIBILITY_ADJUST, UNTIMED_MASTERY_PRACTICE)
 Priority 3: Foundational Scaffolding & Representations (CRA_SCAFFOLDING, ACCESSIBLE_NUMBERS)
 Priority 4: Task Structure & Pacing (TASK_CHUNKING, OPTIONAL_REST_BREAK)

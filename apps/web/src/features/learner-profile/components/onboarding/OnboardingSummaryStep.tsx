@@ -4,13 +4,14 @@ import { CheckCircle2, Compass, ClipboardList, Calculator, ArrowRight, Stethosco
 
 import type { OnboardingFullSummary } from '../../types/onboarding';
 import { ADHD_DIAGNOSIS_STATUS_OPTIONS, ADHD_PRESENTATION_OPTIONS } from '../../types/onboarding';
+import { mathResultCounts } from '../../utils/mathResultCounts';
 import { AnimatedCompanion } from './AnimatedCompanion';
 import { SkillEvidenceList } from '../parent/SkillEvidenceList';
-import { Grade1V2EvidenceView } from '../parent/Grade1V2EvidenceView';
 import { RecommendationList, RecommendationResearchRows } from '../parent/RecommendationList';
 import { ResearchDetails } from '../parent/ResearchDetails';
 import { languageLabel, optionTitle } from '../parent/labels';
 import { parentText } from '../../../../shared/i18n/parentText';
+import { pick } from '../../../../shared/i18n/language';
 
 interface Props {
   summary: OnboardingFullSummary;
@@ -48,6 +49,8 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
   const snap = summary.snapIvSummary;
   const pref = summary.learningPreferences;
   const elpx = math?.elpxProfile;
+  // Independent first responses vs guided/helped activities, from the server's per-item flags
+  const counts = mathResultCounts(math?.evaluatedItems);
   const adhd = summary.adhdInformation;
   const adhdStatus = ADHD_DIAGNOSIS_STATUS_OPTIONS.find((o) => o.value === adhd?.diagnosisStatus);
   const adhdPresentation = ADHD_PRESENTATION_OPTIONS.find((o) => o.value === adhd?.reportedPresentation);
@@ -95,7 +98,16 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
               <Calculator size={18} className="text-mq-warning shrink-0" />
               <span>{t.mathTitle}</span>
             </h2>
-            <span className="text-sm text-mq-text">{t.mathCorrect(math.correctAnswers, math.totalQuestions)}</span>
+            {counts ? (
+              <span className="text-sm text-mq-text">
+                {t.mathIndependent(counts.independentCorrect, counts.independentTotal)}
+                {counts.notIndependent > 0 && (
+                  <span className="block text-xs text-mq-text-muted">{t.mathNotIndependent(counts.notIndependent)}</span>
+                )}
+              </span>
+            ) : (
+              <span className="text-sm text-mq-text">{t.mathCorrect(math.correctAnswers, math.totalQuestions)}</span>
+            )}
             <span
               className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
                 math.evidenceLevel === 'SUFFICIENT'
@@ -107,11 +119,6 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
             </span>
             <span className="basis-full text-xs text-mq-text-muted">{t.mathNote}</span>
           </div>
-
-          <Grade1V2EvidenceView
-            mathSummary={math}
-            childPreferences={summary.progress?.childPreferences || math.childPreferences}
-          />
 
           <SkillEvidenceList profile={elpx ?? null} legacySkills={math.skills} showOverall={false}>
             <p className="font-mono break-words">
@@ -165,13 +172,13 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
             <dl className="text-sm space-y-1">
               <div>
                 <dt className="text-xs text-mq-text-muted">{t.adhdDiagnosed}</dt>
-                <dd className="font-semibold text-mq-text-strong">{adhdStatus.labelSi}</dd>
+                <dd className="font-semibold text-mq-text-strong">{pick(adhdStatus.labelSi, adhdStatus.labelEn)}</dd>
               </div>
               {adhdPresentation && (
                 <div>
                   <dt className="text-xs text-mq-text-muted">{t.adhdType}</dt>
                   <dd className="font-semibold text-mq-text-strong">
-                    {adhdPresentation.labelSi}
+                    {pick(adhdPresentation.labelSi, adhdPresentation.labelEn)}
                     {adhd.diagnosisReportedMonth && (
                       <span className="font-normal text-mq-text-muted"> • {adhd.diagnosisReportedMonth}</span>
                     )}
@@ -198,16 +205,8 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
         <Card icon={<ClipboardList size={16} />} tone="bg-mq-surface-green text-mq-success" title={t.snapTitle}>
           {snap ? (
             <>
-              <dl className="grid grid-cols-2 gap-2 text-center">
-                <div className="px-2 py-2 rounded-xl bg-mq-surface-soft border border-mq-border/60 min-w-0">
-                  <dt className="text-xs text-mq-text-muted leading-snug">{t.snapInattention}</dt>
-                  <dd className="text-base font-bold text-mq-text-strong">{t.snapScore(snap.inattentionTotal)}</dd>
-                </div>
-                <div className="px-2 py-2 rounded-xl bg-mq-surface-soft border border-mq-border/60 min-w-0">
-                  <dt className="text-xs text-mq-text-muted leading-snug">{t.snapHyperactivity}</dt>
-                  <dd className="text-base font-bold text-mq-text-strong">{t.snapScore(snap.hyperactivityTotal)}</dd>
-                </div>
-              </dl>
+              {/* Subscale scores are technical research values and are shown to admins only */}
+              <p className="text-sm font-semibold text-mq-text-strong">{t.snapCompleted}</p>
               <p className="text-xs text-mq-text-muted leading-relaxed">{t.snapNote}</p>
             </>
           ) : (

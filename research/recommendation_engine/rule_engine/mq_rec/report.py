@@ -6,7 +6,7 @@ import json
 from typing import Any, Dict
 
 SOURCE_TITLES = {
-    "REF-BCH-2020": "Boston Children's Hospital, Guided Self-Management Tools for ADHD (Lee et al., 2020)",
+    "REF-BCH-2020": "Boston Children's Hospital, Guided Self-Management Tools for ADHD (Lee & Sinclair-McBride, n.d.)",
     "REF-NICE-NG87": "NICE NG87 (2018)",
     "REF-AAP-2019": "AAP Clinical Practice Guideline (Wolraich et al., 2019)",
     "REF-IES-2021": "IES/WWC Practice Guide: Assisting Students Struggling with Mathematics (Fuchs et al., 2021)",

@@ -271,7 +271,7 @@ export const LearnerCard: React.FC<LearnerCardProps> = ({
             title={`Open ${learner.firstName}'s Student Game Dashboard`}
           >
             <Gamepad2 size={16} className="shrink-0" />
-            <span className="truncate">ක්‍රීඩා පැතිකඩ (Game Profile)</span>
+            <span className="truncate">{t.gameProfile}</span>
             <ArrowRight size={15} strokeWidth={2.5} className="shrink-0" />
           </button>
         </div>

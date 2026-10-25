@@ -1,4 +1,5 @@
 import React from 'react';
+import { teacherText } from '../../../shared/i18n/teacherText';
 import { Navigate, Link } from 'react-router-dom';
 import { Loader2, ShieldAlert, ArrowRight } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -21,7 +22,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       <div className="min-h-screen flex items-center justify-center bg-mq-bg">
         <div className="flex flex-col items-center gap-3 text-mq-primary font-semibold text-sm p-6 bg-white rounded-3xl border border-mq-border shadow-sm">
           <Loader2 size={32} className="animate-spin" />
-          <span>Verifying session...</span>
+          <span>{teacherText.portal.verifyingSession}</span>
         </div>
       </div>
     );

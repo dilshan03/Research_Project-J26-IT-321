@@ -4,12 +4,14 @@ import { CheckCircle2, Compass, ClipboardList, Calculator, ArrowRight, Stethosco
 
 import type { OnboardingFullSummary } from '../../types/onboarding';
 import { ADHD_DIAGNOSIS_STATUS_OPTIONS, ADHD_PRESENTATION_OPTIONS } from '../../types/onboarding';
+import { mathResultCounts } from '../../utils/mathResultCounts';
 import { AnimatedCompanion } from './AnimatedCompanion';
 import { SkillEvidenceList } from '../parent/SkillEvidenceList';
 import { RecommendationList, RecommendationResearchRows } from '../parent/RecommendationList';
 import { ResearchDetails } from '../parent/ResearchDetails';
 import { languageLabel, optionTitle } from '../parent/labels';
 import { parentText } from '../../../../shared/i18n/parentText';
+import { pick } from '../../../../shared/i18n/language';
 
 interface Props {
   summary: OnboardingFullSummary;
@@ -47,6 +49,8 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
   const snap = summary.snapIvSummary;
   const pref = summary.learningPreferences;
   const elpx = math?.elpxProfile;
+  // Independent first responses vs guided/helped activities, from the server's per-item flags
+  const counts = mathResultCounts(math?.evaluatedItems);
   const adhd = summary.adhdInformation;
   const adhdStatus = ADHD_DIAGNOSIS_STATUS_OPTIONS.find((o) => o.value === adhd?.diagnosisStatus);
   const adhdPresentation = ADHD_PRESENTATION_OPTIONS.find((o) => o.value === adhd?.reportedPresentation);
@@ -94,7 +98,16 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
               <Calculator size={18} className="text-mq-warning shrink-0" />
               <span>{t.mathTitle}</span>
             </h2>
-            <span className="text-sm text-mq-text">{t.mathCorrect(math.correctAnswers, math.totalQuestions)}</span>
+            {counts ? (
+              <span className="text-sm text-mq-text">
+                {t.mathIndependent(counts.independentCorrect, counts.independentTotal)}
+                {counts.notIndependent > 0 && (
+                  <span className="block text-xs text-mq-text-muted">{t.mathNotIndependent(counts.notIndependent)}</span>
+                )}
+              </span>
+            ) : (
+              <span className="text-sm text-mq-text">{t.mathCorrect(math.correctAnswers, math.totalQuestions)}</span>
+            )}
             <span
               className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${
                 math.evidenceLevel === 'SUFFICIENT'
@@ -159,13 +172,13 @@ export const OnboardingSummaryStep: React.FC<Props> = ({
             <dl className="text-sm space-y-1">
               <div>
                 <dt className="text-xs text-mq-text-muted">{t.adhdDiagnosed}</dt>
-                <dd className="font-semibold text-mq-text-strong">{adhdStatus.labelSi}</dd>
+                <dd className="font-semibold text-mq-text-strong">{pick(adhdStatus.labelSi, adhdStatus.labelEn)}</dd>
               </div>
               {adhdPresentation && (
                 <div>
                   <dt className="text-xs text-mq-text-muted">{t.adhdType}</dt>
                   <dd className="font-semibold text-mq-text-strong">
-                    {adhdPresentation.labelSi}
+                    {pick(adhdPresentation.labelSi, adhdPresentation.labelEn)}
                     {adhd.diagnosisReportedMonth && (
                       <span className="font-normal text-mq-text-muted"> • {adhd.diagnosisReportedMonth}</span>
                     )}

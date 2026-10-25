@@ -4,6 +4,10 @@ import { Mail, Loader2, AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-reac
 import { AuthLayout } from '../components/AuthLayout';
 import { AuthInput } from '../components/AuthInput';
 import { authService } from '../services/authService';
+import { publicText } from '../../../shared/i18n/publicText';
+
+const a = publicText.auth;
+const t = publicText.auth.forgot;
 
 export const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,11 +18,11 @@ export const ForgotPasswordPage: React.FC = () => {
 
   const validate = (): boolean => {
     if (!email.trim()) {
-      setError('Email address is required.');
+      setError(a.errEmailRequired);
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setError('Please enter a valid email address.');
+      setError(a.errEmailInvalid);
       return false;
     }
     setError('');
@@ -39,7 +43,7 @@ export const ForgotPasswordPage: React.FC = () => {
 
     if (!response.success) {
       setGlobalError(
-        response.error?.message || response.message || 'Failed to process request.'
+        response.error?.message || response.message || t.failed
       );
     } else {
       setIsSubmitted(true);
@@ -48,17 +52,17 @@ export const ForgotPasswordPage: React.FC = () => {
 
   return (
     <AuthLayout
-      title="Reset Password"
-      subtitle="Enter your account email to receive password reset instructions"
+      title={t.title}
+      subtitle={t.subtitle}
     >
       {isSubmitted ? (
         <div className="text-center py-4 space-y-4 animate-fade-in">
           <div className="inline-flex items-center justify-center p-3 bg-mq-success-bg text-mq-success rounded-full mb-1 border border-mq-success/30">
             <CheckCircle2 size={32} />
           </div>
-          <h3 className="text-lg font-bold text-mq-text-strong">Request Submitted</h3>
+          <h3 className="text-lg font-bold text-mq-text-strong">{t.doneTitle}</h3>
           <p className="text-xs text-mq-text-muted leading-relaxed max-w-sm mx-auto">
-            If an account registered to <strong className="text-mq-text">{email}</strong> exists in our system, password reset instructions will be sent shortly.
+            {t.doneTextStart}<strong className="text-mq-text">{email}</strong>{t.doneTextEnd}
           </p>
           <div className="pt-4">
             <Link
@@ -66,7 +70,7 @@ export const ForgotPasswordPage: React.FC = () => {
               className="btn btn-secondary w-full py-2.5 rounded-2xl text-xs font-bold inline-flex items-center justify-center gap-2"
             >
               <ArrowLeft size={16} />
-              Return to Sign In
+              {t.returnToSignIn}
             </Link>
           </div>
         </div>
@@ -86,7 +90,7 @@ export const ForgotPasswordPage: React.FC = () => {
             {/* Email Input */}
             <AuthInput
               id="resetEmail"
-              label="Account Email"
+              label={t.emailLabel}
               type="email"
               placeholder="parent@example.com"
               value={email}
@@ -110,10 +114,10 @@ export const ForgotPasswordPage: React.FC = () => {
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <Loader2 size={20} className="animate-spin" />
-                  Sending Request...
+                  {t.submitting}
                 </span>
               ) : (
-                'Send Reset Link'
+                t.submit
               )}
             </button>
 
@@ -124,7 +128,7 @@ export const ForgotPasswordPage: React.FC = () => {
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-mq-primary hover:text-mq-primary-hover hover:underline"
               >
                 <ArrowLeft size={14} />
-                Back to Sign In
+                {t.backToSignIn}
               </Link>
             </div>
           </form>

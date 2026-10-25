@@ -97,7 +97,7 @@ export const onboardingApi = {
     }
   },
 
-  /** ADHD information and SNAP-IV history (dates only). Read-only. */
+  /** ADHD information and SNAP-IV history with subscale scores and a descriptive comparison. Read-only. */
   async getSupportInformation(learnerId: string): Promise<OnboardingApiResponse<SupportInformation>> {
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/learners/${learnerId}/support-information`, {

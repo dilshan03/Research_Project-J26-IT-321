@@ -7,6 +7,10 @@ import { PasswordInput } from '../components/PasswordInput';
 import { authService } from '../services/authService';
 import { useAuth } from '../hooks/useAuth';
 import { dashboardPathFor } from '../roleRoutes';
+import { publicText } from '../../../shared/i18n/publicText';
+
+const a = publicText.auth;
+const t = publicText.auth.signIn;
 
 export const SignInPage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,13 +28,13 @@ export const SignInPage: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!email.trim()) {
-      newErrors.email = 'Email address is required.';
+      newErrors.email = a.errEmailRequired;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      newErrors.email = 'Please enter a valid email address.';
+      newErrors.email = a.errEmailInvalid;
     }
 
     if (!password) {
-      newErrors.password = 'Password is required.';
+      newErrors.password = a.errPasswordRequired;
     }
 
     setErrors(newErrors);
@@ -56,7 +60,7 @@ export const SignInPage: React.FC = () => {
 
     if (response.success && response.data?.user) {
       login(response.data.user);
-      setSuccessMessage('Sign in successful. Redirecting...');
+      setSuccessMessage(t.success);
       setTimeout(() => {
         navigate('/');
       }, 700);
@@ -70,21 +74,21 @@ export const SignInPage: React.FC = () => {
         role: 'parent' as const,
       };
       login(fallbackUser);
-      setSuccessMessage('Sign in successful. Redirecting...');
+      setSuccessMessage(t.success);
       setTimeout(() => {
         navigate('/');
       }, 700);
     } else {
       setGlobalError(
-        response.error?.message || response.message || 'Sign in failed. Please try again.'
+        response.error?.message || response.message || t.failed
       );
     }
   };
 
   return (
     <AuthLayout
-      title="Welcome Back"
-      subtitle="Sign in to continue your child's math journey"
+      title={t.title}
+      subtitle={t.subtitle}
     >
       {/* A single message: success or failure, never both and never repeated */}
       {successMessage ? (
@@ -111,7 +115,7 @@ export const SignInPage: React.FC = () => {
         {/* Email Input */}
         <AuthInput
           id="signInEmail"
-          label="Email Address"
+          label={a.emailLabel}
           type="email"
           placeholder="parent@example.com"
           value={email}
@@ -129,8 +133,8 @@ export const SignInPage: React.FC = () => {
         {/* Password Input */}
         <PasswordInput
           id="signInPassword"
-          label="Password"
-          placeholder="Enter your password"
+          label={a.passwordLabel}
+          placeholder={t.passwordPlaceholder}
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
@@ -152,14 +156,14 @@ export const SignInPage: React.FC = () => {
               className="w-4 h-4 rounded border-mq-border text-mq-primary focus:ring-mq-primary/30 accent-mq-primary cursor-pointer"
               disabled={isLoading}
             />
-            <span>Remember Me</span>
+            <span>{t.rememberMe}</span>
           </label>
 
           <Link
             to="/forgot-password"
             className="text-xs font-bold text-mq-primary hover:text-mq-primary-hover hover:underline"
           >
-            Forgot Password?
+            {t.forgot}
           </Link>
         </div>
 
@@ -172,22 +176,22 @@ export const SignInPage: React.FC = () => {
           {isLoading ? (
             <span className="flex items-center gap-2">
               <Loader2 size={20} className="animate-spin" />
-              Signing In...
+              {t.submitting}
             </span>
           ) : (
-            'Sign In'
+            t.submit
           )}
         </button>
 
         {/* Sign Up Link */}
         <div className="text-center pt-4 border-t border-mq-border/60 mt-6">
           <p className="text-xs text-mq-text-muted font-medium">
-            Don't have an account?{' '}
+            {t.noAccount}{' '}
             <Link
               to="/sign-up"
               className="font-bold text-mq-primary hover:text-mq-primary-hover hover:underline ml-1"
             >
-              Create an Account
+              {t.createAccount}
             </Link>
           </p>
         </div>

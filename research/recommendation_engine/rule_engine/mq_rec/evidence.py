@@ -11,16 +11,16 @@ EXPERT_LOG = "EXPERT-LOG-2026"  # evidence_base/expert_feedback_log.md (verbal, 
 
 EVIDENCE: Dict[str, List[Dict[str, str]]] = {
     "MQ-RS1-01": [
-        {"sourceId": "REF-BCH-2020", "section": "Skill 1 & 9 (printed pp. 3–6, 38–40)"},
+        {"sourceId": "REF-BCH-2020", "section": "Skill 1 & 9 (PDF pp. 3–6, 38–40)"},
         {"sourceId": "REF-NICE-NG87", "section": "Section 1.4 (printed pp. 13–16)"},
     ],
     "MQ-RS2-01": [
         {"sourceId": "REF-IES-2021", "section": "Recommendation 3 (printed pp. 21–28 / PDF pp. 28–35; 28 studies)"},
-        {"sourceId": "REF-BCH-2020", "section": "Skill 6 (printed pp. 26–30)"},
+        {"sourceId": "REF-BCH-2020", "section": "Skill 6 (PDF pp. 26–30)"},
         {"sourceId": EXPERT_LOG, "section": "Rule R2 — accepted (general strategy; trigger ladder pending review)"},
     ],
     "MQ-RS2-02": [
-        {"sourceId": "REF-BCH-2020", "section": "Skill 6 'Mini-tasks' (printed pp. 26–30)"},
+        {"sourceId": "REF-BCH-2020", "section": "Skill 6 'Mini-tasks' (PDF pp. 26–30)"},
         {"sourceId": "REF-NICE-NG87", "section": "Section 1.5 & Terms 'Environmental Modifications' (printed pp. 17–22, 38–39)"},
         {"sourceId": EXPERT_LOG, "section": "Rule R2 — accepted"},
     ],

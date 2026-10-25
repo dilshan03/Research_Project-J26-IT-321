@@ -9,6 +9,7 @@ import {
 import { AVATAR_OPTIONS, type Learner } from '../../types';
 import { AnimatedCompanion } from './AnimatedCompanion';
 import { parentText } from '../../../../shared/i18n/parentText';
+import { pick } from '../../../../shared/i18n/language';
 
 const t = parentText.handover;
 
@@ -52,7 +53,7 @@ export const ParentChildHandoverStep: React.FC<Props> = ({
           }}
         />
         <div>
-          <span className="text-sm font-semibold text-mq-primary block">{avatar.nameSi}</span>
+          <span className="text-sm font-semibold text-mq-primary block">{pick(avatar.nameSi, avatar.name)}</span>
           <h2 className="text-2xl sm:text-3xl font-bold text-mq-text-strong mt-1">
             {t.greeting(callingName)} 👋
           </h2>

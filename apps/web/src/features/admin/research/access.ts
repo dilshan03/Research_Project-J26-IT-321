@@ -15,7 +15,7 @@ export const accessFromResponse = (res: { ok: boolean; status?: number; data?: {
 /** Admins only ask the server; any other role is denied without a request. */
 export const shouldCheckResearchAccess = (role: string | undefined): boolean => role === 'admin';
 
-export const LEARNER_PROFILE_TABS = ['overview', 'models', 'explainability', 'recommendations', 'evaluation'] as const;
+export const LEARNER_PROFILE_TABS = ['overview', 'models', 'explainability', 'recommendations', 'evaluation', 'imlr-demo'] as const;
 export type LearnerProfileTab = (typeof LEARNER_PROFILE_TABS)[number];
 
 export const TAB_LABELS: Record<LearnerProfileTab, string> = {
@@ -24,6 +24,7 @@ export const TAB_LABELS: Record<LearnerProfileTab, string> = {
   explainability: 'Explainability',
   recommendations: 'Recommendations',
   evaluation: 'Evaluation',
+  'imlr-demo': 'IMLR Prototype Demo',
 };
 
 /** Unknown or missing tab segments fall back to the overview. */

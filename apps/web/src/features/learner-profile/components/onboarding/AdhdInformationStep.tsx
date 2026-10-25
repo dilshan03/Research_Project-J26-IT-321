@@ -21,6 +21,7 @@ import type {
 } from '../../types/onboarding';
 import { ADHD_DIAGNOSIS_STATUS_OPTIONS, ADHD_PRESENTATION_OPTIONS } from '../../types/onboarding';
 import { parentText } from '../../../../shared/i18n/parentText';
+import { pick } from '../../../../shared/i18n/language';
 
 interface Props {
   initialData?: AdhdInformationRecord | null;
@@ -170,7 +171,7 @@ export const AdhdInformationStep: React.FC<Props> = ({
               onClick={() => handleSelectStatus(opt.value)}
               className={optionClass(diagnosisStatus === opt.value)}
             >
-              <span className="block text-base font-semibold text-mq-text-strong">{opt.labelSi}</span>
+              <span className="block text-base font-semibold text-mq-text-strong">{pick(opt.labelSi, opt.labelEn)}</span>
             </button>
           ))}
         </div>
@@ -204,7 +205,7 @@ export const AdhdInformationStep: React.FC<Props> = ({
                 }}
                 className={optionClass(reportedPresentation === opt.value)}
               >
-                <span className="block text-base font-semibold text-mq-text-strong">{opt.labelSi}</span>
+                <span className="block text-base font-semibold text-mq-text-strong">{pick(opt.labelSi, opt.labelEn)}</span>
               </button>
             ))}
           </div>

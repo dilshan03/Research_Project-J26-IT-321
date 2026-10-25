@@ -2,7 +2,7 @@
  "schemaVersion": "MQ-RESEARCH-SNAPSHOT-v1",
  "componentId": "learner-profile",
  "componentTitle": "Learner Profile & Prediction Engine",
- "generatedAtUtc": "2026-10-20T17:57:08+00:00",
+ "generatedAtUtc": "2026-10-20T19:40:39+00:00",
  "generator": {
   "script": "research/recommendation_engine/research_export/export_snapshot.py",
   "version": "1.0.0"
@@ -145,6 +145,48 @@
    "path": "research/experiments/evaluate_elpx.py",
    "sha256": "C4B12DEB2755D378BE746E1EDF470F4D7454F91647820F40864F03EB5469677E",
    "provenance": "simulated"
+  },
+  {
+   "id": "imlr.protocol.py",
+   "path": "research/recommendation_engine/ml_experiments/imlr_probe/protocol.py",
+   "sha256": "B8896E5C5C41A49CFF557D7DF4C442DA65B7C0E5DE0F7FB1BF37DC4DF92ECDAF",
+   "provenance": "synthetic"
+  },
+  {
+   "id": "imlr.item_bank.py",
+   "path": "research/recommendation_engine/ml_experiments/imlr_probe/item_bank.py",
+   "sha256": "25007DE5D7FE46B3DA2AA084862065B655DCDCF53CB03BCD085EA1D3F72F5CC8",
+   "provenance": "synthetic"
+  },
+  {
+   "id": "imlr.forms.py",
+   "path": "research/recommendation_engine/ml_experiments/imlr_probe/forms.py",
+   "sha256": "17C58D61B6E856B215BEF574BB0D1AC42E78465B14DE204B69EB2C90702F5E56",
+   "provenance": "synthetic"
+  },
+  {
+   "id": "imlr.events.py",
+   "path": "research/recommendation_engine/ml_experiments/imlr_probe/events.py",
+   "sha256": "02D884045A497BC5EC961A77B1894F041C13E268BB3800513C79DD1449F911F5",
+   "provenance": "synthetic"
+  },
+  {
+   "id": "imlr.snapshot.py",
+   "path": "research/recommendation_engine/ml_experiments/imlr_probe/snapshot.py",
+   "sha256": "1C6C0619335E7FE67A05217D0A5A1C5B3E3BDF84A2101EF2C68C3A20977AE28A",
+   "provenance": "synthetic"
+  },
+  {
+   "id": "imlr.outcome.py",
+   "path": "research/recommendation_engine/ml_experiments/imlr_probe/outcome.py",
+   "sha256": "D514AEB6C645CB9E6031162CA3D2F5E16C2C49FFAE008F9FC7850E9E45707298",
+   "provenance": "synthetic"
+  },
+  {
+   "id": "imlr.fixtures.py",
+   "path": "research/recommendation_engine/ml_experiments/imlr_probe/fixtures.py",
+   "sha256": "4A67866EE02B4F6BCB2432C8F83949141C71B6E01E622EF25017091150F79062",
+   "provenance": "synthetic"
   }
  ],
  "models": [
@@ -237,6 +279,16 @@
    "provenance": "documentation",
    "description": "Planned trajectory modelling across sessions. No implementation exists.",
    "location": "research/recommendation_engine/longitudinal/README.md"
+  },
+  {
+   "id": "imlr-probe",
+   "name": "IMLR learning-transfer probe",
+   "family": "Assessment protocol with frozen evidence boundary",
+   "version": "IMLR-PROBE-G1 0.1.0-prototype",
+   "status": "PROTOTYPE",
+   "provenance": "synthetic",
+   "description": "Pre-probe, standard teaching and new transfer questions, demonstrated on scripted synthetic scenarios only. Not used with children; no prediction model.",
+   "location": "research/recommendation_engine/ml_experiments/imlr_probe"
   },
   {
    "id": "adhd-presentation",
@@ -7181,12 +7233,5203 @@
     ]
    }
   },
+  "imlrDemo": {
+   "provenance": "synthetic",
+   "notice": "SYNTHETIC FIXTURE - scripted interface events for software tests only; not learner data.",
+   "protocol": {
+    "protocolId": "IMLR-PROBE-G1",
+    "protocolVersion": "0.1.0-prototype",
+    "status": "RESEARCH_PROTOTYPE_NOT_FOR_USE_WITH_CHILDREN",
+    "phases": [
+     {
+      "role": "pre",
+      "items": 2
+     },
+     {
+      "role": "teaching",
+      "items": 2
+     },
+     {
+      "role": "transfer",
+      "items": 3
+     }
+    ],
+    "teachingIsUniversal": true,
+    "responseFormat": "select_one_of_3",
+    "chanceLevel": 0.3333333333333333,
+    "helpPolicy": {
+     "pre": "on_child_request_only",
+     "teaching": "built_in_standardised_script",
+     "transfer": "on_child_request_only"
+    },
+    "nonClaims": [
+     "Research prototype only; not a validated educational or clinical instrument.",
+     "A correct transfer response does not prove permanent or genuine learning.",
+     "The teaching phase is not claimed to cause any improvement.",
+     "Three transfer questions do not constitute a validated learning-readiness measure.",
+     "No mastery, frustration or readiness thresholds are applied.",
+     "No ADHD diagnosis, presentation or symptom change is inferred; ADHD reports and SNAP-IV are never used."
+    ],
+    "approvalsRequired": [
+     "Primary mathematics educators: concept, number range, item-model cell, items, response format, Sinhala wording, session length.",
+     "Clinical supervisor: universal teaching phase, neutral feedback, breaks and help-on-request, reporting wording and audience, data minimisation.",
+     "Ethics approval and consent for research use of the recorded fields.",
+     "Component 1 sign-off before any integration into the onboarding journey (feature-flagged, separate protocol)."
+    ]
+   },
+   "snapshotSchemaVersion": "IMLR-SNAPSHOT-v0.1",
+   "outcomeSchemaVersion": "IMLR-OUTCOME-v0.1",
+   "itemBank": {
+    "version": "IMLR-G1-ITEMS-0.1.0-synthetic",
+    "familyId": "g1_compare_most_proto",
+    "conceptId": "compare_quantities_most",
+    "expertReview": "PENDING",
+    "cells": {
+     "max7-9_gap2": {
+      "largest": [
+       7,
+       9
+      ],
+      "gap": 2,
+      "smallestMin": 2,
+      "roles": [
+       "pre",
+       "transfer"
+      ]
+     },
+     "max5-6_gap2": {
+      "largest": [
+       5,
+       6
+      ],
+      "gap": 2,
+      "smallestMin": 2,
+      "roles": [
+       "teaching"
+      ]
+     }
+    },
+    "items": [
+     {
+      "itemId": "g1p_pre_01",
+      "role": "pre",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "counts": [
+       7,
+       5,
+       3
+      ],
+      "objectType": "birds",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_pre_02",
+      "role": "pre",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "counts": [
+       8,
+       6,
+       4
+      ],
+      "objectType": "mangoes",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_pre_03",
+      "role": "pre",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "counts": [
+       9,
+       7,
+       5
+      ],
+      "objectType": "leaves",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_pre_04",
+      "role": "pre",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "counts": [
+       8,
+       6,
+       2
+      ],
+      "objectType": "shells",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_teach_01",
+      "role": "teaching",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max5-6_gap2",
+      "counts": [
+       6,
+       4,
+       2
+      ],
+      "objectType": "rabbits",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_teach_02",
+      "role": "teaching",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max5-6_gap2",
+      "counts": [
+       5,
+       3,
+       2
+      ],
+      "objectType": "ducks",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_teach_03",
+      "role": "teaching",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max5-6_gap2",
+      "counts": [
+       6,
+       4,
+       3
+      ],
+      "objectType": "balls",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_tr_01",
+      "role": "transfer",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "counts": [
+       7,
+       5,
+       2
+      ],
+      "objectType": "elephants",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_tr_02",
+      "role": "transfer",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "counts": [
+       8,
+       6,
+       3
+      ],
+      "objectType": "butterflies",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_tr_03",
+      "role": "transfer",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "counts": [
+       9,
+       7,
+       4
+      ],
+      "objectType": "fish",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_tr_04",
+      "role": "transfer",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "counts": [
+       7,
+       5,
+       4
+      ],
+      "objectType": "flowers",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_tr_05",
+      "role": "transfer",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "counts": [
+       9,
+       7,
+       3
+      ],
+      "objectType": "stars",
+      "expertReview": "PENDING"
+     },
+     {
+      "itemId": "g1p_tr_06",
+      "role": "transfer",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "counts": [
+       8,
+       6,
+       5
+      ],
+      "objectType": "boats",
+      "expertReview": "PENDING"
+     }
+    ]
+   },
+   "form": {
+    "formId": "IMLR-PROBE-G1-F68730132B249",
+    "protocolId": "IMLR-PROBE-G1",
+    "protocolVersion": "0.1.0-prototype",
+    "itemBankVersion": "IMLR-G1-ITEMS-0.1.0-synthetic",
+    "seed": 7,
+    "items": [
+     {
+      "presentationIndex": 0,
+      "role": "pre",
+      "itemId": "g1p_pre_04",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "objectType": "shells",
+      "extentMode": "equal_extent",
+      "options": [
+       {
+        "optionId": "g1p_pre_04_opt0",
+        "position": 0,
+        "count": 6,
+        "pattern": "scatter",
+        "spacing": "medium"
+       },
+       {
+        "optionId": "g1p_pre_04_opt1",
+        "position": 1,
+        "count": 2,
+        "pattern": "row",
+        "spacing": "tight"
+       },
+       {
+        "optionId": "g1p_pre_04_opt2",
+        "position": 2,
+        "count": 8,
+        "pattern": "grid",
+        "spacing": "tight"
+       }
+      ],
+      "correctPosition": 2
+     },
+     {
+      "presentationIndex": 1,
+      "role": "pre",
+      "itemId": "g1p_pre_02",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "objectType": "mangoes",
+      "extentMode": "equal_extent",
+      "options": [
+       {
+        "optionId": "g1p_pre_02_opt0",
+        "position": 0,
+        "count": 8,
+        "pattern": "row",
+        "spacing": "wide"
+       },
+       {
+        "optionId": "g1p_pre_02_opt1",
+        "position": 1,
+        "count": 6,
+        "pattern": "row",
+        "spacing": "tight"
+       },
+       {
+        "optionId": "g1p_pre_02_opt2",
+        "position": 2,
+        "count": 4,
+        "pattern": "row",
+        "spacing": "wide"
+       }
+      ],
+      "correctPosition": 0
+     },
+     {
+      "presentationIndex": 2,
+      "role": "teaching",
+      "itemId": "g1p_teach_03",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max5-6_gap2",
+      "objectType": "balls",
+      "extentMode": "equal_extent",
+      "options": [
+       {
+        "optionId": "g1p_teach_03_opt0",
+        "position": 0,
+        "count": 4,
+        "pattern": "scatter",
+        "spacing": "medium"
+       },
+       {
+        "optionId": "g1p_teach_03_opt1",
+        "position": 1,
+        "count": 6,
+        "pattern": "row",
+        "spacing": "medium"
+       },
+       {
+        "optionId": "g1p_teach_03_opt2",
+        "position": 2,
+        "count": 3,
+        "pattern": "grid",
+        "spacing": "medium"
+       }
+      ],
+      "correctPosition": 1
+     },
+     {
+      "presentationIndex": 3,
+      "role": "teaching",
+      "itemId": "g1p_teach_01",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max5-6_gap2",
+      "objectType": "rabbits",
+      "extentMode": "equal_spacing",
+      "options": [
+       {
+        "optionId": "g1p_teach_01_opt0",
+        "position": 0,
+        "count": 4,
+        "pattern": "grid",
+        "spacing": "wide"
+       },
+       {
+        "optionId": "g1p_teach_01_opt1",
+        "position": 1,
+        "count": 2,
+        "pattern": "scatter",
+        "spacing": "medium"
+       },
+       {
+        "optionId": "g1p_teach_01_opt2",
+        "position": 2,
+        "count": 6,
+        "pattern": "row",
+        "spacing": "tight"
+       }
+      ],
+      "correctPosition": 2
+     },
+     {
+      "presentationIndex": 4,
+      "role": "transfer",
+      "itemId": "g1p_tr_01",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "objectType": "elephants",
+      "extentMode": "equal_spacing",
+      "options": [
+       {
+        "optionId": "g1p_tr_01_opt0",
+        "position": 0,
+        "count": 2,
+        "pattern": "row",
+        "spacing": "tight"
+       },
+       {
+        "optionId": "g1p_tr_01_opt1",
+        "position": 1,
+        "count": 7,
+        "pattern": "row",
+        "spacing": "tight"
+       },
+       {
+        "optionId": "g1p_tr_01_opt2",
+        "position": 2,
+        "count": 5,
+        "pattern": "row",
+        "spacing": "medium"
+       }
+      ],
+      "correctPosition": 1
+     },
+     {
+      "presentationIndex": 5,
+      "role": "transfer",
+      "itemId": "g1p_tr_02",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "objectType": "butterflies",
+      "extentMode": "equal_spacing",
+      "options": [
+       {
+        "optionId": "g1p_tr_02_opt0",
+        "position": 0,
+        "count": 8,
+        "pattern": "grid",
+        "spacing": "wide"
+       },
+       {
+        "optionId": "g1p_tr_02_opt1",
+        "position": 1,
+        "count": 3,
+        "pattern": "grid",
+        "spacing": "tight"
+       },
+       {
+        "optionId": "g1p_tr_02_opt2",
+        "position": 2,
+        "count": 6,
+        "pattern": "scatter",
+        "spacing": "wide"
+       }
+      ],
+      "correctPosition": 0
+     },
+     {
+      "presentationIndex": 6,
+      "role": "transfer",
+      "itemId": "g1p_tr_04",
+      "familyId": "g1_compare_most_proto",
+      "conceptId": "compare_quantities_most",
+      "cell": "max7-9_gap2",
+      "objectType": "flowers",
+      "extentMode": "equal_spacing",
+      "options": [
+       {
+        "optionId": "g1p_tr_04_opt0",
+        "position": 0,
+        "count": 5,
+        "pattern": "grid",
+        "spacing": "wide"
+       },
+       {
+        "optionId": "g1p_tr_04_opt1",
+        "position": 1,
+        "count": 4,
+        "pattern": "grid",
+        "spacing": "medium"
+       },
+       {
+        "optionId": "g1p_tr_04_opt2",
+        "position": 2,
+        "count": 7,
+        "pattern": "row",
+        "spacing": "tight"
+       }
+      ],
+      "correctPosition": 2
+     }
+    ]
+   },
+   "scenarios": [
+    {
+     "id": "all_independent",
+     "title": "All transfer answers given without help",
+     "description": "Pre 1/2 correct; teaching with one escalation; three transfer answers without help.",
+     "synthetic": true,
+     "inputs": {
+      "preProbe": [
+       {
+        "itemId": "g1p_pre_04",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_pre_02",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "teaching": [
+       {
+        "itemId": "g1p_teach_03",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1,
+         2
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": [
+         "HELP_AFTER_FIRST_RESPONSE"
+        ]
+       },
+       {
+        "itemId": "g1p_teach_01",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": []
+       }
+      ],
+      "teachingWindow": {
+       "startedSeq": 10,
+       "endedSeq": 23,
+       "startedT": 12.0,
+       "endedT": 28.0,
+       "closed": true
+      },
+      "snapshot": {
+       "meta": {
+        "snapshotSchemaVersion": "IMLR-SNAPSHOT-v0.1",
+        "protocolId": "IMLR-PROBE-G1",
+        "protocolVersion": "0.1.0-prototype",
+        "formId": "IMLR-PROBE-G1-F68730132B249",
+        "seed": 7,
+        "predictionTime": {
+         "event": "BOUNDARY_SHOWN",
+         "seq": 24,
+         "t": 30.0
+        },
+        "teachingWindowClosedBeforePredictionTime": true,
+        "eventsUsed": 23,
+        "inputEventsSha256": "C5021C9F8626074C10726A65D512B6D1DB627632859325CAF2443796F9494669",
+        "featureAllowlist": [
+         "pre_items_presented",
+         "pre_items_answered",
+         "pre_independent_correct",
+         "pre_independent_incorrect",
+         "pre_assisted",
+         "pre_assistance_unknown",
+         "pre_child_help_requests",
+         "pre_revisions",
+         "pre_instruction_replays",
+         "pre_first_response_seconds",
+         "teaching_items_presented",
+         "teaching_items_answered",
+         "teaching_max_support_level",
+         "teaching_support_events",
+         "teaching_assisted_first_try_correct",
+         "breaks_before_prediction_time",
+         "elpx_pre_transfer"
+        ]
+       },
+       "features": {
+        "pre_items_presented": 2,
+        "pre_items_answered": 2,
+        "pre_independent_correct": 1,
+        "pre_independent_incorrect": 1,
+        "pre_assisted": 0,
+        "pre_assistance_unknown": 0,
+        "pre_child_help_requests": 0,
+        "pre_revisions": 0,
+        "pre_instruction_replays": 0,
+        "pre_first_response_seconds": [
+         3.5,
+         3.5
+        ],
+        "teaching_items_presented": 2,
+        "teaching_items_answered": 2,
+        "teaching_max_support_level": 2,
+        "teaching_support_events": 3,
+        "teaching_assisted_first_try_correct": 1,
+        "breaks_before_prediction_time": 0,
+        "elpx_pre_transfer": {
+         "available": true,
+         "algorithmVersion": "ELP-X-v1.0",
+         "engineSha256": "60C98EBDA9B016F2BA9D550666BF48065E911D3EC57714E2E071EE64535D477D",
+         "intervalMethod": "scipy.stats.beta",
+         "evidence": "pre-probe items with assistanceStatus NONE_CONFIRMED only",
+         "distinctQuestionsAssessed": 2,
+         "correctFirstResponses": 1,
+         "estimatedProficiency": 0.5,
+         "credibleInterval": {
+          "lower": 0.0943,
+          "upper": 0.9057,
+          "confidenceLevel": 0.95
+         },
+         "provisionalSkillLevel": "INSUFFICIENT_EVIDENCE"
+        }
+       },
+       "snapshotSha256": "614AE8F938880A0411360B964B276185161262D713CA7B590F22D1A561CE526B"
+      }
+     },
+     "outcomes": {
+      "outcomeSchemaVersion": "IMLR-OUTCOME-v0.1",
+      "formId": "IMLR-PROBE-G1-F68730132B249",
+      "predictionTimeSeq": 24,
+      "items": [
+       {
+        "itemId": "g1p_tr_01",
+        "presentationIndex": 4,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [],
+        "evidenceFromSeq": 25
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "presentationIndex": 5,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_INCORRECT",
+        "flags": [],
+        "evidenceFromSeq": 29
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "presentationIndex": 6,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [],
+        "evidenceFromSeq": 33
+       }
+      ],
+      "counts": {
+       "INDEPENDENT_CORRECT": 2,
+       "INDEPENDENT_INCORRECT": 1,
+       "HELPED": 0,
+       "ASSISTANCE_UNKNOWN": 0,
+       "UNANSWERED": 0
+      },
+      "independentCorrect": 2,
+      "independentClassified": 3,
+      "chanceLevelPerItem": 0.3333333333333333,
+      "description": "2 of 3 new questions answered correctly without help (chance per question 0.33; 0 helped, 0 unknown, 0 unanswered)",
+      "interpretation": "Descriptive count of new comparison questions answered correctly without help, shown beside the chance level. It is not a learning-readiness score, does not show that the teaching caused improvement, and does not establish permanent learning. Pending educator and clinical-supervisor review.",
+      "itemDetails": [
+       {
+        "itemId": "g1p_tr_01",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "label": {
+       "independentTransferCorrect": 2,
+       "independentTransferClassified": 3,
+       "itemOutcomes": {
+        "g1p_tr_01": "INDEPENDENT_CORRECT",
+        "g1p_tr_02": "INDEPENDENT_INCORRECT",
+        "g1p_tr_04": "INDEPENDENT_CORRECT"
+       },
+       "status": "USABLE"
+      },
+      "separation": {
+       "predictionTimeSeq": 24,
+       "inputSnapshotSha256": "614AE8F938880A0411360B964B276185161262D713CA7B590F22D1A561CE526B",
+       "labelFromEventsAtOrAfterSeq": 24
+      }
+     },
+     "events": [
+      {
+       "seq": 1,
+       "t": 1.0,
+       "type": "SESSION_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 2,
+       "t": 2.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_04",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 3,
+       "t": 2.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_04",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 4,
+       "t": 5.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_04",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 5,
+       "t": 6.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_04",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 6,
+       "t": 7.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_02",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 7,
+       "t": 7.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_02",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 8,
+       "t": 10.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_02",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 9,
+       "t": 11.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_02",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 10,
+       "t": 12.0,
+       "type": "TEACHING_WINDOW_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 11,
+       "t": 13.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 12,
+       "t": 13.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 13,
+       "t": 16.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 14,
+       "t": 17.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 2,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 15,
+       "t": 20.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 16,
+       "t": 21.0,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 17,
+       "t": 21.5,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_03",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 18,
+       "t": 22.5,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 19,
+       "t": 23.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 20,
+       "t": 26.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 21,
+       "t": 26.5,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 22,
+       "t": 27.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_01",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 23,
+       "t": 28.0,
+       "type": "TEACHING_WINDOW_ENDED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 24,
+       "t": 30.0,
+       "type": "BOUNDARY_SHOWN",
+       "window": "prediction_time"
+      },
+      {
+       "seq": 25,
+       "t": 31.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_01",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 26,
+       "t": 31.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_01",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 27,
+       "t": 34.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_01",
+       "position": 1,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 28,
+       "t": 35.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_01",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 29,
+       "t": 36.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_02",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 30,
+       "t": 36.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_02",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 31,
+       "t": 39.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_02",
+       "position": 1,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 32,
+       "t": 40.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_02",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 33,
+       "t": 41.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_04",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 34,
+       "t": 41.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_04",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 35,
+       "t": 44.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_04",
+       "position": 2,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 36,
+       "t": 45.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_04",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 37,
+       "t": 46.0,
+       "type": "SESSION_ENDED",
+       "window": "after_prediction_time"
+      }
+     ]
+    },
+    {
+     "id": "pre_correct_still_taught",
+     "title": "Correct before teaching, still taught",
+     "description": "Both pre items correct; the standardised teaching phase is still delivered (Decision 1).",
+     "synthetic": true,
+     "inputs": {
+      "preProbe": [
+       {
+        "itemId": "g1p_pre_04",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_pre_02",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "teaching": [
+       {
+        "itemId": "g1p_teach_03",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_teach_01",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": []
+       }
+      ],
+      "teachingWindow": {
+       "startedSeq": 10,
+       "endedSeq": 21,
+       "startedT": 12.0,
+       "endedT": 24.0,
+       "closed": true
+      },
+      "snapshot": {
+       "meta": {
+        "snapshotSchemaVersion": "IMLR-SNAPSHOT-v0.1",
+        "protocolId": "IMLR-PROBE-G1",
+        "protocolVersion": "0.1.0-prototype",
+        "formId": "IMLR-PROBE-G1-F68730132B249",
+        "seed": 7,
+        "predictionTime": {
+         "event": "BOUNDARY_SHOWN",
+         "seq": 22,
+         "t": 26.0
+        },
+        "teachingWindowClosedBeforePredictionTime": true,
+        "eventsUsed": 21,
+        "inputEventsSha256": "C01958A359E994710630049BACF95DE186D4094E003EF08EB5CEE9A09E9C7C5C",
+        "featureAllowlist": [
+         "pre_items_presented",
+         "pre_items_answered",
+         "pre_independent_correct",
+         "pre_independent_incorrect",
+         "pre_assisted",
+         "pre_assistance_unknown",
+         "pre_child_help_requests",
+         "pre_revisions",
+         "pre_instruction_replays",
+         "pre_first_response_seconds",
+         "teaching_items_presented",
+         "teaching_items_answered",
+         "teaching_max_support_level",
+         "teaching_support_events",
+         "teaching_assisted_first_try_correct",
+         "breaks_before_prediction_time",
+         "elpx_pre_transfer"
+        ]
+       },
+       "features": {
+        "pre_items_presented": 2,
+        "pre_items_answered": 2,
+        "pre_independent_correct": 2,
+        "pre_independent_incorrect": 0,
+        "pre_assisted": 0,
+        "pre_assistance_unknown": 0,
+        "pre_child_help_requests": 0,
+        "pre_revisions": 0,
+        "pre_instruction_replays": 0,
+        "pre_first_response_seconds": [
+         3.5,
+         3.5
+        ],
+        "teaching_items_presented": 2,
+        "teaching_items_answered": 2,
+        "teaching_max_support_level": 1,
+        "teaching_support_events": 2,
+        "teaching_assisted_first_try_correct": 2,
+        "breaks_before_prediction_time": 0,
+        "elpx_pre_transfer": {
+         "available": true,
+         "algorithmVersion": "ELP-X-v1.0",
+         "engineSha256": "60C98EBDA9B016F2BA9D550666BF48065E911D3EC57714E2E071EE64535D477D",
+         "intervalMethod": "scipy.stats.beta",
+         "evidence": "pre-probe items with assistanceStatus NONE_CONFIRMED only",
+         "distinctQuestionsAssessed": 2,
+         "correctFirstResponses": 2,
+         "estimatedProficiency": 0.75,
+         "credibleInterval": {
+          "lower": 0.2924,
+          "upper": 0.9916,
+          "confidenceLevel": 0.95
+         },
+         "provisionalSkillLevel": "INSUFFICIENT_EVIDENCE"
+        }
+       },
+       "snapshotSha256": "3FDFD7F1B5DD269987A6ADBB5998B532CB168486511407AD1F95E56938FA0EFB"
+      }
+     },
+     "outcomes": {
+      "outcomeSchemaVersion": "IMLR-OUTCOME-v0.1",
+      "formId": "IMLR-PROBE-G1-F68730132B249",
+      "predictionTimeSeq": 22,
+      "items": [
+       {
+        "itemId": "g1p_tr_01",
+        "presentationIndex": 4,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [],
+        "evidenceFromSeq": 23
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "presentationIndex": 5,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [],
+        "evidenceFromSeq": 27
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "presentationIndex": 6,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_INCORRECT",
+        "flags": [],
+        "evidenceFromSeq": 31
+       }
+      ],
+      "counts": {
+       "INDEPENDENT_CORRECT": 2,
+       "INDEPENDENT_INCORRECT": 1,
+       "HELPED": 0,
+       "ASSISTANCE_UNKNOWN": 0,
+       "UNANSWERED": 0
+      },
+      "independentCorrect": 2,
+      "independentClassified": 3,
+      "chanceLevelPerItem": 0.3333333333333333,
+      "description": "2 of 3 new questions answered correctly without help (chance per question 0.33; 0 helped, 0 unknown, 0 unanswered)",
+      "interpretation": "Descriptive count of new comparison questions answered correctly without help, shown beside the chance level. It is not a learning-readiness score, does not show that the teaching caused improvement, and does not establish permanent learning. Pending educator and clinical-supervisor review.",
+      "itemDetails": [
+       {
+        "itemId": "g1p_tr_01",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "label": {
+       "independentTransferCorrect": 2,
+       "independentTransferClassified": 3,
+       "itemOutcomes": {
+        "g1p_tr_01": "INDEPENDENT_CORRECT",
+        "g1p_tr_02": "INDEPENDENT_CORRECT",
+        "g1p_tr_04": "INDEPENDENT_INCORRECT"
+       },
+       "status": "USABLE"
+      },
+      "separation": {
+       "predictionTimeSeq": 22,
+       "inputSnapshotSha256": "3FDFD7F1B5DD269987A6ADBB5998B532CB168486511407AD1F95E56938FA0EFB",
+       "labelFromEventsAtOrAfterSeq": 22
+      }
+     },
+     "events": [
+      {
+       "seq": 1,
+       "t": 1.0,
+       "type": "SESSION_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 2,
+       "t": 2.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_04",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 3,
+       "t": 2.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_04",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 4,
+       "t": 5.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_04",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 5,
+       "t": 6.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_04",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 6,
+       "t": 7.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_02",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 7,
+       "t": 7.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_02",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 8,
+       "t": 10.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_02",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 9,
+       "t": 11.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_02",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 10,
+       "t": 12.0,
+       "type": "TEACHING_WINDOW_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 11,
+       "t": 13.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 12,
+       "t": 13.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 13,
+       "t": 16.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 14,
+       "t": 17.0,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 15,
+       "t": 17.5,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_03",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 16,
+       "t": 18.5,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 17,
+       "t": 19.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 18,
+       "t": 22.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 19,
+       "t": 22.5,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 20,
+       "t": 23.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_01",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 21,
+       "t": 24.0,
+       "type": "TEACHING_WINDOW_ENDED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 22,
+       "t": 26.0,
+       "type": "BOUNDARY_SHOWN",
+       "window": "prediction_time"
+      },
+      {
+       "seq": 23,
+       "t": 27.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_01",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 24,
+       "t": 27.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_01",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 25,
+       "t": 30.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_01",
+       "position": 1,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 26,
+       "t": 31.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_01",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 27,
+       "t": 32.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_02",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 28,
+       "t": 32.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_02",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 29,
+       "t": 35.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_02",
+       "position": 0,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 30,
+       "t": 36.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_02",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 31,
+       "t": 37.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_04",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 32,
+       "t": 37.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_04",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 33,
+       "t": 40.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_04",
+       "position": 0,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 34,
+       "t": 41.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_04",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 35,
+       "t": 42.0,
+       "type": "SESSION_ENDED",
+       "window": "after_prediction_time"
+      }
+     ]
+    },
+    {
+     "id": "help_before_transfer_response",
+     "title": "Asked for help before answering",
+     "description": "Child asks for help on transfer item 2 before answering.",
+     "synthetic": true,
+     "inputs": {
+      "preProbe": [
+       {
+        "itemId": "g1p_pre_04",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_pre_02",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "teaching": [
+       {
+        "itemId": "g1p_teach_03",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1,
+         2,
+         3
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": [
+         "HELP_AFTER_FIRST_RESPONSE"
+        ]
+       },
+       {
+        "itemId": "g1p_teach_01",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1,
+         2
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": [
+         "HELP_AFTER_FIRST_RESPONSE"
+        ]
+       }
+      ],
+      "teachingWindow": {
+       "startedSeq": 10,
+       "endedSeq": 27,
+       "startedT": 12.0,
+       "endedT": 36.0,
+       "closed": true
+      },
+      "snapshot": {
+       "meta": {
+        "snapshotSchemaVersion": "IMLR-SNAPSHOT-v0.1",
+        "protocolId": "IMLR-PROBE-G1",
+        "protocolVersion": "0.1.0-prototype",
+        "formId": "IMLR-PROBE-G1-F68730132B249",
+        "seed": 7,
+        "predictionTime": {
+         "event": "BOUNDARY_SHOWN",
+         "seq": 28,
+         "t": 38.0
+        },
+        "teachingWindowClosedBeforePredictionTime": true,
+        "eventsUsed": 27,
+        "inputEventsSha256": "73E4307B722AD0664FD8CEFE97FAF8DC6F639C23717121A82BB2592FB3E7678A",
+        "featureAllowlist": [
+         "pre_items_presented",
+         "pre_items_answered",
+         "pre_independent_correct",
+         "pre_independent_incorrect",
+         "pre_assisted",
+         "pre_assistance_unknown",
+         "pre_child_help_requests",
+         "pre_revisions",
+         "pre_instruction_replays",
+         "pre_first_response_seconds",
+         "teaching_items_presented",
+         "teaching_items_answered",
+         "teaching_max_support_level",
+         "teaching_support_events",
+         "teaching_assisted_first_try_correct",
+         "breaks_before_prediction_time",
+         "elpx_pre_transfer"
+        ]
+       },
+       "features": {
+        "pre_items_presented": 2,
+        "pre_items_answered": 2,
+        "pre_independent_correct": 0,
+        "pre_independent_incorrect": 2,
+        "pre_assisted": 0,
+        "pre_assistance_unknown": 0,
+        "pre_child_help_requests": 0,
+        "pre_revisions": 0,
+        "pre_instruction_replays": 0,
+        "pre_first_response_seconds": [
+         3.5,
+         3.5
+        ],
+        "teaching_items_presented": 2,
+        "teaching_items_answered": 2,
+        "teaching_max_support_level": 3,
+        "teaching_support_events": 5,
+        "teaching_assisted_first_try_correct": 0,
+        "breaks_before_prediction_time": 0,
+        "elpx_pre_transfer": {
+         "available": true,
+         "algorithmVersion": "ELP-X-v1.0",
+         "engineSha256": "60C98EBDA9B016F2BA9D550666BF48065E911D3EC57714E2E071EE64535D477D",
+         "intervalMethod": "scipy.stats.beta",
+         "evidence": "pre-probe items with assistanceStatus NONE_CONFIRMED only",
+         "distinctQuestionsAssessed": 2,
+         "correctFirstResponses": 0,
+         "estimatedProficiency": 0.25,
+         "credibleInterval": {
+          "lower": 0.0084,
+          "upper": 0.7076,
+          "confidenceLevel": 0.95
+         },
+         "provisionalSkillLevel": "INSUFFICIENT_EVIDENCE"
+        }
+       },
+       "snapshotSha256": "B922EFAA744935D7EBB716C3D20F3F41B29A5D4E41500B9A5BDF5D3C62B4D733"
+      }
+     },
+     "outcomes": {
+      "outcomeSchemaVersion": "IMLR-OUTCOME-v0.1",
+      "formId": "IMLR-PROBE-G1-F68730132B249",
+      "predictionTimeSeq": 28,
+      "items": [
+       {
+        "itemId": "g1p_tr_01",
+        "presentationIndex": 4,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [],
+        "evidenceFromSeq": 29
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "presentationIndex": 5,
+        "assistanceStatus": "ASSISTED",
+        "outcome": "HELPED",
+        "flags": [],
+        "evidenceFromSeq": 33
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "presentationIndex": 6,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_INCORRECT",
+        "flags": [],
+        "evidenceFromSeq": 39
+       }
+      ],
+      "counts": {
+       "INDEPENDENT_CORRECT": 1,
+       "INDEPENDENT_INCORRECT": 1,
+       "HELPED": 1,
+       "ASSISTANCE_UNKNOWN": 0,
+       "UNANSWERED": 0
+      },
+      "independentCorrect": 1,
+      "independentClassified": 2,
+      "chanceLevelPerItem": 0.3333333333333333,
+      "description": "1 of 2 new questions answered correctly without help (chance per question 0.33; 1 helped, 0 unknown, 0 unanswered)",
+      "interpretation": "Descriptive count of new comparison questions answered correctly without help, shown beside the chance level. It is not a learning-readiness score, does not show that the teaching caused improvement, and does not establish permanent learning. Pending educator and clinical-supervisor review.",
+      "itemDetails": [
+       {
+        "itemId": "g1p_tr_01",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 8.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "child_request"
+         }
+        ],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 1,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "label": {
+       "independentTransferCorrect": 1,
+       "independentTransferClassified": 2,
+       "itemOutcomes": {
+        "g1p_tr_01": "INDEPENDENT_CORRECT",
+        "g1p_tr_02": "HELPED",
+        "g1p_tr_04": "INDEPENDENT_INCORRECT"
+       },
+       "status": "USABLE"
+      },
+      "separation": {
+       "predictionTimeSeq": 28,
+       "inputSnapshotSha256": "B922EFAA744935D7EBB716C3D20F3F41B29A5D4E41500B9A5BDF5D3C62B4D733",
+       "labelFromEventsAtOrAfterSeq": 28
+      }
+     },
+     "events": [
+      {
+       "seq": 1,
+       "t": 1.0,
+       "type": "SESSION_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 2,
+       "t": 2.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_04",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 3,
+       "t": 2.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_04",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 4,
+       "t": 5.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_04",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 5,
+       "t": 6.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_04",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 6,
+       "t": 7.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_02",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 7,
+       "t": 7.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_02",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 8,
+       "t": 10.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_02",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 9,
+       "t": 11.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_02",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 10,
+       "t": 12.0,
+       "type": "TEACHING_WINDOW_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 11,
+       "t": 13.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 12,
+       "t": 13.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 13,
+       "t": 16.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 14,
+       "t": 17.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 2,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 15,
+       "t": 20.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 16,
+       "t": 21.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 3,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 17,
+       "t": 24.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 18,
+       "t": 25.0,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 19,
+       "t": 25.5,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_03",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 20,
+       "t": 26.5,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 21,
+       "t": 27.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 22,
+       "t": 30.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 23,
+       "t": 31.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 2,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 24,
+       "t": 34.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 25,
+       "t": 34.5,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 26,
+       "t": 35.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_01",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 27,
+       "t": 36.0,
+       "type": "TEACHING_WINDOW_ENDED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 28,
+       "t": 38.0,
+       "type": "BOUNDARY_SHOWN",
+       "window": "prediction_time"
+      },
+      {
+       "seq": 29,
+       "t": 39.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_01",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 30,
+       "t": 39.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_01",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 31,
+       "t": 42.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_01",
+       "position": 1,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 32,
+       "t": 43.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_01",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 33,
+       "t": 44.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_02",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 34,
+       "t": 44.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_02",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 35,
+       "t": 46.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_tr_02",
+       "level": 1,
+       "origin": "child_request",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 36,
+       "t": 49.5,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_tr_02",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 37,
+       "t": 52.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_02",
+       "position": 0,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 38,
+       "t": 53.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_02",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 39,
+       "t": 54.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_04",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 40,
+       "t": 54.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_04",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 41,
+       "t": 57.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_04",
+       "position": 0,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 42,
+       "t": 58.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_04",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 43,
+       "t": 59.0,
+       "type": "SESSION_ENDED",
+       "window": "after_prediction_time"
+      }
+     ]
+    },
+    {
+     "id": "help_after_transfer_response",
+     "title": "Asked for help only after answering",
+     "description": "Help requested only after the first transfer response was confirmed.",
+     "synthetic": true,
+     "inputs": {
+      "preProbe": [
+       {
+        "itemId": "g1p_pre_04",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_pre_02",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "teaching": [
+       {
+        "itemId": "g1p_teach_03",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_teach_01",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1,
+         2
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": [
+         "HELP_AFTER_FIRST_RESPONSE"
+        ]
+       }
+      ],
+      "teachingWindow": {
+       "startedSeq": 10,
+       "endedSeq": 23,
+       "startedT": 12.0,
+       "endedT": 28.0,
+       "closed": true
+      },
+      "snapshot": {
+       "meta": {
+        "snapshotSchemaVersion": "IMLR-SNAPSHOT-v0.1",
+        "protocolId": "IMLR-PROBE-G1",
+        "protocolVersion": "0.1.0-prototype",
+        "formId": "IMLR-PROBE-G1-F68730132B249",
+        "seed": 7,
+        "predictionTime": {
+         "event": "BOUNDARY_SHOWN",
+         "seq": 24,
+         "t": 30.0
+        },
+        "teachingWindowClosedBeforePredictionTime": true,
+        "eventsUsed": 23,
+        "inputEventsSha256": "EACD8CCB37D9B2085454C3C95D7DDD5EA22382C304BB977C175722EA8DF6C874",
+        "featureAllowlist": [
+         "pre_items_presented",
+         "pre_items_answered",
+         "pre_independent_correct",
+         "pre_independent_incorrect",
+         "pre_assisted",
+         "pre_assistance_unknown",
+         "pre_child_help_requests",
+         "pre_revisions",
+         "pre_instruction_replays",
+         "pre_first_response_seconds",
+         "teaching_items_presented",
+         "teaching_items_answered",
+         "teaching_max_support_level",
+         "teaching_support_events",
+         "teaching_assisted_first_try_correct",
+         "breaks_before_prediction_time",
+         "elpx_pre_transfer"
+        ]
+       },
+       "features": {
+        "pre_items_presented": 2,
+        "pre_items_answered": 2,
+        "pre_independent_correct": 1,
+        "pre_independent_incorrect": 1,
+        "pre_assisted": 0,
+        "pre_assistance_unknown": 0,
+        "pre_child_help_requests": 0,
+        "pre_revisions": 0,
+        "pre_instruction_replays": 0,
+        "pre_first_response_seconds": [
+         3.5,
+         3.5
+        ],
+        "teaching_items_presented": 2,
+        "teaching_items_answered": 2,
+        "teaching_max_support_level": 2,
+        "teaching_support_events": 3,
+        "teaching_assisted_first_try_correct": 1,
+        "breaks_before_prediction_time": 0,
+        "elpx_pre_transfer": {
+         "available": true,
+         "algorithmVersion": "ELP-X-v1.0",
+         "engineSha256": "60C98EBDA9B016F2BA9D550666BF48065E911D3EC57714E2E071EE64535D477D",
+         "intervalMethod": "scipy.stats.beta",
+         "evidence": "pre-probe items with assistanceStatus NONE_CONFIRMED only",
+         "distinctQuestionsAssessed": 2,
+         "correctFirstResponses": 1,
+         "estimatedProficiency": 0.5,
+         "credibleInterval": {
+          "lower": 0.0943,
+          "upper": 0.9057,
+          "confidenceLevel": 0.95
+         },
+         "provisionalSkillLevel": "INSUFFICIENT_EVIDENCE"
+        }
+       },
+       "snapshotSha256": "C6AB108A186174EAA8A68A99AD5A511C704723F98CBFEA8B2B2AB0067B4ED6F6"
+      }
+     },
+     "outcomes": {
+      "outcomeSchemaVersion": "IMLR-OUTCOME-v0.1",
+      "formId": "IMLR-PROBE-G1-F68730132B249",
+      "predictionTimeSeq": 24,
+      "items": [
+       {
+        "itemId": "g1p_tr_01",
+        "presentationIndex": 4,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_INCORRECT",
+        "flags": [
+         "HELP_AFTER_FIRST_RESPONSE"
+        ],
+        "evidenceFromSeq": 25
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "presentationIndex": 5,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [],
+        "evidenceFromSeq": 31
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "presentationIndex": 6,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [],
+        "evidenceFromSeq": 35
+       }
+      ],
+      "counts": {
+       "INDEPENDENT_CORRECT": 2,
+       "INDEPENDENT_INCORRECT": 1,
+       "HELPED": 0,
+       "ASSISTANCE_UNKNOWN": 0,
+       "UNANSWERED": 0
+      },
+      "independentCorrect": 2,
+      "independentClassified": 3,
+      "chanceLevelPerItem": 0.3333333333333333,
+      "description": "2 of 3 new questions answered correctly without help (chance per question 0.33; 0 helped, 0 unknown, 0 unanswered)",
+      "interpretation": "Descriptive count of new comparison questions answered correctly without help, shown beside the chance level. It is not a learning-readiness score, does not show that the teaching caused improvement, and does not establish permanent learning. Pending educator and clinical-supervisor review.",
+      "itemDetails": [
+       {
+        "itemId": "g1p_tr_01",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 1,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": [
+         "HELP_AFTER_FIRST_RESPONSE"
+        ]
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "label": {
+       "independentTransferCorrect": 2,
+       "independentTransferClassified": 3,
+       "itemOutcomes": {
+        "g1p_tr_01": "INDEPENDENT_INCORRECT",
+        "g1p_tr_02": "INDEPENDENT_CORRECT",
+        "g1p_tr_04": "INDEPENDENT_CORRECT"
+       },
+       "status": "USABLE"
+      },
+      "separation": {
+       "predictionTimeSeq": 24,
+       "inputSnapshotSha256": "C6AB108A186174EAA8A68A99AD5A511C704723F98CBFEA8B2B2AB0067B4ED6F6",
+       "labelFromEventsAtOrAfterSeq": 24
+      }
+     },
+     "events": [
+      {
+       "seq": 1,
+       "t": 1.0,
+       "type": "SESSION_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 2,
+       "t": 2.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_04",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 3,
+       "t": 2.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_04",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 4,
+       "t": 5.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_04",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 5,
+       "t": 6.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_04",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 6,
+       "t": 7.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_02",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 7,
+       "t": 7.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_02",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 8,
+       "t": 10.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_02",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 9,
+       "t": 11.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_02",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 10,
+       "t": 12.0,
+       "type": "TEACHING_WINDOW_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 11,
+       "t": 13.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 12,
+       "t": 13.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 13,
+       "t": 16.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 14,
+       "t": 17.0,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 15,
+       "t": 17.5,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_03",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 16,
+       "t": 18.5,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 17,
+       "t": 19.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 18,
+       "t": 22.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 19,
+       "t": 23.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 2,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 20,
+       "t": 26.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 21,
+       "t": 26.5,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 22,
+       "t": 27.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_01",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 23,
+       "t": 28.0,
+       "type": "TEACHING_WINDOW_ENDED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 24,
+       "t": 30.0,
+       "type": "BOUNDARY_SHOWN",
+       "window": "prediction_time"
+      },
+      {
+       "seq": 25,
+       "t": 31.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_01",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 26,
+       "t": 31.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_01",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 27,
+       "t": 34.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_01",
+       "position": 0,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 28,
+       "t": 35.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_tr_01",
+       "level": 1,
+       "origin": "child_request",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 29,
+       "t": 37.5,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_tr_01",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 30,
+       "t": 38.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_01",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 31,
+       "t": 39.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_02",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 32,
+       "t": 39.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_02",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 33,
+       "t": 42.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_02",
+       "position": 0,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 34,
+       "t": 43.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_02",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 35,
+       "t": 44.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_04",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 36,
+       "t": 44.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_04",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 37,
+       "t": 47.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_04",
+       "position": 2,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 38,
+       "t": 48.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_04",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 39,
+       "t": 49.0,
+       "type": "SESSION_ENDED",
+       "window": "after_prediction_time"
+      }
+     ]
+    },
+    {
+     "id": "missing_assistance_record",
+     "title": "Help records missing or incomplete",
+     "description": "Transfer item 3 has no ITEM_ENDED record; item 2 reports incomplete recording.",
+     "synthetic": true,
+     "inputs": {
+      "preProbe": [
+       {
+        "itemId": "g1p_pre_04",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_pre_02",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "teaching": [
+       {
+        "itemId": "g1p_teach_03",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1,
+         2
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": [
+         "HELP_AFTER_FIRST_RESPONSE"
+        ]
+       },
+       {
+        "itemId": "g1p_teach_01",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": []
+       }
+      ],
+      "teachingWindow": {
+       "startedSeq": 10,
+       "endedSeq": 23,
+       "startedT": 12.0,
+       "endedT": 28.0,
+       "closed": true
+      },
+      "snapshot": {
+       "meta": {
+        "snapshotSchemaVersion": "IMLR-SNAPSHOT-v0.1",
+        "protocolId": "IMLR-PROBE-G1",
+        "protocolVersion": "0.1.0-prototype",
+        "formId": "IMLR-PROBE-G1-F68730132B249",
+        "seed": 7,
+        "predictionTime": {
+         "event": "BOUNDARY_SHOWN",
+         "seq": 24,
+         "t": 30.0
+        },
+        "teachingWindowClosedBeforePredictionTime": true,
+        "eventsUsed": 23,
+        "inputEventsSha256": "B53FC8A3578AFBD71A9DD8F57E0BA684998786323DF0B15157C35BDD59D4D07B",
+        "featureAllowlist": [
+         "pre_items_presented",
+         "pre_items_answered",
+         "pre_independent_correct",
+         "pre_independent_incorrect",
+         "pre_assisted",
+         "pre_assistance_unknown",
+         "pre_child_help_requests",
+         "pre_revisions",
+         "pre_instruction_replays",
+         "pre_first_response_seconds",
+         "teaching_items_presented",
+         "teaching_items_answered",
+         "teaching_max_support_level",
+         "teaching_support_events",
+         "teaching_assisted_first_try_correct",
+         "breaks_before_prediction_time",
+         "elpx_pre_transfer"
+        ]
+       },
+       "features": {
+        "pre_items_presented": 2,
+        "pre_items_answered": 2,
+        "pre_independent_correct": 1,
+        "pre_independent_incorrect": 1,
+        "pre_assisted": 0,
+        "pre_assistance_unknown": 0,
+        "pre_child_help_requests": 0,
+        "pre_revisions": 0,
+        "pre_instruction_replays": 0,
+        "pre_first_response_seconds": [
+         3.5,
+         3.5
+        ],
+        "teaching_items_presented": 2,
+        "teaching_items_answered": 2,
+        "teaching_max_support_level": 2,
+        "teaching_support_events": 3,
+        "teaching_assisted_first_try_correct": 1,
+        "breaks_before_prediction_time": 0,
+        "elpx_pre_transfer": {
+         "available": true,
+         "algorithmVersion": "ELP-X-v1.0",
+         "engineSha256": "60C98EBDA9B016F2BA9D550666BF48065E911D3EC57714E2E071EE64535D477D",
+         "intervalMethod": "scipy.stats.beta",
+         "evidence": "pre-probe items with assistanceStatus NONE_CONFIRMED only",
+         "distinctQuestionsAssessed": 2,
+         "correctFirstResponses": 1,
+         "estimatedProficiency": 0.5,
+         "credibleInterval": {
+          "lower": 0.0943,
+          "upper": 0.9057,
+          "confidenceLevel": 0.95
+         },
+         "provisionalSkillLevel": "INSUFFICIENT_EVIDENCE"
+        }
+       },
+       "snapshotSha256": "1ADBDE5CEED69442B6AA8C3D55E51C9335861480F13E54FCCACA21957F750A79"
+      }
+     },
+     "outcomes": {
+      "outcomeSchemaVersion": "IMLR-OUTCOME-v0.1",
+      "formId": "IMLR-PROBE-G1-F68730132B249",
+      "predictionTimeSeq": 24,
+      "items": [
+       {
+        "itemId": "g1p_tr_01",
+        "presentationIndex": 4,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [],
+        "evidenceFromSeq": 25
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "presentationIndex": 5,
+        "assistanceStatus": "UNKNOWN",
+        "outcome": "ASSISTANCE_UNKNOWN",
+        "flags": [
+         "ASSISTANCE_RECORDING_INCOMPLETE"
+        ],
+        "evidenceFromSeq": 29
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "presentationIndex": 6,
+        "assistanceStatus": "UNKNOWN",
+        "outcome": "ASSISTANCE_UNKNOWN",
+        "flags": [
+         "ASSISTANCE_RECORDING_MISSING"
+        ],
+        "evidenceFromSeq": 33
+       }
+      ],
+      "counts": {
+       "INDEPENDENT_CORRECT": 1,
+       "INDEPENDENT_INCORRECT": 0,
+       "HELPED": 0,
+       "ASSISTANCE_UNKNOWN": 2,
+       "UNANSWERED": 0
+      },
+      "independentCorrect": 1,
+      "independentClassified": 1,
+      "chanceLevelPerItem": 0.3333333333333333,
+      "description": "1 of 1 new questions answered correctly without help (chance per question 0.33; 0 helped, 2 unknown, 0 unanswered)",
+      "interpretation": "Descriptive count of new comparison questions answered correctly without help, shown beside the chance level. It is not a learning-readiness score, does not show that the teaching caused improvement, and does not establish permanent learning. Pending educator and clinical-supervisor review.",
+      "itemDetails": [
+       {
+        "itemId": "g1p_tr_01",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "incomplete",
+        "assistanceStatus": "UNKNOWN",
+        "flags": [
+         "ASSISTANCE_RECORDING_INCOMPLETE"
+        ]
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": null,
+        "assistanceStatus": "UNKNOWN",
+        "flags": [
+         "ASSISTANCE_RECORDING_MISSING"
+        ]
+       }
+      ],
+      "label": {
+       "independentTransferCorrect": 1,
+       "independentTransferClassified": 1,
+       "itemOutcomes": {
+        "g1p_tr_01": "INDEPENDENT_CORRECT",
+        "g1p_tr_02": "ASSISTANCE_UNKNOWN",
+        "g1p_tr_04": "ASSISTANCE_UNKNOWN"
+       },
+       "status": "USABLE"
+      },
+      "separation": {
+       "predictionTimeSeq": 24,
+       "inputSnapshotSha256": "1ADBDE5CEED69442B6AA8C3D55E51C9335861480F13E54FCCACA21957F750A79",
+       "labelFromEventsAtOrAfterSeq": 24
+      }
+     },
+     "events": [
+      {
+       "seq": 1,
+       "t": 1.0,
+       "type": "SESSION_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 2,
+       "t": 2.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_04",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 3,
+       "t": 2.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_04",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 4,
+       "t": 5.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_04",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 5,
+       "t": 6.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_04",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 6,
+       "t": 7.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_02",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 7,
+       "t": 7.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_02",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 8,
+       "t": 10.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_02",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 9,
+       "t": 11.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_02",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 10,
+       "t": 12.0,
+       "type": "TEACHING_WINDOW_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 11,
+       "t": 13.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 12,
+       "t": 13.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 13,
+       "t": 16.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 14,
+       "t": 17.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 2,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 15,
+       "t": 20.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 16,
+       "t": 21.0,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 17,
+       "t": 21.5,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_03",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 18,
+       "t": 22.5,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 19,
+       "t": 23.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 20,
+       "t": 26.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 21,
+       "t": 26.5,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 22,
+       "t": 27.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_01",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 23,
+       "t": 28.0,
+       "type": "TEACHING_WINDOW_ENDED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 24,
+       "t": 30.0,
+       "type": "BOUNDARY_SHOWN",
+       "window": "prediction_time"
+      },
+      {
+       "seq": 25,
+       "t": 31.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_01",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 26,
+       "t": 31.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_01",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 27,
+       "t": 34.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_01",
+       "position": 1,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 28,
+       "t": 35.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_01",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 29,
+       "t": 36.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_02",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 30,
+       "t": 36.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_02",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 31,
+       "t": 39.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_02",
+       "position": 0,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 32,
+       "t": 40.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_02",
+       "assistanceRecording": "incomplete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 33,
+       "t": 41.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_04",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 34,
+       "t": 41.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_04",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 35,
+       "t": 44.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_04",
+       "position": 2,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 36,
+       "t": 45.5,
+       "type": "SESSION_ENDED",
+       "window": "after_prediction_time"
+      }
+     ]
+    },
+    {
+     "id": "unanswered_transfer",
+     "title": "Some new questions not answered",
+     "description": "Transfer item 2 skipped; item 3 presented but never answered.",
+     "synthetic": true,
+     "inputs": {
+      "preProbe": [
+       {
+        "itemId": "g1p_pre_04",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_pre_02",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "teaching": [
+       {
+        "itemId": "g1p_teach_03",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_teach_01",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": []
+       }
+      ],
+      "teachingWindow": {
+       "startedSeq": 10,
+       "endedSeq": 21,
+       "startedT": 12.0,
+       "endedT": 24.0,
+       "closed": true
+      },
+      "snapshot": {
+       "meta": {
+        "snapshotSchemaVersion": "IMLR-SNAPSHOT-v0.1",
+        "protocolId": "IMLR-PROBE-G1",
+        "protocolVersion": "0.1.0-prototype",
+        "formId": "IMLR-PROBE-G1-F68730132B249",
+        "seed": 7,
+        "predictionTime": {
+         "event": "BOUNDARY_SHOWN",
+         "seq": 22,
+         "t": 26.0
+        },
+        "teachingWindowClosedBeforePredictionTime": true,
+        "eventsUsed": 21,
+        "inputEventsSha256": "0CFFC6BC1E83506BFE8149596ADA29D78C1010CD7B34907A7D7366840AC5EFCA",
+        "featureAllowlist": [
+         "pre_items_presented",
+         "pre_items_answered",
+         "pre_independent_correct",
+         "pre_independent_incorrect",
+         "pre_assisted",
+         "pre_assistance_unknown",
+         "pre_child_help_requests",
+         "pre_revisions",
+         "pre_instruction_replays",
+         "pre_first_response_seconds",
+         "teaching_items_presented",
+         "teaching_items_answered",
+         "teaching_max_support_level",
+         "teaching_support_events",
+         "teaching_assisted_first_try_correct",
+         "breaks_before_prediction_time",
+         "elpx_pre_transfer"
+        ]
+       },
+       "features": {
+        "pre_items_presented": 2,
+        "pre_items_answered": 2,
+        "pre_independent_correct": 1,
+        "pre_independent_incorrect": 1,
+        "pre_assisted": 0,
+        "pre_assistance_unknown": 0,
+        "pre_child_help_requests": 0,
+        "pre_revisions": 0,
+        "pre_instruction_replays": 0,
+        "pre_first_response_seconds": [
+         3.5,
+         3.5
+        ],
+        "teaching_items_presented": 2,
+        "teaching_items_answered": 2,
+        "teaching_max_support_level": 1,
+        "teaching_support_events": 2,
+        "teaching_assisted_first_try_correct": 2,
+        "breaks_before_prediction_time": 0,
+        "elpx_pre_transfer": {
+         "available": true,
+         "algorithmVersion": "ELP-X-v1.0",
+         "engineSha256": "60C98EBDA9B016F2BA9D550666BF48065E911D3EC57714E2E071EE64535D477D",
+         "intervalMethod": "scipy.stats.beta",
+         "evidence": "pre-probe items with assistanceStatus NONE_CONFIRMED only",
+         "distinctQuestionsAssessed": 2,
+         "correctFirstResponses": 1,
+         "estimatedProficiency": 0.5,
+         "credibleInterval": {
+          "lower": 0.0943,
+          "upper": 0.9057,
+          "confidenceLevel": 0.95
+         },
+         "provisionalSkillLevel": "INSUFFICIENT_EVIDENCE"
+        }
+       },
+       "snapshotSha256": "68DF9891CC63B6B8A198A6AE34C33FE574FB7F066A614ADF6B214E9CF9ADA6E2"
+      }
+     },
+     "outcomes": {
+      "outcomeSchemaVersion": "IMLR-OUTCOME-v0.1",
+      "formId": "IMLR-PROBE-G1-F68730132B249",
+      "predictionTimeSeq": 22,
+      "items": [
+       {
+        "itemId": "g1p_tr_01",
+        "presentationIndex": 4,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [],
+        "evidenceFromSeq": 23
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "presentationIndex": 5,
+        "assistanceStatus": "NOT_APPLICABLE",
+        "outcome": "UNANSWERED",
+        "flags": [],
+        "evidenceFromSeq": 27
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "presentationIndex": 6,
+        "assistanceStatus": "NOT_APPLICABLE",
+        "outcome": "UNANSWERED",
+        "flags": [],
+        "evidenceFromSeq": 31
+       }
+      ],
+      "counts": {
+       "INDEPENDENT_CORRECT": 1,
+       "INDEPENDENT_INCORRECT": 0,
+       "HELPED": 0,
+       "ASSISTANCE_UNKNOWN": 0,
+       "UNANSWERED": 2
+      },
+      "independentCorrect": 1,
+      "independentClassified": 1,
+      "chanceLevelPerItem": 0.3333333333333333,
+      "description": "1 of 1 new questions answered correctly without help (chance per question 0.33; 0 helped, 0 unknown, 2 unanswered)",
+      "interpretation": "Descriptive count of new comparison questions answered correctly without help, shown beside the chance level. It is not a learning-readiness score, does not show that the teaching caused improvement, and does not establish permanent learning. Pending educator and clinical-supervisor review.",
+      "itemDetails": [
+       {
+        "itemId": "g1p_tr_01",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "role": "transfer",
+        "presented": true,
+        "answered": false,
+        "skipped": true,
+        "firstResponseSeconds": null,
+        "firstResponsePosition": null,
+        "correctFirstResponse": null,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NOT_APPLICABLE",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "role": "transfer",
+        "presented": true,
+        "answered": false,
+        "skipped": false,
+        "firstResponseSeconds": null,
+        "firstResponsePosition": null,
+        "correctFirstResponse": null,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NOT_APPLICABLE",
+        "flags": []
+       }
+      ],
+      "label": {
+       "independentTransferCorrect": 1,
+       "independentTransferClassified": 1,
+       "itemOutcomes": {
+        "g1p_tr_01": "INDEPENDENT_CORRECT",
+        "g1p_tr_02": "UNANSWERED",
+        "g1p_tr_04": "UNANSWERED"
+       },
+       "status": "USABLE"
+      },
+      "separation": {
+       "predictionTimeSeq": 22,
+       "inputSnapshotSha256": "68DF9891CC63B6B8A198A6AE34C33FE574FB7F066A614ADF6B214E9CF9ADA6E2",
+       "labelFromEventsAtOrAfterSeq": 22
+      }
+     },
+     "events": [
+      {
+       "seq": 1,
+       "t": 1.0,
+       "type": "SESSION_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 2,
+       "t": 2.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_04",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 3,
+       "t": 2.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_04",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 4,
+       "t": 5.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_04",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 5,
+       "t": 6.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_04",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 6,
+       "t": 7.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_02",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 7,
+       "t": 7.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_02",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 8,
+       "t": 10.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_02",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 9,
+       "t": 11.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_02",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 10,
+       "t": 12.0,
+       "type": "TEACHING_WINDOW_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 11,
+       "t": 13.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 12,
+       "t": 13.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 13,
+       "t": 16.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 14,
+       "t": 17.0,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 15,
+       "t": 17.5,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_03",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 16,
+       "t": 18.5,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 17,
+       "t": 19.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 18,
+       "t": 22.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 19,
+       "t": 22.5,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 20,
+       "t": 23.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_01",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 21,
+       "t": 24.0,
+       "type": "TEACHING_WINDOW_ENDED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 22,
+       "t": 26.0,
+       "type": "BOUNDARY_SHOWN",
+       "window": "prediction_time"
+      },
+      {
+       "seq": 23,
+       "t": 27.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_01",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 24,
+       "t": 27.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_01",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 25,
+       "t": 30.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_01",
+       "position": 1,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 26,
+       "t": 31.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_01",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 27,
+       "t": 32.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_02",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 28,
+       "t": 32.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_02",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 29,
+       "t": 36.5,
+       "type": "ITEM_SKIPPED",
+       "itemId": "g1p_tr_02",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 30,
+       "t": 37.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_02",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 31,
+       "t": 38.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_04",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 32,
+       "t": 38.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_04",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 33,
+       "t": 39.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_04",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 34,
+       "t": 40.0,
+       "type": "SESSION_ENDED",
+       "window": "after_prediction_time"
+      }
+     ]
+    },
+    {
+     "id": "break_during_transfer",
+     "title": "Took a break during a new question",
+     "description": "Child takes a break during transfer item 1, then answers; a break is not support.",
+     "synthetic": true,
+     "inputs": {
+      "preProbe": [
+       {
+        "itemId": "g1p_pre_04",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_pre_02",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "teaching": [
+       {
+        "itemId": "g1p_teach_03",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1,
+         2
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": [
+         "HELP_AFTER_FIRST_RESPONSE"
+        ]
+       },
+       {
+        "itemId": "g1p_teach_01",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1,
+         2
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": [
+         "HELP_AFTER_FIRST_RESPONSE"
+        ]
+       }
+      ],
+      "teachingWindow": {
+       "startedSeq": 10,
+       "endedSeq": 25,
+       "startedT": 12.0,
+       "endedT": 32.0,
+       "closed": true
+      },
+      "snapshot": {
+       "meta": {
+        "snapshotSchemaVersion": "IMLR-SNAPSHOT-v0.1",
+        "protocolId": "IMLR-PROBE-G1",
+        "protocolVersion": "0.1.0-prototype",
+        "formId": "IMLR-PROBE-G1-F68730132B249",
+        "seed": 7,
+        "predictionTime": {
+         "event": "BOUNDARY_SHOWN",
+         "seq": 26,
+         "t": 34.0
+        },
+        "teachingWindowClosedBeforePredictionTime": true,
+        "eventsUsed": 25,
+        "inputEventsSha256": "EFEB599728FEB77338C35EA7089433622212E07B07548E6C12C058855B5F3536",
+        "featureAllowlist": [
+         "pre_items_presented",
+         "pre_items_answered",
+         "pre_independent_correct",
+         "pre_independent_incorrect",
+         "pre_assisted",
+         "pre_assistance_unknown",
+         "pre_child_help_requests",
+         "pre_revisions",
+         "pre_instruction_replays",
+         "pre_first_response_seconds",
+         "teaching_items_presented",
+         "teaching_items_answered",
+         "teaching_max_support_level",
+         "teaching_support_events",
+         "teaching_assisted_first_try_correct",
+         "breaks_before_prediction_time",
+         "elpx_pre_transfer"
+        ]
+       },
+       "features": {
+        "pre_items_presented": 2,
+        "pre_items_answered": 2,
+        "pre_independent_correct": 0,
+        "pre_independent_incorrect": 2,
+        "pre_assisted": 0,
+        "pre_assistance_unknown": 0,
+        "pre_child_help_requests": 0,
+        "pre_revisions": 0,
+        "pre_instruction_replays": 0,
+        "pre_first_response_seconds": [
+         3.5,
+         3.5
+        ],
+        "teaching_items_presented": 2,
+        "teaching_items_answered": 2,
+        "teaching_max_support_level": 2,
+        "teaching_support_events": 4,
+        "teaching_assisted_first_try_correct": 0,
+        "breaks_before_prediction_time": 0,
+        "elpx_pre_transfer": {
+         "available": true,
+         "algorithmVersion": "ELP-X-v1.0",
+         "engineSha256": "60C98EBDA9B016F2BA9D550666BF48065E911D3EC57714E2E071EE64535D477D",
+         "intervalMethod": "scipy.stats.beta",
+         "evidence": "pre-probe items with assistanceStatus NONE_CONFIRMED only",
+         "distinctQuestionsAssessed": 2,
+         "correctFirstResponses": 0,
+         "estimatedProficiency": 0.25,
+         "credibleInterval": {
+          "lower": 0.0084,
+          "upper": 0.7076,
+          "confidenceLevel": 0.95
+         },
+         "provisionalSkillLevel": "INSUFFICIENT_EVIDENCE"
+        }
+       },
+       "snapshotSha256": "62E718596BCC112001C1F6A84965EED958BAE57190901D4D65D51ACAB39C8B45"
+      }
+     },
+     "outcomes": {
+      "outcomeSchemaVersion": "IMLR-OUTCOME-v0.1",
+      "formId": "IMLR-PROBE-G1-F68730132B249",
+      "predictionTimeSeq": 26,
+      "items": [
+       {
+        "itemId": "g1p_tr_01",
+        "presentationIndex": 4,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [
+         "BREAK_DURING_ITEM"
+        ],
+        "evidenceFromSeq": 27
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "presentationIndex": 5,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_INCORRECT",
+        "flags": [],
+        "evidenceFromSeq": 33
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "presentationIndex": 6,
+        "assistanceStatus": "NONE_CONFIRMED",
+        "outcome": "INDEPENDENT_CORRECT",
+        "flags": [],
+        "evidenceFromSeq": 37
+       }
+      ],
+      "counts": {
+       "INDEPENDENT_CORRECT": 2,
+       "INDEPENDENT_INCORRECT": 1,
+       "HELPED": 0,
+       "ASSISTANCE_UNKNOWN": 0,
+       "UNANSWERED": 0
+      },
+      "independentCorrect": 2,
+      "independentClassified": 3,
+      "chanceLevelPerItem": 0.3333333333333333,
+      "description": "2 of 3 new questions answered correctly without help (chance per question 0.33; 0 helped, 0 unknown, 0 unanswered)",
+      "interpretation": "Descriptive count of new comparison questions answered correctly without help, shown beside the chance level. It is not a learning-readiness score, does not show that the teaching caused improvement, and does not establish permanent learning. Pending educator and clinical-supervisor review.",
+      "itemDetails": [
+       {
+        "itemId": "g1p_tr_01",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 24.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": [
+         "BREAK_DURING_ITEM"
+        ]
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "label": {
+       "independentTransferCorrect": 2,
+       "independentTransferClassified": 3,
+       "itemOutcomes": {
+        "g1p_tr_01": "INDEPENDENT_CORRECT",
+        "g1p_tr_02": "INDEPENDENT_INCORRECT",
+        "g1p_tr_04": "INDEPENDENT_CORRECT"
+       },
+       "status": "USABLE"
+      },
+      "separation": {
+       "predictionTimeSeq": 26,
+       "inputSnapshotSha256": "62E718596BCC112001C1F6A84965EED958BAE57190901D4D65D51ACAB39C8B45",
+       "labelFromEventsAtOrAfterSeq": 26
+      }
+     },
+     "events": [
+      {
+       "seq": 1,
+       "t": 1.0,
+       "type": "SESSION_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 2,
+       "t": 2.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_04",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 3,
+       "t": 2.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_04",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 4,
+       "t": 5.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_04",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 5,
+       "t": 6.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_04",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 6,
+       "t": 7.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_02",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 7,
+       "t": 7.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_02",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 8,
+       "t": 10.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_02",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 9,
+       "t": 11.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_02",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 10,
+       "t": 12.0,
+       "type": "TEACHING_WINDOW_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 11,
+       "t": 13.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 12,
+       "t": 13.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 13,
+       "t": 16.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 14,
+       "t": 17.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 2,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 15,
+       "t": 20.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 16,
+       "t": 21.0,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 17,
+       "t": 21.5,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_03",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 18,
+       "t": 22.5,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 19,
+       "t": 23.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 20,
+       "t": 26.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 0,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 21,
+       "t": 27.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 2,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 22,
+       "t": 30.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 23,
+       "t": 30.5,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 24,
+       "t": 31.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_01",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 25,
+       "t": 32.0,
+       "type": "TEACHING_WINDOW_ENDED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 26,
+       "t": 34.0,
+       "type": "BOUNDARY_SHOWN",
+       "window": "prediction_time"
+      },
+      {
+       "seq": 27,
+       "t": 35.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_01",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 28,
+       "t": 35.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_01",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 29,
+       "t": 36.5,
+       "type": "BREAK_STARTED",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 30,
+       "t": 56.5,
+       "type": "BREAK_ENDED",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 31,
+       "t": 59.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_01",
+       "position": 1,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 32,
+       "t": 60.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_01",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 33,
+       "t": 61.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_02",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 34,
+       "t": 61.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_02",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 35,
+       "t": 64.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_02",
+       "position": 1,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 36,
+       "t": 65.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_02",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 37,
+       "t": 66.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_04",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 38,
+       "t": 66.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_04",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 39,
+       "t": 69.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_04",
+       "position": 2,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 40,
+       "t": 70.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_04",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 41,
+       "t": 71.0,
+       "type": "SESSION_ENDED",
+       "window": "after_prediction_time"
+      }
+     ]
+    },
+    {
+     "id": "teaching_window_not_closed",
+     "title": "Teaching not formally closed",
+     "description": "Teaching window never closed before transfer: independence cannot be confirmed.",
+     "synthetic": true,
+     "inputs": {
+      "preProbe": [
+       {
+        "itemId": "g1p_pre_04",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_pre_02",
+        "role": "pre",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": false,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "NONE_CONFIRMED",
+        "flags": []
+       }
+      ],
+      "teaching": [
+       {
+        "itemId": "g1p_teach_03",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": []
+       },
+       {
+        "itemId": "g1p_teach_01",
+        "role": "teaching",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [
+         {
+          "level": 1,
+          "origin": "protocol"
+         }
+        ],
+        "supportLevels": [
+         1
+        ],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "ASSISTED",
+        "flags": []
+       }
+      ],
+      "teachingWindow": {
+       "startedSeq": 10,
+       "endedSeq": null,
+       "startedT": 12.0,
+       "endedT": null,
+       "closed": false
+      },
+      "snapshot": {
+       "meta": {
+        "snapshotSchemaVersion": "IMLR-SNAPSHOT-v0.1",
+        "protocolId": "IMLR-PROBE-G1",
+        "protocolVersion": "0.1.0-prototype",
+        "formId": "IMLR-PROBE-G1-F68730132B249",
+        "seed": 7,
+        "predictionTime": {
+         "event": "BOUNDARY_SHOWN",
+         "seq": 21,
+         "t": 25.0
+        },
+        "teachingWindowClosedBeforePredictionTime": false,
+        "eventsUsed": 20,
+        "inputEventsSha256": "DF91EF061D7692818C605269EBD54BDB07D8ACEDD8212F0EF92AA183EBBB7841",
+        "featureAllowlist": [
+         "pre_items_presented",
+         "pre_items_answered",
+         "pre_independent_correct",
+         "pre_independent_incorrect",
+         "pre_assisted",
+         "pre_assistance_unknown",
+         "pre_child_help_requests",
+         "pre_revisions",
+         "pre_instruction_replays",
+         "pre_first_response_seconds",
+         "teaching_items_presented",
+         "teaching_items_answered",
+         "teaching_max_support_level",
+         "teaching_support_events",
+         "teaching_assisted_first_try_correct",
+         "breaks_before_prediction_time",
+         "elpx_pre_transfer"
+        ]
+       },
+       "features": {
+        "pre_items_presented": 2,
+        "pre_items_answered": 2,
+        "pre_independent_correct": 1,
+        "pre_independent_incorrect": 1,
+        "pre_assisted": 0,
+        "pre_assistance_unknown": 0,
+        "pre_child_help_requests": 0,
+        "pre_revisions": 0,
+        "pre_instruction_replays": 0,
+        "pre_first_response_seconds": [
+         3.5,
+         3.5
+        ],
+        "teaching_items_presented": 2,
+        "teaching_items_answered": 2,
+        "teaching_max_support_level": 1,
+        "teaching_support_events": 2,
+        "teaching_assisted_first_try_correct": 2,
+        "breaks_before_prediction_time": 0,
+        "elpx_pre_transfer": {
+         "available": true,
+         "algorithmVersion": "ELP-X-v1.0",
+         "engineSha256": "60C98EBDA9B016F2BA9D550666BF48065E911D3EC57714E2E071EE64535D477D",
+         "intervalMethod": "scipy.stats.beta",
+         "evidence": "pre-probe items with assistanceStatus NONE_CONFIRMED only",
+         "distinctQuestionsAssessed": 2,
+         "correctFirstResponses": 1,
+         "estimatedProficiency": 0.5,
+         "credibleInterval": {
+          "lower": 0.0943,
+          "upper": 0.9057,
+          "confidenceLevel": 0.95
+         },
+         "provisionalSkillLevel": "INSUFFICIENT_EVIDENCE"
+        }
+       },
+       "snapshotSha256": "CD07C0F6C0DF3287C176173C555538A201DABFE93722E667D9B4ABB4BD1F887B"
+      }
+     },
+     "outcomes": {
+      "outcomeSchemaVersion": "IMLR-OUTCOME-v0.1",
+      "formId": "IMLR-PROBE-G1-F68730132B249",
+      "predictionTimeSeq": 21,
+      "items": [
+       {
+        "itemId": "g1p_tr_01",
+        "presentationIndex": 4,
+        "assistanceStatus": "UNKNOWN",
+        "outcome": "ASSISTANCE_UNKNOWN",
+        "flags": [
+         "TEACHING_WINDOW_OPEN_AT_PRESENTATION"
+        ],
+        "evidenceFromSeq": 22
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "presentationIndex": 5,
+        "assistanceStatus": "UNKNOWN",
+        "outcome": "ASSISTANCE_UNKNOWN",
+        "flags": [
+         "TEACHING_WINDOW_OPEN_AT_PRESENTATION"
+        ],
+        "evidenceFromSeq": 26
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "presentationIndex": 6,
+        "assistanceStatus": "UNKNOWN",
+        "outcome": "ASSISTANCE_UNKNOWN",
+        "flags": [
+         "TEACHING_WINDOW_OPEN_AT_PRESENTATION"
+        ],
+        "evidenceFromSeq": 30
+       }
+      ],
+      "counts": {
+       "INDEPENDENT_CORRECT": 0,
+       "INDEPENDENT_INCORRECT": 0,
+       "HELPED": 0,
+       "ASSISTANCE_UNKNOWN": 3,
+       "UNANSWERED": 0
+      },
+      "independentCorrect": 0,
+      "independentClassified": 0,
+      "chanceLevelPerItem": 0.3333333333333333,
+      "description": "0 of 0 new questions answered correctly without help (chance per question 0.33; 0 helped, 3 unknown, 0 unanswered)",
+      "interpretation": "Descriptive count of new comparison questions answered correctly without help, shown beside the chance level. It is not a learning-readiness score, does not show that the teaching caused improvement, and does not establish permanent learning. Pending educator and clinical-supervisor review.",
+      "itemDetails": [
+       {
+        "itemId": "g1p_tr_01",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 1,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "UNKNOWN",
+        "flags": [
+         "TEACHING_WINDOW_OPEN_AT_PRESENTATION"
+        ]
+       },
+       {
+        "itemId": "g1p_tr_02",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 0,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "UNKNOWN",
+        "flags": [
+         "TEACHING_WINDOW_OPEN_AT_PRESENTATION"
+        ]
+       },
+       {
+        "itemId": "g1p_tr_04",
+        "role": "transfer",
+        "presented": true,
+        "answered": true,
+        "skipped": false,
+        "firstResponseSeconds": 3.5,
+        "firstResponsePosition": 2,
+        "correctFirstResponse": true,
+        "revisions": 0,
+        "instructionReplays": 0,
+        "supportBeforeFirstResponse": [],
+        "supportLevels": [],
+        "childHelpRequests": 0,
+        "assistanceRecording": "complete",
+        "assistanceStatus": "UNKNOWN",
+        "flags": [
+         "TEACHING_WINDOW_OPEN_AT_PRESENTATION"
+        ]
+       }
+      ],
+      "label": {
+       "independentTransferCorrect": 0,
+       "independentTransferClassified": 0,
+       "itemOutcomes": {
+        "g1p_tr_01": "ASSISTANCE_UNKNOWN",
+        "g1p_tr_02": "ASSISTANCE_UNKNOWN",
+        "g1p_tr_04": "ASSISTANCE_UNKNOWN"
+       },
+       "status": "NO_VALID_TRANSFER_EVIDENCE"
+      },
+      "separation": {
+       "predictionTimeSeq": 21,
+       "inputSnapshotSha256": "CD07C0F6C0DF3287C176173C555538A201DABFE93722E667D9B4ABB4BD1F887B",
+       "labelFromEventsAtOrAfterSeq": 21
+      }
+     },
+     "events": [
+      {
+       "seq": 1,
+       "t": 1.0,
+       "type": "SESSION_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 2,
+       "t": 2.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_04",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 3,
+       "t": 2.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_04",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 4,
+       "t": 5.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_04",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 5,
+       "t": 6.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_04",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 6,
+       "t": 7.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_pre_02",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 7,
+       "t": 7.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_pre_02",
+       "action": "delivered",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 8,
+       "t": 10.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_pre_02",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 9,
+       "t": 11.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_pre_02",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 10,
+       "t": 12.0,
+       "type": "TEACHING_WINDOW_STARTED",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 11,
+       "t": 13.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 12,
+       "t": 13.5,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_03",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 13,
+       "t": 16.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_03",
+       "position": 1,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 14,
+       "t": 17.0,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_03",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 15,
+       "t": 17.5,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_03",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 16,
+       "t": 18.5,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 17,
+       "t": 19.0,
+       "type": "SUPPORT_STARTED",
+       "itemId": "g1p_teach_01",
+       "level": 1,
+       "origin": "protocol",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 18,
+       "t": 22.0,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_teach_01",
+       "position": 2,
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 19,
+       "t": 22.5,
+       "type": "SUPPORT_ENDED",
+       "itemId": "g1p_teach_01",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 20,
+       "t": 23.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_teach_01",
+       "assistanceRecording": "complete",
+       "window": "before_prediction_time"
+      },
+      {
+       "seq": 21,
+       "t": 25.0,
+       "type": "BOUNDARY_SHOWN",
+       "window": "prediction_time"
+      },
+      {
+       "seq": 22,
+       "t": 26.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_01",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 23,
+       "t": 26.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_01",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 24,
+       "t": 29.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_01",
+       "position": 1,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 25,
+       "t": 30.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_01",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 26,
+       "t": 31.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_02",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 27,
+       "t": 31.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_02",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 28,
+       "t": 34.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_02",
+       "position": 0,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 29,
+       "t": 35.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_02",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 30,
+       "t": 36.0,
+       "type": "ITEM_PRESENTED",
+       "itemId": "g1p_tr_04",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 31,
+       "t": 36.5,
+       "type": "INSTRUCTION",
+       "itemId": "g1p_tr_04",
+       "action": "delivered",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 32,
+       "t": 39.5,
+       "type": "RESPONSE_CONFIRMED",
+       "itemId": "g1p_tr_04",
+       "position": 2,
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 33,
+       "t": 40.0,
+       "type": "ITEM_ENDED",
+       "itemId": "g1p_tr_04",
+       "assistanceRecording": "complete",
+       "window": "after_prediction_time"
+      },
+      {
+       "seq": 34,
+       "t": 41.0,
+       "type": "SESSION_ENDED",
+       "window": "after_prediction_time"
+      }
+     ]
+    }
+   ]
+  },
   "softwareTests": [
    {
     "suite": "MQ-REC v0.1 unit tests",
     "kind": "software_test",
     "command": "python -m unittest discover -s test_scenarios -t . (from research/recommendation_engine)",
-    "ranAtUtc": "2026-10-20T17:56:47+00:00",
+    "ranAtUtc": "2026-10-20T19:40:14+00:00",
     "status": "PASSED",
     "testsRun": 44,
     "passed": 44,
@@ -7375,8 +12618,8 @@
    {
     "suite": "NSCH baseline verification tests",
     "kind": "software_test",
-    "command": ".venv\\Scripts\\python.exe -m unittest discover -s tests -t . (from ml_experiments)",
-    "ranAtUtc": "2026-10-20T17:56:48+00:00",
+    "command": ".venv\\Scripts\\python.exe -m unittest tests.test_nsch_baseline (from ml_experiments)",
+    "ranAtUtc": "2026-10-20T19:40:14+00:00",
     "status": "PASSED",
     "testsRun": 21,
     "passed": 21,
@@ -7466,6 +12709,208 @@
      },
      {
       "test": "test_nsch_baseline.TestRequiredFeatures.test_hypothetical_example_uses_documented_codes",
+      "outcome": "passed"
+     }
+    ]
+   },
+   {
+    "suite": "IMLR probe prototype tests",
+    "kind": "software_test",
+    "command": ".venv\\Scripts\\python.exe -m unittest tests.test_imlr_probe (from ml_experiments)",
+    "ranAtUtc": "2026-10-20T19:40:36+00:00",
+    "status": "PASSED",
+    "testsRun": 47,
+    "passed": 47,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "results": [
+     {
+      "test": "test_imlr_probe.TestArrangementIndependence.test_correct_option_is_not_systematically_the_widest_or_tightest",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestArrangementIndependence.test_extent_mode_is_independent_of_correct_position",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestArrangementIndependence.test_pattern_and_spacing_distributions_match_for_correct_and_other_options",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestAssistanceStatus.test_break_is_not_support",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestAssistanceStatus.test_correctness_comes_from_answer_key_not_events",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestAssistanceStatus.test_explicit_independent_and_helped_outcomes",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestAssistanceStatus.test_help_after_first_response_keeps_first_response_independent",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestAssistanceStatus.test_malformed_logs_are_rejected",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestAssistanceStatus.test_missing_or_incomplete_assistance_record_is_unknown_not_unassisted",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestAssistanceStatus.test_open_teaching_window_makes_transfer_unknown",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestAssistanceStatus.test_record_without_assistance_field_is_unknown",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestAssistanceStatus.test_teaching_responses_are_always_assisted",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestAssistanceStatus.test_unanswered_items",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestBalancedPositions.test_correct_positions_are_balanced_across_forms",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestBalancedPositions.test_positions_within_pre_and_teaching_are_distinct",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestBalancedPositions.test_transfer_never_copies_the_supported_items_position",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestBalancedPositions.test_transfer_positions_use_each_position_exactly_once",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestFormAssignment.test_client_view_has_no_answer_key",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestFormAssignment.test_largest_count_is_always_at_the_recorded_position",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestFormAssignment.test_phase_structure_and_universal_teaching",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestFormAssignment.test_same_seed_gives_identical_form",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestFormAssignment.test_seed_and_form_id_are_recorded_and_vary",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestItemBank.test_all_items_pending_expert_review",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestItemBank.test_bank_is_valid",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestItemBank.test_pre_and_transfer_share_a_cell_with_equal_mean_difficulty",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestItemBank.test_teaching_never_previews_transfer_quantities_or_objects",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestNoClinicalClaims.test_demo_prints_non_claims_and_approvals",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestNoClinicalClaims.test_interpretation_disclaims_rather_than_claims",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestNoClinicalClaims.test_outputs_contain_no_clinical_or_readiness_claims",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestNoClinicalClaims.test_prototype_has_no_training_or_learner_data_access",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestPredictionSnapshot.test_elpx_is_recomputed_from_independent_pre_items_only",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestPredictionSnapshot.test_leakage_guard_rejects_forbidden_features",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestPredictionSnapshot.test_missing_boundary_is_refused",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestPredictionSnapshot.test_no_transfer_information_in_snapshot",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestPredictionSnapshot.test_only_allowlisted_features",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestPredictionSnapshot.test_post_prediction_events_cannot_change_snapshot",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestPredictionSnapshot.test_pre_transfer_evidence_changes_the_snapshot",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestPredictionSnapshot.test_snapshot_is_reproducible_and_frozen",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestPredictionSnapshot.test_transfer_before_boundary_is_refused",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestResearchRecord.test_every_scenario_builds_a_consistent_record",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestResearchRecord.test_label_and_inputs_are_separate",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestResearchRecord.test_no_independent_evidence_yields_unusable_label",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestResearchRecord.test_tampered_snapshot_or_mismatched_form_is_refused",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestUnseenItems.test_assignment_refuses_when_unseen_pool_is_exhausted",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestUnseenItems.test_no_item_repeats_within_a_form",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestUnseenItems.test_previously_seen_items_are_never_assigned",
+      "outcome": "passed"
+     },
+     {
+      "test": "test_imlr_probe.TestUnseenItems.test_previously_seen_transfer_item_is_not_counted_as_independent",
       "outcome": "passed"
      }
     ]

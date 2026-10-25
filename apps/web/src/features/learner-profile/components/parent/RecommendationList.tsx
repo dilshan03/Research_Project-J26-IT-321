@@ -3,6 +3,7 @@ import { Lightbulb, Info } from 'lucide-react';
 import type { ElpxStructuredRecommendation } from '../../types/onboarding';
 import { parentText } from '../../../../shared/i18n/parentText';
 import { ResearchDetails } from './ResearchDetails';
+import { pick } from '../../../../shared/i18n/language';
 
 interface RecommendationListProps {
   recommendations: ElpxStructuredRecommendation[];
@@ -57,8 +58,8 @@ export const RecommendationList: React.FC<RecommendationListProps> = ({
               <Lightbulb size={18} />
             </span>
             <div className="min-w-0 space-y-1">
-              <p className="text-sm font-bold text-mq-text-strong break-words">{rec.titleSi || rec.titleEn}</p>
-              <p className="text-sm text-mq-text leading-relaxed break-words">{rec.descriptionSi || rec.descriptionEn}</p>
+              <p className="text-sm font-bold text-mq-text-strong break-words">{pick(rec.titleSi, rec.titleEn)}</p>
+              <p className="text-sm text-mq-text leading-relaxed break-words">{pick(rec.descriptionSi, rec.descriptionEn)}</p>
             </div>
           </div>
         ))}

@@ -49,11 +49,12 @@ export const OverviewTab: React.FC<{ snapshot: ResearchSnapshot; freshness: Fres
       </Panel>
 
       <div className="grid gap-3 grid-cols-2 md:grid-cols-5">
-        <Stat label="Implemented (live)" value={count((m) => m.status === 'IMPLEMENTED')} />
-        <Stat label="Provisional (live)" value={count((m) => m.status === 'PROVISIONAL')} />
-        <Stat label="Offline experiments" value={count((m) => m.status === 'OFFLINE_EXPERIMENT')} />
-        <Stat label="Prototypes" value={count((m) => m.status === 'PROTOTYPE')} />
-        <Stat label="Not implemented" value={count((m) => m.status === 'NOT_IMPLEMENTED' || m.status === 'PLANNED')} />
+        {/* Tones match the status badges: green live, amber provisional, indigo offline, sky prototype, grey planned */}
+        <Stat label="Implemented (live)" value={count((m) => m.status === 'IMPLEMENTED')} tone="emerald" />
+        <Stat label="Provisional (live)" value={count((m) => m.status === 'PROVISIONAL')} tone="amber" />
+        <Stat label="Offline experiments" value={count((m) => m.status === 'OFFLINE_EXPERIMENT')} tone="indigo" />
+        <Stat label="Prototypes" value={count((m) => m.status === 'PROTOTYPE')} tone="sky" />
+        <Stat label="Not implemented" value={count((m) => m.status === 'NOT_IMPLEMENTED' || m.status === 'PLANNED')} tone="slate" />
       </div>
 
       {GROUPS.map((g) => {

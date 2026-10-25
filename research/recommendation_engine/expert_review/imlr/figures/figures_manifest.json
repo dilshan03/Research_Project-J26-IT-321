@@ -1,0 +1,29 @@
+{
+ "generatedFrom": "research/recommendation_engine/ml_experiments/imlr_probe",
+ "protocol": "IMLR-PROBE-G1 0.1.0-prototype",
+ "status": "RESEARCH_PROTOTYPE_NOT_FOR_USE_WITH_CHILDREN",
+ "itemBankVersion": "IMLR-G1-ITEMS-0.1.0-synthetic",
+ "formId": "IMLR-PROBE-G1-F68730132B249",
+ "seed": 7,
+ "densitySampleItem": "g1p_tr_02",
+ "files": [
+  "child_Q1_g1p_pre_04.svg",
+  "child_Q2_g1p_pre_02.svg",
+  "child_Q3_g1p_teach_03.svg",
+  "child_Q4_g1p_teach_01.svg",
+  "child_Q5_g1p_tr_01.svg",
+  "child_Q6_g1p_tr_02.svg",
+  "child_Q7_g1p_tr_04.svg",
+  "density_A1_equal_extent.svg",
+  "density_A2_equal_spacing.svg",
+  "density_A3_ten_frame.svg",
+  "density_A4_matched_total_area.svg",
+  "item_Q1_g1p_pre_04.svg",
+  "item_Q2_g1p_pre_02.svg",
+  "item_Q3_g1p_teach_03.svg",
+  "item_Q4_g1p_teach_01.svg",
+  "item_Q5_g1p_tr_01.svg",
+  "item_Q6_g1p_tr_02.svg",
+  "item_Q7_g1p_tr_04.svg"
+ ]
+}

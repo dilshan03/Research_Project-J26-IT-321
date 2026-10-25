@@ -36,7 +36,7 @@ This document specifies sixteen candidate rules across six functional categories
 - **Recommended Action**: Honor child sensory choice: mute ambient audio and background sound; convert automatic spoken prompts into optional "tap-to-hear" speech bubbles.
 - **Parent/Teacher Explanation (EN)**: "Your child selected quiet sound mode. Spoken guidance is set to 'tap-to-hear' so audio plays only when clicked, supporting calm focus."
 - **Parent/Teacher Explanation (SI)**: "දරුවා නිහඬ ශබ්ද මාදිලිය තෝරාගෙන ඇත. එමනිසා අවශ්‍ය විටෙක පමණක් ක්ලික් කර ශ්‍රව්‍ය උපදෙස් ලබා ගැනීමට සකසා ඇත."
-- **Evidence Reference**: Boston Children's Hospital (Lee et al., 2020), Skill 1 & 9 (printed pp. 3–6, 38–40 / PDF pp. 3–6, 38–40); NICE NG87 Section 1.4 (printed pp. 13–16 / PDF pp. 13–16).
+- **Evidence Reference**: Boston Children's Hospital (Lee & Sinclair-McBride, n.d.), Skill 1 & 9 (PDF pp. 3–6, 38–40); NICE NG87 Section 1.4 (printed pp. 13–16 / PDF pp. 13–16).
 - **Relationship to R1–R8**: Operationalizes Rule R8 (positive, observable learner agency).
 - **Status**: Literature-informed proposal.
 - **Missing-Data Behaviour**: If `childPreferences` is null, preserve parent-configured `audioAssistance`.
@@ -90,7 +90,7 @@ This document specifies sixteen candidate rules across six functional categories
 - **Recommended Action**: Recommend `COLLABORATIVE_LEARNING` (co-play quest modes with turn-taking) and parent-guided encouragement prompts.
 - **Parent/Teacher Explanation (EN)**: "Your home study space is shared and interactive. We suggest joint math discovery activities designed for collaborative parent-child exploration."
 - **Parent/Teacher Explanation (SI)**: "පවුලේ සාමාජිකයන් සමඟ එක්ව ඉගෙනීමට දරුවා කැමති බව පෙනේ. දෙමාපියන්ට දරුවා සමඟ එක්ව විසඳිය හැකි සහයෝගී ක්‍රීඩා නිර්දේශ කෙරේ."
-- **Evidence Reference**: Boston Children's Hospital (Lee et al., 2020), Skill 1 & 2 (printed pp. 3–10 / PDF pp. 3–10).
+- **Evidence Reference**: Boston Children's Hospital (Lee & Sinclair-McBride, n.d.), Skill 1 & 2 (PDF pp. 3–10).
 - **Relationship to R1–R8**: Aligns with Rule R8.
 - **Status**: Supervisor-accepted concept.
 - **Missing-Data Behaviour**: If `socialContext` is missing, defaults to independent self-paced activities.
@@ -118,7 +118,7 @@ This document specifies sixteen candidate rules across six functional categories
 - **Recommended Action**: Recommend `CRA_SCAFFOLDING`: lock abstract symbolic equations; present interactive virtual manipulatives and 2D pictorial counters with tactile placement.
 - **Parent/Teacher Explanation (EN)**: "The learner is developing foundational understanding. We recommend using virtual counters and pictorial models before practicing abstract numbers."
 - **Parent/Teacher Explanation (SI)**: "මූලික සංකල්ප වර්ධනය වෙමින් පවතී. වියුක්ත සමීකරණ වලට පෙර, ගණන් කළ හැකි දෘශ්‍ය රූප ආධාරයෙන් පුහුණු වීම නිර්දේශ කෙරේ."
-- **Evidence Reference**: IES WWC 2021 Practice Guide, Recommendation 3 (printed pp. 21–28 / PDF pp. 28–35; supported by 28 studies); Boston Children's Hospital Skill 6 (printed pp. 26–30 / PDF pp. 26–30).
+- **Evidence Reference**: IES WWC 2021 Practice Guide, Recommendation 3 (printed pp. 21–28 / PDF pp. 28–35; supported by 28 studies); Boston Children's Hospital Skill 6 (PDF pp. 26–30).
 - **Relationship to R1–R8**: Directly operationalizes Rule R2 (suggest worked example or smaller step rather than repeating same item; supervisor accepted).
 - **Status**: Supervisor-accepted concept; specific item progression counts require expert review.
 - **Missing-Data Behaviour**: If `distinctQuestionsAssessed < 3`, suppress proficiency-based scaffolding and trigger `ASSESSMENT_EXPANSION`.
@@ -144,7 +144,7 @@ This document specifies sixteen candidate rules across six functional categories
 - **Recommended Action**: Recommend `TASK_CHUNKING`: present each arithmetic operation as an isolated micro-step with intermediate confirmation before revealing the next step.
 - **Parent/Teacher Explanation (EN)**: "Frequent hint requests indicate high working memory load. Dividing multi-step problems into clear mini-steps reduces frustration."
 - **Parent/Teacher Explanation (SI)**: "කාර්යයන් පියවර කිහිපයකින් සමන්විත වන විට දරුවාට වෙහෙස විය හැක. එබැවින් ගැටළුව කුඩා පියවර වලට වෙන් කර පෙන්වීම වඩාත් පහසු වේ."
-- **Evidence Reference**: Boston Children's Hospital (Lee et al., 2020), Skill 6 "How to Get Things Done - Mini-tasks" (printed pp. 26–30 / PDF pp. 26–30); NICE NG87 Terms 'Environmental Modifications' (printed pp. 38–39 / PDF pp. 38–39).
+- **Evidence Reference**: Boston Children's Hospital (Lee & Sinclair-McBride, n.d.), Skill 6 "How to Get Things Done - Mini-tasks" (PDF pp. 26–30); NICE NG87 Terms 'Environmental Modifications' (printed pp. 38–39 / PDF pp. 38–39).
 - **Relationship to R1–R8**: Supports Rule R2 (smaller steps on struggle; accepted) and Rule R8.
 - **Status**: Literature-informed proposal.
 - **Missing-Data Behaviour**: If hint telemetry is missing, defaults to standard curriculum step presentation.
@@ -170,7 +170,7 @@ This document specifies sixteen candidate rules across six functional categories
 - **Recommended Action**: Recommend `OPTIONAL_REST_BREAK`: display an unobtrusive, gentle "Take a quick stretch" button or avatar break prompt. **Must remain voluntary and dismissible.**
 - **Parent/Teacher Explanation (EN)**: "After 15 minutes of sustained math play, an optional short stretch break is made available. Breaks remain child-guided so they do not interrupt deep focus."
 - **Parent/Teacher Explanation (SI)**: "මිනිත්තු 15ක අඛණ්ඩ ගණිත අභ්‍යාස වලින් පසු, අවශ්‍ය නම් කෙටි විවේකයක් ගැනීමට දරුවාට අවස්ථාව ලබා දේ."
-- **Evidence Reference**: Boston Children's Hospital (Lee et al., 2020), Skill 2 & 8 (printed pp. 8, 34 / PDF pp. 8, 34); NICE NG87 'Environmental Modifications' (printed pp. 38–39 / PDF pp. 38–39).
+- **Evidence Reference**: Boston Children's Hospital (Lee & Sinclair-McBride, n.d.), Skill 2 & 8 (PDF pp. 8, 34); NICE NG87 'Environmental Modifications' (printed pp. 38–39 / PDF pp. 38–39).
 - **Relationship to R1–R8**: Refines Rule R6 (Revision required; ensures break is optional and non-intrusive without arbitrary telemetry thresholds).
 - **Status**: Supervisor-revision-pending (revised to be voluntary and individualized).
 - **Missing-Data Behaviour**: If session duration is unknown, break prompt is only accessible manually via on-screen icon.

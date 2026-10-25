@@ -1,6 +1,6 @@
 """
 Database-free tests for parent-reported ADHD & support information:
-SNAP-IV history (dates only for parents), access control, and the removed medication feature
+SNAP-IV history (subscale scores, never item answers, for parents), access control, and the removed medication feature
 (no endpoint, and any record stored earlier is never returned).
 """
 
@@ -126,14 +126,17 @@ class TestSnapIvHistory:
         assert len(quest["snapIvHistory"]) == 2
         assert quest["snapIv"]["totalScore"] == 0  # latest submission, unchanged contract
 
-    async def test_parents_see_dates_only_never_scores(self, db):
+    async def test_parents_see_subscale_scores_but_never_item_answers(self, db):
+        # Changed on purpose (SNAPIV-PROGRESS-v1.0): parents now see their own subscale scores over time.
         await _call("POST", SNAP_URL, {"responses": SNAP})
         res = await _call("GET", SUPPORT)
         history = res.json()["data"]["snapIv"]["history"]
         assert len(history) == 1 and history[0]["completedAt"]
-        for field in ("totalScore", "inattentionTotal", "hyperactivityTotal", "responses", "Average"):
-            assert field not in res.text
+        assert history[0]["inattention"] == {"total": 18, "average": 2.0}
+        assert history[0]["hyperactivity"] == {"total": 9, "average": 1.0}
+        assert '"responses"' not in res.text and '"itemId"' not in res.text and "_items" not in res.text
         assert "not a clinical change" in res.json()["data"]["snapIv"]["notice"]
+        assert "not a diagnosis" in res.json()["data"]["snapIv"]["progress"]["notice"]
 
     async def test_legacy_single_record_is_kept_when_a_new_one_is_added(self, db):
         db["questionnaires"].docs.append({"learnerId": LEARNER, "snapIv": {

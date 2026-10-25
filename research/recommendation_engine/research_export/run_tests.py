@@ -2,7 +2,7 @@
 Runs a unittest suite and prints a JSON summary (used by export_snapshot in a separate process, so
 each suite imports its own packages from its own directory).
 
-    python -m research_export.run_tests <start_dir> <top_level_dir>
+    python -m research_export.run_tests <start_dir> <top_level_dir> [file_pattern]
 """
 
 import json
@@ -32,9 +32,9 @@ class _Recorder(unittest.TextTestResult):
         self.outcomes.append((test.id(), "skipped"))
 
 
-def main(start_dir: str, top_dir: str) -> int:
+def main(start_dir: str, top_dir: str, pattern: str = "test*.py") -> int:
     sys.path.insert(0, top_dir)
-    suite = unittest.defaultTestLoader.discover(start_dir, top_level_dir=top_dir)
+    suite = unittest.defaultTestLoader.discover(start_dir, pattern=pattern, top_level_dir=top_dir)
     with open(sys.stderr.fileno(), "w", closefd=False) as stream:
         result = unittest.TextTestRunner(stream=stream, resultclass=_Recorder, verbosity=0).run(suite)
     print(json.dumps({
@@ -50,4 +50,4 @@ def main(start_dir: str, top_dir: str) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1], sys.argv[2]))
+    sys.exit(main(*sys.argv[1:4]))

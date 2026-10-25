@@ -156,6 +156,23 @@ class TestSnapshot:
         assert snap["sections"]["nsch"]["testYearUsedForTrainingOrSelection"] is False
         assert data["freshness"]["status"] in {"CURRENT", "STALE", "UNVERIFIABLE"}
 
+    async def test_imlr_demo_is_served_unchanged_with_inputs_and_outcomes_separate(self, db):
+        data = (await _get("/components/learner-profile")).json()["data"]
+        demo = data["snapshot"]["sections"]["imlrDemo"]
+        saved = json.loads(SNAPSHOT_FILE.read_text(encoding="utf-8"))["sections"]["imlrDemo"]
+        assert demo == saved
+        assert demo["provenance"] == "synthetic" and len(demo["scenarios"]) == 8
+        for sc in demo["scenarios"]:
+            assert sc["synthetic"] is True
+            transfer_ids = {i["itemId"] for i in sc["outcomes"]["items"]}
+            assert not any(t in json.dumps(sc["inputs"]) for t in transfer_ids)
+            cutoff = sc["inputs"]["snapshot"]["meta"]["predictionTime"]["seq"]
+            assert all(i["evidenceFromSeq"] > cutoff for i in sc["outcomes"]["items"])
+
+    async def test_imlr_demo_requires_research_access(self, db):
+        res = await _get("/components/learner-profile", session="admin")
+        assert res.status_code == 403 and "imlrDemo" not in res.text
+
     @pytest.mark.parametrize("component", ["behaviour-signal", "content-adaptation", "pedagogical-engine"])
     async def test_other_components_show_empty_state_not_invented_data(self, db, component):
         data = (await _get(f"/components/{component}")).json()["data"]
@@ -175,6 +192,15 @@ class TestSnapshot:
         lambda s: s["models"][0].__setitem__("status", "VALIDATED"),
         lambda s: s.__setitem__("schemaVersion", "MQ-RESEARCH-SNAPSHOT-v0"),
         lambda s: s.__setitem__("componentId", "behaviour-signal"),
+        # IMLR prototype demonstration
+        lambda s: s["sections"]["imlrDemo"].__setitem__("provenance", "live"),
+        lambda s: s["sections"]["imlrDemo"]["scenarios"][0].__setitem__("synthetic", False),
+        lambda s: s["sections"]["imlrDemo"]["protocol"].__setitem__("status", "VALIDATED"),
+        lambda s: s["sections"]["imlrDemo"]["scenarios"][0]["inputs"]["snapshot"]["features"].__setitem__(
+            "transfer_correct", 2),
+        lambda s: s["sections"]["imlrDemo"]["scenarios"][0]["inputs"]["preProbe"].append(
+            {"itemId": s["sections"]["imlrDemo"]["scenarios"][0]["outcomes"]["items"][0]["itemId"]}),
+        lambda s: s["sections"]["imlrDemo"]["scenarios"][0]["outcomes"].__setitem__("items", []),
     ])
     def test_tampered_snapshots_are_rejected(self, tamper):
         snap = json.loads(SNAPSHOT_FILE.read_text(encoding="utf-8"))

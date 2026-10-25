@@ -1,0 +1,22 @@
+diff --git a/verify_pp1_flow.py b/<scratchpad>/verify_pp1_flow_si.py
+index 26cd42f..9d8671b 100644
+--- a/verify_pp1_flow.py
++++ b/<scratchpad>/verify_pp1_flow_si.py
+@@ -90,7 +90,7 @@ with sync_playwright() as p:
+     page.goto(f"{WEB}/sign-in", wait_until="networkidle")
+     page.fill("#signInEmail", parent_a)
+     page.fill("#signInPassword", PASSWORD)
+-    page.get_by_role("button", name="Sign In", exact=True).click()
++    page.get_by_role("button", name=re.compile(r"^(Sign In|පිවිසෙන්න)$")).click()  # PP1 evidence copy: UI now defaults to Sinhala
+     page.wait_for_timeout(2500)
+     check("parent A signs in through the UI (session cookie set)",
+           any(c["name"] == "mathquest_session" for c in ctx_a.cookies()), page.url)
+@@ -133,7 +133,7 @@ with sync_playwright() as p:
+     done()
+     page.get_by_role("radio", name="74").click(); page.get_by_role("radio", name="47").click(); done()
+     page.get_by_role("radio", name="කූරු 5, කැට 2").click(); done()
+-    page.get_by_role("button", name=re.compile("නැවත")).click()                          # instruction replay
++    page.get_by_role("button", name="නැවත බලන්න", exact=True).click()                          # instruction replay
+     page.get_by_role("radio", name="35").click(); done()
+     page.get_by_role("radio", name="46").click(); done()                                   # pre-probe wrong
+     page.get_by_role("radio", name="56").click(); done()                                   # guided: wrong -> L2

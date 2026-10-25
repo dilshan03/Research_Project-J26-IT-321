@@ -44,6 +44,13 @@ class _FakeCursor:
         return list(self._docs[:length] if length else self._docs)
 
 
+class _InsertResult:
+    """Mirrors PyMongo's InsertOneResult.inserted_id."""
+
+    def __init__(self, inserted_id: Any):
+        self.inserted_id = inserted_id
+
+
 class FakeCollection:
     def __init__(self, docs: Optional[List[Dict[str, Any]]] = None):
         self.docs: List[Dict[str, Any]] = [dict(d) for d in (docs or [])]
@@ -64,11 +71,19 @@ class FakeCollection:
     async def count_documents(self, query: Dict[str, Any]) -> int:
         return sum(1 for d in self.docs if _matches(d, query))
 
-    async def insert_one(self, doc: Dict[str, Any]) -> None:
+    async def insert_one(self, doc: Dict[str, Any]) -> "_InsertResult":
         doc.setdefault("_id", ObjectId())
         stored = dict(doc)
         self.docs.append(stored)
         self.inserted.append(stored)
+        return _InsertResult(stored["_id"])
+
+    async def find_one_and_update(self, query: Dict[str, Any], update: Dict[str, Any], **kwargs: Any):
+        """$set only; returns the updated document (PyMongo ReturnDocument.AFTER)."""
+        target = next((d for d in self.docs if _matches(d, query)), None)
+        if target is not None:
+            target.update(update.get("$set", {}))
+        return dict(target) if target is not None else None
 
     async def update_one(self, query: Dict[str, Any], update: Dict[str, Any], upsert: bool = False) -> None:
         target = next((d for d in self.docs if _matches(d, query)), None)

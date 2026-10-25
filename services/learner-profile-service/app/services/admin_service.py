@@ -26,6 +26,7 @@ from app.db.mongodb import (
     get_questionnaires_collection,
     get_users_collection,
 )
+from app.services.dimension_summaries import dimension_summaries_for
 from app.services.evidence_service import get_learner_elpx_profile
 
 logger = logging.getLogger("learner_profile.admin_service")
@@ -178,6 +179,8 @@ async def get_learner_detail(admin: Dict[str, Any], learner_id: str, include_sen
     progress = await get_onboarding_collection().find_one({"learnerId": learner_id})
     questionnaire = await get_questionnaires_collection().find_one({"learnerId": learner_id}) or {}
     assessments = await get_assessments_collection().find({"learnerId": learner_id}).sort("completedAt", -1).to_list(length=None)
+    # Descriptive RU / SC / IC / IA counts; computed on read for onboarding-v2 records stored before they existed
+    assessments = [{**a, "dimensionSummaries": dimension_summaries_for(a)} for a in assessments]
     events_col = get_gameplay_events_collection()
     events_total = await events_col.count_documents({"learnerId": learner_id})
     recent_events = await events_col.find({"learnerId": learner_id}).sort("activityTimestamp", -1).to_list(length=MAX_EVENTS)

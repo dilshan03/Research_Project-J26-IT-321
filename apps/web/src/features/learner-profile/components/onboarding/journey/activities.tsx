@@ -18,7 +18,7 @@ export interface ActivityContext {
 }
 
 /** Creates the item recorder once per mounted activity and wires instruction replay. */
-const useActivity = (meta: ItemMeta, instructionText: string, ctx: ActivityContext) => {
+export const useActivity =(meta: ItemMeta, instructionText: string, ctx: ActivityContext) => {
   const [recorder] = useState(() => new ItemRecorder(meta));
   useEffect(() => recorder.observe(), [recorder]);
   const [instructionKey, setInstructionKey] = useState(0);
@@ -30,7 +30,7 @@ const useActivity = (meta: ItemMeta, instructionText: string, ctx: ActivityConte
   return { recorder, instructionKey, replay };
 };
 
-const frameProps = (ctx: ActivityContext, instructionKey: number, replay: () => void) => ({
+export const frameProps = (ctx: ActivityContext, instructionKey: number, replay: () => void) => ({
   instructionKey,
   onReplay: replay,
   replayIsAudio: ctx.speechEnabled,
@@ -286,10 +286,16 @@ interface ChoiceProps {
   options: ChoiceOption[];
   ctx: ActivityContext;
   onDone: (answer: MathItemAnswer) => void;
+  /**
+   * 'wrap' (default, Grade 1): options flow in a wrapping row.
+   * 'equal': every option gets the same-sized cell (one column on phones, three on wider screens),
+   * so a wider picture never ends up alone on its own row and stands out.
+   */
+  optionsLayout?: 'wrap' | 'equal';
 }
 
 /** Representation matching. Changing the selection before confirming is a recorded revision. */
-export const ChoiceActivity: React.FC<ChoiceProps> = ({ meta, scene, instruction, helpText, stimulus, options, ctx, onDone }) => {
+export const ChoiceActivity: React.FC<ChoiceProps> = ({ meta, scene, instruction, helpText, stimulus, options, ctx, onDone, optionsLayout = 'wrap' }) => {
   const { recorder, instructionKey, replay } = useActivity(meta, instruction, ctx);
   const [choice, setChoice] = useState<{ value: string | number; mode: InteractionMode } | null>(null);
   const [helped, setHelped] = useState(false);
@@ -329,7 +335,11 @@ export const ChoiceActivity: React.FC<ChoiceProps> = ({ meta, scene, instruction
     >
       <div className="flex-1 flex flex-col items-center justify-center gap-6">
         <div className="rounded-3xl bg-white/85 border border-white px-6 py-4 shadow-xs">{stimulus}</div>
-        <div role="radiogroup" aria-label={instruction} className="flex flex-wrap justify-center gap-3">
+        <div
+          role="radiogroup"
+          aria-label={instruction}
+          className={optionsLayout === 'equal' ? 'grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-3xl' : 'flex flex-wrap justify-center gap-3'}
+        >
           {options.map((opt) => {
             const isSelected = choice?.value === opt.value;
             return (
@@ -340,7 +350,7 @@ export const ChoiceActivity: React.FC<ChoiceProps> = ({ meta, scene, instruction
                 aria-checked={isSelected}
                 aria-label={opt.ariaLabel}
                 onClick={(e) => select(opt.value, interactionModeOf(e))}
-                className={`min-w-[80px] min-h-[80px] px-4 py-3 rounded-2xl border-4 bg-white shadow-sm flex items-center justify-center cursor-pointer transition-colors ${
+                className={`${optionsLayout === 'equal' ? 'w-full min-h-[120px]' : 'min-w-[80px] min-h-[80px]'} px-4 py-3 rounded-2xl border-4 bg-white shadow-sm flex items-center justify-center cursor-pointer transition-colors ${
                   isSelected ? 'border-mq-primary ring-4 ring-mq-primary/25' : 'border-white hover:border-mq-primary/40'
                 }`}
               >

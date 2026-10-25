@@ -1,6 +1,8 @@
+import React from 'react';
 import { Sparkles } from 'lucide-react';
 import { PageHeader } from '../../shared/components/PageHeader';
 import { teacherText } from '../../shared/i18n/teacherText';
+import { DetailsForTeacher } from '../../features/pedagogical-agent';
 
 const t = teacherText.recommendations;
 const STRATEGY_CODES = ['VISUAL_MANIPULATIVES', 'CHUNKING_PACING', 'MULTIMODAL_INSTRUCTION', 'POSITIVE_FEEDBACK_LOOPS'] as const;
@@ -8,7 +10,12 @@ const STRATEGY_CODES = ['VISUAL_MANIPULATIVES', 'CHUNKING_PACING', 'MULTIMODAL_I
 export const TeacherRecommendationsPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
-      <PageHeader role="teacher" title={t.title} description={t.description} />
+      <PageHeader
+        role="teacher"
+        title={t.title}
+        titleSi="ඉගැන්වීම් නිර්දේශ සහ පුහුණු දත්ත"
+        description={t.description}
+      />
 
       <div className="bg-white rounded-3xl border border-mq-border p-6 shadow-sm space-y-4">
         <div className="flex items-center gap-2 pb-3 border-b border-mq-border">
@@ -34,6 +41,8 @@ export const TeacherRecommendationsPage: React.FC = () => {
           ))}
         </div>
       </div>
+
+      <DetailsForTeacher />
     </div>
   );
 };

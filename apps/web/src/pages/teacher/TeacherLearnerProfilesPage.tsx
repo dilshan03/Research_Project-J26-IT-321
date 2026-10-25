@@ -1,6 +1,8 @@
+import React from 'react';
 import { ShieldCheck, ExternalLink, BookOpen } from 'lucide-react';
 import { PageHeader } from '../../shared/components/PageHeader';
 import { teacherText } from '../../shared/i18n/teacherText';
+import { DetailsForTeacher } from '../../features/pedagogical-agent';
 
 const t = teacherText.profiles;
 
@@ -10,9 +12,14 @@ export const TeacherLearnerProfilesPage: React.FC = () => {
       <PageHeader
         role="teacher"
         title={t.title}
+        titleSi="ශිෂ්‍ය ඉගෙනුම් විස්තර"
         description={t.description}
       />
 
+      {/* Pedagogical Agent & AD-BKT Practice Telemetry for Teachers */}
+      <DetailsForTeacher />
+
+      {/* Sanitized Cross-Component Architecture & Privacy Guidance */}
       <div className="bg-white rounded-3xl border border-mq-border p-8 sm:p-12 text-center max-w-2xl mx-auto space-y-5">
         <div className="w-16 h-16 bg-mq-surface-green text-mq-success rounded-3xl flex items-center justify-center mx-auto">
           <ShieldCheck size={32} />

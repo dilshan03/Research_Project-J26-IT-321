@@ -120,11 +120,19 @@ export function useInteractionLogger({
    * Log an answer submission
    */
   const logAnswer = useCallback(
-    (selectedAnswer: string | number, isCorrect: boolean, currentHintLevel: HintLevel) => {
+    (
+      selectedAnswer: string | number,
+      isCorrect: boolean,
+      currentHintLevel: HintLevel,
+      extraTelemetry?: Partial<InteractionEvent>
+    ) => {
       markFirstAction();
       attemptCount.current += 1;
       const now = Date.now();
-      const responseTimeMs = now - questionStartTime.current;
+      const responseTimeMs = extraTelemetry?.responseTimeMs ?? (now - questionStartTime.current);
+      const timeLimitMs = extraTelemetry?.timeLimitMs ?? 30000;
+      const remainingTimeMs =
+        extraTelemetry?.remainingTimeMs ?? Math.max(0, timeLimitMs - responseTimeMs);
 
       const answerEvent: InteractionEvent = {
         id: 'evt_' + Math.random().toString(36).substring(2, 9),
@@ -144,6 +152,10 @@ export function useInteractionLogger({
         totalHintsRequested: hintCount.current,
         responseTimeMs,
         idleTimeBeforeFirstActionMs: idleTimeBeforeFirstAction.current,
+        remainingTimeMs,
+        timeLimitMs,
+        cameraPermissionGranted: extraTelemetry?.cameraPermissionGranted,
+        cameraAttentionScore: extraTelemetry?.cameraAttentionScore,
         timestamp: new Date().toISOString()
       };
 

@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+deepface
+tf-keras
+werkzeug
+python-multipart
+numpy
+opencv-python
+

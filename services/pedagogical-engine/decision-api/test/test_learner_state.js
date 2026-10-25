@@ -101,4 +101,50 @@ console.log('Running LearnerStateBuilder Unit Tests...\n');
   console.log('✅ Test 5 Passed: Focused flow state classified accurately.');
 }
 
-console.log('\nAll 5 Unit Tests Passed Successfully! 🎯');
+// Test 6: Remaining Time Normalization & Personal RT Z-Score Attention Slip Detection
+{
+  const interactions = [
+    { eventType: 'ANSWER_SUBMIT', isCorrect: true, timeLimitMs: 30000, remainingTimeMs: 25000, timestamp: '2026-10-16T04:04:00Z' },
+    { eventType: 'ANSWER_SUBMIT', isCorrect: true, timeLimitMs: 30000, remainingTimeMs: 24500, timestamp: '2026-10-16T04:04:10Z' },
+    { eventType: 'ANSWER_SUBMIT', isCorrect: true, timeLimitMs: 30000, remainingTimeMs: 24800, timestamp: '2026-10-16T04:04:20Z' },
+    // Sudden impulsive click: 29.2s remaining out of 30s (responseTimeMs = 800ms) -> wrong
+    { eventType: 'ANSWER_SUBMIT', isCorrect: false, timeLimitMs: 30000, remainingTimeMs: 29200, timestamp: '2026-10-16T04:04:30Z' }
+  ];
+  const state = buildLearnerState(interactions);
+  assert.strictEqual(state.flags.isAttentionSlip, true);
+  assert.strictEqual(state.attentionFusion.fusionMode, 'TELEMETRY_ONLY_FALLBACK');
+  assert.ok(state.metrics.rtZScore < -1.5, 'Expected negative RT Z-score for sudden rapid click');
+  console.log('✅ Test 6 Passed: Remaining time normalized & personal RT Z-score attention slip detected.');
+}
+
+// Test 7: Privacy-Aware Dual-Source Attention Fusion (Multimodal Camera ON vs Fallback Camera OFF)
+{
+  const baseInteractions = [
+    {
+      eventType: 'ANSWER_SUBMIT',
+      isCorrect: false,
+      responseTimeMs: 6000,
+      idleTimeBeforeFirstActionMs: 2000,
+      timestamp: '2026-10-16T04:05:00Z'
+    }
+  ];
+
+  // Mode A: Camera Permission Granted with low visual attention (0.15 -> 0.85 camera inattention)
+  const multimodalState = buildLearnerState(baseInteractions, {
+    cameraTelemetry: { cameraPermissionGranted: true, cameraAttentionScore: 0.15 }
+  });
+  assert.strictEqual(multimodalState.attentionFusion.fusionMode, 'MULTIMODAL_CAMERA_AND_GAMEPLAY');
+  assert.strictEqual(multimodalState.attentionFusion.cameraInattentionIndex, 0.85);
+  assert.ok(multimodalState.metrics.inattentionIndex > 0.50);
+
+  // Mode B: Camera Permission Denied -> falls back purely to gameplay telemetry
+  const fallbackState = buildLearnerState(baseInteractions, {
+    cameraTelemetry: { cameraPermissionGranted: false, cameraAttentionScore: 0.15 }
+  });
+  assert.strictEqual(fallbackState.attentionFusion.fusionMode, 'TELEMETRY_ONLY_FALLBACK');
+  assert.strictEqual(fallbackState.attentionFusion.cameraInattentionIndex, null);
+  assert.ok(fallbackState.metrics.inattentionIndex < 0.25);
+  console.log('✅ Test 7 Passed: Privacy-aware dual-source fusion switches cleanly between Multimodal and Telemetry-Only modes.');
+}
+
+console.log('\nAll 7 Unit Tests Passed Successfully! 🎯');

@@ -1,6 +1,9 @@
 import React from 'react';
 import { Sparkles, Construction, Info, ExternalLink } from 'lucide-react';
 import { PageHeader } from './PageHeader';
+import { teacherText } from '../i18n/teacherText';
+
+const t = teacherText.placeholder;
 
 export interface FeaturePlaceholderProps {
   featureName: string;
@@ -18,14 +21,14 @@ export const FeaturePlaceholder: React.FC<FeaturePlaceholderProps> = ({
   featureName,
   responsibleComponent,
   description,
-  integrationStatus = 'In Active Research & Development',
+  integrationStatus,
   actionLink,
 }) => {
   return (
     <div className="space-y-6 animate-fade-in">
       <PageHeader
         title={featureName}
-        description={`Research Module: ${responsibleComponent}. ${description}`}
+        description={`${t.researchModule(responsibleComponent)} ${description}`}
       />
 
       <div className="w-full bg-white rounded-3xl border border-mq-border p-8 sm:p-12 shadow-sm text-center max-w-2xl mx-auto my-6">
@@ -35,7 +38,7 @@ export const FeaturePlaceholder: React.FC<FeaturePlaceholderProps> = ({
 
       <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 mb-4">
         <Sparkles size={14} className="text-amber-600" />
-        <span>{integrationStatus}</span>
+        <span>{integrationStatus ?? t.status}</span>
       </div>
 
       <h2 className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong mb-2">
@@ -43,7 +46,7 @@ export const FeaturePlaceholder: React.FC<FeaturePlaceholderProps> = ({
       </h2>
 
       <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-mq-primary mb-4">
-        Responsible Component: {responsibleComponent}
+        {t.responsible(responsibleComponent)}
       </p>
 
       <p className="text-mq-text-muted text-sm sm:text-base leading-relaxed max-w-lg mx-auto mb-8">
@@ -53,11 +56,10 @@ export const FeaturePlaceholder: React.FC<FeaturePlaceholderProps> = ({
       <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/80 text-left text-xs text-mq-text-muted max-w-md mx-auto space-y-1.5 mb-6">
         <div className="flex items-center gap-2 font-bold text-mq-text">
           <Info size={14} className="text-mq-primary" />
-          <span>Research Component Integration Architecture</span>
+          <span>{t.architectureTitle}</span>
         </div>
         <p>
-          This route is registered in the MathQuest Dashboard shell and is reserved for the independent{' '}
-          <strong className="text-mq-text">{responsibleComponent}</strong> module.
+          {t.architectureText} <strong className="text-mq-text">{responsibleComponent}</strong> {t.architectureTextEnd}
         </p>
       </div>
 

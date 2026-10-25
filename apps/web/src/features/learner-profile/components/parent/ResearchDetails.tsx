@@ -22,7 +22,7 @@ export const ResearchDetails: React.FC<{ children: React.ReactNode }> = ({ child
         <ChevronDown size={16} className="shrink-0 transition-transform group-open:rotate-180" />
       </summary>
       <div lang="en" className="px-4 pb-4 pt-1 space-y-3 text-xs text-mq-text-muted">
-        <p lang="si">{parentText.research.note}</p>
+        <p>{parentText.research.note}</p>
         {children}
       </div>
     </details>

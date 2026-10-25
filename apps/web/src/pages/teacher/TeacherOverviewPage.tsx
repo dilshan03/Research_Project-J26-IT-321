@@ -13,7 +13,10 @@ import {
   Lock,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/hooks/useAuth';
+import { teacherText } from '../../shared/i18n/teacherText';
 import { DetailsForTeacher } from '../../features/pedagogical-agent';
+
+const t = teacherText.overview;
 
 export const TeacherOverviewPage: React.FC = () => {
   const { user } = useAuth();
@@ -26,14 +29,13 @@ export const TeacherOverviewPage: React.FC = () => {
           <div className="space-y-1.5">
             <span className="text-xs font-bold uppercase tracking-wider text-mq-primary-dark flex items-center gap-1.5">
               <School size={15} className="text-mq-primary" />
-              <span>ගුරු උපකරණ පුවරුව · Educator Portal</span>
+              <span>{t.badge}</span>
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong">
-              Welcome, {user?.fullName || 'Teacher'}!
+              {t.welcome(user?.fullName || t.teacherFallback)}
             </h2>
             <p className="text-sm text-mq-text-muted max-w-2xl">
-              Manage classroom mathematics differentiation, review curriculum progress, adapt Sinhala
-              game content in the Teacher Studio, and monitor instructional recommendations.
+              {t.intro}
             </p>
           </div>
 
@@ -43,7 +45,7 @@ export const TeacherOverviewPage: React.FC = () => {
               className="btn btn-primary inline-flex items-center gap-2 py-2.5 px-5 rounded-full text-xs sm:text-sm font-bold shadow-sm"
             >
               <BookOpen size={16} />
-              <span>Open Teacher Studio</span>
+              <span>{t.openStudio}</span>
               <ExternalLink size={14} />
             </a>
           </div>
@@ -54,7 +56,7 @@ export const TeacherOverviewPage: React.FC = () => {
           <div className="p-3.5 bg-white/80 backdrop-blur rounded-2xl border border-mq-border/80">
             <div className="flex items-center gap-2 text-xs font-semibold text-mq-text-muted">
               <Users size={14} className="text-mq-primary" />
-              <span>Assigned Learners</span>
+              <span>{t.statAssigned}</span>
             </div>
             <p className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong mt-1">
               0
@@ -64,7 +66,7 @@ export const TeacherOverviewPage: React.FC = () => {
           <div className="p-3.5 bg-white/80 backdrop-blur rounded-2xl border border-mq-border/80">
             <div className="flex items-center gap-2 text-xs font-semibold text-mq-success">
               <GraduationCap size={14} />
-              <span>Onboarded</span>
+              <span>{t.statOnboarded}</span>
             </div>
             <p className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong mt-1">
               0
@@ -74,7 +76,7 @@ export const TeacherOverviewPage: React.FC = () => {
           <div className="p-3.5 bg-white/80 backdrop-blur rounded-2xl border border-mq-border/80">
             <div className="flex items-center gap-2 text-xs font-semibold text-mq-warning">
               <AlertCircle size={14} />
-              <span>Support Needed</span>
+              <span>{t.statSupport}</span>
             </div>
             <p className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong mt-1">
               0
@@ -84,7 +86,7 @@ export const TeacherOverviewPage: React.FC = () => {
           <div className="p-3.5 bg-white/80 backdrop-blur rounded-2xl border border-mq-border/80">
             <div className="flex items-center gap-2 text-xs font-semibold text-mq-secondary">
               <Sparkles size={14} />
-              <span>Active Blueprints</span>
+              <span>{t.statBlueprints}</span>
             </div>
             <p className="text-2xl sm:text-3xl font-extrabold text-mq-text-strong mt-1">
               3
@@ -101,18 +103,15 @@ export const TeacherOverviewPage: React.FC = () => {
           </div>
           <div>
             <h3 className="text-sm font-extrabold text-mq-text-strong">
-              Student Privacy & Authorization Governance (ළමා දත්ත රහස්‍යතා ප්‍රමිතීන්)
+              {t.privacyTitle}
             </h3>
             <p className="text-xs text-mq-text-muted">
-              Strict access control adheres to child data protection guidelines.
+              {t.privacySubtitle}
             </p>
           </div>
         </div>
         <p className="text-xs text-mq-text leading-relaxed">
-          In compliance with ethical research standards and privacy protections, teachers do not
-          automatically receive access to all registered platform children. Learner data is accessible only
-          upon verified parental or institutional classroom assignment. Private parental questionnaires
-          (such as raw SNAP-IV medical items) remain strictly confidential and are not exposed.
+          {t.privacyText}
         </p>
       </div>
 
@@ -123,12 +122,10 @@ export const TeacherOverviewPage: React.FC = () => {
         </div>
         <div className="space-y-1">
           <h3 className="text-xl font-extrabold text-mq-text-strong">
-            No Learners Assigned Yet (ඉගෙනුම්කරුවන් තවමත් පවරා නැත)
+            {t.emptyTitle}
           </h3>
           <p className="text-xs sm:text-sm text-mq-text-muted max-w-md mx-auto leading-relaxed">
-            Teacher-to-learner classroom roster management is currently in integration.
-            Once parent consent and student linkage is established by your school administrator,
-            your assigned learners will appear here with sanitized pedagogical progress indicators.
+            {t.emptyText}
           </p>
         </div>
 
@@ -137,14 +134,14 @@ export const TeacherOverviewPage: React.FC = () => {
             to="/teacher/dashboard/learners"
             className="btn btn-secondary text-xs py-2 px-4 rounded-full font-bold"
           >
-            <span>Learn About Roster Linking</span>
+            <span>{t.rosterLink}</span>
           </Link>
           <a
             href="#/adapt"
             className="btn btn-primary text-xs py-2 px-5 rounded-full font-bold inline-flex items-center gap-2"
           >
             <BookOpen size={15} />
-            <span>Go to Content Adaptation Studio</span>
+            <span>{t.studioLink}</span>
           </a>
         </div>
       </div>
@@ -159,16 +156,16 @@ export const TeacherOverviewPage: React.FC = () => {
             <BookOpen size={20} />
           </div>
           <h4 className="text-base font-extrabold text-mq-text-strong">
-            Content Adaptation Studio
+            {t.cardStudioTitle}
           </h4>
           <p className="text-xs text-mq-text-muted leading-relaxed">
-            Review, adjust, and approve AI-generated Sinhala mathematics question blueprints for Grades 1–5.
+            {t.cardStudioText}
           </p>
           <a
             href="#/adapt"
             className="text-xs font-bold text-mq-primary hover:underline inline-flex items-center gap-1 pt-1"
           >
-            <span>Open Studio</span>
+            <span>{t.cardStudioAction}</span>
             <ArrowRight size={13} />
           </a>
         </div>
@@ -178,16 +175,16 @@ export const TeacherOverviewPage: React.FC = () => {
             <Sparkles size={20} />
           </div>
           <h4 className="text-base font-extrabold text-mq-text-strong">
-            Teaching Recommendations
+            {t.cardTipsTitle}
           </h4>
           <p className="text-xs text-mq-text-muted leading-relaxed">
-            Explore pedagogical scaffolding strategies, chunked instruction guides, and multimodal aids.
+            {t.cardTipsText}
           </p>
           <Link
             to="/teacher/dashboard/recommendations"
             className="text-xs font-bold text-mq-primary hover:underline inline-flex items-center gap-1 pt-1"
           >
-            <span>Explore Strategies</span>
+            <span>{t.cardTipsAction}</span>
             <ArrowRight size={13} />
           </Link>
         </div>
@@ -197,16 +194,16 @@ export const TeacherOverviewPage: React.FC = () => {
             <ShieldCheck size={20} />
           </div>
           <h4 className="text-base font-extrabold text-mq-text-strong">
-            Sanitized Research Integration
+            {t.cardSecurityTitle}
           </h4>
           <p className="text-xs text-mq-text-muted leading-relaxed">
-            Understand how MathQuest cross-component APIs protect sensitive data while empowering educators.
+            {t.cardSecurityText}
           </p>
           <Link
             to="/teacher/dashboard/learner-profiles"
             className="text-xs font-bold text-mq-primary hover:underline inline-flex items-center gap-1 pt-1"
           >
-            <span>View Security Spec</span>
+            <span>{t.cardSecurityAction}</span>
             <ArrowRight size={13} />
           </Link>
         </div>

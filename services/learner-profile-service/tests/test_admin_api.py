@@ -143,6 +143,15 @@ class TestAdminReads:
         assert data["assessments"][0]["evaluatedItems"][0]["questionId"] == "g1_num_count_01"
         assert "skillEstimates" in data["elpxProfile"]
 
+    async def test_detail_adds_descriptive_dimension_summaries_for_v2_records(self, db):
+        data = (await _get(f"/learners/{LEARNER}")).json()["data"]
+        assert data["assessments"][0]["dimensionSummaries"] is None            # v1 record: no v2 evidence
+        db["assessments"].docs[0]["assessmentProtocolVersion"] = "onboarding-v2"  # older v2 record, nothing stored
+        data = (await _get(f"/learners/{LEARNER}")).json()["data"]
+        dims = data["assessments"][0]["dimensionSummaries"]
+        assert dims["status"] == "DESCRIPTIVE_PENDING_EDUCATOR_REVIEW"
+        assert "dimensionSummaries" not in db["assessments"].docs[0]             # computed on read, not written back
+
     async def test_sensitive_reports_only_on_request_and_logged_separately(self, db):
         data = (await _get(f"/learners/{LEARNER}?include_sensitive=true")).json()["data"]
         assert data["sensitiveParentReports"]["adhdInformation"]["reportedPresentation"] == "combined"

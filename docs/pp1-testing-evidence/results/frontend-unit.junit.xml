@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+	<testcase name="only admins trigger a server access check" time="0.002715" classname="test"/>
+	<testcase name="access is granted only for HTTP 200 with granted === true" time="0.000706" classname="test"/>
+	<testcase name="service failures are reported as unavailable, never as granted" time="0.000312" classname="test"/>
+	<testcase name="tab segments are validated and default to the overview" time="0.001880" classname="test"/>
+	<testcase name="research paths match the /admin/research/:componentId/:tab? routes" time="0.000406" classname="test"/>
+	<testcase name="all four research components are registered; only the learner profile has a dedicated page" time="0.002727" classname="test"/>
+	<testcase name="the five existing tabs are preserved and the IMLR demo is a sixth tab" time="0.015294" classname="test"/>
+	<testcase name="every exported scenario is labelled synthetic and maps to a complete view" time="0.002443" classname="test"/>
+	<testcase name="questions render the real form: one correct option holding the largest count, chosen answer marked" time="0.001606" classname="test"/>
+	<testcase name="transfer results come from the exported outcomes, not recomputed" time="0.001605" classname="test"/>
+	<testcase name="pre-probe and teaching are classified separately; teaching is always guided" time="0.000778" classname="test"/>
+	<testcase name="missing or incomplete assistance records are shown as unknown with the reason" time="0.000409" classname="test"/>
+	<testcase name="breaks and help after answering are explained without changing independence" time="0.000645" classname="test"/>
+	<testcase name="snapshot inputs and transfer outcomes are separated" time="0.001441" classname="test"/>
+	<testcase name="default language is Sinhala" time="0.002073" classname="test"/>
+	<testcase name="values captured at module level follow the switch (no reload)" time="0.002308" classname="test"/>
+	<testcase name="pick() chooses the current language and falls back to the other" time="0.000242" classname="test"/>
+	<testcase name="subscribers are told about a change, and only once per real change" time="0.000251" classname="test"/>
+	<testcase name="parentText: Sinhala and English have the same keys and every value is filled in" time="0.010990" classname="test"/>
+	<testcase name="teacherText: Sinhala and English have the same keys and every value is filled in" time="0.002607" classname="test"/>
+	<testcase name="publicText: Sinhala and English have the same keys and every value is filled in" time="0.003542" classname="test"/>
+	<testcase name="key wording switches language" time="0.000263" classname="test"/>
+	<testcase name="each role gets exactly the requested links (English)" time="0.004474" classname="test"/>
+	<testcase name="the same links switch to Sinhala" time="0.000891" classname="test"/>
+	<testcase name="admins and signed-out sessions keep the public links; there is no student role" time="0.000360" classname="test"/>
+	<testcase name="links point at existing routes" time="0.001051" classname="test"/>
+	<testcase name="active link highlighting" time="0.000474" classname="test"/>
+	<testcase name="no interaction: nothing is invented" time="0.006245" classname="test"/>
+	<testcase name="time from item display to first interaction" time="0.000789" classname="test"/>
+	<testcase name="rapid repeated taps are recorded as a burst with timestamps and count" time="0.000617" classname="test"/>
+	<testcase name="two taps alone are not a burst (minimum is a recording parameter)" time="0.000300" classname="test"/>
+	<testcase name="an open burst is included in the snapshot without changing state" time="0.000439" classname="test"/>
+	<testcase name="idle intervals between interactions and at the end" time="0.000347" classname="test"/>
+	<testcase name="page visibility and focus changes with hidden duration" time="0.000474" classname="test"/>
+	<testcase name="invalid taps outside interactive targets" time="0.000331" classname="test"/>
+	<testcase name="event lists are capped and marked truncated" time="0.000966" classname="test"/>
+	<testcase name="records contain no positions, key values or interpretations" time="0.001804" classname="test"/>
+	<testcase name="DOM wiring: listeners record events and detach cleanly" time="0.001430" classname="test"/>
+	<testcase name="unseen questions are never submitted" time="0.009241" classname="test"/>
+	<testcase name="presented but unanswered questions are sent as skipped with no time or answer" time="0.000935" classname="test"/>
+	<testcase name="response time is the measured time to the first answer, never a default" time="0.000612" classname="test"/>
+	<testcase name="time accumulates across visits until the first answer" time="0.000332" classname="test"/>
+	<testcase name="an answer for a question that is not on screen does not set a time" time="0.002822" classname="test"/>
+	<testcase name="answered items without a measured time omit responseTimeSeconds" time="0.000257" classname="test"/>
+	<testcase name="only collected evidence fields are passed through" time="0.000427" classname="test"/>
+	<testcase name="guided support is not counted as independent performance" time="0.017088" classname="test"/>
+	<testcase name="helped or unconfirmed items are listed separately, never as independent" time="0.000760" classname="test"/>
+	<testcase name="older records without evidence flags fall back to the original wording" time="0.000241" classname="test"/>
+	<testcase name="chart points run oldest to newest and keep missing scores as gaps, not zeros" time="0.005893" classname="test"/>
+	<testcase name="averages and dates are formatted for parents" time="0.012433" classname="test"/>
+	<testcase name="directions get neutral arrows only (no better/worse meaning)" time="0.000253" classname="test"/>
+	<testcase name="nearest answer step stays on the 0–3 SNAP-IV scale" time="0.000199" classname="test"/>
+	<!-- tests 52 -->
+	<!-- suites 0 -->
+	<!-- pass 52 -->
+	<!-- fail 0 -->
+	<!-- cancelled 0 -->
+	<!-- skipped 0 -->
+	<!-- todo 0 -->
+	<!-- duration_ms 877.2901 -->
+</testsuites>

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { RegistrableRole } from '../types';
 import { User, School, Check } from 'lucide-react';
+import { publicText } from '../../../shared/i18n/publicText';
 
 interface RoleSelectorProps {
   selectedRole: RegistrableRole;
@@ -11,7 +12,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({ selectedRole, onSele
   return (
     <div className="space-y-1.5 w-full">
       <label className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong">
-        I am registering as a <span className="text-mq-danger ml-0.5">*</span>
+        {publicText.auth.signUp.roleLabel} <span className="text-mq-danger ml-0.5">*</span>
       </label>
       <div className="grid grid-cols-2 gap-3">
         {/* Parent / Guardian Card */}
@@ -30,7 +31,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({ selectedRole, onSele
             </div>
           )}
           <User size={22} className={selectedRole === 'parent' ? 'text-mq-primary' : 'text-mq-text-muted'} />
-          <span className="text-xs font-bold text-mq-text-strong">Parent / Guardian</span>
+          <span className="text-xs font-bold text-mq-text-strong">{publicText.auth.signUp.roleParent}</span>
         </button>
 
         {/* Teacher Card */}
@@ -49,7 +50,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({ selectedRole, onSele
             </div>
           )}
           <School size={22} className={selectedRole === 'teacher' ? 'text-mq-primary' : 'text-mq-text-muted'} />
-          <span className="text-xs font-bold text-mq-text-strong">Teacher / Educator</span>
+          <span className="text-xs font-bold text-mq-text-strong">{publicText.auth.signUp.roleTeacher}</span>
         </button>
       </div>
     </div>

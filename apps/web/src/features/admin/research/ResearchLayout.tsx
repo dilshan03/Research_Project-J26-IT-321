@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { ArrowLeft, Loader2, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, FlaskConical, Info, Loader2, ShieldAlert } from 'lucide-react';
 import { AdminShell, navTabClass } from '../components/ui';
 import { RESEARCH_COMPONENTS } from './registry';
 import { researchPath } from './access';
@@ -15,7 +15,7 @@ export const ResearchLayout: React.FC<{ children: React.ReactNode }> = ({ childr
           <ArrowLeft size={14} /> Admin dashboard
         </Link>
         <NavLink to="/admin/research" end className={({ isActive }) => navTabClass(isActive)}>
-          Research &amp; Model Analytics
+          <FlaskConical size={16} /> Research &amp; Model Analytics
         </NavLink>
         {RESEARCH_COMPONENTS.map((c) => (
           <NavLink key={c.id} to={researchPath(c.id)} className={({ isActive }) => navTabClass(isActive)}>
@@ -25,7 +25,8 @@ export const ResearchLayout: React.FC<{ children: React.ReactNode }> = ({ childr
       </>
     }
   >
-    <p className="text-xs text-slate-600 bg-white border border-slate-200 rounded-xl px-3 py-2">
+    <p className="flex items-start gap-2 text-xs text-slate-600 bg-white/80 border border-slate-200 rounded-2xl px-3 py-2">
+      <Info size={14} className="shrink-0 mt-px text-violet-500" />
       Read-only research outputs from sanitized, versioned snapshots and aggregate live counts. Data views are recorded in the
       admin audit log. Nothing here is a diagnosis, and no model on this page makes predictions about MathQuest children.
     </p>

@@ -4308,5 +4308,221 @@
       "raw_sinhala_question": "පන්තියේ පිරිමි ළමුන් 14 ක් සහ ගැහැනු ළමුන් 15 ක් සිටිති. පන්තියේ සිටින මුළු ළමුන් ගණන කීයද?"
     },
     "_id": "2b51c54fea06469ebc902fc6110a409f"
+  },
+  {
+    "activity_id": "act_3f6beda7dc",
+    "cli_score": 1.0,
+    "raw_sinhala_question": "විශාල සංඛ්‍යාව තෝරන්න: 4 සහ 8",
+    "raw_english_question": "Pick the bigger number: 4 and 8",
+    "blueprint": {
+      "activity_id": "act_3f6beda7dc",
+      "source_question_id": "doc_g1_grade_1-p012-1",
+      "grade": 1,
+      "topic": "Comparison",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "COMPARE_QUANTITY",
+          "instruction_si": "වඩා විශාල එක තෝරන්න",
+          "instruction_en": "Pick the bigger one",
+          "target_visual_asset": "COMPARISON_SCALE",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "4",
+              "text_en": "4",
+              "numeric_value": 4.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Picks the first or most eye-catching quantity without comparing.",
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            4,
+            8
+          ],
+          "operation": "COMPARE",
+          "visual_props": {
+            "target": "BIGGER"
+          }
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 1.9,
+      "effective_cli_score": 1.0,
+      "raw_sinhala_question": "විශාල සංඛ්‍යාව තෝරන්න: 4 සහ 8",
+      "raw_english_question": "Pick the bigger number: 4 and 8",
+      "target_learner_id": null,
+      "student_name": "Inattentive Profile (අවධානය)",
+      "customized_by_teacher": true,
+      "behavior_profile": {
+        "learner_id": null,
+        "student_name": "Inattentive Profile (අවධානය)",
+        "archetype_id": "INATTENTIVE",
+        "inattention_level": "HIGH",
+        "impulsivity_level": "LOW",
+        "working_memory_support": true,
+        "activity_pace": "CALM_STEP_BY_STEP",
+        "visual_assistance": "ALWAYS",
+        "audio_assistance": "READ_ON_CLICK"
+      }
+    },
+    "_id": "3ef53d916a74480680d911b786b05055"
+  },
+  {
+    "activity_id": "act_ab5992d643",
+    "cli_score": 1.55,
+    "raw_sinhala_question": "පොත් බෑගයේ බර 8 කි. වතුර බෝතලයේ බර 3 කි. බර වැඩි වස්තුව කුමක්ද?",
+    "raw_english_question": "School bag weight is 8. Water bottle weight is 3. Which one is heavier?",
+    "blueprint": {
+      "activity_id": "act_ab5992d643",
+      "source_question_id": "doc_g1_grade_1-p045-1",
+      "grade": 1,
+      "topic": "Weight Comparison",
+      "game_theme": "VILLAGE_MARKET",
+      "adhd_game_settings": {
+        "step_granularity": "MAXIMAL_THREE_TIER",
+        "distractor_count": 2,
+        "stimulus_density": "LOW",
+        "visual_clutter_filter": true,
+        "timer_enabled": false
+      },
+      "micro_steps": [
+        {
+          "step_order": 1,
+          "action_type": "COMPARE_QUANTITY",
+          "instruction_si": "වඩා විශාල එක තෝරන්න",
+          "instruction_en": "Pick the bigger one",
+          "target_visual_asset": "COMPARISON_SCALE",
+          "correct_target_value": "8",
+          "game_options": [
+            {
+              "text_si": "8",
+              "text_en": "8",
+              "numeric_value": 8.0,
+              "is_correct": true,
+              "distractor_type": "NONE",
+              "distractor_rationale": null,
+              "icon_or_shape": null
+            },
+            {
+              "text_si": "3",
+              "text_en": "3",
+              "numeric_value": 3.0,
+              "is_correct": false,
+              "distractor_type": "IMPULSIVITY",
+              "distractor_rationale": "Picks the first or most eye-catching quantity without comparing.",
+              "icon_or_shape": null
+            }
+          ],
+          "operands": [
+            8,
+            3
+          ],
+          "operation": "COMPARE",
+          "visual_props": {
+            "target": "BIGGER"
+          }
+        }
+      ],
+      "status": "draft",
+      "story_narrative": {
+        "title_si": "ගමේ පොළේ වෙළඳ මෙහෙයුම",
+        "title_en": "Village Market Quest",
+        "backdrop_si": "ගජා අලි පැටියා ගමේ සති පොළට ගොස් නැවුම් පලතුරු සහ පොත් මිලදී ගැනීමට වෙළෙන්දාට සහය වෙයි.",
+        "backdrop_en": "Gaja the friendly elephant visits the vibrant village pola (market) to help count fruits and manage rupee transactions.",
+        "quest_goal_si": "නිවැරදි මුදල් සහ ද්‍රව්‍ය ගණන් කර ගජාට වෙළඳසැල සම්පූර්ණ කිරීමට උදවු කරන්න!",
+        "quest_goal_en": "Count the correct coins and items to help Gaja complete the market visit!",
+        "gaja_dialogue": {
+          "intro": {
+            "si": "ආයුබෝවන් යහළුවනේ! මම ගජා. අද අපි පොළේ යමුද?",
+            "en": "Hello friends! I'm Gaja. Shall we explore the village market today?"
+          },
+          "hint": {
+            "si": "කලබල නොවී රුපියල් කාසි සහ පලතුරු සෙමින් ගණන් කරන්න.",
+            "en": "Stay calm and count the coins and items gently step by step."
+          },
+          "praise": {
+            "si": "හරිම අපූරුයි! ඔයා ගණිතයට හරිම දක්ෂයි!",
+            "en": "Wonderful! You have great math instincts!"
+          },
+          "retry": {
+            "si": "කිසිම ප්‍රශ්නයක් නෑ, අපි නැවත එකතු කර බලමු!",
+            "en": "No problem at all! Let's count once again together!"
+          },
+          "celebrate": {
+            "si": "සාර්ථකයි! ගමේ පොළේ මෙහෙයුම ජයග්‍රහණය කළා!",
+            "en": "Hooray! The village market quest was a resounding success!"
+          }
+        }
+      },
+      "cli_score": 2.8,
+      "effective_cli_score": 1.55,
+      "raw_sinhala_question": "පොත් බෑගයේ බර 8 කි. වතුර බෝතලයේ බර 3 කි. බර වැඩි වස්තුව කුමක්ද?",
+      "raw_english_question": "School bag weight is 8. Water bottle weight is 3. Which one is heavier?",
+      "target_learner_id": null,
+      "student_name": "Inattentive Profile (අවධානය)",
+      "customized_by_teacher": true,
+      "behavior_profile": {
+        "learner_id": null,
+        "student_name": "Inattentive Profile (අවධානය)",
+        "archetype_id": "INATTENTIVE",
+        "inattention_level": "HIGH",
+        "impulsivity_level": "LOW",
+        "working_memory_support": true,
+        "activity_pace": "CALM_STEP_BY_STEP",
+        "visual_assistance": "ALWAYS",
+        "audio_assistance": "READ_ON_CLICK"
+      }
+    },
+    "_id": "ed9552c4407349d4b4504fb5925c661c"
   }
 ]

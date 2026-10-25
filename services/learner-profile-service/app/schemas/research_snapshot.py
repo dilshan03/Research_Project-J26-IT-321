@@ -6,9 +6,10 @@ The envelope is shared by all four research components, so each owner can regist
 Component-specific sections are validated here for the Learner Profile & Prediction Engine only.
 """
 
+import json
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 SNAPSHOT_SCHEMA_VERSION = "MQ-RESEARCH-SNAPSHOT-v1"
 
@@ -140,10 +141,50 @@ class ElpxSection(_Open):
     simulated: ElpxSimulated
 
 
+class ImlrScenario(_Strict):
+    """One scripted synthetic scenario: prediction-time inputs and transfer outcomes kept in separate blocks."""
+    id: str
+    title: str
+    description: str
+    synthetic: Literal[True]
+    inputs: Dict[str, Any]
+    outcomes: Dict[str, Any]
+    events: List[Dict[str, Any]]
+
+    @model_validator(mode="after")
+    def _inputs_exclude_transfer(self) -> "ImlrScenario":
+        transfer_ids = [i.get("itemId") for i in self.outcomes.get("items", [])]
+        if not transfer_ids:
+            raise ValueError("scenario has no transfer outcomes")
+        inputs_text = json.dumps(self.inputs)
+        if any(tid and tid in inputs_text for tid in transfer_ids):
+            raise ValueError("prediction-time inputs reference a transfer item")
+        snapshot = self.inputs.get("snapshot") or {}
+        allowed = set((snapshot.get("meta") or {}).get("featureAllowlist") or [])
+        if not allowed or set(snapshot.get("features") or {}) - allowed:
+            raise ValueError("snapshot features outside the allowlist")
+        return self
+
+
+class ImlrDemoSection(_Open):
+    provenance: Literal["synthetic"]
+    protocol: Dict[str, Any]
+    itemBank: Dict[str, Any]
+    form: Dict[str, Any]
+    scenarios: List[ImlrScenario] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _prototype_status(self) -> "ImlrDemoSection":
+        if self.protocol.get("status") != "RESEARCH_PROTOTYPE_NOT_FOR_USE_WITH_CHILDREN":
+            raise ValueError("IMLR demo must be marked as a research prototype")
+        return self
+
+
 class LearnerProfileSections(_Strict):
     nsch: NschSection
     mqRec: MqRecSection
     elpx: ElpxSection
+    imlrDemo: Optional[ImlrDemoSection] = None
     softwareTests: List[SoftwareTestRun]
 
 

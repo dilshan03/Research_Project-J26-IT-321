@@ -24,6 +24,9 @@ import { PageHeader } from '../../../shared/components/PageHeader';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { authService } from '../../auth/services/authService';
 import type { UserRole } from '../../auth/types';
+import { publicText } from '../../../shared/i18n/publicText';
+
+const t = publicText.account;
 
 export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
   hideNavbar = false,
@@ -84,15 +87,15 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
     const errors: Record<string, string> = {};
 
     if (!formData.fullName.trim()) {
-      errors.fullName = 'Full name is required.';
+      errors.fullName = t.errFullNameRequired;
     } else if (formData.fullName.trim().length < 2) {
-      errors.fullName = 'Full name must be at least 2 characters.';
+      errors.fullName = t.errFullNameShort;
     }
 
     if (!formData.email.trim()) {
-      errors.email = 'Email address is required.';
+      errors.email = t.errEmailRequired;
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
-      errors.email = 'Please enter a valid email address.';
+      errors.email = t.errEmailInvalid;
     }
 
     setFormErrors(errors);
@@ -122,7 +125,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
     if (response.success) {
       // Backend confirmed persistence
       updateUser(response.data || updatedPayload);
-      setSaveSuccessMessage(response.message || 'Profile updated successfully!');
+      setSaveSuccessMessage(response.message || t.updated);
       setIsEditing(false);
     } else {
       // Backend does not support endpoint or failed
@@ -130,7 +133,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
       setSaveErrorMessage(
         response.error?.message ||
           response.message ||
-          'Profile update failed: Backend service is not available to persist changes.'
+          t.updateFailed
       );
     }
   };
@@ -146,11 +149,11 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
 
     if (response.success) {
       setSecurityMessage(
-        response.message || `Password reset instructions have been dispatched to ${user.email}.`
+        response.message || t.resetSent(user.email)
       );
     } else {
       setSecurityError(
-        response.error?.message || response.message || 'Could not request password reset at this time.'
+        response.error?.message || response.message || t.resetFailed
       );
     }
   };
@@ -165,6 +168,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
     : user.email.charAt(0).toUpperCase();
 
   const displayUsername = user.username || (user.email ? user.email.split('@')[0] : 'User');
+  const roleLabel = user.role === 'teacher' ? t.teacher : user.role === 'admin' ? t.admin : t.parent;
 
   return (
     <div className={hideNavbar ? "w-full text-mq-text flex flex-col" : "min-h-screen bg-mq-bg text-mq-text flex flex-col selection:bg-mq-surface-blue"}>
@@ -177,10 +181,8 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
         {hideNavbar && (
           <PageHeader
             role={user.role === 'admin' ? undefined : user.role}
-            title="Account Settings"
-            titleSi="ගිණුම් සැකසුම්"
-            description="Manage your verified account profile, identity credentials, security settings, and notifications."
-            descriptionSi="ඔබගේ පරිශීලක පැතිකඩ, මුරපදය සහ ගිණුම් තොරතුරු මෙතැනින් කළමනාකරණය කරන්න."
+            title={t.title}
+            description={t.description}
           />
         )}
 
@@ -192,10 +194,10 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
               className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-mq-primary hover:text-mq-primary-hover transition-colors"
             >
               <ArrowLeft size={16} />
-              <span>Back to Home</span>
+              <span>{t.backToHome}</span>
             </Link>
             <span className="text-xs font-semibold uppercase tracking-wider text-mq-text-muted">
-              User Account
+              {t.userAccount}
             </span>
           </div>
         )}
@@ -206,14 +208,14 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
             <div className="flex items-start gap-3">
               <CheckCircle2 size={20} className="shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold">Success</p>
+                <p className="font-bold">{t.success}</p>
                 <p className="mt-0.5 text-mq-text">{saveSuccessMessage}</p>
               </div>
             </div>
             <button
               onClick={() => setSaveSuccessMessage(null)}
               className="text-mq-text-muted hover:text-mq-text transition-colors p-1"
-              aria-label="Dismiss message"
+              aria-label={t.dismiss}
             >
               <X size={16} />
             </button>
@@ -225,14 +227,14 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
             <div className="flex items-start gap-3">
               <AlertCircle size={20} className="shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold">Update Notice</p>
+                <p className="font-bold">{t.updateNotice}</p>
                 <p className="mt-0.5 text-mq-text">{saveErrorMessage}</p>
               </div>
             </div>
             <button
               onClick={() => setSaveErrorMessage(null)}
               className="text-mq-text-muted hover:text-mq-text transition-colors p-1"
-              aria-label="Dismiss message"
+              aria-label={t.dismiss}
             >
               <X size={16} />
             </button>
@@ -253,7 +255,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                 </div>
                 <div
                   className="absolute bottom-0 right-0 p-1.5 bg-mq-secondary text-white rounded-full border-2 border-white shadow-sm"
-                  title={`Role: ${user.role}`}
+                  title={t.roleTitle(roleLabel)}
                 >
                   <Shield size={14} />
                 </div>
@@ -267,7 +269,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                   </h1>
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-mq-surface-blue text-mq-primary border border-mq-border">
                     <Shield size={12} />
-                    {user.role}
+                    {roleLabel}
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-mq-text-muted font-medium flex items-center justify-center sm:justify-start gap-1.5 truncate">
@@ -275,7 +277,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                   <span>{user.email}</span>
                 </p>
                 <p className="text-xs text-mq-text-muted/80">
-                  Username: <strong className="text-mq-text font-semibold">@{displayUsername}</strong>
+                  {t.usernameLabel} <strong className="text-mq-text font-semibold">@{displayUsername}</strong>
                 </p>
               </div>
             </div>
@@ -289,7 +291,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                   className="btn btn-primary text-xs sm:text-sm py-2 px-4 rounded-full flex items-center gap-2 shadow-sm"
                 >
                   <Edit3 size={15} />
-                  <span>Edit Profile</span>
+                  <span>{t.editProfile}</span>
                 </button>
               ) : (
                 <button
@@ -298,7 +300,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                   className="btn btn-secondary text-xs sm:text-sm py-2 px-4 rounded-full flex items-center gap-2 border-mq-border text-mq-text-muted hover:text-mq-text"
                 >
                   <X size={15} />
-                  <span>Cancel Editing</span>
+                  <span>{t.cancelEditing}</span>
                 </button>
               )}
             </div>
@@ -314,10 +316,10 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
               </div>
               <div>
                 <h2 className="text-base sm:text-lg font-bold text-mq-text-strong">
-                  Personal Information
+                  {t.personalInfo}
                 </h2>
                 <p className="text-xs text-mq-text-muted">
-                  {isEditing ? 'Update your personal profile details below' : 'View your profile identification'}
+                  {isEditing ? t.personalEdit : t.personalView}
                 </p>
               </div>
             </div>
@@ -330,7 +332,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                 {/* Full Name Field */}
                 <div className="space-y-1.5">
                   <label htmlFor="editFullName" className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong">
-                    Full Name <span className="text-mq-danger">*</span>
+                    {t.fullName} <span className="text-mq-danger">*</span>
                   </label>
                   <div className="relative rounded-2xl shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-mq-text-muted">
@@ -345,7 +347,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                         if (formErrors.fullName) setFormErrors((prev) => ({ ...prev, fullName: '' }));
                       }}
                       disabled={isSaving}
-                      placeholder="e.g. Kasun Perera"
+                      placeholder={t.fullNamePlaceholder}
                       className={`w-full py-2.5 sm:py-3 pl-10 pr-4 text-sm rounded-2xl border bg-mq-surface text-mq-text placeholder-mq-text-muted/60 transition-all outline-none ${
                         formErrors.fullName
                           ? 'border-mq-danger focus:ring-2 focus:ring-mq-danger/20 bg-mq-danger-bg/30'
@@ -364,7 +366,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                 {/* Email Field */}
                 <div className="space-y-1.5">
                   <label htmlFor="editEmail" className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong">
-                    Email Address <span className="text-mq-danger">*</span>
+                    {t.email} <span className="text-mq-danger">*</span>
                   </label>
                   <div className="relative rounded-2xl shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-mq-text-muted">
@@ -379,7 +381,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                         if (formErrors.email) setFormErrors((prev) => ({ ...prev, email: '' }));
                       }}
                       disabled={isSaving}
-                      placeholder="e.g. parent@example.com"
+                      placeholder={t.emailPlaceholder}
                       className={`w-full py-2.5 sm:py-3 pl-10 pr-4 text-sm rounded-2xl border bg-mq-surface text-mq-text placeholder-mq-text-muted/60 transition-all outline-none ${
                         formErrors.email
                           ? 'border-mq-danger focus:ring-2 focus:ring-mq-danger/20 bg-mq-danger-bg/30'
@@ -398,7 +400,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                 {/* Username Field */}
                 <div className="space-y-1.5">
                   <label htmlFor="editUsername" className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong">
-                    Username
+                    {t.username}
                   </label>
                   <div className="relative rounded-2xl shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-mq-text-muted font-bold text-sm">
@@ -414,13 +416,13 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                       className="w-full py-2.5 sm:py-3 pl-10 pr-4 text-sm rounded-2xl border border-mq-border focus:border-mq-primary focus:ring-2 focus:ring-mq-primary/20 bg-mq-surface text-mq-text placeholder-mq-text-muted/60 transition-all outline-none"
                     />
                   </div>
-                  <p className="text-[11px] text-mq-text-muted">Identifier used across MathQuest</p>
+                  <p className="text-[11px] text-mq-text-muted">{t.usernameHelp}</p>
                 </div>
 
                 {/* Role Selector */}
                 <div className="space-y-1.5">
                   <label className="block text-xs font-bold uppercase tracking-wider text-mq-text-strong">
-                    Account Role
+                    {t.accountRole}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -434,7 +436,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                       }`}
                     >
                       <UserIcon size={14} />
-                      <span>Parent</span>
+                      <span>{t.parent}</span>
                       {formData.role === 'parent' && <Check size={14} className="ml-1" />}
                     </button>
                     <button
@@ -448,7 +450,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                       }`}
                     >
                       <Shield size={14} />
-                      <span>Teacher</span>
+                      <span>{t.teacher}</span>
                       {formData.role === 'teacher' && <Check size={14} className="ml-1" />}
                     </button>
                   </div>
@@ -463,7 +465,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                   disabled={isSaving}
                   className="btn btn-secondary text-xs sm:text-sm py-2 px-4 rounded-full"
                 >
-                  Cancel
+                  {t.cancel}
                 </button>
                 <button
                   type="submit"
@@ -473,12 +475,12 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                   {isSaving ? (
                     <>
                       <Loader2 size={16} className="animate-spin" />
-                      <span>Saving Changes...</span>
+                      <span>{t.saving}</span>
                     </>
                   ) : (
                     <>
                       <Save size={16} />
-                      <span>Save Changes</span>
+                      <span>{t.save}</span>
                     </>
                   )}
                 </button>
@@ -490,17 +492,17 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
               {/* Full Name */}
               <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-mq-text-muted block mb-1">
-                  Full Name
+                  {t.fullName}
                 </span>
                 <span className="text-sm sm:text-base font-bold text-mq-text-strong block">
-                  {user.fullName || 'Not specified'}
+                  {user.fullName || t.notSpecified}
                 </span>
               </div>
 
               {/* Username */}
               <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-mq-text-muted block mb-1">
-                  Username
+                  {t.username}
                 </span>
                 <span className="text-sm sm:text-base font-bold text-mq-text-strong block">
                   @{displayUsername}
@@ -510,7 +512,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
               {/* Email Address */}
               <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-mq-text-muted block mb-1">
-                  Email Address
+                  {t.email}
                 </span>
                 <span className="text-sm sm:text-base font-bold text-mq-text-strong block break-all">
                   {user.email}
@@ -520,11 +522,11 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
               {/* User Role */}
               <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-mq-text-muted block mb-1">
-                  Role
+                  {t.role}
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-sm sm:text-base font-bold text-mq-primary capitalize">
                   <Shield size={16} />
-                  {user.role}
+                  {roleLabel}
                 </span>
               </div>
             </div>
@@ -539,10 +541,10 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-mq-text-strong">
-                Account Information
+                {t.accountInfo}
               </h2>
               <p className="text-xs text-mq-text-muted">
-                System identification and account membership
+                {t.accountInfoText}
               </p>
             </div>
           </div>
@@ -551,7 +553,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
             {/* Account ID */}
             <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
               <span className="text-[11px] font-bold uppercase tracking-wider text-mq-text-muted block mb-1">
-                Account ID
+                {t.accountId}
               </span>
               <span className="text-xs sm:text-sm font-mono font-semibold text-mq-text-strong block truncate">
                 {user.id}
@@ -561,20 +563,20 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
             {/* Role Type & Access */}
             <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
               <span className="text-[11px] font-bold uppercase tracking-wider text-mq-text-muted block mb-1">
-                Role Permissions
+                {t.permissions}
               </span>
               <span className="text-xs sm:text-sm font-semibold text-mq-text-strong block capitalize">
-                {user.role === 'teacher' ? 'Educator / Teacher Portal' : 'Parent / Home Supervision'}
+                {user.role === 'teacher' ? t.permissionsTeacher : t.permissionsParent}
               </span>
             </div>
 
             {/* Status */}
             <div className="p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
               <span className="text-[11px] font-bold uppercase tracking-wider text-mq-text-muted block mb-1">
-                Account Status
+                {t.status}
               </span>
               <span className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-mq-success">
-                <CheckCircle2 size={14} /> Active
+                <CheckCircle2 size={14} /> {t.active}
               </span>
             </div>
           </div>
@@ -590,10 +592,10 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                 </div>
                 <div>
                   <h2 className="text-base sm:text-lg font-bold text-mq-text-strong font-sinhala">
-                    මගේ දරුවන් (Child Learner Profiles)
+                    {t.childrenTitle}
                   </h2>
                   <p className="text-xs text-mq-text-muted">
-                    Manage enrolled children's adaptive profiles, learning preferences, and assessments
+                    {t.childrenText}
                   </p>
                 </div>
               </div>
@@ -601,12 +603,12 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
                 to="/learners"
                 className="btn btn-primary text-xs sm:text-sm py-2 px-4 rounded-full flex items-center gap-2 self-start sm:self-auto font-sinhala shadow-sm"
               >
-                <span>දරුවන් කළමනාකරණය (Manage Children)</span>
+                <span>{t.manageChildren}</span>
                 <ArrowRight size={14} />
               </Link>
             </div>
             <p className="text-xs text-mq-text-muted font-sinhala leading-relaxed">
-              ඔබගේ දරුවන් වෙනුවෙන් MathQuest ADHD ඉගෙනුම් පැතිකඩ නිර්මාණය කිරීමට, ඉගෙනුම් මනාප සටහන් කිරීමට හා ආරම්භක ගණිත ඇගයීම් සිදු කිරීමට දරුවන් කළමනාකරණය පිටුවට පිවිසෙන්න.
+              {t.childrenNote}
             </p>
           </div>
         )}
@@ -619,10 +621,10 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-mq-text-strong">
-                Account Security
+                {t.security}
               </h2>
               <p className="text-xs text-mq-text-muted">
-                Manage your authentication credentials and password
+                {t.securityText}
               </p>
             </div>
           </div>
@@ -631,7 +633,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
             <div className="p-3.5 bg-mq-success-bg border border-mq-success/30 rounded-2xl flex items-start gap-3 text-xs sm:text-sm text-mq-success font-medium animate-fade-in">
               <CheckCircle2 size={18} className="shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold">Security Dispatched</p>
+                <p className="font-bold">{t.securitySent}</p>
                 <p className="mt-0.5 text-mq-text">{securityMessage}</p>
               </div>
             </div>
@@ -641,7 +643,7 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
             <div className="p-3.5 bg-mq-danger-bg border border-mq-danger/30 rounded-2xl flex items-start gap-3 text-xs sm:text-sm text-mq-danger font-medium animate-fade-in">
               <AlertCircle size={18} className="shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold">Security Notice</p>
+                <p className="font-bold">{t.securityNotice}</p>
                 <p className="mt-0.5 text-mq-text">{securityError}</p>
               </div>
             </div>
@@ -650,13 +652,13 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-mq-surface-soft border border-mq-border/60">
             <div className="space-y-1">
               <span className="text-[11px] font-bold uppercase tracking-wider text-mq-text-muted block">
-                Password
+                {t.password}
               </span>
               <p className="text-sm font-bold text-mq-text tracking-widest">
                 ••••••••••••••••
               </p>
               <p className="text-xs text-mq-text-muted">
-                Credentials are encrypted. Never share your password with anyone.
+                {t.passwordNote}
               </p>
             </div>
             <button
@@ -667,12 +669,12 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
               {isResettingPassword ? (
                 <>
                   <Loader2 size={15} className="animate-spin" />
-                  <span>Requesting Reset...</span>
+                  <span>{t.requestingReset}</span>
                 </>
               ) : (
                 <>
                   <KeyRound size={15} />
-                  <span>Change Password</span>
+                  <span>{t.changePassword}</span>
                 </>
               )}
             </button>
@@ -682,14 +684,14 @@ export const UserProfilePage: React.FC<{ hideNavbar?: boolean }> = ({
         {/* Section F: Session Actions (Sign Out) */}
         <div className="flex items-center justify-between pt-2 pb-6">
           <p className="text-xs text-mq-text-muted">
-            Signed in as <strong className="text-mq-text">{user.email}</strong>
+            {t.signedInAs} <strong className="text-mq-text">{user.email}</strong>
           </p>
           <button
             onClick={handleSignOut}
             className="btn btn-secondary text-xs sm:text-sm py-2 px-4 rounded-full flex items-center gap-2 text-mq-danger hover:bg-mq-danger-bg border-mq-danger/30"
           >
             <LogOut size={15} />
-            <span>Sign Out</span>
+            <span>{t.signOut}</span>
           </button>
         </div>
       </main>

@@ -10,6 +10,8 @@ import { SignUpPage } from './features/auth/pages/SignUpPage';
 import { ForgotPasswordPage } from './features/auth/pages/ForgotPasswordPage';
 
 import { AuthProvider } from './features/auth/context/AuthContext';
+import { useLanguage } from './shared/i18n/language';
+import { teacherText } from './shared/i18n/teacherText';
 import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
 
 import { ProfilePage } from './pages/profile/ProfilePage';
@@ -67,10 +69,45 @@ function useHashRoute() {
   return hash;
 }
 
-// Floating dev controls removed per UI requirements
+function FloatingDevControls() {
+  const location = useLocation();
+  // Hide during child-facing onboarding to eliminate distraction
+  const isStudentDashboard = location.pathname === '/student/dashboard';
+  const isAgentTest = location.pathname === '/agent-test';
+  const isOnboarding = location.pathname.includes('/onboarding');
+  // Not shown on the admin dashboard (including research analytics); other dashboards keep them
+  const isAdmin = location.pathname === '/admin' || location.pathname.startsWith('/admin/');
+
+  if (isOnboarding || isAdmin) return null;
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5">
+      {!isStudentDashboard && (
+        <a
+          href="/student/dashboard"
+          className="px-4 py-2 bg-mq-primary-dark text-white font-bold rounded-full shadow-2xl hover:bg-mq-primary transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40 text-xs sm:text-sm"
+        >
+          <span>🎒</span>
+          <span>Student Dashboard</span>
+        </a>
+      )}
+      {!isAgentTest && (
+        <a
+          href="/agent-test"
+          className="px-4 py-2 bg-emerald-600 text-white font-bold rounded-full shadow-2xl hover:bg-emerald-700 transition-all flex items-center gap-2 cursor-pointer border-2 border-white/40 text-xs sm:text-sm"
+        >
+          <span>🤖</span>
+          <span>Test 3D Agent</span>
+        </a>
+      )}
+    </div>
+  );
+}
 
 function App() {
   const hash = useHashRoute();
+  // Global Sinhala / English switch: re-render the whole tree (state is kept) when the language changes
+  useLanguage();
 
   if (hash.startsWith('#/adapt')) {
     return <ContentAdaptationPage mode="studio" />;
@@ -86,7 +123,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        
+        <FloatingDevControls />
         <Routes>
 
           {/* ========================================================= */}
@@ -280,10 +317,9 @@ function App() {
               path="progress"
               element={
                 <FeaturePlaceholder
-                  featureName="Classroom Mathematics Progression & Benchmarking"
-                  responsibleComponent="Pedagogical Engine"
-                  description="Aggregated curriculum progression, domain-level skill mastery heatmaps, and learning pacing distributions for assigned classroom groups."
-                  integrationStatus="In Active Research & Development"
+                  featureName={teacherText.placeholder.progress.name}
+                  responsibleComponent={teacherText.placeholder.components.pedagogical}
+                  description={teacherText.placeholder.progress.desc}
                 />
               }
             />
@@ -293,12 +329,11 @@ function App() {
               path="activities"
               element={
                 <FeaturePlaceholder
-                  featureName="Teacher Content Adaptation Studio"
-                  responsibleComponent="Content Adaptation"
-                  description="Generate, review, adjust, and approve ADHD-friendly Sinhala curriculum questions and game blueprints for your classroom."
-                  integrationStatus="In Active Research & Development"
+                  featureName={teacherText.placeholder.activities.name}
+                  responsibleComponent={teacherText.placeholder.components.content}
+                  description={teacherText.placeholder.activities.desc}
                   actionLink={{
-                    label: 'Open Adaptation Studio',
+                    label: teacherText.placeholder.activities.action,
                     href: '#/adapt',
                     isExternalHash: true,
                   }}
@@ -314,10 +349,9 @@ function App() {
               path="behaviour"
               element={
                 <FeaturePlaceholder
-                  featureName="Classroom Attention & Focus Variance Observations"
-                  responsibleComponent="Behaviour Monitoring"
-                  description="Synthesized focus intervals, question-pause patterns, and frustration indicators to inform classroom pacing."
-                  integrationStatus="In Active Research & Development"
+                  featureName={teacherText.placeholder.behaviour.name}
+                  responsibleComponent={teacherText.placeholder.components.behaviour}
+                  description={teacherText.placeholder.behaviour.desc}
                 />
               }
             />
@@ -327,10 +361,9 @@ function App() {
               path="reports"
               element={
                 <FeaturePlaceholder
-                  featureName="Comprehensive Progress & Assessment Reports"
-                  responsibleComponent="Pedagogical Engine"
-                  description="Exportable progress reports, evidence-backed diagnostic summaries, and IEP documentation support for students with ADHD."
-                  integrationStatus="In Active Research & Development"
+                  featureName={teacherText.placeholder.reports.name}
+                  responsibleComponent={teacherText.placeholder.components.pedagogical}
+                  description={teacherText.placeholder.reports.desc}
                 />
               }
             />

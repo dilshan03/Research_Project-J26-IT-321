@@ -1,0 +1,502 @@
+{
+ "_note": "SYNTHETIC: captured from the mocked Grade 2 browser walkthrough (no child, no backend). Used to replay the exact UI payload in tests.",
+ "version": "MATH-QB-v1.0",
+ "grade": 2,
+ "answers": [
+  {
+   "questionId": "g2v2_calibration_move",
+   "activityId": "g2_follow_instruction",
+   "conceptId": "instruction_following",
+   "probeRole": "calibration",
+   "dimensionTags": [
+    "IC",
+    "IA"
+   ],
+   "instructionEvents": [
+    {
+     "action": "delivered",
+     "timestampSeconds": 0,
+     "occurredAt": "2026-10-21T00:46:18.868Z"
+    }
+   ],
+   "supportEvents": [],
+   "revisionEvents": [],
+   "hintUsed": false,
+   "missedDropCount": 0,
+   "selfCorrectionsCount": 0,
+   "interactionObservations": {
+    "version": "ONBOARDING-INTERACTION-OBS-v1.0",
+    "parameters": {
+     "burstMaxGapMs": 500,
+     "burstMinTaps": 3,
+     "idleThresholdMs": 10000,
+     "maxEventsPerList": 50
+    },
+    "observedDurationMs": 819,
+    "idleTimeBeforeFirstActionMs": 638,
+    "pointerDownCount": 3,
+    "keyDownCount": 0,
+    "tapBursts": [
+     {
+      "startMs": 638,
+      "endMs": 817,
+      "tapCount": 3
+     }
+    ],
+    "idleIntervals": [],
+    "pageEvents": [],
+    "hiddenDurationMs": 0,
+    "invalidTapCount": 0,
+    "invalidTaps": [],
+    "truncated": false
+   },
+   "userAnswer": "red_apple",
+   "firstConfirmedResponse": "red_apple",
+   "attempts": 1,
+   "responseTimeSeconds": 0.7,
+   "supportBeforeFirstResponse": false,
+   "demonstrationUsed": false,
+   "interactionMode": "mouse",
+   "inputMethod": "tap",
+   "responseStatus": "answered"
+  },
+  {
+   "questionId": "g2v2_build_tens_ones_34",
+   "activityId": "g2_build_number",
+   "conceptId": "tens_and_ones",
+   "itemFamilyId": "g2_place_value",
+   "representation": "concrete",
+   "dimensionTags": [
+    "MP",
+    "RU",
+    "SC",
+    "IA"
+   ],
+   "instructionEvents": [
+    {
+     "action": "delivered",
+     "timestampSeconds": 0,
+     "occurredAt": "2026-10-21T00:46:19.688Z"
+    }
+   ],
+   "supportEvents": [],
+   "revisionEvents": [
+    {
+     "priorResponse": 40,
+     "newResponse": 30,
+     "timestampSeconds": 1.2,
+     "revisedAt": "2026-10-21T00:46:20.901Z"
+    }
+   ],
+   "hintUsed": false,
+   "missedDropCount": 0,
+   "selfCorrectionsCount": 1,
+   "interactionObservations": {
+    "version": "ONBOARDING-INTERACTION-OBS-v1.0",
+    "parameters": {
+     "burstMaxGapMs": 500,
+     "burstMinTaps": 3,
+     "idleThresholdMs": 10000,
+     "maxEventsPerList": 50
+    },
+    "observedDurationMs": 2659,
+    "idleTimeBeforeFirstActionMs": 493,
+    "pointerDownCount": 17,
+    "keyDownCount": 0,
+    "tapBursts": [
+     {
+      "startMs": 493,
+      "endMs": 1878,
+      "tapCount": 16
+     }
+    ],
+    "idleIntervals": [],
+    "pageEvents": [],
+    "hiddenDurationMs": 0,
+    "invalidTapCount": 0,
+    "invalidTaps": [],
+    "truncated": false
+   },
+   "userAnswer": 34,
+   "firstConfirmedResponse": 34,
+   "attempts": 1,
+   "responseTimeSeconds": 2.7,
+   "supportBeforeFirstResponse": false,
+   "demonstrationUsed": false,
+   "interactionMode": "mouse",
+   "inputMethod": "drag",
+   "responseStatus": "answered"
+  },
+  {
+   "questionId": "g2v2_match_blocks_to_numeral_47",
+   "activityId": "g2_read_blocks",
+   "conceptId": "tens_and_ones",
+   "itemFamilyId": "g2_place_value",
+   "probeRole": "representation",
+   "representation": "pictorial",
+   "dimensionTags": [
+    "RU",
+    "MP",
+    "SC"
+   ],
+   "instructionEvents": [
+    {
+     "action": "delivered",
+     "timestampSeconds": 0,
+     "occurredAt": "2026-10-21T00:46:22.348Z"
+    }
+   ],
+   "supportEvents": [],
+   "revisionEvents": [
+    {
+     "priorResponse": 74,
+     "newResponse": 47,
+     "timestampSeconds": 0.6,
+     "revisedAt": "2026-10-21T00:46:22.942Z"
+    }
+   ],
+   "hintUsed": false,
+   "missedDropCount": 0,
+   "selfCorrectionsCount": 1,
+   "interactionObservations": {
+    "version": "ONBOARDING-INTERACTION-OBS-v1.0",
+    "parameters": {
+     "burstMaxGapMs": 500,
+     "burstMinTaps": 3,
+     "idleThresholdMs": 10000,
+     "maxEventsPerList": 50
+    },
+    "observedDurationMs": 666,
+    "idleTimeBeforeFirstActionMs": 503,
+    "pointerDownCount": 3,
+    "keyDownCount": 0,
+    "tapBursts": [
+     {
+      "startMs": 503,
+      "endMs": 665,
+      "tapCount": 3
+     }
+    ],
+    "idleIntervals": [],
+    "pageEvents": [],
+    "hiddenDurationMs": 0,
+    "invalidTapCount": 0,
+    "invalidTaps": [],
+    "truncated": false
+   },
+   "userAnswer": 47,
+   "firstConfirmedResponse": 47,
+   "attempts": 1,
+   "responseTimeSeconds": 0.7,
+   "supportBeforeFirstResponse": false,
+   "demonstrationUsed": false,
+   "interactionMode": "mouse",
+   "inputMethod": "select",
+   "responseStatus": "answered"
+  },
+  {
+   "questionId": "g2v2_match_numeral_to_blocks_52",
+   "activityId": "g2_show_number",
+   "conceptId": "tens_and_ones",
+   "itemFamilyId": "g2_place_value",
+   "probeRole": "representation",
+   "representation": "symbolic",
+   "dimensionTags": [
+    "RU",
+    "MP",
+    "SC"
+   ],
+   "instructionEvents": [
+    {
+     "action": "delivered",
+     "timestampSeconds": 0,
+     "occurredAt": "2026-10-21T00:46:23.015Z"
+    }
+   ],
+   "supportEvents": [],
+   "revisionEvents": [],
+   "hintUsed": false,
+   "missedDropCount": 0,
+   "selfCorrectionsCount": 0,
+   "interactionObservations": {
+    "version": "ONBOARDING-INTERACTION-OBS-v1.0",
+    "parameters": {
+     "burstMaxGapMs": 500,
+     "burstMinTaps": 3,
+     "idleThresholdMs": 10000,
+     "maxEventsPerList": 50
+    },
+    "observedDurationMs": 563,
+    "idleTimeBeforeFirstActionMs": 501,
+    "pointerDownCount": 2,
+    "keyDownCount": 0,
+    "tapBursts": [],
+    "idleIntervals": [],
+    "pageEvents": [],
+    "hiddenDurationMs": 0,
+    "invalidTapCount": 0,
+    "invalidTaps": [],
+    "truncated": false
+   },
+   "userAnswer": "blocks_5_2",
+   "firstConfirmedResponse": "blocks_5_2",
+   "attempts": 1,
+   "responseTimeSeconds": 0.6,
+   "supportBeforeFirstResponse": false,
+   "demonstrationUsed": false,
+   "interactionMode": "mouse",
+   "inputMethod": "select",
+   "responseStatus": "answered"
+  },
+  {
+   "questionId": "g2v2_add_blocks_21_14",
+   "activityId": "g2_add_blocks",
+   "conceptId": "add_2digit_no_regroup",
+   "itemFamilyId": "g2_add_no_regroup_blocks",
+   "representation": "pictorial",
+   "dimensionTags": [
+    "MP",
+    "RU"
+   ],
+   "instructionEvents": [
+    {
+     "action": "delivered",
+     "timestampSeconds": 0,
+     "occurredAt": "2026-10-21T00:46:23.579Z"
+    },
+    {
+     "action": "replayed",
+     "timestampSeconds": 0.5,
+     "occurredAt": "2026-10-21T00:46:24.083Z"
+    }
+   ],
+   "supportEvents": [],
+   "revisionEvents": [],
+   "hintUsed": false,
+   "missedDropCount": 0,
+   "selfCorrectionsCount": 0,
+   "interactionObservations": {
+    "version": "ONBOARDING-INTERACTION-OBS-v1.0",
+    "parameters": {
+     "burstMaxGapMs": 500,
+     "burstMinTaps": 3,
+     "idleThresholdMs": 10000,
+     "maxEventsPerList": 50
+    },
+    "observedDurationMs": 639,
+    "idleTimeBeforeFirstActionMs": 504,
+    "pointerDownCount": 3,
+    "keyDownCount": 0,
+    "tapBursts": [
+     {
+      "startMs": 504,
+      "endMs": 638,
+      "tapCount": 3
+     }
+    ],
+    "idleIntervals": [],
+    "pageEvents": [],
+    "hiddenDurationMs": 0,
+    "invalidTapCount": 0,
+    "invalidTaps": [],
+    "truncated": false
+   },
+   "userAnswer": 35,
+   "firstConfirmedResponse": 35,
+   "attempts": 1,
+   "responseTimeSeconds": 0.6,
+   "supportBeforeFirstResponse": false,
+   "demonstrationUsed": false,
+   "interactionMode": "mouse",
+   "inputMethod": "select",
+   "responseStatus": "answered"
+  },
+  {
+   "questionId": "g2v2_add_pre_32_15",
+   "activityId": "g2_add_sequence",
+   "conceptId": "add_2digit_no_regroup",
+   "itemFamilyId": "g2_add_no_regroup",
+   "probeRole": "pre",
+   "representation": "symbolic",
+   "dimensionTags": [
+    "MP",
+    "SR"
+   ],
+   "instructionEvents": [
+    {
+     "action": "delivered",
+     "timestampSeconds": 0,
+     "occurredAt": "2026-10-21T00:46:24.218Z"
+    }
+   ],
+   "supportEvents": [],
+   "revisionEvents": [],
+   "hintUsed": false,
+   "missedDropCount": 0,
+   "selfCorrectionsCount": 0,
+   "interactionObservations": {
+    "version": "ONBOARDING-INTERACTION-OBS-v1.0",
+    "parameters": {
+     "burstMaxGapMs": 500,
+     "burstMinTaps": 3,
+     "idleThresholdMs": 10000,
+     "maxEventsPerList": 50
+    },
+    "observedDurationMs": 594,
+    "idleTimeBeforeFirstActionMs": 528,
+    "pointerDownCount": 2,
+    "keyDownCount": 0,
+    "tapBursts": [],
+    "idleIntervals": [],
+    "pageEvents": [],
+    "hiddenDurationMs": 0,
+    "invalidTapCount": 0,
+    "invalidTaps": [],
+    "truncated": false
+   },
+   "userAnswer": 46,
+   "firstConfirmedResponse": 46,
+   "attempts": 1,
+   "responseTimeSeconds": 0.6,
+   "supportBeforeFirstResponse": false,
+   "demonstrationUsed": false,
+   "interactionMode": "mouse",
+   "inputMethod": "select",
+   "responseStatus": "answered"
+  },
+  {
+   "questionId": "g2v2_add_support_24_33",
+   "activityId": "g2_add_sequence",
+   "conceptId": "add_2digit_no_regroup",
+   "itemFamilyId": "g2_add_no_regroup",
+   "probeRole": "support",
+   "representation": "symbolic",
+   "dimensionTags": [
+    "SR"
+   ],
+   "instructionEvents": [
+    {
+     "action": "delivered",
+     "timestampSeconds": 0,
+     "occurredAt": "2026-10-21T00:46:24.814Z"
+    }
+   ],
+   "supportEvents": [
+    {
+     "level": 1,
+     "type": "clarification",
+     "timestampSeconds": 0,
+     "deliveredAt": "2026-10-21T00:46:24.814Z"
+    },
+    {
+     "level": 2,
+     "type": "visual_cue",
+     "timestampSeconds": 0.5,
+     "deliveredAt": "2026-10-21T00:46:25.331Z"
+    }
+   ],
+   "revisionEvents": [],
+   "hintUsed": true,
+   "missedDropCount": 0,
+   "selfCorrectionsCount": 0,
+   "interactionObservations": {
+    "version": "ONBOARDING-INTERACTION-OBS-v1.0",
+    "parameters": {
+     "burstMaxGapMs": 500,
+     "burstMinTaps": 3,
+     "idleThresholdMs": 10000,
+     "maxEventsPerList": 50
+    },
+    "observedDurationMs": 1037,
+    "idleTimeBeforeFirstActionMs": 465,
+    "pointerDownCount": 4,
+    "keyDownCount": 0,
+    "tapBursts": [
+     {
+      "startMs": 465,
+      "endMs": 1036,
+      "tapCount": 4
+     }
+    ],
+    "idleIntervals": [],
+    "pageEvents": [],
+    "hiddenDurationMs": 0,
+    "invalidTapCount": 0,
+    "invalidTaps": [],
+    "truncated": false
+   },
+   "userAnswer": 57,
+   "firstConfirmedResponse": 56,
+   "attempts": 2,
+   "responseTimeSeconds": 0.5,
+   "supportBeforeFirstResponse": true,
+   "demonstrationUsed": false,
+   "interactionMode": "mouse",
+   "inputMethod": "select",
+   "responseStatus": "answered"
+  },
+  {
+   "questionId": "g2v2_add_transfer_41_26",
+   "activityId": "g2_add_sequence",
+   "conceptId": "add_2digit_no_regroup",
+   "itemFamilyId": "g2_add_no_regroup",
+   "probeRole": "transfer",
+   "representation": "symbolic",
+   "dimensionTags": [
+    "SR",
+    "MP"
+   ],
+   "instructionEvents": [
+    {
+     "action": "delivered",
+     "timestampSeconds": 0,
+     "occurredAt": "2026-10-21T00:46:25.852Z"
+    }
+   ],
+   "supportEvents": [],
+   "revisionEvents": [],
+   "hintUsed": false,
+   "missedDropCount": 0,
+   "selfCorrectionsCount": 0,
+   "interactionObservations": {
+    "version": "ONBOARDING-INTERACTION-OBS-v1.0",
+    "parameters": {
+     "burstMaxGapMs": 500,
+     "burstMinTaps": 3,
+     "idleThresholdMs": 10000,
+     "maxEventsPerList": 50
+    },
+    "observedDurationMs": 529,
+    "idleTimeBeforeFirstActionMs": 476,
+    "pointerDownCount": 2,
+    "keyDownCount": 0,
+    "tapBursts": [],
+    "idleIntervals": [],
+    "pageEvents": [],
+    "hiddenDurationMs": 0,
+    "invalidTapCount": 0,
+    "invalidTaps": [],
+    "truncated": false
+   },
+   "userAnswer": 67,
+   "firstConfirmedResponse": 67,
+   "attempts": 1,
+   "responseTimeSeconds": 0.5,
+   "supportBeforeFirstResponse": false,
+   "demonstrationUsed": false,
+   "interactionMode": "mouse",
+   "inputMethod": "select",
+   "responseStatus": "answered"
+  }
+ ],
+ "assessmentProtocolVersion": "onboarding-v2",
+ "childPreferences": {
+  "source": "child",
+  "avatarId": "avatar_owl",
+  "theme": "animal_friends",
+  "soundMode": "quiet",
+  "chosenAt": "2026-10-21T00:46:18.866Z"
+ },
+ "sessionStartedAt": "2026-10-21T00:46:18.024Z",
+ "sessionEndedAt": "2026-10-21T00:46:26.862Z"
+}

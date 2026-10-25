@@ -8,21 +8,15 @@ import type { AdhdInformationData, SupportInformation } from '../types/onboardin
 import { ADHD_DIAGNOSIS_STATUS_OPTIONS, ADHD_PRESENTATION_OPTIONS } from '../types/onboarding';
 import { AdhdInformationStep } from '../components/onboarding/AdhdInformationStep';
 import { ChildSwitcher } from '../components/parent/ChildSwitcher';
+import { SnapIvProgressSection } from '../components/parent/SnapIvProgress';
 import { readRememberedChild, rememberChild } from '../utils/rememberedChild';
 import { LoadingState, EmptyState, ErrorAlert } from '../../../shared/components/ui/StateViews';
 import { parentText } from '../../../shared/i18n/parentText';
+import { pick } from '../../../shared/i18n/language';
 
 const t = parentText.support;
 
 const nameOf = (child: Learner) => child.preferredName || child.firstName;
-// Numeric date (YYYY-MM-DD): browsers often lack Sinhala month names, which would mix languages.
-const formatDate = (iso: string | null) => {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime())
-    ? '—'
-    : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
 
 const Card: React.FC<{ icon: React.ReactNode; title: string; action?: React.ReactNode; children: React.ReactNode }> = ({
   icon,
@@ -206,8 +200,8 @@ export const ParentSupportInfoPage: React.FC = () => {
             >
               {adhd ? (
                 <dl>
-                  <Row label={t.adhdDiagnosed} value={adhdStatus?.labelSi ?? '—'} />
-                  {adhdType && <Row label={t.adhdType} value={adhdType.labelSi} />}
+                  <Row label={t.adhdDiagnosed} value={adhdStatus ? pick(adhdStatus.labelSi, adhdStatus.labelEn) : '—'} />
+                  {adhdType && <Row label={t.adhdType} value={pick(adhdType.labelSi, adhdType.labelEn)} />}
                   {adhd.diagnosisReportedMonth && <Row label={t.adhdMonth} value={adhd.diagnosisReportedMonth} />}
                 </dl>
               ) : (
@@ -216,7 +210,7 @@ export const ParentSupportInfoPage: React.FC = () => {
             </Card>
           )}
 
-          {/* 2. SNAP-IV status and history (dates only) */}
+          {/* 2. SNAP-IV status, history over time and descriptive comparison (parent-reported; not a diagnosis) */}
           <Card
             icon={<ClipboardList size={20} className="text-mq-primary shrink-0" />}
             title={t.snapTitle}
@@ -232,22 +226,17 @@ export const ParentSupportInfoPage: React.FC = () => {
             }
           >
             <p className="text-base text-mq-text-strong font-semibold">{snap ? t.snapStatus[snap.status] : '—'}</p>
-            <div className="space-y-2">
-              <h3 className="text-base font-semibold text-mq-text-strong">{t.snapHistory}</h3>
-              {snap && snap.history.length > 0 ? (
-                <ul className="space-y-1">
-                  {snap.history.map((h, i) => (
-                    <li key={`${h.completedAt}-${i}`} className="flex items-center gap-2 text-base text-mq-text">
-                      <CalendarDays size={16} className="text-mq-text-muted shrink-0" />
-                      <span>{formatDate(h.completedAt)}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-base text-mq-text-muted">{t.snapHistoryEmpty}</p>
-              )}
+            {snap && snap.history.length > 0 ? (
+              <SnapIvProgressSection history={snap.history} progress={snap.progress} />
+            ) : (
+              <p className="flex items-center gap-2 text-base text-mq-text-muted">
+                <CalendarDays size={16} className="shrink-0" />
+                {t.snapHistoryEmpty}
+              </p>
+            )}
+            {!(snap && snap.history.length > 0) && (
               <p className="text-sm text-mq-text-muted leading-relaxed">{t.snapHistoryNotice}</p>
-            </div>
+            )}
           </Card>
         </>
       )}

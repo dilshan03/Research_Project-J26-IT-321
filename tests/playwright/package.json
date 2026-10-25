@@ -1,0 +1,12 @@
+{
+  "name": "mathquest-playwright-e2e",
+  "private": true,
+  "description": "Playwright E2E tests against the isolated local PP1 stack (synthetic data, local MongoDB only).",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report reports/html"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.59.0"
+  }
+}

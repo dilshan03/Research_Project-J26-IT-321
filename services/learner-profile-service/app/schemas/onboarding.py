@@ -560,6 +560,10 @@ class MathAssessmentSummary(BaseModel):
         default=None,
         description="Provisional Independent Mathematical Learning Readiness summary"
     )
+    dimensionSummaries: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Descriptive RU / SC / IC / IA counts (DIM-DESCRIPTIVE); no thresholds or labels, pending educator review"
+    )
     childPreferences: Optional[ChildPreferenceChoices] = Field(
         default=None,
         description="Child-expressed preferences recorded with source='child'"
@@ -618,6 +622,10 @@ class OnboardingProgressResponse(BaseModel):
     imlrSummary: Optional[ImlrSummary] = Field(
         default=None,
         description="Provisional IMLR output if protocol v2 was completed"
+    )
+    dimensionSummaries: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Descriptive RU / SC / IC / IA counts if protocol v2 was completed (pending educator review)"
     )
     # Parent-reported ADHD information and optional SNAP-IV status (Optional, additive)
     adhdInformationCompleted: Optional[bool] = None

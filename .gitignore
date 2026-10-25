@@ -4,8 +4,6 @@ node_modules/
 **/node_modules/
 
 # Environment variables and secrets
-.env
-.env.*
 !.env.example
 
 # Build output
@@ -46,3 +44,4 @@ venv/
 
 # DeepFace generated data
 deepface_observations.jsonl
+config.bat

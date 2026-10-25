@@ -4,8 +4,8 @@
   "private": true,
   "description": "MathQuest Adaptive Learning Platform for ADHD Learners",
   "scripts": {
-    "dev": "node start-all.js",
-    "start": "node start-all.js",
+    "dev": "node init && node start-all.js",
+    "start": "node init && node start-all.js",
     "docker:up": "docker compose up --build",
     "docker:down": "docker compose down"
   }

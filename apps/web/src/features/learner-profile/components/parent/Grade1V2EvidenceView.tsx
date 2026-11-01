@@ -1,20 +1,13 @@
 import React from 'react';
 import {
-  CheckCircle2,
-  Sparkles,
   Compass,
   Layers,
-  HelpCircle,
   Volume2,
   VolumeX,
   Target,
-  ArrowRight,
-  ShieldAlert,
   Info,
-  Palette,
   Eye,
   RefreshCw,
-  MousePointer,
   Award,
 } from 'lucide-react';
 import type { MathAssessmentSummary, ChildPreferenceChoices } from '../../types/onboarding';

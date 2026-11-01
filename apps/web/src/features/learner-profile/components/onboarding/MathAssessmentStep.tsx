@@ -30,7 +30,7 @@ interface Props {
   primaryInstructionLanguage?: string;
   sinhalaComprehension?: string;
   englishComprehension?: string;
-  learningPreferences?: LearningPreferencesData | null;
+  learningPreferences?: Partial<LearningPreferencesData> | null;
   questions: MathQuestion[];
   onSubmit: (answers: MathItemAnswer[], extras?: MathSubmissionExtras) => Promise<void>;
   onSaveAndExit: (answers: MathItemAnswer[]) => Promise<void>;
